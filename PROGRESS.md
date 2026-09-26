@@ -12,6 +12,27 @@
    you are there. Blocks: fork-block checks in M1, fork tests in M5, M6 and M7 on the fork.
    Unblocked meanwhile: discovery at head, the oracle study (logs only), M2 to M4, M5 unit tests.
 
+2. **M11 live testnet deployments need keys you create and fund, and a hosting choice.**
+   Everything else is ready: `./scripts/rehearse-testnet.sh rh-testnet` and `... arb-sepolia`
+   deploy, seed and run a bot cycle on forks of both testnets at head (2026-09-27). Measured
+   there: the deployer spent 0.0065 ETH (Robinhood testnet) and 0.0066 ETH (Arbitrum Sepolia),
+   the allocator 0.0013 ETH per chain for the first allocation; curator and guardian nothing.
+   Please:
+   a. Run `cast wallet new` four times and put the private keys in `.env` as `DEPLOYER_PK`,
+      `CURATOR_PK`, `ALLOCATOR_PK`, `GUARDIAN_PK` (testnet only; the same keys can serve both
+      testnets). I never read `.env`.
+   b. Fund from each chain's official faucet: deployer at least 0.02 testnet ETH and allocator
+      at least 0.02 (the bot pays gas for every rebalance), on Robinhood Chain testnet and on
+      Arbitrum Sepolia. Curator and guardian: 0.001 each for emergency actions.
+   c. RPC URLs are optional: without `RH_TESTNET_RPC_URL` / `ARB_SEPOLIA_RPC_URL` the engine uses
+      the public RPCs recorded in `config/afterhours.yaml`.
+   d. Hosting (M11 asks for a hosted API and web app): choose where the API plus bot runs (an
+      always-on Python service with a small persistent disk for `data/`) and where the web app
+      runs (any Next.js host), then either log in to their CLIs here or tell me you will deploy
+      and I will prepare the config for that host.
+   Then tell me in chat that it is ready and I run `PROFILE=rh-testnet make deploy seed` and the same for
+   `arb-sepolia`, write the addresses to the README and point the hosted app at them.
+
 ## Milestones
 
 - [x] M0 Bootstrap (2026-09-26, `d185414`)
@@ -341,3 +362,17 @@ Evidence
 - `make e2e`: 32 passed (1.4 min); vault and pages specs 39 of 39 over three repeats.
 - `make test-integration`: 2 passed. vitest 25 passed. `make lint` clean.
 - Fork and testnet runs wait on BLOCKED 1 and M11.
+
+### 2026-09-27 M11 Live deployments: rehearsed, blocked on keys and hosting (BLOCKED 2)
+
+Done
+- `scripts/rehearse-testnet.sh <profile>`: Anvil fork of the testnet at head, four throwaway keys from `cast wallet new` held only in the process environment and funded with fork ETH, the real `afterhours deploy`, `sim seed` and `bot once`, deployments and state in a scratch folder, ETH spent per role.
+- Testnet seeding: off Anvil, each simulated lender and borrower is a throwaway key (`cast wallet new`, stored mode 600 in the git-ignored state folder) signing real transactions; the deployer mints simulated tokens and sends each actor `sim.testnet_eth_per_actor` (0.0005 ETH). Mainnet profiles refuse seeding.
+
+Evidence (2026-09-27)
+- Robinhood Chain testnet (46630) fork at block 124796591: vault and 10 markets deployed, 5 lenders deposited 1,622,954 USDG (sim), 6 borrowers borrowed 1,233,445; deployer spent 0.006469 ETH, allocator 0.001253.
+- Arbitrum Sepolia (421614) fork at block 313032307: same results; deployer 0.006645 ETH, allocator 0.001258.
+- Forge's estimate for the deploy script alone: 30.3M gas, 0.0006 ETH on Robinhood testnet and 0.0019 ETH on Arbitrum Sepolia at the gas prices then.
+
+Open: real testnet deploys and hosting (BLOCKED 2).
+

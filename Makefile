@@ -67,7 +67,7 @@ local-chain: ## Start a plain local Anvil chain for the local profile (simulatio
 deploy: ## Deploy markets, vault, registry; write deployments/<profile>.json
 	$(AH) deploy
 
-seed: ## Create simulated lenders and borrowers on the fork or local chain
+seed: ## Create simulated lenders and borrowers (Anvil, or testnets with simulated tokens)
 	$(AH) sim seed
 
 engine: ## Refresh market data (cached) and run the bot scheduler
