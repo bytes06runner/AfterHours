@@ -209,6 +209,35 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
             "markets": [m.to_json() for m in state.markets],
         }
 
+    @app.get("/v1/prices")
+    def prices() -> dict[str, Any]:
+        """Each Stock Token's price from its market oracle (Morpho IOracle, 1e36 scale)."""
+        d = ctx.deployment
+        if not d:
+            raise HTTPException(404, "No deployment for this profile yet.")
+        oracles = {m["symbol"]: m for m in d["markets"] if m["tier"] == "weekday"}
+        try:
+            w3 = ctx.w3()
+            loan_dec = int(
+                call_many(w3, [Call(d["loan_token"]["address"], "decimals()(uint8)")])[0]
+            )
+            coll_dec = call_many(
+                w3, [Call(m["collateral"], "decimals()(uint8)") for m in oracles.values()]
+            )
+            raw = call_many(w3, [Call(m["oracle"], "price()(uint256)") for m in oracles.values()])
+        except Exception as exc:
+            raise HTTPException(
+                503, f"Can't reach the {cfg.active_profile} chain. Retrying shortly."
+            ) from exc
+        source = "simulated" if d["simulation"]["oracle"] else "chainlink"
+        items = []
+        for (sym, _), dec, price in zip(oracles.items(), coll_dec, raw, strict=True):
+            if price is None or dec is None:
+                continue
+            scale = 10 ** (36 + loan_dec - int(dec))
+            items.append({"symbol": sym, "price_usdg": int(price) / scale})
+        return {"source": source, "prices": items}
+
     @app.get("/v1/risk")
     def risk() -> dict[str, Any]:
         now = ctx.now()

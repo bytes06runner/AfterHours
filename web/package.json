@@ -10,7 +10,8 @@
     "test": "vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "print-config": "tsx scripts/print-config.ts"
+    "print-config": "tsx scripts/print-config.ts",
+    "screens": "tsx scripts/screens.ts"
   },
   "dependencies": {
     "@noble/hashes": "^2",

@@ -1,0 +1,84 @@
+"use client";
+
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+
+import { api, STREAM_EVENTS, streamUrl, type StreamEvent } from "./api";
+
+const MINUTE = 60_000;
+
+export const keys = {
+  config: ["config"] as const,
+  status: ["status"] as const,
+  vault: ["vault"] as const,
+  prices: ["prices"] as const,
+  risk: ["risk"] as const,
+  almanac: (days: number) => ["almanac", days] as const,
+  reasons: (stock?: string) => ["reasons", stock ?? "all"] as const,
+  reason: (id: string) => ["reason", id] as const,
+  reportCard: ["report-card"] as const,
+  scenarios: ["scenarios"] as const,
+  replay: (id: string) => ["replay", id] as const,
+};
+
+export const useConfig = () =>
+  useQuery({ queryKey: keys.config, queryFn: api.config, staleTime: 10 * MINUTE });
+export const useStatus = () =>
+  useQuery({ queryKey: keys.status, queryFn: api.status, refetchInterval: MINUTE, retry: 1 });
+export const useVault = () => useQuery({ queryKey: keys.vault, queryFn: api.vault, retry: 1 });
+export const usePrices = () =>
+  useQuery({ queryKey: keys.prices, queryFn: api.prices, refetchInterval: MINUTE, retry: 1 });
+export const useRisk = () => useQuery({ queryKey: keys.risk, queryFn: api.risk, retry: 1 });
+
+/** Which queries each server event makes stale. */
+const INVALIDATES: Record<StreamEvent, readonly (readonly string[])[]> = {
+  status: [keys.status, keys.prices],
+  plan_changed: [keys.risk, keys.vault],
+  tx_sent: [],
+  tx_confirmed: [keys.vault],
+  reason_logged: [["reasons"]],
+  vault_updated: [keys.vault],
+};
+
+export interface LiveEvent {
+  type: StreamEvent;
+  data: unknown;
+  at: number;
+}
+
+/** Subscribe to /v1/stream; refresh affected queries and expose the latest event. */
+export function useLiveStream(): { last: LiveEvent | null; connected: boolean } {
+  const client = useQueryClient();
+  const [last, setLast] = useState<LiveEvent | null>(null);
+  const [connected, setConnected] = useState(false);
+  useEffect(() => {
+    let source: EventSource;
+    try {
+      source = new EventSource(streamUrl());
+    } catch {
+      return;
+    }
+    source.onopen = () => setConnected(true);
+    source.onerror = () => setConnected(false);
+    const handlers = STREAM_EVENTS.map((type) => {
+      const handler = (e: MessageEvent<string>) => {
+        let data: unknown = null;
+        try {
+          data = JSON.parse(e.data);
+        } catch {
+          /* keep null */
+        }
+        for (const key of INVALIDATES[type]) void client.invalidateQueries({ queryKey: key });
+        setLast({ type, data, at: Date.now() });
+      };
+      source.addEventListener(type, handler as EventListener);
+      return [type, handler] as const;
+    });
+    return () => {
+      for (const [type, handler] of handlers)
+        source.removeEventListener(type, handler as EventListener);
+      source.close();
+    };
+  }, [client]);
+  return { last, connected };
+}

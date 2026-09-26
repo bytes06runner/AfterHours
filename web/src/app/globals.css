@@ -1,26 +1,270 @@
 @import "tailwindcss";
 
-/* Placeholder until M8 builds the full token system from docs/DESIGN.md. */
+/*
+ * Afterhours tokens (docs/DESIGN.md section 3).
+ * Every colour role has a day and a night value. One registered number, --phase (0 day,
+ * 1 night), mixes them, so the closing bell crossfades the whole interface by animating a
+ * single value. [data-phase] sets the resting state; the bell sequence tweens --phase.
+ * Contrast (WCAG): ink on limestone 12.3, moonlight on midnight 14.1. Day brass is 3.2 on
+ * limestone and ink on brass is 3.8, so brass carries only large text (19px bold) by day.
+ */
+
+@property --phase {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+/* The interface chrome flips fast at the sequence's midpoint, so text never loses contrast
+   while the illustration takes the full 2.4 s. */
+@property --ui-phase {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 :root {
-  --limestone: #e4e0d5;
-  --ink: #1d1f33;
+  --day-bg: #e4e0d5;
+  --day-surface: #d6d0c0;
+  --day-text: #1d1f33;
+  --day-brass: #9c7431;
+  --day-safe: #2e6b62;
+  --day-risk: #a23b2d;
+  --day-rule: #b9b19c;
+
+  --night-bg: #0e1430;
+  --night-surface: #1b2450;
+  --night-text: #e7e3d8;
+  --night-brass: #f1c76b;
+  --night-safe: #62ad9f;
+  --night-risk: #e2705f;
+  --night-rule: #34407a;
+
+  /* Art tokens follow the slow --phase. */
+  --mix: calc((1 - var(--phase)) * 100%);
+  --a-bg: color-mix(in oklab, var(--day-bg) var(--mix), var(--night-bg));
+  --a-surface: color-mix(in oklab, var(--day-surface) var(--mix), var(--night-surface));
+  --a-text: color-mix(in oklab, var(--day-text) var(--mix), var(--night-text));
+  --a-brass: color-mix(in oklab, var(--day-brass) var(--mix), var(--night-brass));
+  --a-rule: color-mix(in oklab, var(--day-rule) var(--mix), var(--night-rule));
+  --a-on-brass: color-mix(in oklab, var(--day-text) var(--mix), var(--night-bg));
+  /* Buildings darken before the sky does, so at dusk they read as silhouettes. */
+  --mix-fast: calc((1 - min(1, var(--phase) * 1.7)) * 100%);
+  --a-surface-fast: color-mix(in oklab, var(--day-surface) var(--mix-fast), var(--night-surface));
+  --a-text-fast: color-mix(in oklab, var(--day-text) var(--mix-fast), var(--night-text));
+
+  /* Interface tokens follow the fast --ui-phase. */
+  --ui-mix: calc((1 - var(--ui-phase)) * 100%);
+  --c-bg: color-mix(in oklab, var(--day-bg) var(--ui-mix), var(--night-bg));
+  --c-surface: color-mix(in oklab, var(--day-surface) var(--ui-mix), var(--night-surface));
+  --c-text: color-mix(in oklab, var(--day-text) var(--ui-mix), var(--night-text));
+  --c-brass: color-mix(in oklab, var(--day-brass) var(--ui-mix), var(--night-brass));
+  --c-safe: color-mix(in oklab, var(--day-safe) var(--ui-mix), var(--night-safe));
+  --c-risk: color-mix(in oklab, var(--day-risk) var(--ui-mix), var(--night-risk));
+  --c-rule: color-mix(in oklab, var(--day-rule) var(--ui-mix), var(--night-rule));
+  /* Text on a brass button: ink by day, midnight by night. */
+  --c-on-brass: color-mix(in oklab, var(--day-text) var(--ui-mix), var(--night-bg));
+
+  /* Scale (px): 12 14 16 18 21 24 36 48 64 88. */
+  --fs-12: 0.75rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-18: 1.125rem;
+  --fs-21: 1.3125rem;
+  --fs-24: 1.5rem;
+  --fs-36: 2.25rem;
+  --fs-48: 3rem;
+  --fs-64: 4rem;
+  --fs-88: 5.5rem;
+
+  --r-panel: 12px;
+  --r-control: 10px;
+  --ease-ui: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* The bell's crossfade: symmetric, so the window wave climbs evenly across 2.4 s. */
+  --ease-phase: cubic-bezier(0.45, 0, 0.55, 1);
+  --dur-ui: 240ms;
+  --dur-phase: 2400ms;
+}
+
+[data-phase="day"] {
+  --phase: 0;
+  --ui-phase: 0;
+}
+html.no-phase-transition {
+  transition: none !important;
+}
+[data-phase="night"] {
+  --phase: 1;
+  --ui-phase: 1;
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-ink: var(--c-text);
+  --color-brass: var(--c-brass);
+  --color-safe: var(--c-safe);
+  --color-risk: var(--c-risk);
+  --color-rule: var(--c-rule);
+  --color-on-brass: var(--c-on-brass);
+  --font-display: var(--font-bodoni), "Bodoni Moda", serif;
+  --font-sans: var(--font-hanken), "Hanken Grotesk", system-ui, sans-serif;
+  --radius-panel: var(--r-panel);
+  --radius-control: var(--r-control);
+}
+
+html {
+  background: var(--c-bg);
+  color: var(--c-text);
+  transition:
+    --phase var(--dur-phase) var(--ease-phase),
+    --ui-phase 300ms var(--ease-ui) 1050ms;
 }
 
 body {
-  background: var(--limestone);
-  color: var(--ink);
-  font-family: var(--font-text), sans-serif;
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-16);
+  line-height: 1.55;
   font-variant-numeric: tabular-nums lining-nums;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-.stub {
-  max-width: 72ch;
-  margin: 0 auto;
-  padding: 96px 16px;
-}
-
-.stub h1 {
-  font-family: var(--font-display), serif;
-  font-size: 48px;
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
   letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+p {
+  max-width: 68ch;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--c-brass);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2.5px solid var(--c-brass);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--c-brass);
+  color: var(--c-on-brass);
+}
+
+/* Paper grain by day, film grain by night: one SVG turbulence layer, blended. */
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  /* Paper grain by day; faint film grain by night (screen blend lifts midnight quickly). */
+  opacity: calc(0.07 - var(--ui-phase) * 0.045);
+  mix-blend-mode: multiply;
+}
+[data-phase="night"] .grain {
+  mix-blend-mode: screen;
+}
+
+/* Double rule: depth without shadows. */
+.double-rule {
+  border-top: 1.25px solid var(--c-rule);
+  box-shadow: none;
+  position: relative;
+}
+.double-rule::after {
+  content: "";
+  position: absolute;
+  inset: 4px 0 auto 0;
+  border-top: 1.25px solid var(--c-rule);
+}
+
+/* Stepped (deco) corners for DecoFrame and the key panel. */
+.stepped {
+  --step: 12px;
+  clip-path: polygon(
+    var(--step) 0,
+    calc(100% - var(--step)) 0,
+    calc(100% - var(--step)) var(--step),
+    100% var(--step),
+    100% calc(100% - var(--step)),
+    calc(100% - var(--step)) calc(100% - var(--step)),
+    calc(100% - var(--step)) 100%,
+    var(--step) 100%,
+    var(--step) calc(100% - var(--step)),
+    0 calc(100% - var(--step)),
+    0 var(--step),
+    var(--step) var(--step)
+  );
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0 1.25rem;
+  border-radius: var(--r-control);
+  font-weight: 700;
+  font-size: 1.1875rem; /* 19px bold: large text, so ink on day brass meets AA (3.8:1) */
+  line-height: 1;
+  transition:
+    transform var(--dur-ui) var(--ease-ui),
+    background-color var(--dur-ui) var(--ease-ui);
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-brass {
+  background: var(--c-brass);
+  color: var(--c-on-brass);
+  border: 1.25px solid var(--c-brass);
+}
+.btn-quiet {
+  background: transparent;
+  color: var(--c-text);
+  border: 1.25px solid var(--c-text);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  border: 1.25px solid var(--c-rule);
+  background: var(--c-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    transition:
+      --phase 300ms linear,
+      --ui-phase 300ms linear;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }

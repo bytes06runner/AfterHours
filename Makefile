@@ -20,7 +20,7 @@ endif
 AH := uv run --quiet afterhours
 WEB := pnpm --filter @afterhours/web
 
-.PHONY: help setup gen-schema discover verify-discovered local-chain fork deploy seed engine api web up demo report \
+.PHONY: help setup gen-schema discover verify-discovered local-chain screens fork deploy seed engine api web up demo report \
         test test-py test-web test-sol test-config test-integration lint lint-py lint-web lint-sol lint-hardcode
 
 help: ## List commands
@@ -119,6 +119,9 @@ lint-web:
 
 lint-sol:
 	cd contracts && forge fmt --check
+
+screens: ## Screenshot QA of pages at 1440/1024/390 in the current phase (needs make up running)
+	./scripts/screens.sh
 
 lint-hardcode: ## Fail on addresses or URLs outside config/ and deployments/
 	./scripts/lint-hardcode.sh

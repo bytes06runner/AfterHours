@@ -1,0 +1,165 @@
+/*
+ * Illustration styles (docs/DESIGN.md section 4). Everything is driven by --phase, so the
+ * closing bell's crossfade, window wave and stars all follow one animated number.
+ * Strokes are 1.25 or 2 only.
+ */
+
+.a-sky-0 {
+  fill: var(--a-bg);
+}
+.a-sky-1 {
+  fill: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--a-bg) 88%, var(--a-surface)),
+    var(--night-brass) calc(var(--phase) * (1 - var(--phase)) * 45%)
+  );
+}
+.a-sky-2 {
+  /* Dusk: a lamplight glow near the horizon that peaks halfway through the bell. */
+  fill: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--a-bg) 74%, var(--a-surface)),
+    var(--night-brass) calc(var(--phase) * (1 - var(--phase)) * 70%)
+  );
+}
+.a-sky-3 {
+  fill: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--a-bg) 58%, var(--a-surface)),
+    var(--night-brass) calc(var(--phase) * (1 - var(--phase)) * 150%)
+  );
+}
+
+.a-far {
+  fill: color-mix(in oklab, var(--a-surface-fast) 72%, var(--a-bg));
+}
+.a-near {
+  fill: color-mix(in oklab, var(--a-surface-fast) 80%, var(--a-text-fast) 20%);
+}
+
+.a-stone {
+  fill: var(--a-surface-fast);
+}
+.a-stone-shade {
+  fill: color-mix(in oklab, var(--a-surface-fast) 86%, var(--a-text-fast));
+}
+.a-stone-deep {
+  fill: color-mix(in oklab, var(--a-surface-fast) 72%, var(--a-text-fast));
+}
+.a-line {
+  stroke: color-mix(in oklab, var(--a-text-fast) 62%, var(--a-surface-fast));
+  stroke-width: 1.25;
+  fill: none;
+}
+.a-line-2 {
+  stroke: color-mix(in oklab, var(--a-text-fast) 62%, var(--a-surface-fast));
+  stroke-width: 2;
+  fill: none;
+}
+.a-brass {
+  fill: var(--a-brass);
+}
+.a-brass-line {
+  stroke: var(--a-brass);
+  stroke-width: 2;
+  fill: none;
+}
+/* Glass: dark ink by day, deeper than the night sky by night (unlit rooms stay dark). */
+.a-glass {
+  fill: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--day-text) 72%, var(--day-surface)) var(--mix),
+    color-mix(in oklab, var(--night-bg) 80%, var(--night-surface))
+  );
+}
+
+/* Lit windows: floor n lights while --phase passes n/6, so the wave climbs from the ground. */
+.a-lit {
+  fill: var(--a-brass);
+  opacity: clamp(0, calc(var(--phase) * 6 - var(--floor, 0)), 0.92);
+}
+
+.a-sun {
+  fill: var(--a-brass);
+  transform: translateY(calc(var(--phase) * 240px));
+  opacity: clamp(0, calc(1 - var(--phase) * 1.4), 1);
+}
+.a-moon {
+  fill: var(--a-text);
+  opacity: clamp(0, calc(var(--phase) * 1.6 - 0.6), 0.9);
+}
+.a-star {
+  fill: var(--a-text);
+  opacity: clamp(0, calc((var(--phase) - 0.55) * 2.4), 0.85);
+}
+
+/* The bell swings once each time the session changes (bells > 0). */
+.a-bell {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+.a-bell.ringing {
+  animation: bell-swing 1400ms cubic-bezier(0.2, 0.8, 0.2, 1) 1;
+}
+@keyframes bell-swing {
+  0% {
+    transform: rotate(0deg);
+  }
+  18% {
+    transform: rotate(17deg);
+  }
+  42% {
+    transform: rotate(-12deg);
+  }
+  66% {
+    transform: rotate(7deg);
+  }
+  84% {
+    transform: rotate(-3deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.a-hand {
+  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-box: view-box;
+}
+
+/* Ticker ribbon: brass band, scrolls, pauses on hover, static with reduced motion. */
+.ticker {
+  height: 100%;
+  overflow: hidden;
+  background: var(--a-brass);
+  color: var(--a-on-brass);
+  align-items: center; /* display comes from utilities, so responsive "hidden" can win */
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+.ticker-track {
+  display: flex;
+  padding-left: 1em;
+  white-space: nowrap;
+  animation: ticker 40s linear infinite;
+}
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    padding-left: 1em;
+  }
+  .a-bell.ringing {
+    animation: none;
+  }
+}

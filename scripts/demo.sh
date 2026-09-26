@@ -48,7 +48,7 @@ if [ "${DEMO_SKIP_SCENARIO:-0}" != "1" ]; then
   echo "demo: running the closing-bell scenario"
   $AH sim scenario closing_bell | tee "$state_dir.closing_bell.json"
 fi
-echo "demo: API $api   web http://127.0.0.1:$WEB_PORT   (Simulation)"  # hardcode-ok: local web
+echo "demo: API $api   web http://localhost:$WEB_PORT   (Simulation)"  # hardcode-ok: local web
 if [ "${DEMO_EXIT:-0}" = "1" ]; then exit 0; fi
 echo "demo: running; press Ctrl-C to stop"
 wait

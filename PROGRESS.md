@@ -22,7 +22,7 @@
 - [x] M5 Contracts (2026-09-26; pinned-block fork runs wait on BLOCKED 1)
 - [x] M6 Bot and API (2026-09-26; accepted on the local profile, fork run waits on BLOCKED 1)
 - [x] M7 Simulation harness (2026-09-26; local profile, fork run waits on BLOCKED 1)
-- [ ] M8 Frontend foundation
+- [x] M8 Frontend foundation (2026-09-26)
 - [ ] M9 Frontend pages
 - [ ] M10 End-to-end hardening
 - [ ] M11 Live deployments
@@ -244,3 +244,29 @@ Acceptance
 - `make demo` runs the closing-bell scenario end to end without manual steps: pass on the local profile (demo.profile). Switch `demo.profile` to fork once BLOCKED 1 is resolved.
 
 Next: M8 frontend foundation.
+
+### 2026-09-26 M8 Frontend foundation: done
+
+What was done
+- Tokens (`web/src/app/globals.css`): the seven DESIGN colour roles with day and night values. Two registered numbers drive the crossfade: `--phase` (art, 2.4 s, symmetric ease) and `--ui-phase` (text and surfaces, 300 ms at the sequence midpoint). Type scale, radii (frames stepped, panels 12, controls 10, badges round), no shadows, double rules, SVG grain, visible focus rings. Contrast: ink on limestone 12.3:1, moonlight on midnight 14.1:1; day brass carries only large text (buttons are 19px bold, since ink on brass is 3.8:1).
+- Day/night engine (`web/src/lib/phase.tsx`): the phase follows `/v1/status` (the chain's clock on fork and local), the server renders the first paint in the right phase, each change bumps a bell counter; "Preview the close" flips locally without touching the real badge or countdown.
+- Art in code (`web/src/art/`): ExchangeFacade (stepped setbacks, fluted columns, sunburst doors, pediment bell that swings on each session change, clock on New York time, windows lighting floor by floor straight from `--phase`, sun and moon, stars, two-layer skyline whose lit windows scale with activity, dusk glow and silhouettes mid-sequence), DecoFrame (double rule, stepped corners measured in pixels), SunburstDivider, TickerRibbon (live oracle prices, pauses on hover, static with reduced motion; a readable band under the frame on phones).
+- Components: SiteHeader (nav, menu under 1024 px), SessionBadge, BellCountdown with SplitFlap digits (Motion), SimulationBanner, lazy WalletButton (RainbowKit and wagmi load on the first press, themed from tokens, chain from `/v1/config/public`), typed API client with zod schemas for every endpoint, React Query hooks, one SSE subscription that refreshes affected queries.
+- API additions: `GET /v1/prices` (oracle prices for the ticker) and `chain.rpc_url` in the public config (browser-safe).
+- QA tooling: `make screens` (Playwright, 1440/1024/390, day, night, mid-bell; flags horizontal overflow), `WEB_DEV_ORIGINS` for Next 16's dev-origin check.
+
+Screenshot loop (three rounds; final set in `artifacts/screens/landing/`)
+- Round 1: the page never hydrated on 127.0.0.1 (Next 16 blocks dev resources for non-localhost origins): made the allowed hosts configurable. Unlit night windows were pale grey: glass got its own day and night values. Headline sat far below the frame: trimmed the sky crop.
+- Round 2: 1024 px used the 88 px headline and wrapped to five lines: 48/64/88 at base/lg/xl. The ticker started mostly empty: seamless two-copy loop. The in-art ticker was about 5 px on phones: a full-width band under the frame instead (and a cascade bug that kept the tiny one visible).
+- Round 3: mid-bell, text and background crossed through the same grey (unreadable for about a second): split the UI phase from the art phase. The midpoint was flat grey: buildings now darken faster than the sky and the horizon glows at dusk. The preview from night half-mixed palettes and the badge claimed the exchange was open: snap to day, then ring; badges follow the real session. Night grain lifted midnight: grain reduced at night.
+- Checks: no horizontal overflow at any width; reduced motion gives a 300 ms linear crossfade, a static ticker and no bell swing; focus rings visible.
+
+Evidence
+- Lighthouse on the production build (`artifacts/lighthouse/landing.json`): performance 94, accessibility 100, best practices 96. The one failed audit is a console error because the API's CORS list covers the dev port, not the test port.
+- `pnpm lint` (eslint with the React Compiler rules, tsc strict), `pnpm test` (8 passed), prettier clean, `make lint-hardcode` clean.
+
+Acceptance
+- Screenshots at three widths in both modes reviewed and saved: pass (`artifacts/screens/landing/{day,night,bell}-{1440,1024,390}.png`).
+- Lighthouse targets met on a stub landing: pass (94 and 100).
+
+Next: M9 pages (Vault, Almanac, Ledger, Replay, Report card, the landing scroll story).
