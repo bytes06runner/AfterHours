@@ -17,7 +17,7 @@
 - [x] M0 Bootstrap (2026-09-26, `d185414`)
 - [x] M1 Discovery (2026-09-26; fork-block checks wait on BLOCKED 1)
 - [x] M2 Data and gap study (2026-09-26)
-- [ ] M3 Model
+- [x] M3 Model (2026-09-26; fallback applied: ships the EWMA baseline)
 - [ ] M4 Policy and backtest
 - [ ] M5 Contracts
 - [ ] M6 Bot and API
@@ -120,3 +120,31 @@ Acceptance
 - `artifacts/gaps/summary.json` and figures by segment for the selected tokens: pass.
 
 Next: M3 (model runs are done; write up).
+
+### 2026-09-26 M3 Model: done, fallback applied
+
+What was done
+- Baselines (SPEC 7.4): (a) global empirical quantile per segment, (b) per-ticker per-segment empirical quantile with a fallback below 30 rows, (c) EWMA volatility (lambda 0.94) normal quantile scaled by sqrt(closed hours / 24).
+- LightGBM quantile regression for alpha 0.01 and 0.05, one global model.
+- Mondrian conformal calibration by segment, applied the same way to the model and to every baseline.
+- Rolling walk-forward: 6 train years, 1 calibration year, 1 test year; 10 folds, test years 2017 to 2026 (2026 partial). Everything reported is from test years only: 1,229,403 held-out rows.
+- `afterhours model` writes `artifacts/model/report_card.json`, `calibration_<segment>.png` (for the shipped method) and `production.json` (latest train and calibration windows, corrections for every method, model version hash).
+
+Variants tried (all kept for disclosure in `artifacts/model/variants/` and listed in the report card)
+1. Raw target, additive conformal scores: model pinball 5.31e-4 vs EWMA 4.80e-4. Model wins on earnings, holidays and weekends, loses on overnights (77% of rows) and badly in 2020 (calibrated on calm 2019).
+2. Volatility-standardised target, additive scores: model 6.41e-4, worse.
+3. Volatility-standardised target, normalised conformal scores (Lei et al. 2018; the correction scales with the EWMA gap scale): model 5.46e-4 vs EWMA 4.58e-4. This is the current config.
+Stopped here: more tuning against held-out years would be fitting to the test set.
+
+Result (variant 3, alpha 0.01, pooled held-out)
+- LightGBM: miss rate 1.83% overall (pass, within 1 point), 1.23% on earnings (pass, within 2 points); pinball beats baselines (a) and (b) but not (c). Acceptance: fail.
+- Shipped: `ewma_normal` with Mondrian normalised calibration. Miss rate 1.30% overall, 1.08% earnings, 1.72% weekend, 1.13% overnight, 2.74% holiday (the weak spot: about 9 holiday closes per calibration year). At alpha 0.05: 5.35% overall, 5.27% earnings.
+- Production calibration (train 2020 to 2025, calibrate 2026): corrections in gap-scale units for the shipped method: earnings +6.79 (much fatter tail than the normal quantile), weekend -1.36, overnight -0.82, holiday -1.44. Model version `2975043dcd63122f`.
+- Feature importance (model, gain share): VIX 26%, VIX 5-day change 23%, market return 20%; per-ticker volatility much lower, which is why a per-ticker volatility scale wins.
+
+Evidence: `uv run afterhours model` (about 3 minutes; each LightGBM fit about 4.5 s on 724k rows). Tests: `engine/tests/test_model.py` (folds, pinball, Mondrian CQR hits target per segment on synthetic heavy tails, baselines).
+
+Acceptance
+- `report_card.json` meets 7.4 or the fallback is applied and stated: pass (fallback applied; the report card's first sentence says so; README states it).
+
+Next: M4 backtest and tuning.

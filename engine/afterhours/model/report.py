@@ -24,8 +24,14 @@ from afterhours.model.conformal import MondrianCQR
 log = logging.getLogger(__name__)
 
 
-def train_production(cfg: AfterhoursConfig, data: pd.DataFrame, out: Path) -> dict[str, Any]:
-    """Fit the production model on the latest train window and calibrate on the latest year."""
+def train_production(
+    cfg: AfterhoursConfig, data: pd.DataFrame, out: Path, shipped: str
+) -> dict[str, Any]:
+    """Fit on the latest train window and calibrate every method on the latest year.
+
+    The API serves `shipped`: the LightGBM model if it passed acceptance, else the best
+    baseline. Corrections for every method are stored so the report card can show them all.
+    """
     w = cfg.model.walk_forward
     years = pd.to_datetime(data["session_prev"]).dt.year
     last = int(years.max())
@@ -33,32 +39,41 @@ def train_production(cfg: AfterhoursConfig, data: pd.DataFrame, out: Path) -> di
     train_span = (cal_span[0] - w.train_years, cal_span[0])
     train = data[(years >= train_span[0]) & (years < train_span[1])]
     cal = data[(years >= cal_span[0]) & (years < cal_span[1])]
+    norm = cfg.model.conformal.normalize == "ewma"
     files: list[Path] = []
-    corrections: dict[str, dict[str, float]] = {}
+    corrections: dict[str, dict[str, dict[str, float]]] = {}
+    tables: dict[str, dict[str, Any]] = {}
     for alpha in cfg.model.quantiles:
         model = wf.fit_lgbm(cfg, train, alpha)
         path = out / f"lgbm_q{alpha:g}.txt"
         model.booster_.save_model(str(path))
         files.append(path)
         raw = wf.predict_all(cfg, train, cal, alpha, model)
-        corrections[f"{alpha:g}"] = (
-            MondrianCQR(alpha, SEGMENTS)
-            .fit(
-                raw["model"],
-                cal["g"].to_numpy(),
-                cal["segment"],
-                wf.gap_scale(cal) if cfg.model.conformal.normalize == "ewma" else None,
+        for method, preds in raw.items():
+            corrections.setdefault(method, {})[f"{alpha:g}"] = (
+                MondrianCQR(alpha, SEGMENTS)
+                .fit(
+                    preds, cal["g"].to_numpy(), cal["segment"], wf.gap_scale(cal) if norm else None
+                )
+                .corrections
             )
-            .corrections
+        # Quantile tables the two empirical baselines need at serving time.
+        tables.setdefault("global_segment", {})[f"{alpha:g}"] = (
+            train.groupby("segment")["g"].quantile(alpha).to_dict()
         )
     meta: dict[str, Any] = {
+        "shipped": shipped,
+        "alpha": cfg.model.target_alpha,
         "target_scaling": cfg.model.target_scaling,
+        "conformal_normalize": cfg.model.conformal.normalize,
+        "ewma_lambda": cfg.model.baselines.ewma_lambda,
         "features": FEATURES,
         "segments": SEGMENTS,
         "quantiles": cfg.model.quantiles,
         "train_years": list(train_span),
         "calibrate_years": list(cal_span),
         "corrections": corrections,
+        "tables": tables,
         "rows": {"train": len(train), "calibrate": len(cal)},
     }
     meta["model_version"] = wf.model_version(files, meta)
@@ -66,8 +81,8 @@ def train_production(cfg: AfterhoursConfig, data: pd.DataFrame, out: Path) -> di
     return meta
 
 
-def calibration_figures(curves: dict[str, Any], out: Path) -> list[Path]:
-    """One nominal-vs-observed plot per segment."""
+def calibration_figures(curves: dict[str, Any], out: Path, method: str) -> list[Path]:
+    """One nominal-vs-observed plot per segment for `method`."""
     import matplotlib
 
     matplotlib.use("Agg")
@@ -95,7 +110,7 @@ def calibration_figures(curves: dict[str, Any], out: Path) -> list[Path]:
             )
         ax.set_xlabel("target miss rate (alpha)")
         ax.set_ylabel("observed miss rate, held-out years")
-        ax.set_title(f"Calibration: {seg} (n={points[0]['n']:,})")
+        ax.set_title(f"{method}, {seg} (n={points[0]['n']:,})", fontsize=10)
         ax.set_xlim(0, top)
         ax.set_ylim(0, top)
         fig.tight_layout()
@@ -138,7 +153,7 @@ def build_report(
         name: wf.calibration_curve(pooled, cfg.model.quantiles, name)
         for name in ("model", *wf.BASELINES)
     }
-    production = train_production(cfg, data, out)
+    production = train_production(cfg, data, out, acc["shipped"])
     card = {
         "generated_at": datetime.now(UTC).isoformat(),
         "code_version": code_version(),
@@ -154,6 +169,7 @@ def build_report(
             )
         ),
         "acceptance": acc,
+        "shipped_performance": acc["held_out"][acc["shipped"]],
         "calibration_curves": curves,
         "folds": result["folds"],
         "feature_importance_gain_share": result["feature_importance_gain_share"],
@@ -162,5 +178,5 @@ def build_report(
     }
     (out / "report_card.json").write_text(json.dumps(card, indent=2, default=str) + "\n")
     pooled.to_parquet(cfg.path(cfg.data.cache_dir) / "heldout_predictions.parquet")
-    calibration_figures(curves["model"], out)
+    calibration_figures(curves[acc["shipped"]], out, acc["shipped"])
     return card
