@@ -83,6 +83,7 @@ class Allocator:
             for s, v in load_discovered(cfg, "fork").get("stock_tokens", {}).items()
         }
         self.chain_clock = cfg.profile.local_rpc_port_env is not None
+        self.rate_source = "assumed (no borrowing yet)"
 
     def now(self, state: VaultState | None = None) -> datetime:
         """Chain time on local and fork profiles (the demo moves it), wall time elsewhere."""
@@ -104,13 +105,16 @@ class Allocator:
         """Solve the LP for the current state and forecasts."""
         driving = {s: max(fs, key=lambda f: f.bad_case_drop) for s, fs in forecasts.items()}
         by_key = {(m.symbol, m.tier): m for m in state.markets}
-        assumed = self.cfg.backtest
+        # Live supply rates once anything is borrowed; the backtest's assumed rates only at cold
+        # start. Mixing the two makes the planner chase empty markets.
+        live = any(m.supply_apy > 0 for m in state.markets)
+        self.rate_source = "live" if live else "assumed (no borrowing yet)"
         stocks = []
         for s in self.symbols():
             rate = {}
             for t in self.tiers:
-                live = by_key[(s, t.name)].supply_apy
-                rate[t.name] = live if live > 0 else assumed.apy(t.lltv)
+                m = by_key[(s, t.name)]
+                rate[t.name] = m.supply_apy if live else self.cfg.backtest.apy(t.lltv)
             stocks.append(
                 StockState(
                     symbol=s,
@@ -175,9 +179,12 @@ class Allocator:
         vault = self.deployment["vault"]["address"]
         adapter = self.deployment["adapter"]["address"]
         deltas = []
+        min_move = self.cfg.policy.min_rebalance_usd
         for m in state.markets:
             target = plan.allocation.get((m.symbol, m.tier), m.vault_supply)
             delta = target - m.vault_supply
+            if abs(delta) < min_move and plan.allowed.get((m.symbol, m.tier), True):
+                continue  # dust: not worth a transaction or a reason card
             if delta < -dust:
                 amount = min(-delta, m.vault_supply - m.lent_out) - dust
                 deltas.append((m, -amount))
@@ -222,6 +229,28 @@ class Allocator:
             mv["txs"].append(sent.tx_hash)
         return moves
 
+    def _why(
+        self, plan: Plan, symbol: str, out_tier: str | None, in_tier: str | None, state: VaultState
+    ) -> str:
+        """Plain-English cause of a move: risk first, then rates, then limits."""
+        if out_tier in ("weekday", "weekend") and not plan.allowed[(symbol, out_tier)]:
+            text = plan.reasons[(symbol, out_tier)]
+            return text[0].upper() + text[1:] + ". Only money not lent out can move."
+        if in_tier in ("weekday", "weekend") and out_tier not in ("weekday", "weekend"):
+            text = plan.reasons[(symbol, in_tier)]
+            return f"Placed idle USDG where it is allowed: {text}."
+        rates = {(m.symbol, m.tier): m.supply_apy for m in state.markets}
+        if out_tier in ("weekday", "weekend") and in_tier in ("weekday", "weekend"):
+            return (
+                f"Moved toward a higher supply rate: {in_tier} {_pct(rates[(symbol, in_tier)])} "
+                f"vs {out_tier} {_pct(rates[(symbol, out_tier)])} ({self.rate_source} rates)."
+            )
+        limit = plan.stock_limits.get(symbol, 0.0)
+        return (
+            f"Returned to idle to keep {symbol} within its limit of {limit:,.0f} USDG "
+            f"({self.cfg.vault.max_share_per_stock:.0%} of the vault) or where no market pays more."
+        )
+
     def _anchor_reasons(
         self,
         state: VaultState,
@@ -238,7 +267,7 @@ class Allocator:
             out_tier = max(mv["out"], key=mv["out"].get) if mv["out"] else None
             in_tier = max(mv["in"], key=mv["in"].get) if mv["in"] else None
             amount = max(sum(mv["out"].values()), sum(mv["in"].values()))
-            rule = plan.reasons[(symbol, "weekday")]
+            rule = self._why(plan, symbol, out_tier, in_tier, state)
             if out_tier and in_tier:
                 action = "reallocate"
             elif out_tier:
@@ -254,7 +283,7 @@ class Allocator:
                 to_tier=in_tier,
                 amount_usdg=amount,
                 forecast=driving[symbol],
-                rule=rule[0].upper() + rule[1:] + ".",
+                rule=rule,
                 created_at=self.now(),
             )
             h = reason_hash(card)
@@ -277,6 +306,10 @@ class Allocator:
                 {"id": card["id"], "stock": symbol, "hash": h, "registry_tx": sent.tx_hash},
             )
             result.reasons.append(card["id"])
+
+
+def _pct(x: float) -> str:
+    return f"{x:.2%}"
 
 
 def plan_json(

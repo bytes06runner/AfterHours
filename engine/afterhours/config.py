@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime
 from functools import cache
 from pathlib import Path
 from typing import Annotated, Any, Literal
@@ -237,10 +238,31 @@ class SimConfig(_Strict):
     eth_per_actor: Annotated[float, Field(gt=0)]
 
 
+class ShockSpec(_Strict):
+    symbol: str
+    pct: Annotated[float, Field(gt=-1, lt=1)]
+
+
+class DriftSpec(_Strict):
+    symbol: str
+    step_pct: Annotated[float, Field(gt=-1, lt=1)]
+    steps: PositiveInt
+    minutes_per_step: PositiveInt
+
+
+class DemoConfig(_Strict):
+    profile: str
+    start: datetime
+    max_closes: PositiveInt
+    earnings_shock: ShockSpec
+    oracle_drift: DriftSpec
+
+
 class PolicyConfig(_Strict):
     safety_margin: Fraction
     turnover_penalty: Annotated[float, Field(ge=0)]
     min_rebalance_usd: Annotated[float, Field(ge=0)]
+    min_rebalance_share_of_tvl: Fraction
     lookahead_closed_periods: PositiveInt
 
 
@@ -346,6 +368,7 @@ class AfterhoursConfig(BaseSettings):
     policy: PolicyConfig
     backtest: BacktestConfig
     sim: SimConfig
+    demo: DemoConfig
     schedule: ScheduleConfig
     api: ApiConfig
     web: WebConfig

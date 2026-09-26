@@ -146,13 +146,16 @@ def solve(
     x = res.x[:n]
     alloc = {k: float(x[idx[k]]) for k in keys}
     turnover = float(np.abs(x - prev).sum())
+    # Risk-driven moves (money above the borrowed floor in a tier that is no longer allowed)
+    # always execute; other moves must clear the minimum rebalance.
+    forced = any(not allowed[k] and prev[idx[k]] - lower[idx[k]] > 1e-6 for k in keys)
     return Plan(
         allocation=alloc,
         idle=float(total - x.sum()),
         allowed=allowed,
         reasons=reasons,
         turnover=turnover,
-        execute=turnover >= min_rebalance_usd,
+        execute=forced or turnover >= min_rebalance_usd,
         objective=float(-res.fun),
         status="optimal",
         stock_limits=limits,

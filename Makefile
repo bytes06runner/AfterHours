@@ -75,14 +75,16 @@ api: ## Start the FastAPI service
 web: ## Start the Next.js app
 	@NEXT_PUBLIC_API_BASE_URL="$${NEXT_PUBLIC_API_BASE_URL:-http://$${API_HOST}:$${API_PORT}}" $(WEB) exec next dev --port "$${WEB_PORT}"  # hardcode-ok: local scheme
 
-up: ## Everything above for the fork profile, in order
-	@echo "make up arrives with M7." >&2; exit 2
+up: ## Chain, deploy, seed, API, bot and web for the demo profile, in order (no scenario)
+	DEMO_SKIP_SCENARIO=1 ./scripts/demo.sh
 
 demo: ## make up plus the scripted closing-bell scenario
-	@echo "make demo arrives with M7." >&2; exit 2
+	./scripts/demo.sh
 
 report: ## Regenerate gap stats, model report card and backtest artifacts
-	@echo "make report arrives with M2 to M4." >&2; exit 2
+	$(AH) gaps
+	$(AH) model
+	$(AH) backtest
 
 # ---------------------------------------------------------------- quality
 

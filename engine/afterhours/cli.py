@@ -266,5 +266,29 @@ def api_cmd() -> None:
     serve()
 
 
+@sim_app.command("scenario")
+def sim_scenario(
+    name: Annotated[str, typer.Argument(help="closing_bell | earnings_shock | oracle_drift")],
+) -> None:
+    """Run one scripted scenario (Simulation)."""
+    from afterhours.sim import scenarios
+
+    _logging()
+    cfg = load_config()
+    if not cfg.profile.local_rpc_port_env:
+        raise typer.BadParameter("scenarios run only on fork and local chains")
+    d = cfg.demo
+    if name == "closing_bell":
+        out = scenarios.closing_bell(cfg, d.max_closes)
+    elif name == "earnings_shock":
+        out = scenarios.earnings_shock(cfg, d.earnings_shock.symbol, d.earnings_shock.pct)
+    elif name == "oracle_drift":
+        o = d.oracle_drift
+        out = scenarios.oracle_drift(cfg, o.symbol, o.step_pct, o.steps, o.minutes_per_step)
+    else:
+        raise typer.BadParameter(f"unknown scenario {name}")
+    typer.echo(json.dumps(out, indent=2, default=str))
+
+
 if __name__ == "__main__":
     app()

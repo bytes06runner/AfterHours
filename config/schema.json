@@ -528,6 +528,40 @@
       "title": "DataSources",
       "type": "object"
     },
+    "DemoConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "earnings_shock": {
+          "$ref": "#/$defs/ShockSpec"
+        },
+        "max_closes": {
+          "exclusiveMinimum": 0,
+          "title": "Max Closes",
+          "type": "integer"
+        },
+        "oracle_drift": {
+          "$ref": "#/$defs/DriftSpec"
+        },
+        "profile": {
+          "title": "Profile",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "profile",
+        "start",
+        "max_closes",
+        "earnings_shock",
+        "oracle_drift"
+      ],
+      "title": "DemoConfig",
+      "type": "object"
+    },
     "DiscoveryConfig": {
       "additionalProperties": false,
       "properties": {
@@ -636,6 +670,39 @@
         "uniswap_deployments"
       ],
       "title": "DiscoverySources",
+      "type": "object"
+    },
+    "DriftSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "minutes_per_step": {
+          "exclusiveMinimum": 0,
+          "title": "Minutes Per Step",
+          "type": "integer"
+        },
+        "step_pct": {
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": -1,
+          "title": "Step Pct",
+          "type": "number"
+        },
+        "steps": {
+          "exclusiveMinimum": 0,
+          "title": "Steps",
+          "type": "integer"
+        },
+        "symbol": {
+          "title": "Symbol",
+          "type": "string"
+        }
+      },
+      "required": [
+        "symbol",
+        "step_pct",
+        "steps",
+        "minutes_per_step"
+      ],
+      "title": "DriftSpec",
       "type": "object"
     },
     "GapsConfig": {
@@ -953,6 +1020,12 @@
           "title": "Lookahead Closed Periods",
           "type": "integer"
         },
+        "min_rebalance_share_of_tvl": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Min Rebalance Share Of Tvl",
+          "type": "number"
+        },
         "min_rebalance_usd": {
           "minimum": 0,
           "title": "Min Rebalance Usd",
@@ -974,6 +1047,7 @@
         "safety_margin",
         "turnover_penalty",
         "min_rebalance_usd",
+        "min_rebalance_share_of_tvl",
         "lookahead_closed_periods"
       ],
       "title": "PolicyConfig",
@@ -1174,6 +1248,27 @@
         "triggers"
       ],
       "title": "ScheduleConfig",
+      "type": "object"
+    },
+    "ShockSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "pct": {
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": -1,
+          "title": "Pct",
+          "type": "number"
+        },
+        "symbol": {
+          "title": "Symbol",
+          "type": "string"
+        }
+      },
+      "required": [
+        "symbol",
+        "pct"
+      ],
+      "title": "ShockSpec",
       "type": "object"
     },
     "SimConfig": {
@@ -1447,6 +1542,9 @@
     "data": {
       "$ref": "#/$defs/DataConfig"
     },
+    "demo": {
+      "$ref": "#/$defs/DemoConfig"
+    },
     "discovery": {
       "$ref": "#/$defs/DiscoveryConfig"
     },
@@ -1507,6 +1605,7 @@
     "policy",
     "backtest",
     "sim",
+    "demo",
     "schedule",
     "api",
     "web",

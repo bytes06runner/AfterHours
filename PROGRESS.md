@@ -215,3 +215,16 @@ Acceptance
 - On the fork, a forced close-out moves funds exactly as planned, the registry event matches the recomputed hash, and SSE emits every event type: passed on the local profile (self-deployed Morpho, simulated oracle and collateral). The same code path runs on the fork once `make fork` has an archive RPC (BLOCKED 1); the fork deploy test already exercises the real contracts.
 
 Next: M7 scripted scenarios and `make demo`.
+
+### 2026-09-26 Session pause (usage limit): M7 nearly done, M8 started
+
+Done since M6
+- Scenarios (`engine/afterhours/sim/scenarios.py`, `afterhours sim scenario <name>`): closing_bell (steps bell by bell until a stock loses the weekday tier), earnings_shock (gaps a simulated oracle at the open, liquidates through Morpho, reports exposure and loss), oracle_drift (walks an oracle down; the shock trigger fires on the third 1.2% step).
+- `make demo` / `make up` (`scripts/demo.sh`): local chain starting Tuesday 2026-08-18 13:00 New York (chosen by scanning 68 weeks; reason in config), deploy, seed, API, scheduler, web, closing-bell scenario. Verified unattended with DEMO_EXIT=1: Tuesday no moves; Wednesday's pre-close check moves SPY's unborrowed 113,607 USDG (sim) out of the 91.5% tier and places freed money in USO's 77% tier, each with an anchored reason card.
+- Fixed on the way: live and assumed rates were mixed (the planner chased empty markets); reason cards now state the real cause (risk, rate or limit); risk-driven moves always execute, rate moves need 1% of the vault; dust moves under 1,000 USDG are skipped.
+- `make report` = gaps, model, backtest.
+
+In flight / next
+- The backtest was rerunning to match the LP's new execution rule (risk moves always execute). When `artifacts/backtest/results.json` is regenerated, compare it with the M4 table above, update M4's numbers if they moved, and commit.
+- Run `make test-integration` (engine/tests/integration/test_demo.py is new, not yet run) and then mark M7 done.
+- M8: web dependencies are installed (gsap, motion, lenis, visx, wagmi 2, viem, RainbowKit 2, react-query, canonicalize, @noble/hashes, Playwright). Plan: one registered `--phase` CSS property mixes every day and night token with color-mix; art components in web/src/art; add a public RPC URL to /v1/config/public for the wallet. Check brass-button contrast (ink on brass is about 3.9:1, so labels need 19px bold to count as large text).
