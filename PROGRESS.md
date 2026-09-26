@@ -407,3 +407,20 @@ Submission checklist (every field from Colosseum's FAQ, `docs/findings/m12-submi
 
 Evidence
 - `make lint`: clean, including lint-numbers and lint-hardcode. `make test`: Python 49 passed, vitest 25, forge 22 passed (2 fork tests skipped without a fork URL). `make e2e`: 32 passed.
+
+### 2026-09-27 Decision rule for option A (written before any run)
+
+Context: read-only runs showed NVDA and META almost never qualify for the weekday tier (the flat
+5-point margin leaves a 1.11% limit against a 6.1% cushion), and a fixed per-stock map (SPY and
+SGOV weekday, the rest weekend, no forecast) beat Afterhours on bad debt, worst event and
+interest. The team chose option A: retune against a fair fixed-map baseline.
+
+Rule (set by the team, not to be changed after results are seen):
+- Tune only on closed periods from 2017 through 2021. Evaluate once on 2022 through 2026.
+- The dynamic strategy wins only if, on 2022 to 2026, it has less bad debt than the
+  no-hindsight fixed map at equal or higher interest.
+- If it does not win, ship option B (fixed per-stock tiers plus pulling unborrowed money before
+  risky nights) and say so plainly in the README and the report card.
+- Report all strategies on both the 5 vault stocks and the full Stock Token universe.
+- README, pitch.md and demo.md change only after this rule has been applied.
+- Time box: one working day for A. The LightGBM multiplier (item 5) waits until A is decided.
