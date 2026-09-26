@@ -1,0 +1,43 @@
+{
+  "id": "35fe6ee1-5a69-4688-8649-9d63df627f13",
+  "created_at": "2026-08-18T17:00:39+00:00",
+  "profile": "local",
+  "subject": "0xc965a7b2e91153f30927403c3a0c85b44388eafd6d0bc3f1dd8643d104168a04",
+  "stock": "USO",
+  "action": "reallocate",
+  "from_tier": "idle",
+  "to_tier": "weekend",
+  "amount_usdg": "486887.34",
+  "closed_period": {
+    "starts": "2026-08-18T20:00:00+00:00",
+    "ends": "2026-08-19T13:30:00+00:00",
+    "segment": "overnight",
+    "hours": "17.50"
+  },
+  "prediction": {
+    "alpha": "0.0100",
+    "bad_case_drop": "0.042353",
+    "model_version": "2975043dcd63122f",
+    "method": "ewma_normal"
+  },
+  "top_drivers": [
+    {
+      "feature": "stock_volatility",
+      "contribution": "0.066547",
+      "detail": "EWMA daily volatility 3.47%"
+    },
+    {
+      "feature": "segment_overnight",
+      "contribution": "-0.024194",
+      "detail": "calibrated overnight correction -0.82 volatility units"
+    },
+    {
+      "feature": "closed_hours",
+      "contribution": "0.000000",
+      "detail": "17.5 hours closed"
+    }
+  ],
+  "drivers_method": "exact additive split of the calibrated EWMA baseline (volatility, closed hours, segment)",
+  "rule_fired": "Placed idle USDG where it is allowed: bad-case drop 4.2% plus margin 5.0% = 9.2% fits inside the weekend tier cushion of 17.3% (LLTV 77.0%).",
+  "reason_hash": "0x2a9c6a53a0e5f78872ab0bb38bb93903d964c29d3698307f2d6edda220ef3278"
+}

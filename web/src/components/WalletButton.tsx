@@ -1,28 +1,20 @@
 "use client";
 
-/**
- * Connect button. RainbowKit and wagmi are large, so they load only after the first press.
- */
 import dynamic from "next/dynamic";
-import { useState } from "react";
 
-const WalletRoot = dynamic(() => import("./WalletRoot"), {
-  ssr: false,
-  loading: () => (
-    <button type="button" className="btn btn-quiet !min-h-[40px] !text-[16px]" disabled>
-      Connecting
-    </button>
-  ),
-});
+import { useWalletGate } from "./wallet/WalletGate";
 
+const ConnectLazy = dynamic(() => import("./wallet/ConnectLazy"), { ssr: false });
+
+/** Connect button. The wallet libraries load after the first press (or on the vault page). */
 export function WalletButton() {
-  const [wanted, setWanted] = useState(false);
-  if (wanted) return <WalletRoot openOnMount />;
+  const { enabled, enable } = useWalletGate();
+  if (enabled) return <ConnectLazy />;
   return (
     <button
       type="button"
       className="btn btn-quiet !min-h-[40px] !text-[16px]"
-      onClick={() => setWanted(true)}
+      onClick={() => enable(true)}
     >
       Connect
     </button>

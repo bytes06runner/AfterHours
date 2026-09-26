@@ -705,6 +705,33 @@
       "title": "DriftSpec",
       "type": "object"
     },
+    "FaucetConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "cooldown_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Cooldown Seconds",
+          "type": "integer"
+        },
+        "eth": {
+          "exclusiveMinimum": 0,
+          "title": "Eth",
+          "type": "number"
+        },
+        "usdg": {
+          "exclusiveMinimum": 0,
+          "title": "Usdg",
+          "type": "number"
+        }
+      },
+      "required": [
+        "usdg",
+        "eth",
+        "cooldown_seconds"
+      ],
+      "title": "FaucetConfig",
+      "type": "object"
+    },
     "GapsConfig": {
       "additionalProperties": false,
       "properties": {
@@ -1015,6 +1042,18 @@
     "PolicyConfig": {
       "additionalProperties": false,
       "properties": {
+        "idle_reserve_share": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Idle Reserve Share",
+          "type": "number"
+        },
+        "liquidity_min_headroom_share": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Liquidity Min Headroom Share",
+          "type": "number"
+        },
         "lookahead_closed_periods": {
           "exclusiveMinimum": 0,
           "title": "Lookahead Closed Periods",
@@ -1048,7 +1087,9 @@
         "turnover_penalty",
         "min_rebalance_usd",
         "min_rebalance_share_of_tvl",
-        "lookahead_closed_periods"
+        "lookahead_closed_periods",
+        "idle_reserve_share",
+        "liquidity_min_headroom_share"
       ],
       "title": "PolicyConfig",
       "type": "object"
@@ -1293,6 +1334,9 @@
           "title": "Eth Per Actor",
           "type": "number"
         },
+        "faucet": {
+          "$ref": "#/$defs/FaucetConfig"
+        },
         "lender_deposit_usdg": {
           "$ref": "#/$defs/Range"
         },
@@ -1313,7 +1357,8 @@
         "borrowers_per_market",
         "borrow_share_of_market_supply",
         "borrower_ltv_share_of_lltv",
-        "eth_per_actor"
+        "eth_per_actor",
+        "faucet"
       ],
       "title": "SimConfig",
       "type": "object"

@@ -26,7 +26,7 @@ from afterhours.config import AfterhoursConfig
 from afterhours.data.pipeline import make_cache
 from afterhours.deploy import role_keys
 from afterhours.deployments import load_deployment, load_discovered
-from afterhours.explain.reason import build_card, reason_hash
+from afterhours.explain.reason import VAULT_SUBJECT, build_card, reason_hash
 from afterhours.policy.lp import Plan, StockState, solve, tier_spec
 from afterhours.risk.live import Forecast, LiveRisk, session_state
 from afterhours.state import Store
@@ -138,6 +138,7 @@ class Allocator:
             min_rebalance_usd=p.min_rebalance_usd,
             max_share_per_stock=self.cfg.vault.max_share_per_stock * (1 - 1e-6),
             depth_multiplier=self.cfg.vault.depth_multiplier,
+            idle_reserve_share=p.idle_reserve_share,
         )
         return plan, driving
 
@@ -166,6 +167,7 @@ class Allocator:
             return result
         moves = self._execute(state, plan, result)
         self._anchor_reasons(state, plan, driving, moves, result)
+        self._route_liquidity(read_state(self.w3, self.deployment), plan, driving, result)
         after = read_state(self.w3, self.deployment)
         self.store.emit("vault_updated", after.to_json())
         result.executed = True
@@ -231,6 +233,111 @@ class Allocator:
             mv["txs"].append(sent.tx_hash)
         return moves
 
+    def _route_liquidity(
+        self, state: VaultState, plan: Plan, driving: dict[str, Forecast], result: CycleResult
+    ) -> None:
+        """Point deposits and withdrawals at the safest allowed weekend-tier market (SPEC 6.3)."""
+        # Deposits land in the liquidity market at once, so it must have room under the stock cap
+        # (Vault V2 reverts with RelativeCapExceeded otherwise). No such market: deposits stay idle.
+        cap = self.cfg.vault.max_share_per_stock * state.total_assets
+        room_needed = self.cfg.policy.liquidity_min_headroom_share * state.total_assets
+        held = {
+            s: sum(m.vault_supply for m in state.markets if m.symbol == s) for s in self.symbols()
+        }
+        allowed = [
+            m
+            for m in state.markets
+            if m.tier == "weekend"
+            and plan.allowed.get((m.symbol, m.tier))
+            and cap - held[m.symbol] >= room_needed
+        ]
+        if not allowed:
+            if state.liquidity_market is not None:
+                self._clear_liquidity(state, result)
+            return
+        target = min(allowed, key=lambda m: driving[m.symbol].bad_case_drop)
+        key = f"{target.symbol}:{target.tier}"
+        if state.liquidity_market == key:
+            return
+        vault = self.deployment["vault"]["address"]
+        adapter = self.deployment["adapter"]["address"]
+        sent = self.allocator.send(
+            vault,
+            "setLiquidityAdapterAndData(address,bytes)",
+            adapter,
+            encode([PARAMS_TYPE], [target.params]),
+        )
+        self.store.emit(
+            "tx_confirmed",
+            {
+                "tx": sent.tx_hash,
+                "block": sent.block,
+                "symbol": target.symbol,
+                "tier": target.tier,
+                "function": "setLiquidityAdapterAndData",
+            },
+        )
+        f = driving[target.symbol]
+        card = build_card(
+            profile=self.profile,
+            subject=VAULT_SUBJECT,
+            stock=target.symbol,
+            action="queue_reorder",
+            from_tier=state.liquidity_market,
+            to_tier=key,
+            amount_usdg=0.0,
+            forecast=f,
+            rule=(
+                f"New deposits and withdrawals now use {target.symbol}'s weekend tier market, the "
+                f"safest allowed market: bad case {f.bad_case_drop:.1%} against a cushion of "
+                f"{self.tiers[1].cushion:.1%}."
+            ),
+            created_at=self.now(),
+        )
+        self._log_card(card, sent.tx_hash, result)
+
+    def _clear_liquidity(self, state: VaultState, result: CycleResult) -> None:
+        """Route deposits to idle cash when no market has room."""
+        sent = self.allocator.send(
+            self.deployment["vault"]["address"],
+            "setLiquidityAdapterAndData(address,bytes)",
+            "0x" + "0" * 40,
+            b"",
+        )
+        self.store.emit(
+            "tx_confirmed",
+            {
+                "tx": sent.tx_hash,
+                "block": sent.block,
+                "function": "setLiquidityAdapterAndData",
+                "symbol": None,
+            },
+        )
+        result.txs.append(sent.tx_hash)
+
+    def _log_card(self, card: dict[str, Any], move_tx: str, result: CycleResult) -> None:
+        """Hash a card, log it to the registry, store it and emit reason_logged."""
+        h = reason_hash(card)
+        sent = self.allocator.send(
+            self.deployment["registry"]["address"],
+            "logReason(bytes32,bytes32,string)",
+            bytes.fromhex(card["subject"][2:]),
+            bytes.fromhex(h[2:]),
+            f"afterhours:reason:{card['id']}",
+        )
+        card["tx"] = {
+            "chain_id": int(self.w3.eth.chain_id),
+            "reallocate_tx": move_tx,
+            "registry_tx": sent.tx_hash,
+        }
+        card["reason_hash"] = h
+        self.store.add_reason(card)
+        self.store.emit(
+            "reason_logged",
+            {"id": card["id"], "stock": card["stock"], "hash": h, "registry_tx": sent.tx_hash},
+        )
+        result.reasons.append(card["id"])
+
     def _why(
         self, plan: Plan, symbol: str, out_tier: str | None, in_tier: str | None, state: VaultState
     ) -> str:
@@ -262,8 +369,6 @@ class Allocator:
         result: CycleResult,
     ) -> None:
         """One card per stock that moved, hashed and logged to the registry."""
-        registry = self.deployment["registry"]["address"]
-        chain_id = int(self.w3.eth.chain_id)
         weekday_id = {m.symbol: m.market_id for m in state.markets if m.tier == "weekday"}
         for symbol, mv in moves.items():
             out_tier = max(mv["out"], key=mv["out"].get) if mv["out"] else None
@@ -288,26 +393,7 @@ class Allocator:
                 rule=rule,
                 created_at=self.now(),
             )
-            h = reason_hash(card)
-            sent = self.allocator.send(
-                registry,
-                "logReason(bytes32,bytes32,string)",
-                bytes.fromhex(card["subject"][2:]),
-                bytes.fromhex(h[2:]),
-                f"afterhours:reason:{card['id']}",
-            )
-            card["tx"] = {
-                "chain_id": chain_id,
-                "reallocate_tx": mv["txs"][-1],
-                "registry_tx": sent.tx_hash,
-            }
-            card["reason_hash"] = h
-            self.store.add_reason(card)
-            self.store.emit(
-                "reason_logged",
-                {"id": card["id"], "stock": symbol, "hash": h, "registry_tx": sent.tx_hash},
-            )
-            result.reasons.append(card["id"])
+            self._log_card(card, mv["txs"][-1], result)
 
 
 def _pct(x: float) -> str:

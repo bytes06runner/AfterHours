@@ -52,6 +52,7 @@ class SimParams:
     max_share_per_stock: float
     depth_multiplier: float
     depth_usd: dict[str, float]
+    idle_reserve_share: float = 0.0
 
     @property
     def tiers(self) -> tuple[TierSpec, TierSpec]:
@@ -132,6 +133,7 @@ def _target(
         min_rebalance_usd=p.min_rebalance_usd,
         max_share_per_stock=p.max_share_per_stock,
         depth_multiplier=p.depth_multiplier,
+        idle_reserve_share=p.idle_reserve_share,
     )
     if plan.status != "optimal" or (not plan.execute and ledger.supply):
         return {k: max(v, ledger.borrowed.get(k, 0.0)) for k, v in ledger.supply.items()}, False
@@ -261,4 +263,5 @@ def params_from(
         max_share_per_stock=cfg_vault.max_share_per_stock,
         depth_multiplier=cfg_vault.depth_multiplier,
         depth_usd=dict(depth),
+        idle_reserve_share=cfg_policy.idle_reserve_share,
     )

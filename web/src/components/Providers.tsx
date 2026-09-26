@@ -4,12 +4,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { PhaseProvider, type Phase } from "@/lib/phase";
-import { useLiveStream } from "@/lib/queries";
+import { LiveStreamProvider } from "@/lib/queries";
 
-function Live() {
-  useLiveStream();
-  return null;
-}
+import { WalletGate } from "./wallet/WalletGate";
 
 export function Providers({
   initialPhase,
@@ -27,8 +24,9 @@ export function Providers({
   return (
     <QueryClientProvider client={client}>
       <PhaseProvider initial={initialPhase}>
-        <Live />
-        {children}
+        <LiveStreamProvider>
+          <WalletGate>{children}</WalletGate>
+        </LiveStreamProvider>
       </PhaseProvider>
     </QueryClientProvider>
   );

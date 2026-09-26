@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any
 
-from eth_abi import encode
+from eth_abi import decode, encode
 from eth_utils import keccak
 from web3 import Web3
 
@@ -48,6 +48,16 @@ class VaultState:
     idle: float
     markets: list[MarketState]
     decimals: int
+    liquidity_market: str | None = None  # "SYMBOL:tier" where deposits go and withdrawals come from
+
+    @property
+    def withdrawable_now(self) -> float:
+        """Idle cash plus what the liquidity market can hand back right now (Vault V2 exit)."""
+        extra = 0.0
+        for m in self.markets:
+            if f"{m.symbol}:{m.tier}" == self.liquidity_market:
+                extra = m.vault_supply - m.lent_out
+        return self.idle + extra
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -56,6 +66,8 @@ class VaultState:
             "total_assets": self.total_assets,
             "idle": self.idle,
             "decimals": self.decimals,
+            "liquidity_market": self.liquidity_market,
+            "withdrawable_now": self.withdrawable_now,
             "markets": [m.to_json() for m in self.markets],
         }
 
@@ -136,4 +148,30 @@ def read_state(w3: Web3, deployment: dict[str, Any]) -> VaultState:
                 allocation_id="0x" + ids[i][1].hex(),
             )
         )
-    return VaultState(number, ts, int(head[1]) / unit, int(head[2]) / unit, out, dec)
+    liq = call_many(
+        w3,
+        [Call(vault, "liquidityAdapter()(address)"), Call(vault, "liquidityData()(bytes)")],
+        block=number,
+    )
+    liquidity_market = None
+    if liq[0] and str(liq[0]).lower() == adapter.lower() and liq[1]:
+        params = decode([PARAMS_TYPE], bytes(liq[1]))[0]
+        for m in out:
+            if tuple(x.lower() if isinstance(x, str) else x for x in m.params) == tuple(
+                x.lower() if isinstance(x, str) else x for x in params
+            ):
+                liquidity_market = f"{m.symbol}:{m.tier}"
+    liq = call_many(
+        w3,
+        [Call(vault, "liquidityAdapter()(address)"), Call(vault, "liquidityData()(bytes)")],
+        block=number,
+    )
+    liquidity_market = None
+    if liq[0] and str(liq[0]).lower() == adapter.lower() and liq[1]:
+        target = tuple(str(x).lower() for x in decode([PARAMS_TYPE], bytes(liq[1]))[0])
+        for m in out:
+            if tuple(str(x).lower() for x in m.params) == target:
+                liquidity_market = f"{m.symbol}:{m.tier}"
+    return VaultState(
+        number, ts, int(head[1]) / unit, int(head[2]) / unit, out, dec, liquidity_market
+    )

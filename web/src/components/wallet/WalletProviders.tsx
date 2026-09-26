@@ -3,32 +3,45 @@
 import "@rainbow-me/rainbowkit/styles.css";
 
 import {
-  ConnectButton,
   RainbowKitProvider,
-  lightTheme,
+  connectorsForWallets,
   darkTheme,
+  lightTheme,
   useConnectModal,
 } from "@rainbow-me/rainbowkit";
+import {
+  injectedWallet,
+  metaMaskWallet,
+  rainbowWallet,
+  walletConnectWallet,
+} from "@rainbow-me/rainbowkit/wallets";
 import { useEffect, useMemo } from "react";
-import { WagmiProvider, createConfig, http } from "wagmi";
-import { injected } from "wagmi/connectors";
 import { defineChain } from "viem";
+import { WagmiProvider, createConfig, http } from "wagmi";
 
 import { usePhase } from "@/lib/phase";
+
+import { WalletReady } from "./ready";
 import { useConfig } from "@/lib/queries";
 
-function OpenOnMount() {
+function OpenOnMount({ open }: { open: boolean }) {
   const { openConnectModal } = useConnectModal();
   useEffect(() => {
-    openConnectModal?.();
-  }, [openConnectModal]);
+    if (open) openConnectModal?.();
+  }, [open, openConnectModal]);
   return null;
 }
 
-/** Wallet providers built from /v1/config/public: chain id, name and a browser-safe RPC. */
-export default function WalletRoot({ openOnMount = false }: { openOnMount?: boolean }) {
+/** wagmi and RainbowKit, built from /v1/config/public (chain id, name, browser-safe RPC). */
+export default function WalletProviders({
+  children,
+  openModal,
+}: {
+  children: React.ReactNode;
+  openModal: boolean;
+}) {
   const { data: pub } = useConfig();
-  const { phase } = usePhase();
+  const { live } = usePhase();
   const config = useMemo(() => {
     if (!pub?.chain.chain_id || !pub.chain.rpc_url) return null;
     const chain = defineChain({
@@ -40,15 +53,28 @@ export default function WalletRoot({ openOnMount = false }: { openOnMount?: bool
         ? { default: { name: "Explorer", url: pub.chain.explorer_url } }
         : undefined,
     });
+    // RainbowKit lists only wallets registered here. The browser wallet always works; the others
+    // need a WalletConnect project id (NEXT_PUBLIC_WC_PROJECT_ID).
+    const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "";
+    const wallets = projectId
+      ? [injectedWallet, metaMaskWallet, rainbowWallet, walletConnectWallet]
+      : [injectedWallet];
+    const connectors = connectorsForWallets([{ groupName: "Wallets", wallets }], {
+      appName: "Afterhours",
+      projectId: projectId || "not-configured",
+    });
     return createConfig({
       chains: [chain],
-      connectors: [injected()],
+      connectors,
       transports: { [chain.id]: http() },
+      ssr: false,
     });
   }, [pub]);
   const theme = useMemo(() => {
-    const base = phase === "day" ? lightTheme : darkTheme;
-    const t = base({ borderRadius: "medium", fontStack: "system" });
+    const t = (live === "day" ? lightTheme : darkTheme)({
+      borderRadius: "medium",
+      fontStack: "system",
+    });
     t.colors.accentColor = "var(--c-brass)";
     t.colors.accentColorForeground = "var(--c-on-brass)";
     t.colors.modalBackground = "var(--c-bg)";
@@ -56,15 +82,13 @@ export default function WalletRoot({ openOnMount = false }: { openOnMount?: bool
     t.fonts.body = "var(--font-hanken), sans-serif";
     t.shadows.dialog = "none";
     return t;
-  }, [phase]);
-  if (!config) {
-    return <span className="badge">Wallet unavailable: the API has no chain RPC</span>;
-  }
+  }, [live]);
+  if (!config) return <>{children}</>;
   return (
     <WagmiProvider config={config}>
       <RainbowKitProvider theme={theme} modalSize="compact">
-        {openOnMount && <OpenOnMount />}
-        <ConnectButton label="Connect" chainStatus="none" showBalance={false} />
+        <OpenOnMount open={openModal} />
+        <WalletReady.Provider value={true}>{children}</WalletReady.Provider>
       </RainbowKitProvider>
     </WagmiProvider>
   );

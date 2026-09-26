@@ -8,6 +8,12 @@ const sample = {
   simulation: { oracle: false, collateral: false },
   vault: { name: "Afterhours USDG", symbol: "ahUSDG" },
   exchange_calendar: "XNYS",
+  schedule: {
+    hourly: true,
+    pre_close_minutes: 120,
+    post_open_minutes: 30,
+    lookahead_closed_periods: 3,
+  },
   deployment: {},
   discovered: { morpho: { blue: "0x" + "1".repeat(40) } },
 };

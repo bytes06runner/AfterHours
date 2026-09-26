@@ -228,6 +228,12 @@ class Range(_Strict):
     high: Annotated[float, Field(ge=0)]
 
 
+class FaucetConfig(_Strict):
+    usdg: Annotated[float, Field(gt=0)]
+    eth: Annotated[float, Field(gt=0)]
+    cooldown_seconds: PositiveInt
+
+
 class SimConfig(_Strict):
     seed: int
     lenders: PositiveInt
@@ -236,6 +242,7 @@ class SimConfig(_Strict):
     borrow_share_of_market_supply: Fraction
     borrower_ltv_share_of_lltv: Range
     eth_per_actor: Annotated[float, Field(gt=0)]
+    faucet: FaucetConfig
 
 
 class ShockSpec(_Strict):
@@ -264,6 +271,8 @@ class PolicyConfig(_Strict):
     min_rebalance_usd: Annotated[float, Field(ge=0)]
     min_rebalance_share_of_tvl: Fraction
     lookahead_closed_periods: PositiveInt
+    idle_reserve_share: Fraction
+    liquidity_min_headroom_share: Fraction
 
 
 class TriggersConfig(_Strict):

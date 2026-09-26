@@ -270,3 +270,28 @@ Acceptance
 - Lighthouse targets met on a stub landing: pass (94 and 100).
 
 Next: M9 pages (Vault, Almanac, Ledger, Replay, Report card, the landing scroll story).
+
+### 2026-09-26 M9 in progress: Ledger, Vault, verify in browser, deposit and withdraw
+
+Done
+- Verify on chain in the browser (`web/src/lib/verify.ts`): RFC 8785 (`canonicalize`) + keccak-256 (`@noble/hashes`), then the ReasonLogged event read with viem from the card's registry transaction. A vitest pins the browser hash to the hash the Python bot anchored for a real card.
+- Telegram (reason card as a printed slip with driver bars) and VerifyBadge (matched or mismatched, both hashes, event number, block, transaction).
+- Ledger page: telegram rail, stock filter, paging, empty state naming the next pre-close check (public config now carries the schedule).
+- Vault page: position and deposit panel, session badge and countdown, AllocationBoard (brass bars sized by USDG, lent-out part hatched, idle reservoir with the reserve line, bars glide when money moves and the row flashes on tx_confirmed), latest three telegrams.
+- Wallet: one lazily loaded set of wagmi and RainbowKit providers shared by the header and the vault (WalletGate).
+
+Bugs found by the new end-to-end test and fixed
+- The wallet modal listed no wallets (RainbowKit needs connectorsForWallets): now the browser wallet always, MetaMask, Rainbow and WalletConnect when NEXT_PUBLIC_WC_PROJECT_ID is set.
+- Vault V2 pays withdrawals only from idle cash and its liquidity market (maxWithdraw always returns 0), and the bot kept almost nothing idle: new `policy.idle_reserve_share` 0.05 in the LP, and the bot now sets the liquidity market (SPEC 6.3 "where new deposits go") to the safest allowed weekend-tier market, logged as a `queue_reorder` reason.
+- Deposits reverted with RelativeCapExceeded because the liquidity market's stock was already at its 35% cap: the bot now routes only to markets with at least `policy.liquidity_min_headroom_share` (5%) of room, else to idle cash.
+- Share amounts used USDG's 6 decimals instead of the vault's 18; withdraw gas estimates were too tight (OutOfGas): the panel adds a 30% buffer to its own estimate.
+- Sim-only faucet `POST /v1/sim/faucet` (local profile, simulated USDG, per-address cooldown).
+
+Backtest regenerated with the 5% idle reserve (same tuned setting): Afterhours 7.47% net yield and $5,122 bad debt; always weekend 6.85% and $7,491; always weekday 8.84% and $108,748; perfect foresight 8.96% and $65,615. Afterhours still beats always-weekend on both in every sensitivity. These supersede the M4 table above.
+
+Evidence
+- `WEB_BASE_URL=... ANVIL_RPC_URL=... pnpm exec playwright test` (web/e2e/vault.spec.ts): pass in 14 s: faucet, deposit 1,000 USDG (sim), withdraw 400 through the UI with an in-page test wallet on the local chain.
+- Ledger in the browser: "Matched onchain" for the SPY de-risk card (registry event #4, block 168).
+- vitest 12 passed; eslint and tsc clean; Python tests, ruff and mypy clean.
+
+Next: Almanac, Replay, Report card, landing scroll story; screenshot loop for every page.

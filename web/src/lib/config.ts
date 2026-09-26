@@ -33,6 +33,12 @@ export const PublicConfigSchema = z.object({
     symbol: z.string().min(1),
   }),
   exchange_calendar: z.string().min(1),
+  schedule: z.object({
+    hourly: z.boolean(),
+    pre_close_minutes: z.number(),
+    post_open_minutes: z.number(),
+    lookahead_closed_periods: z.number(),
+  }),
   deployment: z.record(z.string(), z.unknown()),
   discovered: z.record(z.string(), addressTree),
 });

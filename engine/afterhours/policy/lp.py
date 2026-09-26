@@ -10,7 +10,7 @@ Variables x[s,t] (USDG supplied), with
     x[s,t] <= borrowed[s,t]                    if tier t is not allowed for s
     sum_t x[s,t] <= max(stock_limit_s, sum_t borrowed[s,t])
     stock_limit_s = min(max_share * total, depth_multiplier * depth_s)
-    sum x + idle = total, idle >= 0
+    sum x + idle = total, idle >= idle_reserve_share * total (unless lent-out money exceeds it)
 Objective: maximise sum r[s,t] x[s,t] - turnover_penalty * sum |x - x_prev|, linearised
 with x - x_prev = up - down, up, down >= 0. Solved with HiGHS through scipy.
 """
@@ -89,8 +89,13 @@ def solve(
     min_rebalance_usd: float,
     max_share_per_stock: float,
     depth_multiplier: float,
+    idle_reserve_share: float = 0.0,
 ) -> Plan:
-    """Solve the allocation LP. Units are USDG."""
+    """Solve the allocation LP. Units are USDG.
+
+    `idle_reserve_share` keeps that share of the vault uninvested (the idle reservoir), so
+    withdrawals can be paid without pulling from markets; money already lent out can exceed it.
+    """
     keys = [(s.symbol, t.name) for s in stocks for t in tiers]
     n = len(keys)
     idx = {k: i for i, k in enumerate(keys)}
@@ -128,7 +133,7 @@ def solve(
         rhs.append(limits[s.symbol])
     total_row = np.concatenate([np.ones(n), np.zeros(2 * n)])
     rows.append(total_row)
-    rhs.append(total)
+    rhs.append(max(total * (1 - idle_reserve_share), float(lower.sum())))
     bounds = [(lower[i], upper[i]) for i in range(n)] + [(0, None)] * (2 * n)
     res = linprog(
         c,

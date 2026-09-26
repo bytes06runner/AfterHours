@@ -40,6 +40,12 @@ class Shock(BaseModel):
     pct: float  # e.g. -0.2 for a 20% drop
 
 
+class FaucetRequest(BaseModel):
+    """Body of POST /v1/sim/faucet."""
+
+    address: str
+
+
 class Context:
     """Per-process handles, created lazily so the API starts even when the chain is down."""
 
@@ -203,6 +209,10 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
             "tvl_usdg": state.total_assets,
             "idle_usdg": state.idle,
             "placed_usdg": placed,
+            "liquidity_market": state.liquidity_market,
+            "withdrawable_now_usdg": state.withdrawable_now,
+            "idle_reserve_share": cfg.policy.idle_reserve_share,
+            "max_share_per_stock": cfg.vault.max_share_per_stock,
             "apy": apy,
             "share_price": int(assets_per_share) / 10**state.decimals,
             "tiers": d["tiers"],
@@ -428,6 +438,36 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
         )
         ctx.store.emit("status", {"shock": body.symbol, "pct": body.pct, "price8": new})
         return {"symbol": body.symbol, "old_price8": price, "new_price8": new}
+
+    faucet_log: dict[str, float] = {}
+
+    @app.post("/v1/sim/faucet")
+    def sim_faucet(body: FaucetRequest) -> dict[str, Any]:
+        """Simulated USDG and gas for a browser wallet (local profile, simulated loan token)."""
+        import time as _time
+
+        from afterhours.chain.tx import Signer
+        from afterhours.deploy import role_keys
+
+        d = ctx.deployment
+        if cfg.active_profile != "local" or not d or not d["simulation"]["collateral"]:
+            raise HTTPException(403, "The faucet runs only on the local simulation.")
+        if not Web3.is_address(body.address):
+            raise HTTPException(400, "That is not an address.")
+        who = Web3.to_checksum_address(body.address)
+        f = cfg.sim.faucet
+        last = faucet_log.get(who, 0.0)
+        if _time.time() - last < f.cooldown_seconds:
+            raise HTTPException(429, f"One faucet request per {f.cooldown_seconds} seconds.")
+        faucet_log[who] = _time.time()
+        w3 = ctx.w3()
+        w3.provider.make_request("anvil_setBalance", [who, hex(int(f.eth * 1e18))])  # type: ignore[arg-type]
+        loan = d["loan_token"]["address"]
+        dec = int(call_many(w3, [Call(loan, "decimals()(uint8)")])[0])
+        Signer(w3, role_keys(cfg, cfg.active_profile)["DEPLOYER_PK"]).send(
+            loan, "mint(address,uint256)", who, int(f.usdg * 10**dec)
+        )
+        return {"address": who, "usdg": f.usdg, "eth": f.eth, "label": "Simulation"}
 
     @app.get("/v1/stream")
     async def stream(replay: bool = False) -> EventSourceResponse:

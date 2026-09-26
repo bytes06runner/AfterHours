@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { createContext, createElement, useContext, useEffect, useState } from "react";
 
 import { api, STREAM_EVENTS, streamUrl, type StreamEvent } from "./api";
 
@@ -82,3 +82,16 @@ export function useLiveStream(): { last: LiveEvent | null; connected: boolean } 
   }, [client]);
   return { last, connected };
 }
+
+const LiveContext = createContext<{ last: LiveEvent | null; connected: boolean }>({
+  last: null,
+  connected: false,
+});
+
+/** The app's one event-stream subscription; children read it with useLiveEvent. */
+export function LiveStreamProvider({ children }: { children: React.ReactNode }) {
+  const value = useLiveStream();
+  return createElement(LiveContext.Provider, { value }, children);
+}
+
+export const useLiveEvent = () => useContext(LiveContext);

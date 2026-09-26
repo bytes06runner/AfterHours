@@ -195,6 +195,10 @@ policy:
   # Act on the worst bad case over the next N closed periods, so loans have time to roll off
   # before a scheduled risky night (earnings). 1 = only the next period (the SPEC 7.5 rule).
   lookahead_closed_periods: 3           # tuned in M4 (grid 1, 3, 5, 10); 1 is the SPEC 7.5 rule
+  # Vault V2 pays withdrawals from idle cash and its liquidity market only, so keep a reserve.
+  idle_reserve_share: 0.05
+  # The liquidity market receives new deposits at once; it needs this much room under its stock cap.
+  liquidity_min_headroom_share: 0.05
 
 # Backtest and replay (M4). Historical stock prices, simulated vault. Rates, utilisation and
 # borrower behaviour are ASSUMPTIONS: Stock Token markets on Robinhood Chain show ~0% utilisation
@@ -229,6 +233,9 @@ sim:
   borrow_share_of_market_supply: 0.8      # borrowers take up to this share of each market's supply
   borrower_ltv_share_of_lltv: { low: 0.60, high: 0.95 }
   eth_per_actor: 10
+  # Browser faucet for the local demo only (simulated USDG, local chain): per request, and
+  # at most once per address per cooldown.
+  faucet: { usdg: 50000, eth: 1, cooldown_seconds: 60 }
 
 # The scripted demo (M7). Runs on `profile`: local until an archive RPC allows the fork.
 # start: Tuesday 2026-08-18 13:00 New York. Found by scanning Tuesdays from June 2025 to

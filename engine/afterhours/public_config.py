@@ -30,6 +30,12 @@ def public_config(cfg: AfterhoursConfig) -> dict[str, Any]:
         },
         "vault": {"name": cfg.vault.name, "symbol": cfg.vault.symbol},
         "exchange_calendar": cfg.data.exchange_calendar,
+        "schedule": {
+            "hourly": cfg.schedule.hourly,
+            "pre_close_minutes": cfg.schedule.pre_close_minutes,
+            "post_open_minutes": cfg.schedule.post_open_minutes,
+            "lookahead_closed_periods": cfg.policy.lookahead_closed_periods,
+        },
         "deployment": load_deployment(cfg),
         "discovered": _addresses_only(load_discovered(cfg)),
     }
