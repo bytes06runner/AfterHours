@@ -16,10 +16,12 @@ afterhours = { workspace = true }
 [dependency-groups]
 dev = [
   "mypy>=1.13",
+  "pandas-stubs>=3.0.5.260914",
   "pytest>=8.3",
   "ruff>=0.8",
   "types-PyYAML",
   "types-jsonschema",
+  "types-requests>=2.33.0.20260906",
 ]
 
 [tool.ruff]
@@ -29,7 +31,10 @@ extend-exclude = ["contracts/lib", "web", "data"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "N", "PL", "PT"]
-ignore = ["PLR0913", "PLR2004"]
+ignore = [
+  "PLR0913", "PLR2004", "PLR0917", "PLR0912", "PLR0915", "PLR0914",
+  "PLC0415",  # lazy imports keep the CLI fast; heavy modules load per command
+]
 
 [tool.mypy]
 python_version = "3.12"
@@ -43,3 +48,11 @@ addopts = "-q"
 
 [tool.ruff.lint.isort]
 known-first-party = ["afterhours"]
+
+[[tool.mypy.overrides]]
+module = ["yfinance", "yfinance.*", "pandas_market_calendars", "lightgbm", "scipy.*", "sklearn.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["eth_abi", "eth_utils"]
+implicit_reexport = true

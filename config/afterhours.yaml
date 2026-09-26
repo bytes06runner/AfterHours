@@ -14,44 +14,94 @@ profiles:
   fork:
     chain: robinhood
     rpc_env: RH_MAINNET_RPC_URL
-    fork_block: null
+    # Friday 2026-09-25 13:00 New York time (block timestamp 1790355600), three hours before
+    # the closing bell. Found with `cast find-block`; evidence in deployments/fork.discovered.json.
+    fork_block: 72388902
     local_rpc_port_env: ANVIL_PORT
     oracle_mode: chainlink
     collateral_mode: native
+    morpho_source: discovered
   rh-testnet:
     chain: robinhood-testnet
     rpc_env: RH_TESTNET_RPC_URL
     oracle_mode: simulated
     collateral_mode: simulated
+    morpho_source: self-deployed   # Morpho has no Robinhood testnet deployment (M1)
   rh-mainnet:
     chain: robinhood
     rpc_env: RH_MAINNET_RPC_URL
     oracle_mode: chainlink
     collateral_mode: native
+    morpho_source: discovered
     requires_human_go: true
   arb-sepolia:
     chain: arbitrum-sepolia
     rpc_env: ARB_SEPOLIA_RPC_URL
     oracle_mode: simulated
     collateral_mode: simulated
+    morpho_source: self-deployed   # Morpho has no Arbitrum Sepolia deployment (M1)
   arb-one:
     chain: arbitrum
     rpc_env: ARB_ONE_RPC_URL
-    oracle_mode: chainlink
-    collateral_mode: native
+    oracle_mode: simulated         # no Robinhood Stock Tokens or feeds on Arbitrum One (M1)
+    collateral_mode: simulated
+    morpho_source: discovered
     requires_human_go: true
 
+# Chain facts verified in M1 with `cast chain-id` against each public RPC; sources in
+# docs/findings/m1-discovery.md. Public RPCs are rate limited: set the *_RPC_URL env vars for real use.
 chains:
-  robinhood: { chain_id: null, explorer_url: null, explorer_api_url: null }
-  robinhood-testnet: { chain_id: null, explorer_url: null, explorer_api_url: null, faucet_url: null }
-  arbitrum: { chain_id: null, explorer_url: null }
-  arbitrum-sepolia: { chain_id: null, explorer_url: null, faucet_url: null }
+  robinhood:
+    chain_id: 4663
+    public_rpc_url: https://rpc.mainnet.chain.robinhood.com
+    explorer_url: https://robinhoodchain.blockscout.com
+    explorer_api_url: https://robinhoodchain.blockscout.com/api
+  robinhood-testnet:
+    chain_id: 46630
+    public_rpc_url: https://rpc.testnet.chain.robinhood.com
+    explorer_url: https://explorer.testnet.chain.robinhood.com
+    explorer_api_url: https://explorer.testnet.chain.robinhood.com/api
+    faucet_url: https://faucet.testnet.chain.robinhood.com
+  arbitrum:
+    chain_id: 42161
+    public_rpc_url: https://arb1.arbitrum.io/rpc
+    explorer_url: https://arbiscan.io
+  arbitrum-sepolia:
+    chain_id: 421614
+    public_rpc_url: https://sepolia-rollup.arbitrum.io/rpc
+    explorer_url: https://sepolia.arbiscan.io
+    faucet_url: https://arbitrum.faucet.dev
 
 morpho:
-  source: discovered
   vault_kind: null
   lltv_tiers: { weekday: null, weekend: null }
   liquidation_incentive: { verify_from: "morpho-blue ConstantsLib + MathLib" }
+
+# Onchain discovery (M1). Every address we use is fetched from one of these sources by
+# `afterhours discover`, then checked onchain; results go to deployments/<profile>.discovered.json.
+discovery:
+  chain: robinhood
+  loan_token_symbol: USDG
+  morpho_chain_key: RobinhoodMainnet       # key in the Morpho SDK address book
+  uniswap_chain_id_key: "4663"             # key in Uniswap's deployments.json
+  sources:
+    robinhood_token_contracts_page: https://docs.robinhood.com/chain/contracts
+    robinhood_assets_api: https://api.robinhood.com/rhj/assets
+    chainlink_feed_directory: https://reference-data-directory.vercel.app/feeds-robinhood-mainnet.json
+    chainlink_feed_docs: https://docs.chain.link/data-feeds/tokenized-equity-feeds/robinhood
+    morpho_address_book: https://raw.githubusercontent.com/morpho-org/sdks/main/packages/morpho-ts/src/addresses.ts
+    morpho_addresses_docs: https://docs.morpho.org/get-started/resources/addresses/
+    morpho_api: https://api.morpho.org/graphql
+    uniswap_deployments: https://developers.uniswap.org/deployments.json
+  oracle_study:
+    weekends: 8
+    max_log_block_range: 2000000
+  pool_scan:
+    quote_symbols: [USDG, WETH]
+    v3_fee_tiers: [100, 500, 3000, 10000]
+    depth_probe_usd: [1000, 10000, 100000, 1000000, 3000000, 10000000, 30000000]
+  http_timeout_seconds: 30
+  user_agent: afterhours-discovery/0.1
 
 vault:
   name: Afterhours USDG
@@ -70,10 +120,29 @@ universe:
   history_start: "2010-01-01"
 
 data:
-  providers: [yfinance, stooq, alphavantage]
+  providers: [yfinance, stooq, alphavantage]   # tried in order; results cached
   earnings_providers: [yfinance, finnhub, alphavantage]
   exchange_calendar: XNYS
   cache_dir: data/cache
+  vix_ticker: "^VIX"
+  market_ticker: SPY                  # market-wide return on the last session
+  download_batch_size: 50
+  earnings_history_limit: 100         # quarters requested per ticker from yfinance
+  cache_max_age_hours: 24             # refetch cached series older than this
+  request_pause_seconds: 0.3
+  finnhub_key_env: FINNHUB_API_KEY
+  alphavantage_key_env: ALPHAVANTAGE_API_KEY
+  sources:
+    sp500_constituents_url: https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+    stooq_daily_url: https://stooq.com/q/d/l/?s={symbol}&i=d
+    alphavantage_url: https://www.alphavantage.co/query
+    finnhub_url: https://finnhub.io/api/v1
+
+# Gap study (M2): statistics written to artifacts/gaps/.
+gaps:
+  quantiles: [0.001, 0.005, 0.01, 0.05, 0.5, 0.95, 0.99]
+  drop_thresholds: [0.05, 0.10, 0.20, 0.30]
+  worst_n: 25
 
 model:
   quantiles: [0.01, 0.05]
@@ -81,6 +150,10 @@ model:
   conformal: { method: cqr, mondrian_segments: [earnings, weekend, holiday, overnight] }
   lightgbm: { num_leaves: 31, learning_rate: 0.05, n_estimators: 800, min_child_samples: 50 }
   walk_forward: { train_years: 6, calibrate_years: 1, test_years: 1 }
+  baselines: { ewma_lambda: 0.94, min_ticker_segment_rows: 30 }
+  acceptance: { overall_coverage_tolerance: 0.01, earnings_coverage_tolerance: 0.02 }
+  seed: 7
+  n_jobs: -1
 
 policy:
   safety_margin: 0.02

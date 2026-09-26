@@ -53,11 +53,13 @@ class ProfileConfig(_Strict):
     local_rpc_port_env: EnvName | None = None
     oracle_mode: Literal["chainlink", "simulated"]
     collateral_mode: Literal["native", "simulated"]
+    morpho_source: Literal["discovered", "self-deployed"]
     requires_human_go: bool = False
 
 
 class ChainConfig(_Strict):
     chain_id: PositiveInt | None = None
+    public_rpc_url: HttpUrlStr | None = None
     explorer_url: HttpUrlStr | None = None
     explorer_api_url: HttpUrlStr | None = None
     faucet_url: HttpUrlStr | None = None
@@ -73,7 +75,6 @@ class LiquidationIncentiveConfig(_Strict):
 
 
 class MorphoConfig(_Strict):
-    source: Literal["discovered", "self-deployed"]
     vault_kind: Literal["metamorpho", "vault-v2"] | None = None
     lltv_tiers: LltvTiers
     liquidation_incentive: LiquidationIncentiveConfig
@@ -102,11 +103,33 @@ class UniverseConfig(_Strict):
     history_start: Annotated[str, StringConstraints(pattern=r"^\d{4}-\d{2}-\d{2}$")]
 
 
+class DataSources(_Strict):
+    sp500_constituents_url: HttpUrlStr
+    stooq_daily_url: HttpUrlStr
+    alphavantage_url: HttpUrlStr
+    finnhub_url: HttpUrlStr
+
+
 class DataConfig(_Strict):
     providers: list[Literal["yfinance", "stooq", "alphavantage"]]
     earnings_providers: list[Literal["yfinance", "finnhub", "alphavantage"]]
     exchange_calendar: str
     cache_dir: str
+    vix_ticker: str
+    market_ticker: str
+    download_batch_size: PositiveInt
+    earnings_history_limit: PositiveInt
+    cache_max_age_hours: Annotated[float, Field(gt=0)]
+    request_pause_seconds: Annotated[float, Field(ge=0)]
+    finnhub_key_env: EnvName
+    alphavantage_key_env: EnvName
+    sources: DataSources
+
+
+class GapsConfig(_Strict):
+    quantiles: list[Annotated[float, Field(gt=0, lt=1)]]
+    drop_thresholds: list[Annotated[float, Field(gt=0, lt=1)]]
+    worst_n: PositiveInt
 
 
 class ConformalConfig(_Strict):
@@ -127,12 +150,26 @@ class WalkForwardConfig(_Strict):
     test_years: PositiveInt
 
 
+class BaselinesConfig(_Strict):
+    ewma_lambda: Annotated[float, Field(gt=0, lt=1)]
+    min_ticker_segment_rows: PositiveInt
+
+
+class AcceptanceConfig(_Strict):
+    overall_coverage_tolerance: Fraction
+    earnings_coverage_tolerance: Fraction
+
+
 class ModelConfig(_Strict):
     quantiles: list[Annotated[float, Field(gt=0, lt=1)]]
     target_alpha: Annotated[float, Field(gt=0, lt=1)]
     conformal: ConformalConfig
     lightgbm: LightGbmConfig
     walk_forward: WalkForwardConfig
+    baselines: BaselinesConfig
+    acceptance: AcceptanceConfig
+    seed: int
+    n_jobs: int
 
     @model_validator(mode="after")
     def _alpha_is_a_quantile(self) -> ModelConfig:
@@ -178,6 +215,42 @@ class AlertsConfig(_Strict):
     webhook_env: EnvName
 
 
+class DiscoverySources(_Strict):
+    """Where each discovered fact comes from. Every entry is an official or primary source."""
+
+    robinhood_token_contracts_page: HttpUrlStr
+    robinhood_assets_api: HttpUrlStr
+    chainlink_feed_directory: HttpUrlStr
+    chainlink_feed_docs: HttpUrlStr
+    morpho_address_book: HttpUrlStr
+    morpho_addresses_docs: HttpUrlStr
+    morpho_api: HttpUrlStr
+    uniswap_deployments: HttpUrlStr
+
+
+class OracleStudyConfig(_Strict):
+    weekends: PositiveInt
+    max_log_block_range: PositiveInt
+
+
+class PoolScanConfig(_Strict):
+    quote_symbols: list[str]
+    v3_fee_tiers: list[PositiveInt]
+    depth_probe_usd: list[Annotated[float, Field(gt=0)]]
+
+
+class DiscoveryConfig(_Strict):
+    chain: str
+    loan_token_symbol: str
+    morpho_chain_key: str
+    uniswap_chain_id_key: str
+    sources: DiscoverySources
+    oracle_study: OracleStudyConfig
+    pool_scan: PoolScanConfig
+    http_timeout_seconds: Annotated[float, Field(gt=0)]
+    user_agent: str
+
+
 class AfterhoursConfig(BaseSettings):
     """The whole configuration. Build it with `load_config`, not directly."""
 
@@ -193,9 +266,11 @@ class AfterhoursConfig(BaseSettings):
     profiles: dict[str, ProfileConfig]
     chains: dict[str, ChainConfig]
     morpho: MorphoConfig
+    discovery: DiscoveryConfig
     vault: VaultConfig
     universe: UniverseConfig
     data: DataConfig
+    gaps: GapsConfig
     model: ModelConfig
     policy: PolicyConfig
     schedule: ScheduleConfig
@@ -223,6 +298,8 @@ class AfterhoursConfig(BaseSettings):
         for name, profile in self.profiles.items():
             if profile.chain not in self.chains:
                 raise ValueError(f"profile {name!r} uses unknown chain {profile.chain!r}")
+        if self.discovery.chain not in self.chains:
+            raise ValueError(f"discovery.chain {self.discovery.chain!r} is not in chains")
         return self
 
     @property
@@ -234,6 +311,14 @@ class AfterhoursConfig(BaseSettings):
     def chain(self) -> ChainConfig:
         """The chain of the active profile."""
         return self.chains[self.profile.chain]
+
+    def rpc_url(self, profile: str | None = None) -> str:
+        """Upstream RPC for a profile: the env var it names, else the chain's public RPC."""
+        prof = self.profiles[profile or self.active_profile]
+        url = os.environ.get(prof.rpc_env) or self.chains[prof.chain].public_rpc_url
+        if not url:
+            raise KeyError(f"set {prof.rpc_env} in .env; chain {prof.chain} has no public RPC")
+        return url
 
     def path(self, relative: str) -> Path:
         """Resolve a repo-relative path from config against the repository root."""

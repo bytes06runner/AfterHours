@@ -20,7 +20,7 @@ endif
 AH := uv run --quiet afterhours
 WEB := pnpm --filter @afterhours/web
 
-.PHONY: help setup gen-schema fork deploy seed engine api web up demo report \
+.PHONY: help setup gen-schema discover verify-discovered fork deploy seed engine api web up demo report \
         test test-py test-web test-sol test-config lint lint-py lint-web lint-sol lint-hardcode
 
 help: ## List commands
@@ -32,6 +32,7 @@ setup: ## Install toolchains and dependencies (uv, pnpm, foundry libs)
 	@command -v pnpm >/dev/null || npm install -g pnpm@9
 	uv python install 3.12
 	uv sync
+	./scripts/link-libomp.sh
 	pnpm install
 	git submodule update --init --recursive
 	git config core.hooksPath .githooks
@@ -40,6 +41,12 @@ setup: ## Install toolchains and dependencies (uv, pnpm, foundry libs)
 
 gen-schema: ## Regenerate config/schema.json from the pydantic model
 	$(AH) config schema
+
+discover: ## M1: find and verify protocol addresses, write deployments/<profile>.discovered.json
+	$(AH) discover
+
+verify-discovered: ## Re-check the discovered file with plain cast calls
+	./scripts/verify-discovered.sh
 
 # ---------------------------------------------------------------- stack (later milestones)
 

@@ -1,5 +1,28 @@
 {
   "$defs": {
+    "AcceptanceConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "earnings_coverage_tolerance": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Earnings Coverage Tolerance",
+          "type": "number"
+        },
+        "overall_coverage_tolerance": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Overall Coverage Tolerance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "overall_coverage_tolerance",
+        "earnings_coverage_tolerance"
+      ],
+      "title": "AcceptanceConfig",
+      "type": "object"
+    },
     "AlertsConfig": {
       "additionalProperties": false,
       "properties": {
@@ -46,6 +69,28 @@
         "admin_token_env"
       ],
       "title": "ApiConfig",
+      "type": "object"
+    },
+    "BaselinesConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "ewma_lambda": {
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "title": "Ewma Lambda",
+          "type": "number"
+        },
+        "min_ticker_segment_rows": {
+          "exclusiveMinimum": 0,
+          "title": "Min Ticker Segment Rows",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ewma_lambda",
+        "min_ticker_segment_rows"
+      ],
+      "title": "BaselinesConfig",
       "type": "object"
     },
     "ChainConfig": {
@@ -102,6 +147,19 @@
           ],
           "default": null,
           "title": "Faucet Url"
+        },
+        "public_rpc_url": {
+          "anyOf": [
+            {
+              "pattern": "^https?://",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Public Rpc Url"
         }
       },
       "title": "ChainConfig",
@@ -139,9 +197,29 @@
     "DataConfig": {
       "additionalProperties": false,
       "properties": {
+        "alphavantage_key_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Alphavantage Key Env",
+          "type": "string"
+        },
         "cache_dir": {
           "title": "Cache Dir",
           "type": "string"
+        },
+        "cache_max_age_hours": {
+          "exclusiveMinimum": 0,
+          "title": "Cache Max Age Hours",
+          "type": "number"
+        },
+        "download_batch_size": {
+          "exclusiveMinimum": 0,
+          "title": "Download Batch Size",
+          "type": "integer"
+        },
+        "earnings_history_limit": {
+          "exclusiveMinimum": 0,
+          "title": "Earnings History Limit",
+          "type": "integer"
         },
         "earnings_providers": {
           "items": {
@@ -159,6 +237,15 @@
           "title": "Exchange Calendar",
           "type": "string"
         },
+        "finnhub_key_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Finnhub Key Env",
+          "type": "string"
+        },
+        "market_ticker": {
+          "title": "Market Ticker",
+          "type": "string"
+        },
         "providers": {
           "items": {
             "enum": [
@@ -170,15 +257,214 @@
           },
           "title": "Providers",
           "type": "array"
+        },
+        "request_pause_seconds": {
+          "minimum": 0,
+          "title": "Request Pause Seconds",
+          "type": "number"
+        },
+        "sources": {
+          "$ref": "#/$defs/DataSources"
+        },
+        "vix_ticker": {
+          "title": "Vix Ticker",
+          "type": "string"
         }
       },
       "required": [
         "providers",
         "earnings_providers",
         "exchange_calendar",
-        "cache_dir"
+        "cache_dir",
+        "vix_ticker",
+        "market_ticker",
+        "download_batch_size",
+        "earnings_history_limit",
+        "cache_max_age_hours",
+        "request_pause_seconds",
+        "finnhub_key_env",
+        "alphavantage_key_env",
+        "sources"
       ],
       "title": "DataConfig",
+      "type": "object"
+    },
+    "DataSources": {
+      "additionalProperties": false,
+      "properties": {
+        "alphavantage_url": {
+          "pattern": "^https?://",
+          "title": "Alphavantage Url",
+          "type": "string"
+        },
+        "finnhub_url": {
+          "pattern": "^https?://",
+          "title": "Finnhub Url",
+          "type": "string"
+        },
+        "sp500_constituents_url": {
+          "pattern": "^https?://",
+          "title": "Sp500 Constituents Url",
+          "type": "string"
+        },
+        "stooq_daily_url": {
+          "pattern": "^https?://",
+          "title": "Stooq Daily Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sp500_constituents_url",
+        "stooq_daily_url",
+        "alphavantage_url",
+        "finnhub_url"
+      ],
+      "title": "DataSources",
+      "type": "object"
+    },
+    "DiscoveryConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "chain": {
+          "title": "Chain",
+          "type": "string"
+        },
+        "http_timeout_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Http Timeout Seconds",
+          "type": "number"
+        },
+        "loan_token_symbol": {
+          "title": "Loan Token Symbol",
+          "type": "string"
+        },
+        "morpho_chain_key": {
+          "title": "Morpho Chain Key",
+          "type": "string"
+        },
+        "oracle_study": {
+          "$ref": "#/$defs/OracleStudyConfig"
+        },
+        "pool_scan": {
+          "$ref": "#/$defs/PoolScanConfig"
+        },
+        "sources": {
+          "$ref": "#/$defs/DiscoverySources"
+        },
+        "uniswap_chain_id_key": {
+          "title": "Uniswap Chain Id Key",
+          "type": "string"
+        },
+        "user_agent": {
+          "title": "User Agent",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chain",
+        "loan_token_symbol",
+        "morpho_chain_key",
+        "uniswap_chain_id_key",
+        "sources",
+        "oracle_study",
+        "pool_scan",
+        "http_timeout_seconds",
+        "user_agent"
+      ],
+      "title": "DiscoveryConfig",
+      "type": "object"
+    },
+    "DiscoverySources": {
+      "additionalProperties": false,
+      "description": "Where each discovered fact comes from. Every entry is an official or primary source.",
+      "properties": {
+        "chainlink_feed_directory": {
+          "pattern": "^https?://",
+          "title": "Chainlink Feed Directory",
+          "type": "string"
+        },
+        "chainlink_feed_docs": {
+          "pattern": "^https?://",
+          "title": "Chainlink Feed Docs",
+          "type": "string"
+        },
+        "morpho_address_book": {
+          "pattern": "^https?://",
+          "title": "Morpho Address Book",
+          "type": "string"
+        },
+        "morpho_addresses_docs": {
+          "pattern": "^https?://",
+          "title": "Morpho Addresses Docs",
+          "type": "string"
+        },
+        "morpho_api": {
+          "pattern": "^https?://",
+          "title": "Morpho Api",
+          "type": "string"
+        },
+        "robinhood_assets_api": {
+          "pattern": "^https?://",
+          "title": "Robinhood Assets Api",
+          "type": "string"
+        },
+        "robinhood_token_contracts_page": {
+          "pattern": "^https?://",
+          "title": "Robinhood Token Contracts Page",
+          "type": "string"
+        },
+        "uniswap_deployments": {
+          "pattern": "^https?://",
+          "title": "Uniswap Deployments",
+          "type": "string"
+        }
+      },
+      "required": [
+        "robinhood_token_contracts_page",
+        "robinhood_assets_api",
+        "chainlink_feed_directory",
+        "chainlink_feed_docs",
+        "morpho_address_book",
+        "morpho_addresses_docs",
+        "morpho_api",
+        "uniswap_deployments"
+      ],
+      "title": "DiscoverySources",
+      "type": "object"
+    },
+    "GapsConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "drop_thresholds": {
+          "items": {
+            "exclusiveMaximum": 1,
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "title": "Drop Thresholds",
+          "type": "array"
+        },
+        "quantiles": {
+          "items": {
+            "exclusiveMaximum": 1,
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "title": "Quantiles",
+          "type": "array"
+        },
+        "worst_n": {
+          "exclusiveMinimum": 0,
+          "title": "Worst N",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "quantiles",
+        "drop_thresholds",
+        "worst_n"
+      ],
+      "title": "GapsConfig",
       "type": "object"
     },
     "LightGbmConfig": {
@@ -266,11 +552,21 @@
     "ModelConfig": {
       "additionalProperties": false,
       "properties": {
+        "acceptance": {
+          "$ref": "#/$defs/AcceptanceConfig"
+        },
+        "baselines": {
+          "$ref": "#/$defs/BaselinesConfig"
+        },
         "conformal": {
           "$ref": "#/$defs/ConformalConfig"
         },
         "lightgbm": {
           "$ref": "#/$defs/LightGbmConfig"
+        },
+        "n_jobs": {
+          "title": "N Jobs",
+          "type": "integer"
         },
         "quantiles": {
           "items": {
@@ -280,6 +576,10 @@
           },
           "title": "Quantiles",
           "type": "array"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
         },
         "target_alpha": {
           "exclusiveMaximum": 1,
@@ -296,7 +596,11 @@
         "target_alpha",
         "conformal",
         "lightgbm",
-        "walk_forward"
+        "walk_forward",
+        "baselines",
+        "acceptance",
+        "seed",
+        "n_jobs"
       ],
       "title": "ModelConfig",
       "type": "object"
@@ -309,14 +613,6 @@
         },
         "lltv_tiers": {
           "$ref": "#/$defs/LltvTiers"
-        },
-        "source": {
-          "enum": [
-            "discovered",
-            "self-deployed"
-          ],
-          "title": "Source",
-          "type": "string"
         },
         "vault_kind": {
           "anyOf": [
@@ -336,7 +632,6 @@
         }
       },
       "required": [
-        "source",
         "lltv_tiers",
         "liquidation_incentive"
       ],
@@ -362,6 +657,27 @@
         "min_pool_depth_usd"
       ],
       "title": "OnchainSelection",
+      "type": "object"
+    },
+    "OracleStudyConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "max_log_block_range": {
+          "exclusiveMinimum": 0,
+          "title": "Max Log Block Range",
+          "type": "integer"
+        },
+        "weekends": {
+          "exclusiveMinimum": 0,
+          "title": "Weekends",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "weekends",
+        "max_log_block_range"
+      ],
+      "title": "OracleStudyConfig",
       "type": "object"
     },
     "PathsConfig": {
@@ -416,6 +732,41 @@
       "title": "PolicyConfig",
       "type": "object"
     },
+    "PoolScanConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "depth_probe_usd": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "title": "Depth Probe Usd",
+          "type": "array"
+        },
+        "quote_symbols": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Quote Symbols",
+          "type": "array"
+        },
+        "v3_fee_tiers": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "title": "V3 Fee Tiers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "quote_symbols",
+        "v3_fee_tiers",
+        "depth_probe_usd"
+      ],
+      "title": "PoolScanConfig",
+      "type": "object"
+    },
     "ProfileConfig": {
       "additionalProperties": false,
       "properties": {
@@ -457,6 +808,14 @@
           "default": null,
           "title": "Local Rpc Port Env"
         },
+        "morpho_source": {
+          "enum": [
+            "discovered",
+            "self-deployed"
+          ],
+          "title": "Morpho Source",
+          "type": "string"
+        },
         "oracle_mode": {
           "enum": [
             "chainlink",
@@ -480,7 +839,8 @@
         "chain",
         "rpc_env",
         "oracle_mode",
-        "collateral_mode"
+        "collateral_mode",
+        "morpho_source"
       ],
       "title": "ProfileConfig",
       "type": "object"
@@ -736,6 +1096,12 @@
     "data": {
       "$ref": "#/$defs/DataConfig"
     },
+    "discovery": {
+      "$ref": "#/$defs/DiscoveryConfig"
+    },
+    "gaps": {
+      "$ref": "#/$defs/GapsConfig"
+    },
     "model": {
       "$ref": "#/$defs/ModelConfig"
     },
@@ -774,9 +1140,11 @@
     "profiles",
     "chains",
     "morpho",
+    "discovery",
     "vault",
     "universe",
     "data",
+    "gaps",
     "model",
     "policy",
     "schedule",

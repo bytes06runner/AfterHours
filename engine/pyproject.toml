@@ -10,6 +10,16 @@ dependencies = [
   "jsonschema>=4.23",
   "python-dotenv>=1.0",
   "typer>=0.13",
+  "web3>=7.6",
+  "httpx>=0.28",
+  "pandas-market-calendars>=5.0",
+  "yfinance>=0.2.60",
+  "pyarrow>=17",
+  "matplotlib>=3.9",
+  "lxml>=5",
+  "lightgbm>=4.5",
+  "scikit-learn>=1.5",
+  "scipy>=1.14",
 ]
 
 [project.scripts]

@@ -1,0 +1,59 @@
+{
+  "records": [
+    {
+      "id": "v4-poolmanager-ethereum",
+      "protocol": "v4",
+      "contract": "PoolManager",
+      "chain": "Ethereum",
+      "chainId": 1,
+      "address": "0x000000000004444c5dc75cB358380D2e3dE08A90",
+      "tier": "labs-launched",
+      "sourceRepo": "https://github.com/Uniswap/v4-core",
+      "sourceRef": "v4-core@1.0.0",
+      "sourceCodeUrl": "https://github.com/Uniswap/v4-core/blob/main/src/PoolManager.sol",
+      "explorerUrl": "https://etherscan.io/address/0x000000000004444c5dc75cB358380D2e3dE08A90",
+      "env": "mainnet",
+      "status": "active",
+      "aliases": [
+        "eth",
+        "mainnet"
+      ]
+    },
+    {
+      "id": "v4-poolmanager-robinhood-chain",
+      "protocol": "v4",
+      "contract": "PoolManager",
+      "chain": "Robinhood Chain",
+      "chainId": 4663,
+      "address": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
+      "tier": "labs-supported",
+      "sourceRepo": "https://github.com/Uniswap/v4-core",
+      "sourceRef": "56928a9",
+      "sourceCodeUrl": "https://github.com/Uniswap/v4-core/blob/main/src/PoolManager.sol",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x8366a39CC670B4001A1121B8F6A443A643e40951",
+      "env": "mainnet",
+      "status": "active",
+      "aliases": [
+        "robinhood"
+      ]
+    },
+    {
+      "id": "v3-uniswapv3factory-robinhood-chain",
+      "protocol": "v3",
+      "contract": "UniswapV3Factory",
+      "chain": "Robinhood Chain",
+      "chainId": 4663,
+      "address": "0x1f7d7550B1b028f7571E69A784071F0205FD2EfA",
+      "tier": "labs-supported",
+      "sourceRepo": "https://github.com/Uniswap/v3-core",
+      "sourceRef": "56928a9",
+      "sourceCodeUrl": "https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Factory.sol",
+      "explorerUrl": "https://robinhoodchain.blockscout.com/address/0x1f7d7550B1b028f7571E69A784071F0205FD2EfA",
+      "env": "mainnet",
+      "status": "active",
+      "aliases": [
+        "robinhood"
+      ]
+    }
+  ]
+}
