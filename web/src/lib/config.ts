@@ -22,6 +22,7 @@ export const PublicConfigSchema = z.object({
     key: z.string().min(1),
     chain_id: z.number().int().positive().nullable(),
     explorer_url: z.url({ protocol: /^https?$/ }).nullable(),
+    rpc_url: z.url({ protocol: /^https?$/ }).nullable(),
   }),
   simulation: z.object({
     oracle: z.boolean(),

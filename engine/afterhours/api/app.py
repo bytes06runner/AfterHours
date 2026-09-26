@@ -96,6 +96,16 @@ def _read_json(path: str, mtime: float) -> dict[str, Any]:
     return data
 
 
+def next_pre_close(cfg: AfterhoursConfig, now: datetime) -> datetime:
+    """The next pre-close check strictly after `now`: today's if ahead, else the next session's."""
+    from afterhours.features.dataset import sessions
+
+    sess = sessions(cfg.data.exchange_calendar, now.date(), (now + timedelta(days=10)).date())
+    lead = timedelta(minutes=cfg.schedule.pre_close_minutes)
+    checks: list[datetime] = [c.to_pydatetime() - lead for c in sess["close"]]
+    return min(t for t in checks if t > now)
+
+
 def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     """Build the FastAPI app."""
     cfg = cfg or load_config()
@@ -358,10 +368,7 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
 
         w3 = ctx.w3()
         now = ctx.now()
-        s = session_state(cfg.data.exchange_calendar, now)
-        target = s.next_close - timedelta(minutes=cfg.schedule.pre_close_minutes)
-        if s.state == "open" and now >= target:
-            target = now
+        target = next_pre_close(cfg, now)
         w3.provider.make_request("evm_setNextBlockTimestamp", [int(target.timestamp())])  # type: ignore[arg-type]
         w3.provider.make_request("evm_mine", [])  # type: ignore[arg-type]
         result = Allocator(cfg).run_cycle("close_out")

@@ -22,6 +22,7 @@ def public_config(cfg: AfterhoursConfig) -> dict[str, Any]:
             "key": profile.chain,
             "chain_id": chain.chain_id,
             "explorer_url": chain.explorer_url,
+            "rpc_url": browser_rpc(cfg),
         },
         "simulation": {
             "oracle": profile.oracle_mode == "simulated",
@@ -32,6 +33,17 @@ def public_config(cfg: AfterhoursConfig) -> dict[str, Any]:
         "deployment": load_deployment(cfg),
         "discovered": _addresses_only(load_discovered(cfg)),
     }
+
+
+def browser_rpc(cfg: AfterhoursConfig) -> str | None:
+    """An RPC the browser may use: the local node on fork and local profiles, else the chain's
+    public RPC. Never the RPC from .env, which may carry an API key."""
+    if cfg.profile.local_rpc_port_env:
+        try:
+            return cfg.node_url()
+        except KeyError:
+            return None
+    return cfg.chain.public_rpc_url
 
 
 def _addresses_only(discovered: dict[str, Any]) -> dict[str, Any]:

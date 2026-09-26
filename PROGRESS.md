@@ -21,7 +21,7 @@
 - [x] M4 Policy and backtest (2026-09-26)
 - [x] M5 Contracts (2026-09-26; pinned-block fork runs wait on BLOCKED 1)
 - [x] M6 Bot and API (2026-09-26; accepted on the local profile, fork run waits on BLOCKED 1)
-- [ ] M7 Simulation harness
+- [x] M7 Simulation harness (2026-09-26; local profile, fork run waits on BLOCKED 1)
 - [ ] M8 Frontend foundation
 - [ ] M9 Frontend pages
 - [ ] M10 End-to-end hardening
@@ -228,3 +228,19 @@ In flight / next
 - The backtest was rerunning to match the LP's new execution rule (risk moves always execute). When `artifacts/backtest/results.json` is regenerated, compare it with the M4 table above, update M4's numbers if they moved, and commit.
 - Run `make test-integration` (engine/tests/integration/test_demo.py is new, not yet run) and then mark M7 done.
 - M8: web dependencies are installed (gsap, motion, lenis, visx, wagmi 2, viem, RainbowKit 2, react-query, canonicalize, @noble/hashes, Playwright). Plan: one registered `--phase` CSS property mixes every day and night token with color-mix; art components in web/src/art; add a public RPC URL to /v1/config/public for the wallet. Check brass-button contrast (ink on brass is about 3.9:1, so labels need 19px bold to count as large text).
+
+### 2026-09-26 M7 Simulation harness: done (local profile)
+
+- Backtest regenerated after the execution-rule change: headline results unchanged (M4 table stands); sensitivity figures moved by at most 2 USDG.
+- `POST /v1/sim/close-out` now jumps to the next pre-close check strictly after "now" (before, a second call on the same afternoon re-ran "now").
+- Cycle results list `executed_markets` and the dust threshold, so "moved exactly as planned" is checkable: moved markets land on target to the cent; untouched ones differ by less than 1,000 USDG.
+- `/v1/config/public` gains `chain.rpc_url`: the local node on fork and local profiles, else the chain's public RPC; never the .env RPC.
+
+Evidence
+- `uv run pytest -m integration engine/tests/integration/test_local_stack.py`: pass (chain starts at the demo week; close-out rings until the bot acts; plan matched, every card "matched" onchain, all six event types on the stream).
+- `uv run pytest -m integration engine/tests/integration/test_demo.py`: pass in 52 s (`DEMO_EXIT=1 ./scripts/demo.sh`: de-risked SPY at Wednesday 2026-08-19 14:00 New York, reason anchored with a registry tx).
+
+Acceptance
+- `make demo` runs the closing-bell scenario end to end without manual steps: pass on the local profile (demo.profile). Switch `demo.profile` to fork once BLOCKED 1 is resolved.
+
+Next: M8 frontend foundation.

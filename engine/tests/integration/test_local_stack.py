@@ -20,7 +20,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from afterhours.config import REPO_ROOT
+from afterhours.config import REPO_ROOT, load_config
 
 pytestmark = pytest.mark.integration
 
@@ -36,7 +36,10 @@ def stack(tmp_path_factory: pytest.TempPathFactory) -> Iterator[dict[str, str]]:
     if not shutil.which("anvil"):
         pytest.skip("anvil not installed")
     port = _free_port()
-    anvil = subprocess.Popen(["anvil", "--port", str(port), "--silent"])
+    start = int(
+        load_config(load_env_file=False).demo.start.timestamp()
+    )  # a week with a real de-risk
+    anvil = subprocess.Popen(["anvil", "--port", str(port), "--silent", "--timestamp", str(start)])
     deploy_dir = REPO_ROOT / "contracts" / "cache" / f"it-deployments-{port}"
     deploy_dir.mkdir(parents=True)
     shutil.copy(REPO_ROOT / "deployments" / "fork.discovered.json", deploy_dir)
@@ -110,19 +113,28 @@ def test_close_out_moves_funds_as_planned_and_everything_verifies(stack: dict[st
         timeout=60,
     )
     assert shock.status_code == 200
-    res = httpx.post(
-        f"{base}/v1/sim/close-out",
-        headers={"authorization": f"Bearer {stack['token']}"},
-        timeout=300,
-    )
-    assert res.status_code == 200, res.text
-    body = res.json()
+    # Ring pre-close checks until the bot acts (in the demo week SPY de-risks by Wednesday).
+    for _ in range(5):
+        res = httpx.post(
+            f"{base}/v1/sim/close-out",
+            headers={"authorization": f"Bearer {stack['token']}"},
+            timeout=300,
+        )
+        assert res.status_code == 200, res.text
+        body = res.json()
+        if body["plan"].get("executed_markets"):
+            break
 
     # Funds moved exactly as planned (to the unit, less dust).
     vault = httpx.get(f"{base}/v1/vault", timeout=60).json()
     placed = {f"{m['symbol']}:{m['tier']}": m["vault_supply"] for m in vault["markets"]}
+    moved = set(body["plan"].get("executed_markets", []))
+    assert moved, "the close-out should move something"
+    dust = float(body["plan"]["dust_threshold_usdg"])
     for key, target in body["plan"]["allocation"].items():
-        assert placed[key] == pytest.approx(target, abs=0.01), key
+        # Markets the bot moved land on target to the cent; others differed by less than dust.
+        tolerance = 0.01 if key in moved else dust
+        assert placed[key] == pytest.approx(target, abs=tolerance), key
 
     # Every reason card matches its registry event.
     cards = httpx.get(f"{base}/v1/reasons", timeout=60).json()["items"]

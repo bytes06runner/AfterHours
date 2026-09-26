@@ -161,6 +161,7 @@ class Allocator:
         self.store.write("plan", plan_doc)
         self.store.write("forecasts", {s: [f.to_json() for f in fs] for s, fs in forecasts.items()})
         result = CycleResult(trigger, now.isoformat(), plan_doc, False)
+        plan_doc["dust_threshold_usdg"] = self.cfg.policy.min_rebalance_usd
         if not (execute and plan.execute and plan.status == "optimal"):
             return result
         moves = self._execute(state, plan, result)
@@ -222,6 +223,7 @@ class Allocator:
                 },
             )
             result.txs.append(sent.tx_hash)
+            result.plan.setdefault("executed_markets", []).append(f"{m.symbol}:{m.tier}")
             mv = moves.setdefault(m.symbol, {"out": {}, "in": {}, "txs": []})
             mv["out" if amount < 0 else "in"][m.tier] = mv["out" if amount < 0 else "in"].get(
                 m.tier, 0.0
