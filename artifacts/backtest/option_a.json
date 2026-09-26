@@ -1,0 +1,5695 @@
+{
+  "label": "historical stock prices, simulated vault",
+  "code_version": "813979f-dirty",
+  "rule": "tune on tuning_years, evaluate once on evaluation_years; dynamic wins only if it has less bad debt than the fixed map at equal or higher interest (PROGRESS.md)",
+  "config": {
+    "tuning_years": [
+      2017,
+      2021
+    ],
+    "evaluation_years": [
+      2022,
+      2026
+    ],
+    "tiers": {
+      "weekday": 0.915,
+      "middle": 0.86,
+      "weekend": 0.77
+    },
+    "tier_sets": [
+      [
+        "weekday",
+        "weekend"
+      ],
+      [
+        "weekday",
+        "middle",
+        "weekend"
+      ]
+    ],
+    "margin_fractions": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5
+    ],
+    "lookaheads": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "blend_step": 0.05,
+    "fixed_map": {
+      "window_days": 365,
+      "quantile": 0.01,
+      "min_observations": 60
+    },
+    "universes": [
+      "vault",
+      "stock_tokens"
+    ]
+  },
+  "universes": {
+    "vault": {
+      "tickers": [
+        "NVDA",
+        "SPY",
+        "META",
+        "SGOV",
+        "USO"
+      ],
+      "periods": {
+        "tuning": {
+          "first": "2017-01-03",
+          "last": "2021-12-31",
+          "closed_periods": 1259
+        },
+        "evaluation": {
+          "first": "2022-01-03",
+          "last": "2026-09-24",
+          "closed_periods": 1186
+        }
+      },
+      "chosen_on_tuning": {
+        "afterhours": {
+          "universe": "vault",
+          "span": "tuning",
+          "kind": "afterhours",
+          "tier_set": [
+            "weekday",
+            "weekend"
+          ],
+          "fraction": 0.5,
+          "lookahead": 10,
+          "tuning_result": {
+            "net_lender_yield_annualised": 0.08368618411333872,
+            "net_return_total": 0.4935064783588574,
+            "interest_usdg": 990506.7096522555,
+            "bad_debt_usdg": 3493.752934538961,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 1707.3741408026347,
+              "share_of_vault": 0.0006513301684151184,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.6176586277745958,
+              "middle": 0.0,
+              "weekend": 0.30141679683006656,
+              "idle": 0.08092457539533761
+            },
+            "reallocations": 1174,
+            "final_assets_usdg": 2987012.9567177147
+          }
+        },
+        "fixed_map": {
+          "universe": "vault",
+          "span": "tuning",
+          "kind": "fixed_map",
+          "tier_set": [
+            "weekday",
+            "middle",
+            "weekend"
+          ],
+          "fraction": 0.4,
+          "tuning_result": {
+            "net_lender_yield_annualised": 0.08570828056258772,
+            "net_return_total": 0.5074675582924626,
+            "interest_usdg": 1052515.8088658266,
+            "bad_debt_usdg": 37580.69228089012,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 14276.806326486767,
+              "share_of_vault": 0.00542753236512591,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.6184796717920258,
+              "middle": 0.1611776438588613,
+              "weekend": 0.1698362934189631,
+              "idle": 0.050506390930149796
+            },
+            "reallocations": 865,
+            "final_assets_usdg": 3014935.116584925
+          }
+        }
+      },
+      "evaluation": {
+        "afterhours": {
+          "net_lender_yield_annualised": 0.08672948258764035,
+          "net_return_total": 0.4811331921382147,
+          "interest_usdg": 963014.7235826162,
+          "bad_debt_usdg": 748.3393061987398,
+          "bad_debt_events": 9,
+          "worst_event": {
+            "session_prev": "2022-02-02",
+            "bad_debt_usdg": 399.1998015397535,
+            "share_of_vault": 0.00019832204047164127,
+            "ticker": "META",
+            "g": -0.24256968129013312,
+            "segment": "earnings"
+          },
+          "share_of_time": {
+            "weekday": 0.7008511780200231,
+            "middle": 0.0,
+            "weekend": 0.2367216669543766,
+            "idle": 0.062427155025600346
+          },
+          "reallocations": 1149,
+          "final_assets_usdg": 2962266.384276429
+        },
+        "fixed_map": {
+          "net_lender_yield_annualised": 0.09132367935626662,
+          "net_return_total": 0.5109388225054752,
+          "interest_usdg": 1030359.2017344927,
+          "bad_debt_usdg": 8481.556723542715,
+          "bad_debt_events": 10,
+          "worst_event": {
+            "session_prev": "2022-10-26",
+            "bad_debt_usdg": 4275.079432053272,
+            "share_of_vault": 0.0019870065962678705,
+            "ticker": "META",
+            "g": -0.2452627779928216,
+            "segment": "earnings"
+          },
+          "share_of_time": {
+            "weekday": 0.7365132707443852,
+            "middle": 0.1959147046716656,
+            "weekend": 0.017028278566836367,
+            "idle": 0.05054374601711283
+          },
+          "reallocations": 825,
+          "final_assets_usdg": 3021877.6450109505
+        }
+      },
+      "blends": {
+        "tuning": [
+          {
+            "w": 0.0,
+            "net_lender_yield_annualised": 0.06888241809939744,
+            "net_return_total": 0.3944156501519629,
+            "interest_usdg": 789688.0150221357,
+            "bad_debt_usdg": 856.7147182092942,
+            "bad_debt_events": 3,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 818.3888014770506,
+              "share_of_vault": 0.00033133045854589284,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.0,
+              "middle": 0.0,
+              "weekend": 0.9494967867782325,
+              "idle": 0.05050321322176748
+            },
+            "reallocations": 521,
+            "final_assets_usdg": 2788831.3003039258
+          },
+          {
+            "w": 0.05,
+            "net_lender_yield_annualised": 0.06996437423181723,
+            "net_return_total": 0.40147469056109686,
+            "interest_usdg": 805929.9394961947,
+            "bad_debt_usdg": 2980.558374002822,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 1507.3120417828536,
+              "share_of_vault": 0.0006082118206341719,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.04747444499507017,
+              "middle": 0.0,
+              "weekend": 0.9020144549063382,
+              "idle": 0.05051110009859148
+            },
+            "reallocations": 520,
+            "final_assets_usdg": 2802949.3811221938
+          },
+          {
+            "w": 0.1,
+            "net_lender_yield_annualised": 0.07104787209996899,
+            "net_return_total": 0.40857239751938756,
+            "interest_usdg": 822256.9394257433,
+            "bad_debt_usdg": 5112.144386963461,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 2196.2352820886563,
+              "share_of_vault": 0.0008832451660011938,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.09494843096135798,
+              "middle": 0.0,
+              "weekend": 0.8545358786522248,
+              "idle": 0.05051569038641716
+            },
+            "reallocations": 525,
+            "final_assets_usdg": 2817144.795038775
+          },
+          {
+            "w": 0.15,
+            "net_lender_yield_annualised": 0.07213311616980644,
+            "net_return_total": 0.4157103277633538,
+            "interest_usdg": 838670.6885112538,
+            "bad_debt_usdg": 7250.032984535397,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 2885.0677780975852,
+              "share_of_vault": 0.0011564039911496995,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.14242259221214842,
+              "middle": 0.0,
+              "weekend": 0.8070613558688207,
+              "idle": 0.050516051919030865
+            },
+            "reallocations": 541,
+            "final_assets_usdg": 2831420.6555267074
+          },
+          {
+            "w": 0.2,
+            "net_lender_yield_annualised": 0.07321957376256316,
+            "net_return_total": 0.42288518308467293,
+            "interest_usdg": 855165.9228320693,
+            "bad_debt_usdg": 9395.55666272472,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 3573.9084528503886,
+              "share_of_vault": 0.0014277396367887198,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.1898963231420003,
+              "middle": 0.0,
+              "weekend": 0.7595852925680012,
+              "idle": 0.050518384289998455
+            },
+            "reallocations": 555,
+            "final_assets_usdg": 2845770.366169346
+          },
+          {
+            "w": 0.25,
+            "net_lender_yield_annualised": 0.07430738160745065,
+            "net_return_total": 0.4300980569743733,
+            "interest_usdg": 871744.6599584025,
+            "bad_debt_usdg": 11548.546009656975,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 4262.722972589332,
+              "share_of_vault": 0.001697247176868582,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.23736958318630302,
+              "middle": 0.0,
+              "weekend": 0.7121087495589266,
+              "idle": 0.05052166725477039
+            },
+            "reallocations": 565,
+            "final_assets_usdg": 2860196.1139487466
+          },
+          {
+            "w": 0.3,
+            "net_lender_yield_annualised": 0.07539671738766174,
+            "net_return_total": 0.4373503317281535,
+            "interest_usdg": 888409.5553860895,
+            "bad_debt_usdg": 13708.891929782485,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 4951.511339530152,
+              "share_of_vault": 0.001964937525003992,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.28484317207398385,
+              "middle": 0.0,
+              "weekend": 0.6646340681725955,
+              "idle": 0.05052275975342073
+            },
+            "reallocations": 578,
+            "final_assets_usdg": 2874700.6634563073
+          },
+          {
+            "w": 0.35,
+            "net_lender_yield_annualised": 0.07648744218283343,
+            "net_return_total": 0.4446412892145011,
+            "interest_usdg": 905159.1955298615,
+            "bad_debt_usdg": 15876.617100870295,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 5640.273555900433,
+              "share_of_vault": 0.002230820742588548,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.3323165922843387,
+              "middle": 0.0,
+              "weekend": 0.6171593856708996,
+              "idle": 0.05052402204476186
+            },
+            "reallocations": 590,
+            "final_assets_usdg": 2889282.5784290023
+          },
+          {
+            "w": 0.4,
+            "net_lender_yield_annualised": 0.07757943249349264,
+            "net_return_total": 0.4519703010197549,
+            "interest_usdg": 921992.2680361702,
+            "bad_debt_usdg": 18051.66599666233,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 6329.0096239310415,
+              "share_of_vault": 0.002494906892626334,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.379789130655623,
+              "middle": 0.0,
+              "weekend": 0.5696836959834284,
+              "idle": 0.05052717336094861
+            },
+            "reallocations": 600,
+            "final_assets_usdg": 2903940.60203951
+          },
+          {
+            "w": 0.45,
+            "net_lender_yield_annualised": 0.07867291248459796,
+            "net_return_total": 0.4593390738599643,
+            "interest_usdg": 938912.357251144,
+            "bad_debt_usdg": 20234.20953122937,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 7017.719545856127,
+              "share_of_vault": 0.00275720222862113,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.42726207291626833,
+              "middle": 0.0,
+              "weekend": 0.5222092002310386,
+              "idle": 0.050528726852693016
+            },
+            "reallocations": 609,
+            "final_assets_usdg": 2918678.1477199285
+          },
+          {
+            "w": 0.5,
+            "net_lender_yield_annualised": 0.07976774702310485,
+            "net_return_total": 0.46674690394946095,
+            "interest_usdg": 955918.0073194862,
+            "bad_debt_usdg": 22424.19942057023,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 7706.403323913114,
+              "share_of_vault": 0.0030177191209291,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.4747346658665841,
+              "middle": 0.0,
+              "weekend": 0.4747346658665841,
+              "idle": 0.05053066826683175
+            },
+            "reallocations": 622,
+            "final_assets_usdg": 2933493.807898922
+          },
+          {
+            "w": 0.55,
+            "net_lender_yield_annualised": 0.08086409068898526,
+            "net_return_total": 0.47419504590834705,
+            "interest_usdg": 973011.7520867883,
+            "bad_debt_usdg": 24621.660270096956,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 8395.060960349268,
+              "share_of_vault": 0.0032764667526922623,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.5222078095427563,
+              "middle": 0.0,
+              "weekend": 0.4272609350804054,
+              "idle": 0.05053125537683845
+            },
+            "reallocations": 634,
+            "final_assets_usdg": 2948390.091816694
+          },
+          {
+            "w": 0.6,
+            "net_lender_yield_annualised": 0.08196324831101642,
+            "net_return_total": 0.4816926344420085,
+            "interest_usdg": 990193.5795867115,
+            "bad_debt_usdg": 26808.310702692404,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 9083.345210828185,
+              "share_of_vault": 0.003533299649611092,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.5696788587196416,
+              "middle": 0.0,
+              "weekend": 0.3797859058130895,
+              "idle": 0.05053523546726881
+            },
+            "reallocations": 644,
+            "final_assets_usdg": 2963385.268884017
+          },
+          {
+            "w": 0.65,
+            "net_lender_yield_annualised": 0.08306256060788009,
+            "net_return_total": 0.48922174536720897,
+            "interest_usdg": 1007458.835013888,
+            "bad_debt_usdg": 29015.344279473997,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 9771.847615778199,
+              "share_of_vault": 0.003788496084663653,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.6171493045855048,
+              "middle": 0.0,
+              "weekend": 0.33231116400756805,
+              "idle": 0.05053953140692716
+            },
+            "reallocations": 651,
+            "final_assets_usdg": 2978443.490734418
+          },
+          {
+            "w": 0.7,
+            "net_lender_yield_annualised": 0.08416337797546092,
+            "net_return_total": 0.49679178940178126,
+            "interest_usdg": 1024815.5308017491,
+            "bad_debt_usdg": 31231.951998196822,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 10460.480980063157,
+              "share_of_vault": 0.004042012732558356,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.6646217565578313,
+              "middle": 0.0,
+              "weekend": 0.2848378956676598,
+              "idle": 0.05054034777450889
+            },
+            "reallocations": 662,
+            "final_assets_usdg": 2993583.5788035626
+          },
+          {
+            "w": 0.75,
+            "net_lender_yield_annualised": 0.08526747200803575,
+            "net_return_total": 0.5044152428700772,
+            "interest_usdg": 1042264.4625658335,
+            "bad_debt_usdg": 33433.97682567133,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 11148.560734986522,
+              "share_of_vault": 0.004293561298875392,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.7120927006571034,
+              "middle": 0.0,
+              "weekend": 0.23736423355236924,
+              "idle": 0.05054306579052738
+            },
+            "reallocations": 674,
+            "final_assets_usdg": 3008830.4857401545
+          },
+          {
+            "w": 0.8,
+            "net_lender_yield_annualised": 0.08637114192041051,
+            "net_return_total": 0.5120667667409486,
+            "interest_usdg": 1059795.6526519966,
+            "bad_debt_usdg": 35662.11917010056,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 11836.92797948732,
+              "share_of_vault": 0.004543544238314686,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.7595627790941122,
+              "middle": 0.0,
+              "weekend": 0.18989069477352802,
+              "idle": 0.05054652613235976
+            },
+            "reallocations": 681,
+            "final_assets_usdg": 3024133.5334818973
+          },
+          {
+            "w": 0.85,
+            "net_lender_yield_annualised": 0.08747656973667062,
+            "net_return_total": 0.5197616394307061,
+            "interest_usdg": 1077417.042492705,
+            "bad_debt_usdg": 37893.763631291324,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 12524.802251172201,
+              "share_of_vault": 0.004791633587374857,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.8070325215896657,
+              "middle": 0.0,
+              "weekend": 0.14241750380994114,
+              "idle": 0.050549974600393115
+            },
+            "reallocations": 692,
+            "final_assets_usdg": 3039523.2788614123
+          },
+          {
+            "w": 0.9,
+            "net_lender_yield_annualised": 0.08858334633679976,
+            "net_return_total": 0.5274972396881352,
+            "interest_usdg": 1095127.874542058,
+            "bad_debt_usdg": 40133.39516578851,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 13212.993865965589,
+              "share_of_vault": 0.005038153068976825,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.8545018220408568,
+              "middle": 0.0,
+              "weekend": 0.09494464689343263,
+              "idle": 0.05055353106571053
+            },
+            "reallocations": 699,
+            "final_assets_usdg": 3054994.4793762704
+          },
+          {
+            "w": 0.95,
+            "net_lender_yield_annualised": 0.08969151097544259,
+            "net_return_total": 0.5352740539257586,
+            "interest_usdg": 1112927.8850900487,
+            "bad_debt_usdg": 42379.77723852599,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 13901.136098184552,
+              "share_of_vault": 0.005282972882351753,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.9019700887186645,
+              "middle": 0.0,
+              "weekend": 0.047472109932561096,
+              "idle": 0.05055780134877436
+            },
+            "reallocations": 705,
+            "final_assets_usdg": 3070548.107851517
+          },
+          {
+            "w": 1.0,
+            "net_lender_yield_annualised": 0.09080127259783044,
+            "net_return_total": 0.543093772205655,
+            "interest_usdg": 1130820.4896800723,
+            "bad_debt_usdg": 44632.94526876012,
+            "bad_debt_events": 11,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 14589.228523107478,
+              "share_of_vault": 0.005526097219279394,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.9494392412870273,
+              "middle": 0.0,
+              "weekend": 0.0,
+              "idle": 0.05056075871297275
+            },
+            "reallocations": 713,
+            "final_assets_usdg": 3086187.54441131
+          }
+        ],
+        "evaluation": [
+          {
+            "w": 0.0,
+            "net_lender_yield_annualised": 0.06880816574629578,
+            "net_return_total": 0.36926525431555635,
+            "interest_usdg": 739125.4657461727,
+            "bad_debt_usdg": 594.9571150501743,
+            "bad_debt_events": 2,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 556.7389429364222,
+              "share_of_vault": 0.00026376663926407784,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.0,
+              "middle": 0.0,
+              "weekend": 0.9494940422476894,
+              "idle": 0.05050595775231062
+            },
+            "reallocations": 492,
+            "final_assets_usdg": 2738530.5086311125
+          },
+          {
+            "w": 0.05,
+            "net_lender_yield_annualised": 0.07003203487666565,
+            "net_return_total": 0.3766859962759961,
+            "interest_usdg": 754460.8034962481,
+            "bad_debt_usdg": 1088.8109442585408,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 736.4163349834002,
+              "share_of_vault": 0.0003485592707138469,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.04747426633221326,
+              "middle": 0.0,
+              "weekend": 0.9020110603120395,
+              "idle": 0.0505146733557473
+            },
+            "reallocations": 492,
+            "final_assets_usdg": 2753371.992551992
+          },
+          {
+            "w": 0.1,
+            "net_lender_yield_annualised": 0.07125638637536635,
+            "net_return_total": 0.38414134671962863,
+            "interest_usdg": 769876.6655034394,
+            "bad_debt_usdg": 1593.9720641775327,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 922.1692024871295,
+              "share_of_vault": 0.000436062658437483,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.09494766178980457,
+              "middle": 0.0,
+              "weekend": 0.8545289561082032,
+              "idle": 0.050523382101992066
+            },
+            "reallocations": 492,
+            "final_assets_usdg": 2768282.6934392573
+          },
+          {
+            "w": 0.15,
+            "net_lender_yield_annualised": 0.07248148416356326,
+            "net_return_total": 0.39163305935106996,
+            "interest_usdg": 785376.5800042145,
+            "bad_debt_usdg": 2110.461302077747,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1114.0037847310923,
+              "share_of_vault": 0.0005262718119214109,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.14242078902552432,
+              "middle": 0.0,
+              "weekend": 0.807051137811323,
+              "idle": 0.05052807316315263
+            },
+            "reallocations": 500,
+            "final_assets_usdg": 2783266.1187021397
+          },
+          {
+            "w": 0.2,
+            "net_lender_yield_annualised": 0.07370709738929193,
+            "net_return_total": 0.39915987088997373,
+            "interest_usdg": 800958.0413101574,
+            "bad_debt_usdg": 2638.29953021403,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1311.9263237037944,
+              "share_of_vault": 0.0006191817497983634,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.18989346857171244,
+              "middle": 0.0,
+              "weekend": 0.7595738742868497,
+              "idle": 0.05053265714143779
+            },
+            "reallocations": 510,
+            "final_assets_usdg": 2798319.7417799477
+          },
+          {
+            "w": 0.25,
+            "net_lender_yield_annualised": 0.07493348902083885,
+            "net_return_total": 0.40672354652121046,
+            "interest_usdg": 816624.600639363,
+            "bad_debt_usdg": 3177.5075969462614,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1515.9430640944033,
+              "share_of_vault": 0.000714787499828939,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.23736678194732602,
+              "middle": 0.0,
+              "weekend": 0.7121003458419807,
+              "idle": 0.05053287221069325
+            },
+            "reallocations": 525,
+            "final_assets_usdg": 2813447.0930424207
+          },
+          {
+            "w": 0.3,
+            "net_lender_yield_annualised": 0.07616025751709321,
+            "net_return_total": 0.41432175505982194,
+            "interest_usdg": 832371.6705628737,
+            "bad_debt_usdg": 3728.1604432268587,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1726.0602532875964,
+              "share_of_vault": 0.0008130840988828655,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.284839478313535,
+              "middle": 0.0,
+              "weekend": 0.6646254493982139,
+              "idle": 0.050535072288251166
+            },
+            "reallocations": 537,
+            "final_assets_usdg": 2828643.510119644
+          },
+          {
+            "w": 0.35,
+            "net_lender_yield_annualised": 0.07738753117430663,
+            "net_return_total": 0.4219554261380305,
+            "interest_usdg": 848201.0356408819,
+            "bad_debt_usdg": 4290.183364826464,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1942.2841413596086,
+              "share_of_vault": 0.0009140665929208341,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.33231190713968983,
+              "middle": 0.0,
+              "weekend": 0.617150684688007,
+              "idle": 0.050537408172303164
+            },
+            "reallocations": 549,
+            "final_assets_usdg": 2843910.852276061
+          },
+          {
+            "w": 0.4,
+            "net_lender_yield_annualised": 0.07861533126159981,
+            "net_return_total": 0.4296248334111694,
+            "interest_usdg": 864113.3071683676,
+            "bad_debt_usdg": 4863.640346026386,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 2164.620981073081,
+              "share_of_vault": 0.0010177300369758626,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.3797842026113188,
+              "middle": 0.0,
+              "weekend": 0.5696763039169723,
+              "idle": 0.05053949347170881
+            },
+            "reallocations": 561,
+            "final_assets_usdg": 2859249.666822339
+          },
+          {
+            "w": 0.45,
+            "net_lender_yield_annualised": 0.07984371119037048,
+            "net_return_total": 0.43733045531428205,
+            "interest_usdg": 880107.2222400674,
+            "bad_debt_usdg": 5446.311611500462,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 2393.077027872585,
+              "share_of_vault": 0.0011240694951349945,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.42725560566953324,
+              "middle": 0.0,
+              "weekend": 0.5222012958183478,
+              "idle": 0.05054309851211882
+            },
+            "reallocations": 570,
+            "final_assets_usdg": 2874660.910628564
+          },
+          {
+            "w": 0.5,
+            "net_lender_yield_annualised": 0.08107263292195199,
+            "net_return_total": 0.44507219913592566,
+            "interest_usdg": 896183.8019616628,
+            "bad_debt_usdg": 6039.403689808878,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 2627.658539879819,
+              "share_of_vault": 0.0012330800405209094,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.4747266582794732,
+              "middle": 0.0,
+              "weekend": 0.4747266582794732,
+              "idle": 0.05054668344105364
+            },
+            "reallocations": 582,
+            "final_assets_usdg": 2890144.3982718512
+          },
+          {
+            "w": 0.55,
+            "net_lender_yield_annualised": 0.08230250343717582,
+            "net_return_total": 0.4528527899072805,
+            "interest_usdg": 912345.4477048508,
+            "bad_debt_usdg": 6639.867890275613,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 2868.3717778890586,
+              "share_of_vault": 0.0013447567552736905,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.5221977115989481,
+              "middle": 0.0,
+              "weekend": 0.4272526731263822,
+              "idle": 0.05054961527466961
+            },
+            "reallocations": 592,
+            "final_assets_usdg": 2905705.579814561
+          },
+          {
+            "w": 0.6,
+            "net_lender_yield_annualised": 0.0835329313008506,
+            "net_return_total": 0.46066991368367094,
+            "interest_usdg": 928590.919131049,
+            "bad_debt_usdg": 7251.09176371891,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 3115.223005362551,
+              "share_of_vault": 0.0014590947305326127,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.5696683000570452,
+              "middle": 0.0,
+              "weekend": 0.3797788667046899,
+              "idle": 0.05055283323826495
+            },
+            "reallocations": 601,
+            "final_assets_usdg": 2921339.827367342
+          },
+          {
+            "w": 0.65,
+            "net_lender_yield_annualised": 0.0847638696158799,
+            "net_return_total": 0.46852341785220175,
+            "interest_usdg": 944918.9884180488,
+            "bad_debt_usdg": 7872.152713643851,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 3368.2184884250273,
+              "share_of_vault": 0.001576089066417597,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.6171375908626673,
+              "middle": 0.0,
+              "weekend": 0.33230485661836034,
+              "idle": 0.05055755251897226
+            },
+            "reallocations": 608,
+            "final_assets_usdg": 2937046.8357044035
+          },
+          {
+            "w": 0.7,
+            "net_lender_yield_annualised": 0.08599555863328301,
+            "net_return_total": 0.4764149889004097,
+            "interest_usdg": 961333.5035931303,
+            "bad_debt_usdg": 8503.52579231349,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 3627.3644958600275,
+              "share_of_vault": 0.0016957348720115035,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.6646076455508786,
+              "middle": 0.0,
+              "weekend": 0.28483184809324985,
+              "idle": 0.05056050635587159
+            },
+            "reallocations": 620,
+            "final_assets_usdg": 2952829.9778008196
+          },
+          {
+            "w": 0.75,
+            "net_lender_yield_annualised": 0.08722784003977524,
+            "net_return_total": 0.48434377002355244,
+            "interest_usdg": 977832.7584176953,
+            "bad_debt_usdg": 9145.21837059222,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 3892.6672991046953,
+              "share_of_vault": 0.0018180272653418018,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.7120772390149926,
+              "middle": 0.0,
+              "weekend": 0.23735907967166203,
+              "idle": 0.050563681313345314
+            },
+            "reallocations": 629,
+            "final_assets_usdg": 2968687.540047105
+          },
+          {
+            "w": 0.8,
+            "net_lender_yield_annualised": 0.08846064760477201,
+            "net_return_total": 0.4923094840111868,
+            "interest_usdg": 994416.2177812934,
+            "bad_debt_usdg": 9797.249758924305,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 4164.133172244495,
+              "share_of_vault": 0.0019429613733622586,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.759545837905987,
+              "middle": 0.0,
+              "weekend": 0.18988645947649674,
+              "idle": 0.05056770261751635
+            },
+            "reallocations": 636,
+            "final_assets_usdg": 2984618.9680223735
+          },
+          {
+            "w": 0.85,
+            "net_lender_yield_annualised": 0.08969409059099309,
+            "net_return_total": 0.5003129880633079,
+            "interest_usdg": 1011085.6203216013,
+            "bad_debt_usdg": 10459.644194988272,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 4441.76839200925,
+              "share_of_vault": 0.002070532331935243,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.8070142810033651,
+              "middle": 0.0,
+              "weekend": 0.14241428488294475,
+              "idle": 0.05057143411369013
+            },
+            "reallocations": 644,
+            "final_assets_usdg": 3000625.976126616
+          },
+          {
+            "w": 0.9,
+            "net_lender_yield_annualised": 0.09092815736129789,
+            "net_return_total": 0.508354362403102,
+            "interest_usdg": 1027841.1455603614,
+            "bad_debt_usdg": 11132.420754142027,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 4725.579237767586,
+              "share_of_vault": 0.0022007352858133948,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.8544825045356341,
+              "middle": 0.0,
+              "weekend": 0.09494250050396211,
+              "idle": 0.05057499496040378
+            },
+            "reallocations": 652,
+            "final_assets_usdg": 3016708.724806204
+          },
+          {
+            "w": 0.95,
+            "net_lender_yield_annualised": 0.09216269940831046,
+            "net_return_total": 0.5164327890041052,
+            "interest_usdg": 1044681.1685945645,
+            "bad_debt_usdg": 11815.590586356284,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 5015.571991523283,
+              "share_of_vault": 0.0023335653886221545,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.9019491053722997,
+              "middle": 0.0,
+              "weekend": 0.047471005545911084,
+              "idle": 0.05057988908178931
+            },
+            "reallocations": 658,
+            "final_assets_usdg": 3032865.5780082103
+          },
+          {
+            "w": 1.0,
+            "net_lender_yield_annualised": 0.0933969201027971,
+            "net_return_total": 0.5245431660264128,
+            "interest_usdg": 1061606.9745077195,
+            "bad_debt_usdg": 12520.642454892739,
+            "bad_debt_events": 10,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 5317.201178111169,
+              "share_of_vault": 0.002471547243773512,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.9494176479876016,
+              "middle": 0.0,
+              "weekend": 0.0,
+              "idle": 0.050582352012398295
+            },
+            "reallocations": 668,
+            "final_assets_usdg": 3049086.3320528255
+          }
+        ]
+      },
+      "grid": {
+        "tuning": [
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "interest_usdg": 1074877.3484907371,
+            "bad_debt_usdg": 46068.452295134586,
+            "worst_event_share": 0.005578660179923473,
+            "net_lender_yield_annualised": 0.08670744267087271
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 1,
+            "interest_usdg": 1124164.825701044,
+            "bad_debt_usdg": 39407.20339376708,
+            "worst_event_share": 0.005508764109117478,
+            "net_lender_yield_annualised": 0.09069999352310898
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 3,
+            "interest_usdg": 1114597.1245549396,
+            "bad_debt_usdg": 32564.417929611744,
+            "worst_event_share": 0.005456750151064994,
+            "net_lender_yield_annualised": 0.0905068881634068
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 5,
+            "interest_usdg": 1105256.3719733835,
+            "bad_debt_usdg": 27600.074607790262,
+            "worst_event_share": 0.005422321362714044,
+            "net_lender_yield_annualised": 0.09019646125527925
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 10,
+            "interest_usdg": 1094401.9052656807,
+            "bad_debt_usdg": 21546.88261595748,
+            "worst_event_share": 0.005418392464231211,
+            "net_lender_yield_annualised": 0.0898554915315537
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "interest_usdg": 1074877.3484907371,
+            "bad_debt_usdg": 46068.452295134586,
+            "worst_event_share": 0.005578660179923473,
+            "net_lender_yield_annualised": 0.08670744267087271
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 1,
+            "interest_usdg": 1120348.5842461968,
+            "bad_debt_usdg": 38971.06207334868,
+            "worst_event_share": 0.0055098794047418196,
+            "net_lender_yield_annualised": 0.090460437146614
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 3,
+            "interest_usdg": 1107131.7219367896,
+            "bad_debt_usdg": 32362.92040807598,
+            "worst_event_share": 0.00544329284206601,
+            "net_lender_yield_annualised": 0.08999145243532225
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 5,
+            "interest_usdg": 1094978.495810066,
+            "bad_debt_usdg": 27471.221477949202,
+            "worst_event_share": 0.005450655526111246,
+            "net_lender_yield_annualised": 0.08947521128916547
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 10,
+            "interest_usdg": 1083218.1188400723,
+            "bad_debt_usdg": 21322.693577124195,
+            "worst_event_share": 0.005448721247166864,
+            "net_lender_yield_annualised": 0.08907558027146734
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "interest_usdg": 1074877.3484907371,
+            "bad_debt_usdg": 46068.452295134586,
+            "worst_event_share": 0.005578660179923473,
+            "net_lender_yield_annualised": 0.08670744267087271
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 1,
+            "interest_usdg": 1113466.1459936958,
+            "bad_debt_usdg": 41587.48366629505,
+            "worst_event_share": 0.0055160013745835625,
+            "net_lender_yield_annualised": 0.0897861017207775
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 3,
+            "interest_usdg": 1098166.2036438507,
+            "bad_debt_usdg": 31818.54596073178,
+            "worst_event_share": 0.005439901069314141,
+            "net_lender_yield_annualised": 0.08939268061333006
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 5,
+            "interest_usdg": 1084115.275297112,
+            "bad_debt_usdg": 26283.32812029507,
+            "worst_event_share": 0.005402572899105447,
+            "net_lender_yield_annualised": 0.08878584610824625
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 10,
+            "interest_usdg": 1069351.217299409,
+            "bad_debt_usdg": 20249.919928934745,
+            "worst_event_share": 0.005403937767879772,
+            "net_lender_yield_annualised": 0.08816229031503964
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "interest_usdg": 1062571.030808684,
+            "bad_debt_usdg": 40503.79214517147,
+            "worst_event_share": 0.005531348995502102,
+            "net_lender_yield_annualised": 0.08622238000051508
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 1,
+            "interest_usdg": 1108350.9431064902,
+            "bad_debt_usdg": 31825.21298650107,
+            "worst_event_share": 0.005461484341677698,
+            "net_lender_yield_annualised": 0.09011621063441866
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 3,
+            "interest_usdg": 1087152.300164768,
+            "bad_debt_usdg": 25613.77073386669,
+            "worst_event_share": 0.005426174883745509,
+            "net_lender_yield_annualised": 0.08905014520136567
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 5,
+            "interest_usdg": 1068238.2431416023,
+            "bad_debt_usdg": 21562.958404737554,
+            "worst_event_share": 0.005392465148374616,
+            "net_lender_yield_annualised": 0.0879887674804074
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 10,
+            "interest_usdg": 1049906.8453690999,
+            "bad_debt_usdg": 17726.30562744253,
+            "worst_event_share": 0.005401329601434203,
+            "net_lender_yield_annualised": 0.08694970883918596
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "interest_usdg": 1018049.9923307094,
+            "bad_debt_usdg": 34130.199908128154,
+            "worst_event_share": 0.005467490461361201,
+            "net_lender_yield_annualised": 0.08346125127671344
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 1,
+            "interest_usdg": 1097756.2604801566,
+            "bad_debt_usdg": 26883.458548223163,
+            "worst_event_share": 0.004917339777371815,
+            "net_lender_yield_annualised": 0.08971459689763939
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 3,
+            "interest_usdg": 1069576.9458087548,
+            "bad_debt_usdg": 15781.657350286945,
+            "worst_event_share": 0.003277433373857546,
+            "net_lender_yield_annualised": 0.08849771922147731
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 5,
+            "interest_usdg": 1046231.2495585479,
+            "bad_debt_usdg": 9664.75304534462,
+            "worst_event_share": 0.0020985848333484147,
+            "net_lender_yield_annualised": 0.08726453533606349
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 10,
+            "interest_usdg": 1024471.2807734408,
+            "bad_debt_usdg": 6406.79750356598,
+            "worst_event_share": 0.0015415307377192483,
+            "net_lender_yield_annualised": 0.08593397197504582
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "interest_usdg": 974727.2517448384,
+            "bad_debt_usdg": 34129.15462281739,
+            "worst_event_share": 0.005548998439245082,
+            "net_lender_yield_annualised": 0.08029116574411654
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 1,
+            "interest_usdg": 1067686.5854435936,
+            "bad_debt_usdg": 24374.319573809462,
+            "worst_event_share": 0.0048792727141623755,
+            "net_lender_yield_annualised": 0.08774804155968541
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 3,
+            "interest_usdg": 1038818.2392402759,
+            "bad_debt_usdg": 13972.467206118103,
+            "worst_event_share": 0.0032854617502168365,
+            "net_lender_yield_annualised": 0.08642240036204774
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 5,
+            "interest_usdg": 1015503.9013550957,
+            "bad_debt_usdg": 7177.954253822766,
+            "worst_event_share": 0.002103397721127543,
+            "net_lender_yield_annualised": 0.0852310078515306
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 10,
+            "interest_usdg": 990506.7096522555,
+            "bad_debt_usdg": 3493.752934538961,
+            "worst_event_share": 0.0006513301684151184,
+            "net_lender_yield_annualised": 0.08368618411333872
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "interest_usdg": 1108141.5687995057,
+            "bad_debt_usdg": 46068.452295134586,
+            "worst_event_share": 0.005578660179923473,
+            "net_lender_yield_annualised": 0.08908824299622986
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 1,
+            "interest_usdg": 1127824.3633718838,
+            "bad_debt_usdg": 39700.95687873935,
+            "worst_event_share": 0.005508563526135956,
+            "net_lender_yield_annualised": 0.09093832681380132
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 3,
+            "interest_usdg": 1123839.7950356533,
+            "bad_debt_usdg": 32687.55584655932,
+            "worst_event_share": 0.005456331271570748,
+            "net_lender_yield_annualised": 0.09115262285763004
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 5,
+            "interest_usdg": 1119579.9150542966,
+            "bad_debt_usdg": 27684.27794921699,
+            "worst_event_share": 0.005421587687394526,
+            "net_lender_yield_annualised": 0.09120519410072636
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 10,
+            "interest_usdg": 1111333.3569410967,
+            "bad_debt_usdg": 21754.22427689158,
+            "worst_event_share": 0.005417253247712809,
+            "net_lender_yield_annualised": 0.09104134335410752
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "interest_usdg": 1108141.5687995057,
+            "bad_debt_usdg": 46068.452295134586,
+            "worst_event_share": 0.005578660179923473,
+            "net_lender_yield_annualised": 0.08908824299622986
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 1,
+            "interest_usdg": 1125873.6697454709,
+            "bad_debt_usdg": 39184.38094476472,
+            "worst_event_share": 0.005509072209422752,
+            "net_lender_yield_annualised": 0.09083680144979023
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 3,
+            "interest_usdg": 1119820.899167152,
+            "bad_debt_usdg": 32494.8761177629,
+            "worst_event_share": 0.005441666616565922,
+            "net_lender_yield_annualised": 0.09088188237456385
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 5,
+            "interest_usdg": 1114259.7085008954,
+            "bad_debt_usdg": 27431.14216290557,
+            "worst_event_share": 0.005401887357002576,
+            "net_lender_yield_annualised": 0.09084666296539834
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 10,
+            "interest_usdg": 1105372.948763891,
+            "bad_debt_usdg": 21444.357145577054,
+            "worst_event_share": 0.005398190057491115,
+            "net_lender_yield_annualised": 0.09064125742413487
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "interest_usdg": 1095719.245925044,
+            "bad_debt_usdg": 46068.452295134586,
+            "worst_event_share": 0.005578660179923473,
+            "net_lender_yield_annualised": 0.08820157821585362
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 1,
+            "interest_usdg": 1121666.7965993388,
+            "bad_debt_usdg": 42853.15925516448,
+            "worst_event_share": 0.005956793211760107,
+            "net_lender_yield_annualised": 0.09027858786118181
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 3,
+            "interest_usdg": 1115097.7442132283,
+            "bad_debt_usdg": 33111.209923252965,
+            "worst_event_share": 0.0058777966843618175,
+            "net_lender_yield_annualised": 0.0905036149134657
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 5,
+            "interest_usdg": 1108264.940584932,
+            "bad_debt_usdg": 27650.376951085156,
+            "worst_event_share": 0.005838700198179862,
+            "net_lender_yield_annualised": 0.0904063352493294
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 10,
+            "interest_usdg": 1096931.0671026707,
+            "bad_debt_usdg": 20914.10520979633,
+            "worst_event_share": 0.005396873493276284,
+            "net_lender_yield_annualised": 0.09008008924054733
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "interest_usdg": 1091529.8704389303,
+            "bad_debt_usdg": 40842.90673735819,
+            "worst_event_share": 0.005518290005655701,
+            "net_lender_yield_annualised": 0.08827564693761003
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 1,
+            "interest_usdg": 1119706.6430742647,
+            "bad_debt_usdg": 32557.00495390832,
+            "worst_event_share": 0.0054590132799195255,
+            "net_lender_yield_annualised": 0.09086939502737557
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 3,
+            "interest_usdg": 1108950.503573101,
+            "bad_debt_usdg": 26321.684473030517,
+            "worst_event_share": 0.00542189443868386,
+            "net_lender_yield_annualised": 0.09054914425781346
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 5,
+            "interest_usdg": 1097627.8850115167,
+            "bad_debt_usdg": 22286.777161310063,
+            "worst_event_share": 0.005386335386910688,
+            "net_lender_yield_annualised": 0.09003209774231968
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 10,
+            "interest_usdg": 1083371.916039885,
+            "bad_debt_usdg": 18539.950708174096,
+            "worst_event_share": 0.005391146158582314,
+            "net_lender_yield_annualised": 0.08928477015868364
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "interest_usdg": 1052515.8088658266,
+            "bad_debt_usdg": 37580.69228089012,
+            "worst_event_share": 0.00542753236512591,
+            "net_lender_yield_annualised": 0.08570828056258772
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 1,
+            "interest_usdg": 1112258.3640465892,
+            "bad_debt_usdg": 29374.607985485814,
+            "worst_event_share": 0.0049487495184026165,
+            "net_lender_yield_annualised": 0.09056721375250176
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 3,
+            "interest_usdg": 1093420.8361679716,
+            "bad_debt_usdg": 18677.253152782334,
+            "worst_event_share": 0.003136525424546567,
+            "net_lender_yield_annualised": 0.08998966127240116
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 5,
+            "interest_usdg": 1076863.5746363548,
+            "bad_debt_usdg": 13565.329562319695,
+            "worst_event_share": 0.002571113254429382,
+            "net_lender_yield_annualised": 0.08917553275125911
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 10,
+            "interest_usdg": 1058308.3651358902,
+            "bad_debt_usdg": 9884.21432620997,
+            "worst_event_share": 0.0025743500637263163,
+            "net_lender_yield_annualised": 0.08811386788086684
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "interest_usdg": 1034332.504099435,
+            "bad_debt_usdg": 37467.191072409325,
+            "worst_event_share": 0.005460343438114858,
+            "net_lender_yield_annualised": 0.08440140158478604
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 1,
+            "interest_usdg": 1094178.581188014,
+            "bad_debt_usdg": 27434.66402890639,
+            "worst_event_share": 0.004989013950044256,
+            "net_lender_yield_annualised": 0.08942088546621485
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 3,
+            "interest_usdg": 1070207.2805618285,
+            "bad_debt_usdg": 17702.8390851935,
+            "worst_event_share": 0.0029203273432809305,
+            "net_lender_yield_annualised": 0.08840551743563574
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 5,
+            "interest_usdg": 1049127.5044459975,
+            "bad_debt_usdg": 12931.401834506272,
+            "worst_event_share": 0.0025309658444514524,
+            "net_lender_yield_annualised": 0.08723796231135728
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 10,
+            "interest_usdg": 1025305.6273722141,
+            "bad_debt_usdg": 9153.516463337162,
+            "worst_event_share": 0.002598580984497476,
+            "net_lender_yield_annualised": 0.08579607302068593
+          }
+        ],
+        "evaluation": [
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "interest_usdg": 1056736.3558800276,
+            "bad_debt_usdg": 11927.326474350955,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.09307196790160144
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 1,
+            "interest_usdg": 1062398.842625781,
+            "bad_debt_usdg": 8148.4935564894095,
+            "worst_event_share": 0.0005598977562377233,
+            "net_lender_yield_annualised": 0.09378875870148584
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 3,
+            "interest_usdg": 1059534.0177693767,
+            "bad_debt_usdg": 7642.452882437063,
+            "worst_event_share": 0.0011154349997289919,
+            "net_lender_yield_annualised": 0.09360984220346213
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 5,
+            "interest_usdg": 1055816.4311121614,
+            "bad_debt_usdg": 7630.863017802509,
+            "worst_event_share": 0.0017075011267926586,
+            "net_lender_yield_annualised": 0.09332851778407703
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 10,
+            "interest_usdg": 1047198.2241238438,
+            "bad_debt_usdg": 5587.623921768911,
+            "worst_event_share": 0.000810573582093104,
+            "net_lender_yield_annualised": 0.09282874389098494
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "interest_usdg": 1046775.7909400106,
+            "bad_debt_usdg": 11137.696595089295,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.09237402544053741
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 1,
+            "interest_usdg": 1058336.405357052,
+            "bad_debt_usdg": 14373.322203827884,
+            "worst_event_share": 0.004017307463712965,
+            "net_lender_yield_annualised": 0.093007657657876
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 3,
+            "interest_usdg": 1051080.5113848208,
+            "bad_debt_usdg": 19214.9497246419,
+            "worst_event_share": 0.007105907236211268,
+            "net_lender_yield_annualised": 0.09208643904863445
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 5,
+            "interest_usdg": 1049143.755225014,
+            "bad_debt_usdg": 12930.548774183584,
+            "worst_event_share": 0.004438932639385598,
+            "net_lender_yield_annualised": 0.09241784243445772
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 10,
+            "interest_usdg": 1041058.6053035951,
+            "bad_debt_usdg": 7002.3947563266,
+            "worst_event_share": 0.0014710169952030475,
+            "net_lender_yield_annualised": 0.09225347014583485
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "interest_usdg": 1046775.7909400106,
+            "bad_debt_usdg": 11137.696595089295,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.09237402544053741
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 1,
+            "interest_usdg": 1056601.9173474326,
+            "bad_debt_usdg": 12505.41087185914,
+            "worst_event_share": 0.0037710746125271303,
+            "net_lender_yield_annualised": 0.09301780165685813
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 3,
+            "interest_usdg": 1050797.1812766267,
+            "bad_debt_usdg": 9967.390763538795,
+            "worst_event_share": 0.0031380668497658923,
+            "net_lender_yield_annualised": 0.09276933673518117
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 5,
+            "interest_usdg": 1045867.2863786634,
+            "bad_debt_usdg": 6375.318052780145,
+            "worst_event_share": 0.0016078964944118577,
+            "net_lender_yield_annualised": 0.0926675218612909
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 10,
+            "interest_usdg": 1033515.8365532802,
+            "bad_debt_usdg": 4094.381077292232,
+            "worst_event_share": 0.0005669970205119628,
+            "net_lender_yield_annualised": 0.09189997019554741
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "interest_usdg": 1017091.8647951548,
+            "bad_debt_usdg": 14239.245096151693,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.08986525662181899
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 1,
+            "interest_usdg": 1051836.6988452026,
+            "bad_debt_usdg": 10894.621049225278,
+            "worst_event_share": 0.00293232754977735,
+            "net_lender_yield_annualised": 0.09277788074554327
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 3,
+            "interest_usdg": 1042352.3963974789,
+            "bad_debt_usdg": 9172.76847568063,
+            "worst_event_share": 0.0019115093078735756,
+            "net_lender_yield_annualised": 0.09218664448640612
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 5,
+            "interest_usdg": 1036543.3817022064,
+            "bad_debt_usdg": 3002.4279297123153,
+            "worst_event_share": 0.00044406007129428105,
+            "net_lender_yield_annualised": 0.09221419175228851
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 10,
+            "interest_usdg": 1020067.8733376897,
+            "bad_debt_usdg": 2199.265201845758,
+            "worst_event_share": 0.00030616584525307457,
+            "net_lender_yield_annualised": 0.0910169572459758
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "interest_usdg": 991309.7409292252,
+            "bad_debt_usdg": 10281.04855217161,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.08818327807019344
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 1,
+            "interest_usdg": 1035932.3514879409,
+            "bad_debt_usdg": 19851.53218836649,
+            "worst_event_share": 0.005529540505491262,
+            "net_lender_yield_annualised": 0.09088007411075805
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 3,
+            "interest_usdg": 1021294.6996440709,
+            "bad_debt_usdg": 10937.171620854177,
+            "worst_event_share": 0.0031364367595814097,
+            "net_lender_yield_annualised": 0.0904414363022259
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 5,
+            "interest_usdg": 1007995.7229383237,
+            "bad_debt_usdg": 7332.9363372621865,
+            "worst_event_share": 0.0029139782775626367,
+            "net_lender_yield_annualised": 0.0896969210910743
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 10,
+            "interest_usdg": 995263.5884727823,
+            "bad_debt_usdg": 1465.9194909873913,
+            "worst_event_share": 0.0005004306591798836,
+            "net_lender_yield_annualised": 0.08916856148439845
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "interest_usdg": 941703.4469370289,
+            "bad_debt_usdg": 3808.9563528713397,
+            "worst_event_share": 0.0015745768898361248,
+            "net_lender_yield_annualised": 0.08483015154444562
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 1,
+            "interest_usdg": 1014760.0905301006,
+            "bad_debt_usdg": 6066.849992478993,
+            "worst_event_share": 0.0010769964354877808,
+            "net_lender_yield_annualised": 0.09031376055949236
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 3,
+            "interest_usdg": 996652.5813567931,
+            "bad_debt_usdg": 3691.4714929605484,
+            "worst_event_share": 0.0006657153938034139,
+            "net_lender_yield_annualised": 0.08910411217788927
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 5,
+            "interest_usdg": 983630.4061072746,
+            "bad_debt_usdg": 2016.5490826082332,
+            "worst_event_share": 0.0003968774521586731,
+            "net_lender_yield_annualised": 0.08822850337477628
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 10,
+            "interest_usdg": 963014.7235826162,
+            "bad_debt_usdg": 748.3393061987398,
+            "worst_event_share": 0.00019832204047164127,
+            "net_lender_yield_annualised": 0.08672948258764035
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "interest_usdg": 1059931.043995225,
+            "bad_debt_usdg": 11927.326474350955,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.09331470646096052
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 1,
+            "interest_usdg": 1056062.3721605558,
+            "bad_debt_usdg": 24060.428511831124,
+            "worst_event_share": 0.007949249594092992,
+            "net_lender_yield_annualised": 0.09209684058563794
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 3,
+            "interest_usdg": 1056792.6536934506,
+            "bad_debt_usdg": 17227.636793359714,
+            "worst_event_share": 0.0034695551924138926,
+            "net_lender_yield_annualised": 0.09267308213012004
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 5,
+            "interest_usdg": 1057428.0584624386,
+            "bad_debt_usdg": 10504.12865276964,
+            "worst_event_share": 0.0018879534190891546,
+            "net_lender_yield_annualised": 0.093232684556249
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 10,
+            "interest_usdg": 1053341.3281523357,
+            "bad_debt_usdg": 7459.246455331562,
+            "worst_event_share": 0.001504463582893747,
+            "net_lender_yield_annualised": 0.09315352286452905
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "interest_usdg": 1055930.3430251556,
+            "bad_debt_usdg": 11005.660488564265,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.09308075895090973
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 1,
+            "interest_usdg": 1054960.7341496986,
+            "bad_debt_usdg": 24407.963289389107,
+            "worst_event_share": 0.008635292843113795,
+            "net_lender_yield_annualised": 0.09198629668160585
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 3,
+            "interest_usdg": 1051609.7502421085,
+            "bad_debt_usdg": 24093.671129591312,
+            "worst_event_share": 0.007244100090142404,
+            "net_lender_yield_annualised": 0.09175452052542177
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 5,
+            "interest_usdg": 1051916.5227255602,
+            "bad_debt_usdg": 17077.361354729812,
+            "worst_event_share": 0.004631934701371988,
+            "net_lender_yield_annualised": 0.0923131449846859
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 10,
+            "interest_usdg": 1049174.590704829,
+            "bad_debt_usdg": 7778.689521815168,
+            "worst_event_share": 0.0015125191123618953,
+            "net_lender_yield_annualised": 0.09281240992057849
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "interest_usdg": 1055930.3430251556,
+            "bad_debt_usdg": 11005.660488564265,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.09308075895090973
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 1,
+            "interest_usdg": 1058684.6972889556,
+            "bad_debt_usdg": 11474.550755468983,
+            "worst_event_share": 0.0032276463915201577,
+            "net_lender_yield_annualised": 0.09325442813615914
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 3,
+            "interest_usdg": 1055902.1660393346,
+            "bad_debt_usdg": 8270.316470658607,
+            "worst_event_share": 0.002072673289246531,
+            "net_lender_yield_annualised": 0.09328646153379094
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 5,
+            "interest_usdg": 1052978.5646368172,
+            "bad_debt_usdg": 6780.283981227538,
+            "worst_event_share": 0.0015774472115920853,
+            "net_lender_yield_annualised": 0.09317755054591736
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 10,
+            "interest_usdg": 1044233.9956461301,
+            "bad_debt_usdg": 4989.657144268314,
+            "worst_event_share": 0.0006328877687233362,
+            "net_lender_yield_annualised": 0.09264867213474659
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "interest_usdg": 1044085.9088391843,
+            "bad_debt_usdg": 10967.481072637527,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.09218197836715336
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 1,
+            "interest_usdg": 1055660.6149063706,
+            "bad_debt_usdg": 12858.159496457865,
+            "worst_event_share": 0.0029779356118639936,
+            "net_lender_yield_annualised": 0.09291940187515757
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 3,
+            "interest_usdg": 1052652.075288693,
+            "bad_debt_usdg": 6411.067533224909,
+            "worst_event_share": 0.001472968055729612,
+            "net_lender_yield_annualised": 0.0931807971899612
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 5,
+            "interest_usdg": 1048903.7696248305,
+            "bad_debt_usdg": 2997.2449751069703,
+            "worst_event_share": 0.0004487979236142013,
+            "net_lender_yield_annualised": 0.09315538033317683
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 10,
+            "interest_usdg": 1036053.0397341166,
+            "bad_debt_usdg": 2592.5445265545013,
+            "worst_event_share": 0.00032865673506133757,
+            "net_lender_yield_annualised": 0.09220805786346498
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "interest_usdg": 1030359.2017344927,
+            "bad_debt_usdg": 8481.556723542715,
+            "worst_event_share": 0.0019870065962678705,
+            "net_lender_yield_annualised": 0.09132367935626662
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 1,
+            "interest_usdg": 1048464.4197593672,
+            "bad_debt_usdg": 17230.100740125163,
+            "worst_event_share": 0.005411960117928633,
+            "net_lender_yield_annualised": 0.09203829083615989
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 3,
+            "interest_usdg": 1042773.260837335,
+            "bad_debt_usdg": 7335.191921343111,
+            "worst_event_share": 0.001317967080387147,
+            "net_lender_yield_annualised": 0.09235878424674215
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 5,
+            "interest_usdg": 1036012.3282853902,
+            "bad_debt_usdg": 3193.6077594825324,
+            "worst_event_share": 0.0007298976729120159,
+            "net_lender_yield_annualised": 0.09215912654091762
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 10,
+            "interest_usdg": 1022529.7139353991,
+            "bad_debt_usdg": 2153.2951483541474,
+            "worst_event_share": 0.0005007802833140205,
+            "net_lender_yield_annualised": 0.0912088616091633
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "interest_usdg": 1005008.2212337179,
+            "bad_debt_usdg": 4086.996491158792,
+            "worst_event_share": 0.0015608626491471819,
+            "net_lender_yield_annualised": 0.08971679263102561
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 1,
+            "interest_usdg": 1038948.0892684332,
+            "bad_debt_usdg": 9782.876250002357,
+            "worst_event_share": 0.0020571286956667123,
+            "net_lender_yield_annualised": 0.09188041375320011
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 3,
+            "interest_usdg": 1027643.4052288795,
+            "bad_debt_usdg": 5714.460129295167,
+            "worst_event_share": 0.0011307830143091765,
+            "net_lender_yield_annualised": 0.09132760212800317
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 5,
+            "interest_usdg": 1019234.2859492855,
+            "bad_debt_usdg": 3501.5445912811592,
+            "worst_event_share": 0.0007158044703249049,
+            "net_lender_yield_annualised": 0.09085341587425733
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 10,
+            "interest_usdg": 1001101.7613152069,
+            "bad_debt_usdg": 1222.5958990646532,
+            "worst_event_share": 0.00021579929360498063,
+            "net_lender_yield_annualised": 0.08963665950883137
+          }
+        ]
+      },
+      "decision": {
+        "dynamic_wins": false,
+        "dynamic": {
+          "net_lender_yield_annualised": 0.08672948258764035,
+          "net_return_total": 0.4811331921382147,
+          "interest_usdg": 963014.7235826162,
+          "bad_debt_usdg": 748.3393061987398,
+          "bad_debt_events": 9,
+          "worst_event": {
+            "session_prev": "2022-02-02",
+            "bad_debt_usdg": 399.1998015397535,
+            "share_of_vault": 0.00019832204047164127,
+            "ticker": "META",
+            "g": -0.24256968129013312,
+            "segment": "earnings"
+          },
+          "share_of_time": {
+            "weekday": 0.7008511780200231,
+            "middle": 0.0,
+            "weekend": 0.2367216669543766,
+            "idle": 0.062427155025600346
+          },
+          "reallocations": 1149,
+          "final_assets_usdg": 2962266.384276429
+        },
+        "fixed_map": {
+          "net_lender_yield_annualised": 0.09132367935626662,
+          "net_return_total": 0.5109388225054752,
+          "interest_usdg": 1030359.2017344927,
+          "bad_debt_usdg": 8481.556723542715,
+          "bad_debt_events": 10,
+          "worst_event": {
+            "session_prev": "2022-10-26",
+            "bad_debt_usdg": 4275.079432053272,
+            "share_of_vault": 0.0019870065962678705,
+            "ticker": "META",
+            "g": -0.2452627779928216,
+            "segment": "earnings"
+          },
+          "share_of_time": {
+            "weekday": 0.7365132707443852,
+            "middle": 0.1959147046716656,
+            "weekend": 0.017028278566836367,
+            "idle": 0.05054374601711283
+          },
+          "reallocations": 825,
+          "final_assets_usdg": 3021877.6450109505
+        }
+      }
+    },
+    "stock_tokens": {
+      "tickers": [
+        "AAPL",
+        "AMD",
+        "AMZN",
+        "ASML",
+        "BABA",
+        "CLSK",
+        "COIN",
+        "CRCL",
+        "CRWV",
+        "DELL",
+        "EWY",
+        "GME",
+        "GOOGL",
+        "INTC",
+        "IONQ",
+        "META",
+        "MSFT",
+        "MSTR",
+        "MU",
+        "NBIS",
+        "NVDA",
+        "ORCL",
+        "PLTR",
+        "QQQ",
+        "RGTI",
+        "RKLB",
+        "SGOV",
+        "SLV",
+        "SNDK",
+        "SPCX",
+        "SPY",
+        "TSLA",
+        "TSM",
+        "USAR",
+        "USO"
+      ],
+      "periods": {
+        "tuning": {
+          "first": "2017-01-03",
+          "last": "2021-12-31",
+          "closed_periods": 1259
+        },
+        "evaluation": {
+          "first": "2022-01-03",
+          "last": "2026-09-24",
+          "closed_periods": 1186
+        }
+      },
+      "chosen_on_tuning": {
+        "afterhours": {
+          "universe": "stock_tokens",
+          "span": "tuning",
+          "kind": "afterhours",
+          "tier_set": [
+            "weekday",
+            "weekend"
+          ],
+          "fraction": 0.5,
+          "lookahead": 5,
+          "tuning_result": {
+            "net_lender_yield_annualised": 0.08844683704842127,
+            "net_return_total": 0.5265414359706091,
+            "interest_usdg": 1057025.6565729338,
+            "bad_debt_usdg": 3942.784631703276,
+            "bad_debt_events": 92,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 1821.6531539671707,
+              "share_of_vault": 0.0006861943340793574,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.7160473438723475,
+              "middle": 0.0,
+              "weekend": 0.2307996978770275,
+              "idle": 0.053152958250625035
+            },
+            "reallocations": 1247,
+            "final_assets_usdg": 3053082.871941218
+          }
+        },
+        "fixed_map": {
+          "universe": "stock_tokens",
+          "span": "tuning",
+          "kind": "fixed_map",
+          "tier_set": [
+            "weekday",
+            "middle",
+            "weekend"
+          ],
+          "fraction": 0.3,
+          "tuning_result": {
+            "net_lender_yield_annualised": 0.09058239259507506,
+            "net_return_total": 0.5415489613634326,
+            "interest_usdg": 1112954.795257669,
+            "bad_debt_usdg": 29856.87253080229,
+            "bad_debt_events": 30,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 14277.75020790538,
+              "share_of_vault": 0.005375489387155836,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.7795508835096656,
+              "middle": 0.16776067808798992,
+              "weekend": 0.002147128930454305,
+              "idle": 0.050541309471890075
+            },
+            "reallocations": 807,
+            "final_assets_usdg": 3083097.922726865
+          }
+        }
+      },
+      "evaluation": {
+        "afterhours": {
+          "net_lender_yield_annualised": 0.09038523980818125,
+          "net_return_total": 0.5048124511462666,
+          "interest_usdg": 1010963.6507009882,
+          "bad_debt_usdg": 1338.7484084497407,
+          "bad_debt_events": 83,
+          "worst_event": {
+            "session_prev": "2024-08-01",
+            "bad_debt_usdg": 629.1598770589967,
+            "share_of_vault": 0.00025152506693447554,
+            "ticker": "INTC",
+            "g": -0.244750342356454,
+            "segment": "overnight"
+          },
+          "share_of_time": {
+            "weekday": 0.8070494739393238,
+            "middle": 0.0,
+            "weekend": 0.1395464216346985,
+            "idle": 0.05340410442597764
+          },
+          "reallocations": 1181,
+          "final_assets_usdg": 3009624.9022925333
+        },
+        "fixed_map": {
+          "net_lender_yield_annualised": 0.0927888620062085,
+          "net_return_total": 0.5205432003819317,
+          "interest_usdg": 1054466.102178209,
+          "bad_debt_usdg": 13379.701414360998,
+          "bad_debt_events": 42,
+          "worst_event": {
+            "session_prev": "2022-10-26",
+            "bad_debt_usdg": 5248.398842386795,
+            "share_of_vault": 0.0024394852699800946,
+            "ticker": "META",
+            "g": -0.2452627779928216,
+            "segment": "earnings"
+          },
+          "share_of_time": {
+            "weekday": 0.8963613102660949,
+            "middle": 0.05308597204315559,
+            "weekend": 0.0,
+            "idle": 0.05055271769074957
+          },
+          "reallocations": 818,
+          "final_assets_usdg": 3041086.400763863
+        }
+      },
+      "blends": {
+        "tuning": [
+          {
+            "w": 0.0,
+            "net_lender_yield_annualised": 0.0688836420570278,
+            "net_return_total": 0.3944236195613229,
+            "interest_usdg": 789691.058827172,
+            "bad_debt_usdg": 843.819704531778,
+            "bad_debt_events": 3,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 818.3888014770506,
+              "share_of_vault": 0.0003313285655531353,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.0,
+              "middle": 0.0,
+              "weekend": 0.9494967765132516,
+              "idle": 0.0505032234867484
+            },
+            "reallocations": 521,
+            "final_assets_usdg": 2788847.239122646
+          },
+          {
+            "w": 0.05,
+            "net_lender_yield_annualised": 0.0699942285710411,
+            "net_return_total": 0.40166987447865066,
+            "interest_usdg": 806013.5133766491,
+            "bad_debt_usdg": 2673.7644193361034,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 1533.561416587243,
+              "share_of_vault": 0.0006186949936781618,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.04747442711652825,
+              "middle": 0.0,
+              "weekend": 0.9020141152139963,
+              "idle": 0.05051145766947545
+            },
+            "reallocations": 520,
+            "final_assets_usdg": 2803339.7489573015
+          },
+          {
+            "w": 0.1,
+            "net_lender_yield_annualised": 0.07110640225002407,
+            "net_return_total": 0.40895662969794766,
+            "interest_usdg": 822424.8426223566,
+            "bad_debt_usdg": 4511.58322646723,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 2248.734031697435,
+              "share_of_vault": 0.0009040463320532413,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.09494844462165958,
+              "middle": 0.0,
+              "weekend": 0.8545360015949095,
+              "idle": 0.05051555378343094
+            },
+            "reallocations": 526,
+            "final_assets_usdg": 2817913.2593958955
+          },
+          {
+            "w": 0.15,
+            "net_lender_yield_annualised": 0.07222021439928517,
+            "net_return_total": 0.416284446692454,
+            "interest_usdg": 838925.7477298871,
+            "bad_debt_usdg": 6356.854344969154,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 2963.906646807628,
+              "share_of_vault": 0.0011873948137087708,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.14242267348391513,
+              "middle": 0.0,
+              "weekend": 0.8070618164088075,
+              "idle": 0.05051551010727755
+            },
+            "reallocations": 543,
+            "final_assets_usdg": 2832568.893384908
+          },
+          {
+            "w": 0.2,
+            "net_lender_yield_annualised": 0.07333521935188192,
+            "net_return_total": 0.42365060373862384,
+            "interest_usdg": 855511.5858065925,
+            "bad_debt_usdg": 8210.378329347672,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 3679.07926191782,
+              "share_of_vault": 0.0014687536210715687,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.18989652619349112,
+              "middle": 0.0,
+              "weekend": 0.7595861047739645,
+              "idle": 0.05051736903254432
+            },
+            "reallocations": 555,
+            "final_assets_usdg": 2847301.207477248
+          },
+          {
+            "w": 0.25,
+            "net_lender_yield_annualised": 0.07445150592226724,
+            "net_return_total": 0.4310558843011325,
+            "interest_usdg": 872183.0391319161,
+            "bad_debt_usdg": 10071.270529647618,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 4394.251877028012,
+              "share_of_vault": 0.0017481341131156051,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.23736971751081476,
+              "middle": 0.0,
+              "weekend": 0.712109152532416,
+              "idle": 0.050521129956769266
+            },
+            "reallocations": 564,
+            "final_assets_usdg": 2862111.768602265
+          },
+          {
+            "w": 0.3,
+            "net_lender_yield_annualised": 0.07556945888412936,
+            "net_return_total": 0.43850305818285285,
+            "interest_usdg": 888944.1335587838,
+            "bad_debt_usdg": 11938.017193072452,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 5109.251345840234,
+              "share_of_vault": 0.0020254788809274805,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.28484316155405326,
+              "middle": 0.0,
+              "weekend": 0.6646340436261094,
+              "idle": 0.05052279481983723
+            },
+            "reallocations": 579,
+            "final_assets_usdg": 2877006.1163657056
+          },
+          {
+            "w": 0.35,
+            "net_lender_yield_annualised": 0.07668869923045762,
+            "net_return_total": 0.44598981925209014,
+            "interest_usdg": 905793.23140329,
+            "bad_debt_usdg": 13813.59289910579,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 5824.350678733268,
+              "share_of_vault": 0.0023009099268401626,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.33231651936387957,
+              "middle": 0.0,
+              "weekend": 0.6171592502471605,
+              "idle": 0.05052423038896003
+            },
+            "reallocations": 591,
+            "final_assets_usdg": 2891979.63850418
+          },
+          {
+            "w": 0.4,
+            "net_lender_yield_annualised": 0.07770968121231103,
+            "net_return_total": 0.4528464603659885,
+            "interest_usdg": 922511.2567333047,
+            "bad_debt_usdg": 16818.33600132617,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 6646.213212018984,
+              "share_of_vault": 0.002617301037486649,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.3797891594197185,
+              "middle": 0.0,
+              "weekend": 0.5696837391295996,
+              "idle": 0.050527101450681795
+            },
+            "reallocations": 601,
+            "final_assets_usdg": 2905692.920731977
+          },
+          {
+            "w": 0.45,
+            "net_lender_yield_annualised": 0.07881671307949034,
+            "net_return_total": 0.4603103419057015,
+            "interest_usdg": 939500.1048625351,
+            "bad_debt_usdg": 18879.42105113442,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 7376.416330363166,
+              "share_of_vault": 0.0028948717792678063,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.4272620102762899,
+              "middle": 0.0,
+              "weekend": 0.5222091236710277,
+              "idle": 0.050528866052682406
+            },
+            "reallocations": 611,
+            "final_assets_usdg": 2920620.683811403
+          },
+          {
+            "w": 0.5,
+            "net_lender_yield_annualised": 0.07992477766179129,
+            "net_return_total": 0.4678118600564962,
+            "interest_usdg": 956575.4643897346,
+            "bad_debt_usdg": 20951.7442767425,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 8106.036183403851,
+              "share_of_vault": 0.0031702880055235684,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.4747345173196261,
+              "middle": 0.0,
+              "weekend": 0.4747345173196261,
+              "idle": 0.050530965360747714
+            },
+            "reallocations": 623,
+            "final_assets_usdg": 2935623.7201129925
+          },
+          {
+            "w": 0.55,
+            "net_lender_yield_annualised": 0.08117918499236376,
+            "net_return_total": 0.4763412622770147,
+            "interest_usdg": 974075.0233678852,
+            "bad_debt_usdg": 21392.498813845446,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 8684.621165054668,
+              "share_of_vault": 0.0033832642097666185,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.5222067749258311,
+              "middle": 0.0,
+              "weekend": 0.42726008857567765,
+              "idle": 0.05053313649849124
+            },
+            "reallocations": 634,
+            "final_assets_usdg": 2952682.5245540296
+          },
+          {
+            "w": 0.6,
+            "net_lender_yield_annualised": 0.08228959503929278,
+            "net_return_total": 0.48392457551864076,
+            "interest_usdg": 991339.054380812,
+            "bad_debt_usdg": 23489.903343529513,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 9452.5457315665,
+              "share_of_vault": 0.0036696062342399423,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.5696779102973291,
+              "middle": 0.0,
+              "weekend": 0.3797852735335177,
+              "idle": 0.05053681616915331
+            },
+            "reallocations": 641,
+            "final_assets_usdg": 2967849.1510372814
+          },
+          {
+            "w": 0.65,
+            "net_lender_yield_annualised": 0.08325562260161967,
+            "net_return_total": 0.4905471654385909,
+            "interest_usdg": 1008328.9569012135,
+            "bad_debt_usdg": 27234.626024031182,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 10296.782440981713,
+              "share_of_vault": 0.00398581720113421,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.6171495962881032,
+              "middle": 0.0,
+              "weekend": 0.3323113210782256,
+              "idle": 0.05053908263367137
+            },
+            "reallocations": 653,
+            "final_assets_usdg": 2981094.3308771816
+          },
+          {
+            "w": 0.7,
+            "net_lender_yield_annualised": 0.08456324462348985,
+            "net_return_total": 0.49954917771078344,
+            "interest_usdg": 1026233.9949656076,
+            "bad_debt_usdg": 27135.639544042187,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 10829.408081354206,
+              "share_of_vault": 0.004174882985078402,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.6646198612582005,
+              "middle": 0.0,
+              "weekend": 0.2848370833963845,
+              "idle": 0.05054305534541493
+            },
+            "reallocations": 663,
+            "final_assets_usdg": 2999098.355421567
+          },
+          {
+            "w": 0.75,
+            "net_lender_yield_annualised": 0.08569547600433691,
+            "net_return_total": 0.5073788251938596,
+            "interest_usdg": 1043807.3718389636,
+            "bad_debt_usdg": 29049.721451238955,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 11543.948754556377,
+              "share_of_vault": 0.004434838872637581,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.7120902536426177,
+              "middle": 0.0,
+              "weekend": 0.2373634178808775,
+              "idle": 0.05054632847650484
+            },
+            "reallocations": 672,
+            "final_assets_usdg": 3014757.6503877193
+          },
+          {
+            "w": 0.8,
+            "net_lender_yield_annualised": 0.08659482401442009,
+            "net_return_total": 0.5136212958354642,
+            "interest_usdg": 1060878.9784739732,
+            "bad_debt_usdg": 33636.38680305047,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 12489.587993868134,
+              "share_of_vault": 0.00478523737185851,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.759561719399854,
+              "middle": 0.0,
+              "weekend": 0.1898904298499635,
+              "idle": 0.05054785075018254
+            },
+            "reallocations": 677,
+            "final_assets_usdg": 3027242.5916709285
+          },
+          {
+            "w": 0.85,
+            "net_lender_yield_annualised": 0.08796118447995616,
+            "net_return_total": 0.5231448953179392,
+            "interest_usdg": 1079221.7420664125,
+            "bad_debt_usdg": 32931.95143053078,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 12973.609472495664,
+              "share_of_vault": 0.004949483539226559,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.8070300872618591,
+              "middle": 0.0,
+              "weekend": 0.1424170742226887,
+              "idle": 0.05055283851545215
+            },
+            "reallocations": 688,
+            "final_assets_usdg": 3046289.790635878
+          },
+          {
+            "w": 0.9,
+            "net_lender_yield_annualised": 0.08909601320844307,
+            "net_return_total": 0.5310910785222598,
+            "interest_usdg": 1097067.9437162236,
+            "bad_debt_usdg": 34885.78667170349,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 13688.398290144434,
+              "share_of_vault": 0.005204043623796831,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.854499629523383,
+              "middle": 0.0,
+              "weekend": 0.09494440328037725,
+              "idle": 0.050555967196239816
+            },
+            "reallocations": 696,
+            "final_assets_usdg": 3062182.1570445197
+          },
+          {
+            "w": 0.95,
+            "net_lender_yield_annualised": 0.08994242587697299,
+            "net_return_total": 0.5370392981513397,
+            "interest_usdg": 1114235.7882742253,
+            "bad_debt_usdg": 40157.191971534936,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 14684.691570399817,
+              "share_of_vault": 0.0055689486150378035,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.9019703345703382,
+              "middle": 0.0,
+              "weekend": 0.04747212287212315,
+              "idle": 0.0505575425575387
+            },
+            "reallocations": 702,
+            "final_assets_usdg": 3074078.5963026793
+          },
+          {
+            "w": 1.0,
+            "net_lender_yield_annualised": 0.0913703866705835,
+            "net_return_total": 0.5471162589369094,
+            "interest_usdg": 1133042.2792719742,
+            "bad_debt_usdg": 38809.76139814597,
+            "bad_debt_events": 18,
+            "worst_event": {
+              "session_prev": "2020-03-06",
+              "bad_debt_usdg": 15117.894255710155,
+              "share_of_vault": 0.005707677593122728,
+              "ticker": "USO",
+              "g": -0.21878573547847802,
+              "segment": "weekend"
+            },
+            "share_of_time": {
+              "weekday": 0.9494372108954056,
+              "middle": 0.0,
+              "weekend": 0.0,
+              "idle": 0.05056278910459452
+            },
+            "reallocations": 710,
+            "final_assets_usdg": 3094232.517873819
+          }
+        ],
+        "evaluation": [
+          {
+            "w": 0.0,
+            "net_lender_yield_annualised": 0.06880971539993741,
+            "net_return_total": 0.3692746304216483,
+            "interest_usdg": 739130.0895600059,
+            "bad_debt_usdg": 580.828716698359,
+            "bad_debt_events": 2,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 549.2427461567797,
+              "share_of_vault": 0.0002602143022675605,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.0,
+              "middle": 0.0,
+              "weekend": 0.9494940318375352,
+              "idle": 0.05050596816246475
+            },
+            "reallocations": 492,
+            "final_assets_usdg": 2738549.2608432965
+          },
+          {
+            "w": 0.05,
+            "net_lender_yield_annualised": 0.07003329290700044,
+            "net_return_total": 0.376693640423408,
+            "interest_usdg": 754467.4500780245,
+            "bad_debt_usdg": 1080.1692312148273,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 726.5183920965839,
+              "share_of_vault": 0.000343872896647472,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.04747426590556268,
+              "middle": 0.0,
+              "weekend": 0.9020110522057186,
+              "idle": 0.05051468188871868
+            },
+            "reallocations": 492,
+            "final_assets_usdg": 2753387.280846816
+          },
+          {
+            "w": 0.1,
+            "net_lender_yield_annualised": 0.07125715322874493,
+            "net_return_total": 0.38414602621267946,
+            "interest_usdg": 769885.4320494806,
+            "bad_debt_usdg": 1593.3796241221985,
+            "bad_debt_events": 25,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 909.7966139377256,
+              "share_of_vault": 0.00043020973515265384,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.0949476612070441,
+              "middle": 0.0,
+              "weekend": 0.8545289508633978,
+              "idle": 0.05052338792955807
+            },
+            "reallocations": 492,
+            "final_assets_usdg": 2768292.052425359
+          },
+          {
+            "w": 0.15,
+            "net_lender_yield_annualised": 0.07248223319334213,
+            "net_return_total": 0.39163764957061264,
+            "interest_usdg": 785387.6639892908,
+            "bad_debt_usdg": 2112.364848066711,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1099.0840399070448,
+              "share_of_vault": 0.0005192200873106934,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.14242078833094188,
+              "middle": 0.0,
+              "weekend": 0.8070511338753246,
+              "idle": 0.05052807779373343
+            },
+            "reallocations": 500,
+            "final_assets_usdg": 2783275.2991412254
+          },
+          {
+            "w": 0.2,
+            "net_lender_yield_annualised": 0.07370709182144752,
+            "net_return_total": 0.39915983662365284,
+            "interest_usdg": 800971.4642098749,
+            "bad_debt_usdg": 2651.790962572017,
+            "bad_debt_events": 25,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1294.387302228539,
+              "share_of_vault": 0.0006108992308927697,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.1898934684393836,
+              "middle": 0.0,
+              "weekend": 0.7595738737575344,
+              "idle": 0.05053265780308203
+            },
+            "reallocations": 510,
+            "final_assets_usdg": 2798319.6732473057
+          },
+          {
+            "w": 0.25,
+            "net_lender_yield_annualised": 0.07493372228089012,
+            "net_return_total": 0.4067249881935995,
+            "interest_usdg": 816639.3659446569,
+            "bad_debt_usdg": 3189.389557454763,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1495.713037121584,
+              "share_of_vault": 0.0007052424518980952,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.23736637771718336,
+              "middle": 0.0,
+              "weekend": 0.7120991331515524,
+              "idle": 0.05053448913126421
+            },
+            "reallocations": 523,
+            "final_assets_usdg": 2813449.976387199
+          },
+          {
+            "w": 0.3,
+            "net_lender_yield_annualised": 0.07616031907625187,
+            "net_return_total": 0.41432213714735555,
+            "interest_usdg": 832389.0948403907,
+            "bad_debt_usdg": 3744.8205456691276,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1703.0678847989716,
+              "share_of_vault": 0.0008022450445383145,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.2848389864610193,
+              "middle": 0.0,
+              "weekend": 0.6646243017423492,
+              "idle": 0.05053671179663157
+            },
+            "reallocations": 535,
+            "final_assets_usdg": 2828644.274294711
+          },
+          {
+            "w": 0.35,
+            "net_lender_yield_annualised": 0.07738747103150767,
+            "net_return_total": 0.4219550512543775,
+            "interest_usdg": 848221.9345108392,
+            "bad_debt_usdg": 4311.832002086525,
+            "bad_debt_events": 21,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 1916.4584894649217,
+              "share_of_vault": 0.0009019023112219287,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.3323116123294731,
+              "middle": 0.0,
+              "weekend": 0.6171501371832997,
+              "idle": 0.05053825048722727
+            },
+            "reallocations": 548,
+            "final_assets_usdg": 2843910.102508755
+          },
+          {
+            "w": 0.4,
+            "net_lender_yield_annualised": 0.07861408439561335,
+            "net_return_total": 0.42961702840568217,
+            "interest_usdg": 864136.9960497547,
+            "bad_debt_usdg": 4902.93923838168,
+            "bad_debt_events": 26,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 2135.891499312963,
+              "share_of_vault": 0.0010042095625386964,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.3797838605220767,
+              "middle": 0.0,
+              "weekend": 0.5696757907831682,
+              "idle": 0.05054034869475507
+            },
+            "reallocations": 560,
+            "final_assets_usdg": 2859234.0568113644
+          },
+          {
+            "w": 0.45,
+            "net_lender_yield_annualised": 0.07984346046838398,
+            "net_return_total": 0.43732887920316643,
+            "interest_usdg": 880134.8932757534,
+            "bad_debt_usdg": 5477.134869409796,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 2361.373566524515,
+              "share_of_vault": 0.0011091621172443899,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.42725557600706787,
+              "middle": 0.0,
+              "weekend": 0.5222012595642379,
+              "idle": 0.05054316442869424
+            },
+            "reallocations": 570,
+            "final_assets_usdg": 2874657.7584063327
+          },
+          {
+            "w": 0.5,
+            "net_lender_yield_annualised": 0.08106452512847584,
+            "net_return_total": 0.44502101561447027,
+            "interest_usdg": 896181.2091852287,
+            "bad_debt_usdg": 6139.177956279458,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 2592.911347266064,
+              "share_of_vault": 0.0012167553022449547,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.4747278529912347,
+              "middle": 0.0,
+              "weekend": 0.4747278529912347,
+              "idle": 0.05054429401753061
+            },
+            "reallocations": 585,
+            "final_assets_usdg": 2890042.0312289405
+          },
+          {
+            "w": 0.55,
+            "net_lender_yield_annualised": 0.08229247276450669,
+            "net_return_total": 0.45278919909248194,
+            "interest_usdg": 912340.3726125271,
+            "bad_debt_usdg": 6761.974427573104,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 2830.5115016876643,
+              "share_of_vault": 0.001326984452581305,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.5221987720402362,
+              "middle": 0.0,
+              "weekend": 0.427253540760174,
+              "idle": 0.0505476871995897
+            },
+            "reallocations": 594,
+            "final_assets_usdg": 2905578.398184964
+          },
+          {
+            "w": 0.6,
+            "net_lender_yield_annualised": 0.08352084792039882,
+            "net_return_total": 0.46059298500408996,
+            "interest_usdg": 928582.5327933169,
+            "bad_debt_usdg": 7396.562785140484,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 3074.180693921256,
+              "share_of_vault": 0.0014398449114140636,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.5696687796933315,
+              "middle": 0.0,
+              "weekend": 0.37977918646219133,
+              "idle": 0.05055203384447719
+            },
+            "reallocations": 602,
+            "final_assets_usdg": 2921185.97000818
+          },
+          {
+            "w": 0.65,
+            "net_lender_yield_annualised": 0.08474965185814365,
+            "net_return_total": 0.4684325176071742,
+            "interest_usdg": 944908.3787978272,
+            "bad_debt_usdg": 8043.343583479079,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 3323.925592077758,
+              "share_of_vault": 0.0015553320300078087,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.617138245810957,
+              "middle": 0.0,
+              "weekend": 0.33230520928283847,
+              "idle": 0.050556544906204544
+            },
+            "reallocations": 609,
+            "final_assets_usdg": 2936865.035214348
+          },
+          {
+            "w": 0.7,
+            "net_lender_yield_annualised": 0.08597914120816696,
+            "net_return_total": 0.4763095812592959,
+            "interest_usdg": 961321.5173023917,
+            "bad_debt_usdg": 8702.354783806095,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 3579.752868245788,
+              "share_of_vault": 0.001673441167716065,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.6646090947102186,
+              "middle": 0.0,
+              "weekend": 0.2848324691615339,
+              "idle": 0.0505584361282476
+            },
+            "reallocations": 620,
+            "final_assets_usdg": 2952619.1625185916
+          },
+          {
+            "w": 0.75,
+            "net_lender_yield_annualised": 0.08720899394299164,
+            "net_return_total": 0.48422225773272376,
+            "interest_usdg": 977818.1143789864,
+            "bad_debt_usdg": 9373.598913548813,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 3841.669198489424,
+              "share_of_vault": 0.0017941676919659187,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.7120788992485039,
+              "middle": 0.0,
+              "weekend": 0.23735963308283903,
+              "idle": 0.0505614676686571
+            },
+            "reallocations": 629,
+            "final_assets_usdg": 2968444.5154654477
+          },
+          {
+            "w": 0.8,
+            "net_lender_yield_annualised": 0.08843922768358703,
+            "net_return_total": 0.49217079341923986,
+            "interest_usdg": 994398.6827716662,
+            "bad_debt_usdg": 10057.095933189023,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 4109.6812628457965,
+              "share_of_vault": 0.0019175069782425857,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.759547727163738,
+              "middle": 0.0,
+              "weekend": 0.1898869317909345,
+              "idle": 0.050565341045327485
+            },
+            "reallocations": 636,
+            "final_assets_usdg": 2984341.5868384796
+          },
+          {
+            "w": 0.85,
+            "net_lender_yield_annualised": 0.08966995286103252,
+            "net_return_total": 0.5001560404681196,
+            "interest_usdg": 1011064.9535994701,
+            "bad_debt_usdg": 10752.872663243925,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 4383.795745323766,
+              "share_of_vault": 0.0020434544100745027,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.8070164179616531,
+              "middle": 0.0,
+              "weekend": 0.1424146619932395,
+              "idle": 0.05056892004510733
+            },
+            "reallocations": 644,
+            "final_assets_usdg": 3000312.080936239
+          },
+          {
+            "w": 0.9,
+            "net_lender_yield_annualised": 0.09090115914703922,
+            "net_return_total": 0.5081780750566076,
+            "interest_usdg": 1027817.0988735815,
+            "bad_debt_usdg": 11460.948760371648,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 4664.019333900872,
+              "share_of_vault": 0.0021720053790176895,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.8544849085315847,
+              "middle": 0.0,
+              "weekend": 0.09494276761462174,
+              "idle": 0.05057232385379354
+            },
+            "reallocations": 652,
+            "final_assets_usdg": 3016356.150113215
+          },
+          {
+            "w": 0.95,
+            "net_lender_yield_annualised": 0.09213269956122905,
+            "net_return_total": 0.5162360766947494,
+            "interest_usdg": 1044653.4862448929,
+            "bad_debt_usdg": 12181.33285539232,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 4950.358720522269,
+              "share_of_vault": 0.0023031552846410185,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.9019517962743419,
+              "middle": 0.0,
+              "weekend": 0.04747114717233291,
+              "idle": 0.05057705655332529
+            },
+            "reallocations": 658,
+            "final_assets_usdg": 3032472.1533894986
+          },
+          {
+            "w": 1.0,
+            "net_lender_yield_annualised": 0.09338838181107456,
+            "net_return_total": 0.5244869415486284,
+            "interest_usdg": 1061619.9963121833,
+            "bad_debt_usdg": 12646.113214925163,
+            "bad_debt_events": 20,
+            "worst_event": {
+              "session_prev": "2022-10-26",
+              "bad_debt_usdg": 5248.269013508449,
+              "share_of_vault": 0.002439429014677306,
+              "ticker": "META",
+              "g": -0.2452627779928216,
+              "segment": "earnings"
+            },
+            "share_of_time": {
+              "weekday": 0.949417699947852,
+              "middle": 0.0,
+              "weekend": 0.0,
+              "idle": 0.050582300052148074
+            },
+            "reallocations": 668,
+            "final_assets_usdg": 3048973.883097257
+          }
+        ]
+      },
+      "grid": {
+        "tuning": [
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "interest_usdg": 1092326.1854867614,
+            "bad_debt_usdg": 37662.30066003772,
+            "worst_event_share": 0.005490609294276238,
+            "net_lender_yield_annualised": 0.08855974322342108
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 1,
+            "interest_usdg": 1133630.9790512798,
+            "bad_debt_usdg": 26549.7987581904,
+            "worst_event_share": 0.00548830215498019,
+            "net_lender_yield_annualised": 0.09227687215691027
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 3,
+            "interest_usdg": 1128251.9811544095,
+            "bad_debt_usdg": 24530.471392314386,
+            "worst_event_share": 0.005463341416413903,
+            "net_lender_yield_annualised": 0.0920401340223207
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 5,
+            "interest_usdg": 1121900.5587071849,
+            "bad_debt_usdg": 24818.505686353932,
+            "worst_event_share": 0.005460109633430418,
+            "net_lender_yield_annualised": 0.09157168350434164
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 10,
+            "interest_usdg": 1118255.777406485,
+            "bad_debt_usdg": 21606.183273369777,
+            "worst_event_share": 0.005447378638827579,
+            "net_lender_yield_annualised": 0.09154114328302265
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "interest_usdg": 1079811.6611875808,
+            "bad_debt_usdg": 36531.16563244596,
+            "worst_event_share": 0.005490609294276238,
+            "net_lender_yield_annualised": 0.08774576641679133
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 1,
+            "interest_usdg": 1130710.9332318692,
+            "bad_debt_usdg": 29569.45052888731,
+            "worst_event_share": 0.005488595841111164,
+            "net_lender_yield_annualised": 0.09185819407685414
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 3,
+            "interest_usdg": 1123116.382081913,
+            "bad_debt_usdg": 24560.468068553047,
+            "worst_event_share": 0.0054331776381913895,
+            "net_lender_yield_annualised": 0.09167574187295546
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 5,
+            "interest_usdg": 1114391.2254726544,
+            "bad_debt_usdg": 25568.635059935856,
+            "worst_event_share": 0.005428593676061733,
+            "net_lender_yield_annualised": 0.09098781040717441
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 10,
+            "interest_usdg": 1110603.2745400358,
+            "bad_debt_usdg": 22011.765831319128,
+            "worst_event_share": 0.00541938324010089,
+            "net_lender_yield_annualised": 0.09097145697020026
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "interest_usdg": 1078197.4795296642,
+            "bad_debt_usdg": 36531.16563244596,
+            "worst_event_share": 0.005490609294276238,
+            "net_lender_yield_annualised": 0.08763014627358823
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 1,
+            "interest_usdg": 1126556.0766724965,
+            "bad_debt_usdg": 27689.900355627826,
+            "worst_event_share": 0.005470764134624164,
+            "net_lender_yield_annualised": 0.09169764214475662
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 3,
+            "interest_usdg": 1114858.022187788,
+            "bad_debt_usdg": 26244.865208679028,
+            "worst_event_share": 0.005432193223738377,
+            "net_lender_yield_annualised": 0.0909729890396691
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 5,
+            "interest_usdg": 1105144.098503648,
+            "bad_debt_usdg": 24460.58388062632,
+            "worst_event_share": 0.005413176288966045,
+            "net_lender_yield_annualised": 0.09041122505018695
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 10,
+            "interest_usdg": 1100835.9068256528,
+            "bad_debt_usdg": 20814.565283030348,
+            "worst_event_share": 0.005405381973673967,
+            "net_lender_yield_annualised": 0.0903642620717704
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "interest_usdg": 1078847.5826930455,
+            "bad_debt_usdg": 33899.953857217246,
+            "worst_event_share": 0.005386129803307218,
+            "net_lender_yield_annualised": 0.08786512789692447
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 1,
+            "interest_usdg": 1123080.5572157188,
+            "bad_debt_usdg": 22782.999021494306,
+            "worst_event_share": 0.005413020808491889,
+            "net_lender_yield_annualised": 0.09179865541475407
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 3,
+            "interest_usdg": 1106160.3212369608,
+            "bad_debt_usdg": 20482.655237152623,
+            "worst_event_share": 0.005399289091397795,
+            "net_lender_yield_annualised": 0.09076516303825621
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 5,
+            "interest_usdg": 1092370.8715961492,
+            "bad_debt_usdg": 19543.00205680566,
+            "worst_event_share": 0.005380514749794006,
+            "net_lender_yield_annualised": 0.08985356200161476
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 10,
+            "interest_usdg": 1084846.4385939036,
+            "bad_debt_usdg": 17615.209044640695,
+            "worst_event_share": 0.005374784249921354,
+            "net_lender_yield_annualised": 0.0894555672641777
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "interest_usdg": 1070430.2967782696,
+            "bad_debt_usdg": 36610.370501954814,
+            "worst_event_share": 0.005407425917937115,
+            "net_lender_yield_annualised": 0.08706742753809871
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 1,
+            "interest_usdg": 1117020.2499320486,
+            "bad_debt_usdg": 23166.906048814468,
+            "worst_event_share": 0.0041767445527421225,
+            "net_lender_yield_annualised": 0.09134358989161151
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 3,
+            "interest_usdg": 1096118.4802688677,
+            "bad_debt_usdg": 11002.507369482451,
+            "worst_event_share": 0.0024241355252241073,
+            "net_lender_yield_annualised": 0.09072537844178008
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 5,
+            "interest_usdg": 1078485.970963493,
+            "bad_debt_usdg": 6651.426380697443,
+            "worst_event_share": 0.001469204553904846,
+            "net_lender_yield_annualised": 0.08978296586154078
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 10,
+            "interest_usdg": 1069151.489359271,
+            "bad_debt_usdg": 5496.24566865121,
+            "worst_event_share": 0.001463054407659808,
+            "net_lender_yield_annualised": 0.08920096345910267
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "interest_usdg": 1030466.0410696729,
+            "bad_debt_usdg": 35336.860356093064,
+            "worst_event_share": 0.005472106545231186,
+            "net_lender_yield_annualised": 0.0842755061918985
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 1,
+            "interest_usdg": 1102559.8329795818,
+            "bad_debt_usdg": 20996.04465934504,
+            "worst_event_share": 0.004355336705159994,
+            "net_lender_yield_annualised": 0.09047364377614375
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 3,
+            "interest_usdg": 1077699.4876746635,
+            "bad_debt_usdg": 7385.406797642308,
+            "worst_event_share": 0.0017616889659584885,
+            "net_lender_yield_annualised": 0.08967487032222299
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 5,
+            "interest_usdg": 1057025.6565729338,
+            "bad_debt_usdg": 3942.784631703276,
+            "worst_event_share": 0.0006861943340793574,
+            "net_lender_yield_annualised": 0.08844683704842127
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 10,
+            "interest_usdg": 1042922.5370911934,
+            "bad_debt_usdg": 2964.370431010348,
+            "worst_event_share": 0.0006121214839805949,
+            "net_lender_yield_annualised": 0.08750774214606705
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "interest_usdg": 1117822.0087482084,
+            "bad_debt_usdg": 35645.62934105608,
+            "worst_event_share": 0.005583532549118395,
+            "net_lender_yield_annualised": 0.09051707316572877
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 1,
+            "interest_usdg": 1134155.0149864645,
+            "bad_debt_usdg": 29969.268630308816,
+            "worst_event_share": 0.005489684121766403,
+            "net_lender_yield_annualised": 0.09207285850654268
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 3,
+            "interest_usdg": 1132748.0221308281,
+            "bad_debt_usdg": 26357.069132245866,
+            "worst_event_share": 0.005474639706577832,
+            "net_lender_yield_annualised": 0.0922282522190232
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 5,
+            "interest_usdg": 1130293.8887038436,
+            "bad_debt_usdg": 25098.803416126626,
+            "worst_event_share": 0.00546076105773478,
+            "net_lender_yield_annualised": 0.09214399427731124
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 10,
+            "interest_usdg": 1129391.6954928413,
+            "bad_debt_usdg": 21624.186879694855,
+            "worst_event_share": 0.005448052012582359,
+            "net_lender_yield_annualised": 0.09232520888623807
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "interest_usdg": 1112884.2752185047,
+            "bad_debt_usdg": 34302.45822340682,
+            "worst_event_share": 0.005583532549118395,
+            "net_lender_yield_annualised": 0.09026213951387452
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 1,
+            "interest_usdg": 1133152.5730990877,
+            "bad_debt_usdg": 29715.015355528925,
+            "worst_event_share": 0.005489452073559195,
+            "net_lender_yield_annualised": 0.0920201160420735
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 3,
+            "interest_usdg": 1130811.566956363,
+            "bad_debt_usdg": 25342.382660792973,
+            "worst_event_share": 0.005440792833351601,
+            "net_lender_yield_annualised": 0.0921633089211602
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 5,
+            "interest_usdg": 1126883.9647732489,
+            "bad_debt_usdg": 25730.004018009608,
+            "worst_event_share": 0.00542878606692564,
+            "net_lender_yield_annualised": 0.09185907430310114
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 10,
+            "interest_usdg": 1126031.0354816439,
+            "bad_debt_usdg": 21421.03016095748,
+            "worst_event_share": 0.005416939876135905,
+            "net_lender_yield_annualised": 0.09210276150690877
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "interest_usdg": 1112142.5308836293,
+            "bad_debt_usdg": 34475.3789045435,
+            "worst_event_share": 0.005538961553987264,
+            "net_lender_yield_annualised": 0.09019723162988469
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 1,
+            "interest_usdg": 1132091.0391903059,
+            "bad_debt_usdg": 25832.198657378103,
+            "worst_event_share": 0.005447233420778723,
+            "net_lender_yield_annualised": 0.09221894516934115
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 3,
+            "interest_usdg": 1126814.1326673059,
+            "bad_debt_usdg": 25582.53200472326,
+            "worst_event_share": 0.005430968893261361,
+            "net_lender_yield_annualised": 0.09186455111060954
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 5,
+            "interest_usdg": 1122059.4922580514,
+            "bad_debt_usdg": 24788.399499505456,
+            "worst_event_share": 0.0054135320980927505,
+            "net_lender_yield_annualised": 0.09158503240844418
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 10,
+            "interest_usdg": 1119563.2960767797,
+            "bad_debt_usdg": 20807.337433059794,
+            "worst_event_share": 0.0054037318767445235,
+            "net_lender_yield_annualised": 0.09168986248648348
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "interest_usdg": 1112954.795257669,
+            "bad_debt_usdg": 29856.87253080229,
+            "worst_event_share": 0.005375489387155836,
+            "net_lender_yield_annualised": 0.09058239259507506
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 1,
+            "interest_usdg": 1130422.3877831362,
+            "bad_debt_usdg": 23712.393391917205,
+            "worst_event_share": 0.00587384628958134,
+            "net_lender_yield_annualised": 0.09225072671954582
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 3,
+            "interest_usdg": 1122859.4613701436,
+            "bad_debt_usdg": 20175.15694661723,
+            "worst_event_share": 0.005397380514239534,
+            "net_lender_yield_annualised": 0.09196700627621968
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 5,
+            "interest_usdg": 1115159.4840918283,
+            "bad_debt_usdg": 20863.23533409405,
+            "worst_event_share": 0.005382127077732632,
+            "net_lender_yield_annualised": 0.09137489036734214
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 10,
+            "interest_usdg": 1110606.4918636559,
+            "bad_debt_usdg": 18581.713422191046,
+            "worst_event_share": 0.005375016192506825,
+            "net_lender_yield_annualised": 0.09121432562289722
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "interest_usdg": 1084839.6369040401,
+            "bad_debt_usdg": 31838.814911330926,
+            "worst_event_share": 0.005389061011558003,
+            "net_lender_yield_annualised": 0.08844097627186409
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 1,
+            "interest_usdg": 1126931.0467290208,
+            "bad_debt_usdg": 21379.927668918834,
+            "worst_event_share": 0.004265906382342342,
+            "net_lender_yield_annualised": 0.09216908226658971
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 3,
+            "interest_usdg": 1115636.7092289464,
+            "bad_debt_usdg": 13720.642656422306,
+            "worst_event_share": 0.0027848534088206495,
+            "net_lender_yield_annualised": 0.09191282937224377
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 5,
+            "interest_usdg": 1105591.61944107,
+            "bad_debt_usdg": 7666.548660430692,
+            "worst_event_share": 0.001557389563794873,
+            "net_lender_yield_annualised": 0.09163120756768173
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 10,
+            "interest_usdg": 1098958.5160921128,
+            "bad_debt_usdg": 8771.318468849056,
+            "worst_event_share": 0.0024687303929414716,
+            "net_lender_yield_annualised": 0.09108436244673968
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "interest_usdg": 1059443.5534275942,
+            "bad_debt_usdg": 32727.553907455876,
+            "worst_event_share": 0.0054163887917389065,
+            "net_lender_yield_annualised": 0.08655695111528483
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 1,
+            "interest_usdg": 1117148.3408460417,
+            "bad_debt_usdg": 21206.079070313554,
+            "worst_event_share": 0.0046941281847870785,
+            "net_lender_yield_annualised": 0.09149118416150648
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 3,
+            "interest_usdg": 1101300.1866438896,
+            "bad_debt_usdg": 10636.559831766437,
+            "worst_event_share": 0.002850868926514217,
+            "net_lender_yield_annualised": 0.09111806390476884
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 5,
+            "interest_usdg": 1086920.1237929726,
+            "bad_debt_usdg": 8219.222606516667,
+            "worst_event_share": 0.00224739767282541,
+            "net_lender_yield_annualised": 0.09027058901722262
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 10,
+            "interest_usdg": 1076053.2127673214,
+            "bad_debt_usdg": 6908.615596744566,
+            "worst_event_share": 0.001987010277470384,
+            "net_lender_yield_annualised": 0.08959169815610113
+          }
+        ],
+        "evaluation": [
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "interest_usdg": 1063831.4689246754,
+            "bad_debt_usdg": 8548.368682892045,
+            "worst_event_share": 0.0012794283907768276,
+            "net_lender_yield_annualised": 0.09386705978556864
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 1,
+            "interest_usdg": 1058613.6623601867,
+            "bad_debt_usdg": 16850.721985631455,
+            "worst_event_share": 0.005344618430639818,
+            "net_lender_yield_annualised": 0.09284033314526008
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 3,
+            "interest_usdg": 1061004.5126650562,
+            "bad_debt_usdg": 4596.072452092806,
+            "worst_event_share": 0.0004434297536108906,
+            "net_lender_yield_annualised": 0.09395235701404814
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 5,
+            "interest_usdg": 1058356.1162096395,
+            "bad_debt_usdg": 3697.195589664089,
+            "worst_event_share": 0.00027339416614300353,
+            "net_lender_yield_annualised": 0.09381973825649959
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 10,
+            "interest_usdg": 1050485.8541911892,
+            "bad_debt_usdg": 4789.077967418856,
+            "worst_event_share": 0.000858947208063235,
+            "net_lender_yield_annualised": 0.09313944075043734
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "interest_usdg": 1064572.6305391917,
+            "bad_debt_usdg": 4990.772772224669,
+            "worst_event_share": 0.0008331114450468875,
+            "net_lender_yield_annualised": 0.0941927588139897
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 1,
+            "interest_usdg": 1061547.6506863127,
+            "bad_debt_usdg": 7851.348009402944,
+            "worst_event_share": 0.0019200137691040686,
+            "net_lender_yield_annualised": 0.09374674343402156
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 3,
+            "interest_usdg": 1059264.512524298,
+            "bad_debt_usdg": 5091.713082604278,
+            "worst_event_share": 0.00050247373468491,
+            "net_lender_yield_annualised": 0.09378287820477493
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 5,
+            "interest_usdg": 1056717.5143854036,
+            "bad_debt_usdg": 2391.5602763859715,
+            "worst_event_share": 0.0002791975550899777,
+            "net_lender_yield_annualised": 0.09379449162909048
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 10,
+            "interest_usdg": 1048390.7969293307,
+            "bad_debt_usdg": 3675.3397493206653,
+            "worst_event_share": 0.0003507455602968461,
+            "net_lender_yield_annualised": 0.09306485507792162
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "interest_usdg": 1064546.6115784363,
+            "bad_debt_usdg": 4868.509598168244,
+            "worst_event_share": 0.0008330921839934343,
+            "net_lender_yield_annualised": 0.09420004670932758
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 1,
+            "interest_usdg": 1062083.2359977262,
+            "bad_debt_usdg": 4288.2571340607665,
+            "worst_event_share": 0.0007134150619078703,
+            "net_lender_yield_annualised": 0.09405741824550562
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 3,
+            "interest_usdg": 1055337.975898409,
+            "bad_debt_usdg": 10326.346471107292,
+            "worst_event_share": 0.001987672688912927,
+            "net_lender_yield_annualised": 0.09308736780233517
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 5,
+            "interest_usdg": 1053666.6527862693,
+            "bad_debt_usdg": 5185.061717449722,
+            "worst_event_share": 0.001362846996956636,
+            "net_lender_yield_annualised": 0.09335099896882615
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 10,
+            "interest_usdg": 1044815.0906681227,
+            "bad_debt_usdg": 2745.1846127529548,
+            "worst_event_share": 0.0003890988668916036,
+            "net_lender_yield_annualised": 0.09286368412065515
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "interest_usdg": 1046196.2558808163,
+            "bad_debt_usdg": 8202.641189303722,
+            "worst_event_share": 0.0008370222808137737,
+            "net_lender_yield_annualised": 0.09255344780587049
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 1,
+            "interest_usdg": 1061892.857405848,
+            "bad_debt_usdg": 3022.725708821599,
+            "worst_event_share": 0.0006629512668995613,
+            "net_lender_yield_annualised": 0.09413885920932663
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 3,
+            "interest_usdg": 1056994.7464047384,
+            "bad_debt_usdg": 4021.5224231390303,
+            "worst_event_share": 0.0012473445320313047,
+            "net_lender_yield_annualised": 0.09369190081895296
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 5,
+            "interest_usdg": 1052533.0971874504,
+            "bad_debt_usdg": 3637.1913954088386,
+            "worst_event_share": 0.001086951454978199,
+            "net_lender_yield_annualised": 0.09338246081905277
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 10,
+            "interest_usdg": 1040905.5319338907,
+            "bad_debt_usdg": 1532.343393415894,
+            "worst_event_share": 0.00027942006699983407,
+            "net_lender_yield_annualised": 0.09265848042586389
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "interest_usdg": 1023643.3418097317,
+            "bad_debt_usdg": 5075.98023334188,
+            "worst_event_share": 0.001357867900094826,
+            "net_lender_yield_annualised": 0.0910704403530127
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 1,
+            "interest_usdg": 1056718.8988902536,
+            "bad_debt_usdg": 5809.954542775122,
+            "worst_event_share": 0.0018767043838484312,
+            "net_lender_yield_annualised": 0.0935352771398481
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 3,
+            "interest_usdg": 1047140.9805043846,
+            "bad_debt_usdg": 2378.6352883902446,
+            "worst_event_share": 0.000579961226076454,
+            "net_lender_yield_annualised": 0.09306841925891329
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 5,
+            "interest_usdg": 1035439.3116078441,
+            "bad_debt_usdg": 5428.436238701543,
+            "worst_event_share": 0.002144562009458172,
+            "net_lender_yield_annualised": 0.09194494981439005
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 10,
+            "interest_usdg": 1023987.5334827518,
+            "bad_debt_usdg": 1902.951676996348,
+            "worst_event_share": 0.0004853692938319243,
+            "net_lender_yield_annualised": 0.09133950290266069
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "interest_usdg": 995085.4643397734,
+            "bad_debt_usdg": 3861.231570001048,
+            "worst_event_share": 0.0010443084423083025,
+            "net_lender_yield_annualised": 0.08897025616252008
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 1,
+            "interest_usdg": 1042261.7520917874,
+            "bad_debt_usdg": 3165.5697854053788,
+            "worst_event_share": 0.0005093140431506799,
+            "net_lender_yield_annualised": 0.09263739381994429
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 3,
+            "interest_usdg": 1024595.3425797612,
+            "bad_debt_usdg": 1379.5529844238306,
+            "worst_event_share": 0.00026172045684391595,
+            "net_lender_yield_annualised": 0.09142598629395704
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 5,
+            "interest_usdg": 1010963.6507009882,
+            "bad_debt_usdg": 1338.7484084497407,
+            "worst_event_share": 0.00025152506693447554,
+            "net_lender_yield_annualised": 0.09038523980818125
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 10,
+            "interest_usdg": 994579.9840189336,
+            "bad_debt_usdg": 1051.4917763894841,
+            "worst_event_share": 0.00028197158350253633,
+            "net_lender_yield_annualised": 0.08914782540272093
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "interest_usdg": 1064253.9612752316,
+            "bad_debt_usdg": 6369.364646151024,
+            "worst_event_share": 0.0008336068528607822,
+            "net_lender_yield_annualised": 0.09406420749817124
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 1,
+            "interest_usdg": 1063234.758900431,
+            "bad_debt_usdg": 6997.785933799091,
+            "worst_event_share": 0.0008074434349910812,
+            "net_lender_yield_annualised": 0.09393936193518204
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 3,
+            "interest_usdg": 1061094.1872182973,
+            "bad_debt_usdg": 8831.37930243419,
+            "worst_event_share": 0.0016576226312262177,
+            "net_lender_yield_annualised": 0.09363800864112304
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 5,
+            "interest_usdg": 1060646.4794034115,
+            "bad_debt_usdg": 6301.7235907282875,
+            "worst_event_share": 0.0012593178621910642,
+            "net_lender_yield_annualised": 0.09379591729453818
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.0,
+            "lookahead": 10,
+            "interest_usdg": 1058749.2937970478,
+            "bad_debt_usdg": 2550.750314248921,
+            "worst_event_share": 0.00027896805623549975,
+            "net_lender_yield_annualised": 0.09393644938073376
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "interest_usdg": 1061623.5134733994,
+            "bad_debt_usdg": 13171.42695026824,
+            "worst_event_share": 0.002439429014677306,
+            "net_lender_yield_annualised": 0.09334875835122602
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 1,
+            "interest_usdg": 1063606.495411009,
+            "bad_debt_usdg": 4024.3695512332615,
+            "worst_event_share": 0.00039848690237020767,
+            "net_lender_yield_annualised": 0.09419277911501811
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 3,
+            "interest_usdg": 1061880.4496389253,
+            "bad_debt_usdg": 3798.485529301975,
+            "worst_event_share": 0.00027637739570896447,
+            "net_lender_yield_annualised": 0.09407915908866826
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 5,
+            "interest_usdg": 1055957.192228508,
+            "bad_debt_usdg": 13578.404818323777,
+            "worst_event_share": 0.0038770682021846306,
+            "net_lender_yield_annualised": 0.09288717894726473
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.1,
+            "lookahead": 10,
+            "interest_usdg": 1054924.1053981455,
+            "bad_debt_usdg": 6047.943227194123,
+            "worst_event_share": 0.00136177725719207,
+            "net_lender_yield_annualised": 0.09338096162259468
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "interest_usdg": 1062181.6319280062,
+            "bad_debt_usdg": 10330.448295256469,
+            "worst_event_share": 0.0024394852699800946,
+            "net_lender_yield_annualised": 0.09360677828992947
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 1,
+            "interest_usdg": 1063605.4171182185,
+            "bad_debt_usdg": 2695.811962465011,
+            "worst_event_share": 0.00027832583411117786,
+            "net_lender_yield_annualised": 0.0942932838118129
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 3,
+            "interest_usdg": 1059458.0155093481,
+            "bad_debt_usdg": 6183.733545266666,
+            "worst_event_share": 0.001922604152029602,
+            "net_lender_yield_annualised": 0.09371473610174408
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 5,
+            "interest_usdg": 1057931.0950622533,
+            "bad_debt_usdg": 4742.274275613252,
+            "worst_event_share": 0.0012769874288660259,
+            "net_lender_yield_annualised": 0.0937082540419587
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.2,
+            "lookahead": 10,
+            "interest_usdg": 1053558.957312344,
+            "bad_debt_usdg": 2212.8043691360263,
+            "worst_event_share": 0.00027864710104607773,
+            "net_lender_yield_annualised": 0.09356845656373602
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "interest_usdg": 1054466.102178209,
+            "bad_debt_usdg": 13379.701414360998,
+            "worst_event_share": 0.0024394852699800946,
+            "net_lender_yield_annualised": 0.0927888620062085
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 1,
+            "interest_usdg": 1062261.9412551585,
+            "bad_debt_usdg": 3307.5582870321878,
+            "worst_event_share": 0.0008761432803326671,
+            "net_lender_yield_annualised": 0.09414524014367553
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 3,
+            "interest_usdg": 1060354.6752252788,
+            "bad_debt_usdg": 1837.713923074135,
+            "worst_event_share": 0.0002788066721727306,
+            "net_lender_yield_annualised": 0.09411210965297645
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 5,
+            "interest_usdg": 1057301.7819763725,
+            "bad_debt_usdg": 1957.5953098025557,
+            "worst_event_share": 0.00027423005247299566,
+            "net_lender_yield_annualised": 0.09387169057994638
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.3,
+            "lookahead": 10,
+            "interest_usdg": 1048675.3639870868,
+            "bad_debt_usdg": 2383.5161907369197,
+            "worst_event_share": 0.00044231844221449026,
+            "net_lender_yield_annualised": 0.09318466025387595
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "interest_usdg": 1045634.9870041973,
+            "bad_debt_usdg": 9682.552208436708,
+            "worst_event_share": 0.0024394852699800946,
+            "net_lender_yield_annualised": 0.09239797541440486
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 1,
+            "interest_usdg": 1060164.747805391,
+            "bad_debt_usdg": 3940.4084684824693,
+            "worst_event_share": 0.0013823666800223487,
+            "net_lender_yield_annualised": 0.09393840444087376
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 3,
+            "interest_usdg": 1053610.1459681336,
+            "bad_debt_usdg": 4973.477818787605,
+            "worst_event_share": 0.001704375377537414,
+            "net_lender_yield_annualised": 0.09336277546414262
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 5,
+            "interest_usdg": 1046124.7923559936,
+            "bad_debt_usdg": 8190.080729971643,
+            "worst_event_share": 0.0034663436937245468,
+            "net_lender_yield_annualised": 0.09254896243687782
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.4,
+            "lookahead": 10,
+            "interest_usdg": 1039087.4464683278,
+            "bad_debt_usdg": 2168.801497025802,
+            "worst_event_share": 0.0005654401516561559,
+            "net_lender_yield_annualised": 0.09247157988393395
+          },
+          {
+            "kind": "fixed_map",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "interest_usdg": 1035901.1370125993,
+            "bad_debt_usdg": 4358.898497582652,
+            "worst_event_share": 0.0013134513570446456,
+            "net_lender_yield_annualised": 0.09206177847078645
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 1,
+            "interest_usdg": 1053206.896780942,
+            "bad_debt_usdg": 3247.2952281861217,
+            "worst_event_share": 0.0006370305075612554,
+            "net_lender_yield_annualised": 0.09346321933891799
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 3,
+            "interest_usdg": 1043376.7318838908,
+            "bad_debt_usdg": 1946.5273711784298,
+            "worst_event_share": 0.00026202567927481715,
+            "net_lender_yield_annualised": 0.09281501972602935
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 5,
+            "interest_usdg": 1034928.2443489652,
+            "bad_debt_usdg": 2722.065190379628,
+            "worst_event_share": 0.0007202656930675057,
+            "net_lender_yield_annualised": 0.092112416463207
+          },
+          {
+            "kind": "afterhours",
+            "tier_set": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "fraction": 0.5,
+            "lookahead": 10,
+            "interest_usdg": 1019965.1868260015,
+            "bad_debt_usdg": 1232.342075542673,
+            "worst_event_share": 0.00026455726218010587,
+            "net_lender_yield_annualised": 0.09108310512869333
+          }
+        ]
+      },
+      "decision": {
+        "dynamic_wins": false,
+        "dynamic": {
+          "net_lender_yield_annualised": 0.09038523980818125,
+          "net_return_total": 0.5048124511462666,
+          "interest_usdg": 1010963.6507009882,
+          "bad_debt_usdg": 1338.7484084497407,
+          "bad_debt_events": 83,
+          "worst_event": {
+            "session_prev": "2024-08-01",
+            "bad_debt_usdg": 629.1598770589967,
+            "share_of_vault": 0.00025152506693447554,
+            "ticker": "INTC",
+            "g": -0.244750342356454,
+            "segment": "overnight"
+          },
+          "share_of_time": {
+            "weekday": 0.8070494739393238,
+            "middle": 0.0,
+            "weekend": 0.1395464216346985,
+            "idle": 0.05340410442597764
+          },
+          "reallocations": 1181,
+          "final_assets_usdg": 3009624.9022925333
+        },
+        "fixed_map": {
+          "net_lender_yield_annualised": 0.0927888620062085,
+          "net_return_total": 0.5205432003819317,
+          "interest_usdg": 1054466.102178209,
+          "bad_debt_usdg": 13379.701414360998,
+          "bad_debt_events": 42,
+          "worst_event": {
+            "session_prev": "2022-10-26",
+            "bad_debt_usdg": 5248.398842386795,
+            "share_of_vault": 0.0024394852699800946,
+            "ticker": "META",
+            "g": -0.2452627779928216,
+            "segment": "earnings"
+          },
+          "share_of_time": {
+            "weekday": 0.8963613102660949,
+            "middle": 0.05308597204315559,
+            "weekend": 0.0,
+            "idle": 0.05055271769074957
+          },
+          "reallocations": 818,
+          "final_assets_usdg": 3041086.400763863
+        }
+      }
+    }
+  }
+}

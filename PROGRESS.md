@@ -455,3 +455,60 @@ Grid and selection, fixed now (config `backtest.option_a`):
 - Static blends 0% to 100% weekday in 5% steps, and the two pure tiers, reported on both periods.
 - Decision (from the rule above): the chosen dynamic setting wins only if on 2022 to 2026 it has
   less bad debt than the chosen fixed map and equal or higher interest.
+
+### 2026-09-27 Item 4: holiday miscoverage (2.74% against a 1% target): not a bug
+
+- The per-segment (Mondrian) correction is applied to the shipped EWMA baseline in the
+  walk-forward evaluation (`model/walkforward.py`, every forecaster including the baselines) and
+  in the live forecast (`risk/live.py` applies `production.json` corrections for the period's
+  segment; the holiday correction is -1.44 volatility units). Evaluation and live agree.
+- The misses cluster on a few market-wide shocks: 93 held-out holiday dates, 1,280 misses, 68.4%
+  of them on 5 dates (2021-11-24, the Friday after Thanksgiving; 2018-12-04, before the
+  national day of mourning; 2018-12-31; 2025-01-08; 2020-09-04). Without those 5 dates the
+  holiday miss rate is 0.92%. The median per-date miss rate is 0.40%; 32% of dates have none.
+- Why the calibration misses them: each fold calibrates on one year, which holds only 8 to 11
+  holiday dates, and about 500 stocks gap together on each. The effective sample is a handful of
+  independent events, so the 1% correction is set by whichever few holidays that year had.
+  Conformal guarantees assume exchangeable rows; rows on the same date are not.
+- Possible remedies (not applied; they change the forecast used by option A mid-experiment):
+  calibrate holidays on a longer window, or pool holidays with weekends (similar closed hours).
+
+### 2026-09-27 Item 6: size of the Stock Token lending market on Morpho (mainnet)
+
+- `afterhours market-size` at Robinhood Chain block 73,382,409 (2026-09-26 20:50 UTC):
+  149 Morpho Blue markets use a Stock Token as collateral (285 markets in all; 147 of the 149
+  were in Morpho's API at M1, the other 2 are 38.5% LLTV markets for SPY and NVDA). USDG-loan
+  markets: 804,926 USDG supplied, 6,115 USDG borrowed. Largest by supply: SPCX 280,057, AAPL
+  238,985, GOOGL 158,819, NVDA 106,623. Stored totals at the block, without interest accrued
+  since each market's last update.
+- Sources: CreateMarket events and `market(id)` layout from morpho-blue `IMorpho.sol` and
+  `EventsLib.sol` (URLs in config); Morpho Blue, USDG and the 35 Stock Tokens from M1 discovery.
+  Written to `artifacts/discovery/market_size.json` and `numbers.json` (`market.*`).
+
+### 2026-09-27 Option A result: the dynamic strategy does not win; option B applies
+
+`afterhours option-a` (324 runs, `artifacts/backtest/option_a.json`), grid and rule as
+pre-registered in commit 813979f. Historical stock prices, simulated vault; each period starts
+with a fresh 2,000,000 USDG vault. Evaluation 2022-01-03 to 2026-09-24 (1,186 closed periods):
+
+| Strategy (chosen on 2017-2021) | 5 vault stocks: yield, bad debt, worst event | 35 Stock Tokens: yield, bad debt, worst event |
+| --- | --- | --- |
+| Always weekday | 9.34%, 12,521, 0.247% | 9.34%, 12,646, 0.244% |
+| Always weekend | 6.88%, 595, 0.026% | 6.88%, 581, 0.026% |
+| Static blend nearest the dynamic yield | 75% weekday: 8.72%, 9,145, 0.182% | 90% weekday: 9.09%, 11,461, 0.217% |
+| No-hindsight fixed map (3 tiers, f 0.4 / 0.3) | 9.13%, 8,482, 0.199% | 9.28%, 13,380, 0.244% |
+| Dynamic Afterhours (2 tiers, f 0.5, lookahead 10 / 5) | 8.67%, 748, 0.020% | 9.04%, 1,339, 0.025% |
+
+Interest on evaluation: dynamic 963,015 vs fixed map 1,030,359 (vault stocks); 1,010,964 vs
+1,054,466 (35 Stock Tokens). The dynamic strategy has less bad debt but less interest in both
+universes, so under the rule it does not win. Option B applies.
+
+Facts for the record, not grounds to change the rule:
+- No fixed-map setting met the 0.10% worst-event cap on the tuning period (smallest worst
+  event 0.543% and 0.538%), so the rule's fallback picked the fixed map with the smallest
+  worst event. On evaluation it lost 0.199% and 0.244% of the vault in one event; the dynamic
+  strategy's worst was 0.020% and 0.025%.
+- With the margin as a share of the cushion, the dynamic strategy puts NVDA and META in the
+  weekday tier far more often: 70% of money-time in the weekday tier on evaluation (vault stocks).
+- Checked for artefacts: in the 35-stock universe 11 to 13 stocks each hold over 1% of the money;
+  SPY and SGOV hold about 55% in every strategy because measured depth caps the others.

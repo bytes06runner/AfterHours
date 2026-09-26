@@ -288,6 +288,22 @@ def market_size_cmd() -> None:
     typer.echo(f"wrote {out}")
 
 
+@app.command("option-a")
+def option_a_cmd(
+    jobs: Annotated[int, typer.Option(help="Worker processes (0: all cores but one)")] = 0,
+) -> None:
+    """Option A: tune on the tuning years, evaluate once on the held-out years (PROGRESS.md)."""
+    from afterhours.backtest.option_a import write
+    from afterhours.data.pipeline import DATASET_KEY, make_cache
+
+    _logging()
+    cfg = load_config()
+    data = make_cache(cfg).get(DATASET_KEY, allow_stale=True)
+    if data is None:
+        raise typer.BadParameter("no dataset; run `afterhours data build` first")
+    typer.echo(f"wrote {write(cfg, data, jobs)}")
+
+
 @app.command("numbers")
 def numbers_cmd() -> None:
     """M12: write artifacts/report/numbers.json, the numbers the README and pitch quote."""
