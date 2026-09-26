@@ -212,9 +212,218 @@ export const PricesSchema = z.object({
 });
 export type Prices = z.infer<typeof PricesSchema>;
 
-// The report card and replay payloads are large, artifact-shaped documents; the pages that use
-// them validate the parts they read.
-const Loose = z.record(z.string(), z.unknown());
+export const SEGMENT_KEYS = ["overall", "earnings", "holiday", "weekend", "overnight"] as const;
+export type SegmentKey = (typeof SEGMENT_KEYS)[number];
+const Perf = z.object({
+  n: z.number(),
+  miss_rate: z.number(),
+  pinball: z.number(),
+  mean_drop: z.number(),
+});
+const CalPoint = z.object({ nominal: z.number(), observed: z.number(), n: z.number() });
+const Strategy = z.object({
+  net_lender_yield_annualised: z.number(),
+  net_return_total: z.number(),
+  interest_usdg: z.number(),
+  bad_debt_usdg: z.number(),
+  bad_debt_events: z.number(),
+  worst_event: z
+    .object({
+      session_prev: z.string(),
+      bad_debt_usdg: z.number(),
+      share_of_vault: z.number(),
+      ticker: z.string(),
+      g: z.number(),
+      segment: z.string(),
+    })
+    .partial()
+    .nullable(),
+  share_of_time: z.object({ weekday: z.number(), weekend: z.number(), idle: z.number() }),
+  reallocations: z.number(),
+  final_assets_usdg: z.number(),
+});
+export const STRATEGIES = [
+  "always_weekday",
+  "always_weekend",
+  "afterhours",
+  "perfect_foresight",
+] as const;
+export type StrategyKey = (typeof STRATEGIES)[number];
+const Quant = z.object({
+  n: z.number(),
+  std: z.number(),
+  min: z.number(),
+  share_drops_at_least: z.record(z.string(), z.number()),
+  count_drops_at_least: z.record(z.string(), z.number()),
+});
+const Hist = z.object({
+  edges: z.array(z.number()),
+  segments: z.record(z.string(), z.object({ n: z.number(), share: z.array(z.number()) })),
+});
+
+export const ReportCardSchema = z.object({
+  model: z.object({
+    first_sentence: z.string(),
+    label: z.string(),
+    acceptance: z.object({
+      alpha: z.number(),
+      held_out: z.record(z.string(), z.record(z.string(), Perf)),
+      coverage_overall: z.object({
+        miss_rate: z.number(),
+        target: z.number(),
+        tolerance: z.number(),
+        pass: z.boolean(),
+      }),
+      coverage_earnings: z.object({
+        miss_rate: z.number(),
+        target: z.number(),
+        tolerance: z.number(),
+        pass: z.boolean(),
+      }),
+      pinball_vs_baselines: z.record(
+        z.string(),
+        z.object({ model: z.number(), baseline: z.number(), pass: z.boolean() }),
+      ),
+      passed: z.boolean(),
+      shipped: z.string(),
+      fallback_reason: z.string().optional(),
+    }),
+    shipped_performance: z.record(z.string(), Perf),
+    calibration_curves: z.record(z.string(), z.record(z.string(), z.array(CalPoint))),
+    variants_tried: z.array(
+      z.object({
+        target_scaling: z.string(),
+        conformal_normalize: z.string(),
+        model_pinball: z.number(),
+        miss_rate_overall: z.number(),
+      }),
+    ),
+    code_version: z.string(),
+    config: z.object({
+      target_alpha: z.number(),
+      conformal: z.object({ method: z.string(), mondrian_segments: z.array(z.string()) }),
+      walk_forward: z.object({
+        train_years: z.number(),
+        calibrate_years: z.number(),
+        test_years: z.number(),
+      }),
+      baselines: z.object({ ewma_lambda: z.number(), min_ticker_segment_rows: z.number() }),
+    }),
+    model_version: z.string(),
+    folds: z.number(),
+  }),
+  backtest: z.object({
+    label: z.string(),
+    period: z.object({
+      first: z.string(),
+      last: z.string(),
+      closed_periods: z.number(),
+      rows: z.number(),
+    }),
+    selected: z.array(z.string()),
+    chosen: z.object({
+      weekday_lltv: z.number(),
+      weekend_lltv: z.number(),
+      safety_margin: z.number(),
+      lookahead_closed_periods: z.number(),
+      rule: z.string(),
+      eligible_settings: z.number(),
+    }),
+    strategies: z.record(z.string(), Strategy),
+    sensitivity: z.array(
+      z.object({ kind: z.string(), value: z.number(), results: z.record(z.string(), Strategy) }),
+    ),
+    assumptions: z.object({
+      vault_usdg: z.number(),
+      supply_apy_by_lltv: z.record(z.string(), z.number()),
+      utilization: z.number(),
+      loan_turnover_per_session: z.number(),
+      note: z.string(),
+    }),
+  }),
+  gaps: z.object({
+    label: z.string(),
+    period: z.object({ first_close: z.string(), last_open: z.string() }),
+    tickers: z.object({ universe: z.number(), selected: z.array(z.string()) }),
+    universe: z.record(z.string(), Quant),
+    selected: z.record(z.string(), Quant),
+    worst_selected: z.array(
+      z.object({
+        ticker: z.string(),
+        session_prev: z.string(),
+        session_next: z.string(),
+        segment: z.string(),
+        g: z.number(),
+      }),
+    ),
+    histograms: z.object({ universe: Hist, selected: Hist.nullable() }),
+    tail: z.object({
+      drops: z.array(z.number()),
+      universe: z.record(z.string(), z.array(z.number())),
+      selected: z.record(z.string(), z.array(z.number())).optional(),
+    }),
+  }),
+});
+export type ReportCard = z.infer<typeof ReportCardSchema>;
+
+const ScenarioSchema = z.object({
+  id: z.string(),
+  ticker: z.string(),
+  session_prev: z.string(),
+  session_next: z.string(),
+  segment: z.enum(["earnings", "holiday", "weekend", "overnight"]),
+  g: z.number(),
+  hours_closed: z.number(),
+});
+export type Scenario = z.infer<typeof ScenarioSchema>;
+export const ScenariosSchema = z.object({ label: z.string(), scenarios: z.array(ScenarioSchema) });
+
+const ReplayPoint = z.object({
+  session_prev: z.string(),
+  weekday_supply: z.number(),
+  weekday_lent: z.number(),
+  weekend_supply: z.number(),
+  weekend_lent: z.number(),
+  idle: z.number(),
+  bad_debt_period: z.number(),
+  bad_debt_cum: z.number(),
+  interest_cum: z.number(),
+  assets: z.number(),
+});
+export type ReplayPoint = z.infer<typeof ReplayPoint>;
+const ReplayVault = z.object({
+  bad_debt_usdg: z.number(),
+  interest_usdg: z.number(),
+  final_assets_usdg: z.number(),
+  series: z.array(ReplayPoint),
+});
+export const ReplaySchema = ScenarioSchema.extend({
+  label: z.string(),
+  price_path: z.array(z.object({ date: z.string(), open: z.number(), close: z.number() })),
+  periods: z.array(
+    z.object({
+      session_prev: z.string(),
+      session_next: z.string(),
+      g: z.number(),
+      segment: z.string(),
+      bad_case_drop: z.number(),
+      allowed: z.object({ weekday: z.boolean(), weekend: z.boolean() }),
+    }),
+  ),
+  vaults: z.object({ always_weekday: ReplayVault, afterhours: ReplayVault }),
+  vault_usdg: z.number(),
+  settings: z.object({
+    weekday_lltv: z.number(),
+    weekend_lltv: z.number(),
+    safety_margin: z.number(),
+    lookahead_closed_periods: z.number(),
+  }),
+  tiers: z.object({
+    weekday: z.object({ lltv: z.number(), cushion: z.number() }),
+    weekend: z.object({ lltv: z.number(), cushion: z.number() }),
+  }),
+});
+export type Replay = z.infer<typeof ReplaySchema>;
 
 export const api = {
   config: (): Promise<PublicConfig> =>
@@ -230,9 +439,9 @@ export const api = {
       ReasonsSchema,
     ),
   reason: (id: string) => get(`/v1/reasons/${encodeURIComponent(id)}`, ReasonDetailSchema),
-  reportCard: () => get("/v1/report-card", Loose),
-  scenarios: () => get("/v1/replay/scenarios", Loose),
-  replay: (id: string) => get(`/v1/replay/${encodeURIComponent(id)}`, Loose),
+  reportCard: () => get("/v1/report-card", ReportCardSchema),
+  scenarios: () => get("/v1/replay/scenarios", ScenariosSchema),
+  replay: (id: string) => get(`/v1/replay/${encodeURIComponent(id)}`, ReplaySchema),
 };
 
 export const STREAM_EVENTS = [

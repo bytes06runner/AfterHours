@@ -30,7 +30,7 @@ function when(iso: string): string {
 }
 
 /** Torn bottom edge, drawn once and stretched. */
-function TornEdge() {
+export function TornEdge() {
   const teeth = Array.from(
     { length: 40 },
     (_, i) => `L${i * 10 + 5} ${i % 2 ? 2 : 8} L${(i + 1) * 10} ${i % 3 ? 4 : 1}`,
@@ -47,11 +47,50 @@ function TornEdge() {
   );
 }
 
+/** Signed contribution bars: brass adds to the bad case, verdigris takes away. */
+export function DriverBars({
+  drivers,
+}: {
+  drivers: { feature: string; value: number; detail: string }[];
+}) {
+  const scale = Math.max(...drivers.map((d) => Math.abs(d.value)), 1e-9);
+  return (
+    <ul className="mt-2 flex flex-col gap-2">
+      {drivers.map((d) => (
+        <li
+          key={d.feature}
+          className="grid grid-cols-[9rem_1fr_4rem] items-center gap-3 text-[14px]"
+          title={d.detail}
+        >
+          <span>{FEATURE[d.feature] ?? d.feature}</span>
+          <span className="relative h-3 rounded-full bg-bg">
+            <span
+              className="absolute top-0 h-3 rounded-full"
+              style={{
+                left: d.value < 0 ? `${50 - (50 * Math.abs(d.value)) / scale}%` : "50%",
+                width: `${(50 * Math.abs(d.value)) / scale}%`,
+                background: d.value < 0 ? "var(--c-safe)" : "var(--c-brass)",
+              }}
+            />
+            <span
+              aria-hidden="true"
+              className="absolute left-1/2 top-[-3px] h-[18px] border-l-[1.25px] border-ink"
+            />
+          </span>
+          <span className="text-right font-semibold">
+            {d.value >= 0 ? "+" : "−"}
+            {formatPct(Math.abs(d.value))}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** A reason card printed as a telegram slip. */
 export function Telegram({ card, compact = false }: { card: Card; compact?: boolean }) {
   const drop = Number(card.prediction.bad_case_drop);
   const drivers = card.top_drivers.map((d) => ({ ...d, value: Number(d.contribution) }));
-  const scale = Math.max(...drivers.map((d) => Math.abs(d.value)), 1e-9);
   const from = TIER[card.from_tier ?? ""] ?? card.from_tier;
   const to = TIER[card.to_tier ?? ""] ?? card.to_tier;
   return (
@@ -92,35 +131,7 @@ export function Telegram({ card, compact = false }: { card: Card; compact?: bool
               <figcaption className="text-[14px] font-semibold">
                 What made up the bad case
               </figcaption>
-              <ul className="mt-2 flex flex-col gap-2">
-                {drivers.map((d) => (
-                  <li
-                    key={d.feature}
-                    className="grid grid-cols-[9rem_1fr_4rem] items-center gap-3 text-[14px]"
-                    title={d.detail}
-                  >
-                    <span>{FEATURE[d.feature] ?? d.feature}</span>
-                    <span className="relative h-3 rounded-full bg-bg">
-                      <span
-                        className="absolute top-0 h-3 rounded-full"
-                        style={{
-                          left: d.value < 0 ? `${50 - (50 * Math.abs(d.value)) / scale}%` : "50%",
-                          width: `${(50 * Math.abs(d.value)) / scale}%`,
-                          background: d.value < 0 ? "var(--c-safe)" : "var(--c-brass)",
-                        }}
-                      />
-                      <span
-                        aria-hidden="true"
-                        className="absolute left-1/2 top-[-3px] h-[18px] border-l-[1.25px] border-ink"
-                      />
-                    </span>
-                    <span className="text-right font-semibold">
-                      {d.value >= 0 ? "+" : "−"}
-                      {formatPct(Math.abs(d.value))}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <DriverBars drivers={drivers} />
               <p className="mt-2 text-[12px]">
                 {card.drivers_method.charAt(0).toUpperCase() + card.drivers_method.slice(1)}.
               </p>

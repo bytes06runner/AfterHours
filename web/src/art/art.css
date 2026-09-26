@@ -163,3 +163,18 @@
     animation: none;
   }
 }
+
+/* AlmanacPage: ruled paper. Lines every 28 px in the rule colour on a paper tone between the
+   background and the surface. */
+.almanac-paper {
+  background-color: color-mix(in oklab, var(--c-bg) 55%, var(--c-surface));
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 27px,
+    color-mix(in oklab, var(--c-rule) 55%, transparent) 27px 28px
+  );
+}
+/* Night bands: midnight on paper by day, deeper than the paper by night. */
+.almanac-night {
+  fill: color-mix(in oklab, var(--night-bg) calc(100% - var(--ui-phase) * 30%), black);
+}

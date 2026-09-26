@@ -29,6 +29,19 @@ export const useVault = () => useQuery({ queryKey: keys.vault, queryFn: api.vaul
 export const usePrices = () =>
   useQuery({ queryKey: keys.prices, queryFn: api.prices, refetchInterval: MINUTE, retry: 1 });
 export const useRisk = () => useQuery({ queryKey: keys.risk, queryFn: api.risk, retry: 1 });
+export const useAlmanac = (days: number) =>
+  useQuery({ queryKey: keys.almanac(days), queryFn: () => api.almanac(days), retry: 1 });
+export const useReportCard = () =>
+  useQuery({ queryKey: keys.reportCard, queryFn: api.reportCard, staleTime: 60 * MINUTE });
+export const useScenarios = () =>
+  useQuery({ queryKey: keys.scenarios, queryFn: api.scenarios, staleTime: 60 * MINUTE });
+export const useReplay = (id: string | null) =>
+  useQuery({
+    queryKey: keys.replay(id ?? ""),
+    queryFn: () => api.replay(id!),
+    enabled: Boolean(id),
+    staleTime: 60 * MINUTE,
+  });
 
 /** Which queries each server event makes stale. */
 const INVALIDATES: Record<StreamEvent, readonly (readonly string[])[]> = {
