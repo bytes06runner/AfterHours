@@ -424,3 +424,34 @@ Rule (set by the team, not to be changed after results are seen):
 - Report all strategies on both the 5 vault stocks and the full Stock Token universe.
 - README, pitch.md and demo.md change only after this rule has been applied.
 - Time box: one working day for A. The LightGBM multiplier (item 5) waits until A is decided.
+
+### 2026-09-27 Option A: step 1 findings and the pre-registered grid (before the sweep)
+
+Step 1 (read-only, reproduces results.json exactly: 5,122 USDG):
+- 84% of Afterhours' bad debt is META in the weekend tier (4,278 of 5,122), almost all from two
+  earnings nights: 2022-10-26 (2,228) and 2022-02-02 (2,017). The fixed map lost 1,028 and 931
+  on the same nights because it held about half as much META (time-weighted 260,747 vs 555,681
+  USDG). Afterhours had flagged both nights and pulled the unborrowed part; the lent part stayed.
+- The LP does shift money into NVDA and META when SPY is blocked from the weekday tier (mean
+  supply NVDA 618k vs 556k, META 575k vs 534k, SPY 628k vs 726k). The backtest assumes one APY
+  per tier for every stock, so once SPY leaves the weekday tier the LP is indifferent between
+  stocks and per-stock exposure comes from tie-breaks and the turnover penalty, not risk.
+
+Step 3: Morpho Blue on Robinhood Chain has 86% LLTV enabled (EnableLltv events, rechecked with
+isLltvEnabled, M1). Liquidation incentive factor 1.043841 (Morpho's formula with the cursor 0.3
+and the 1.15 cap verified in the deployed bytecode), cushion 10.23%. Added as a middle tier.
+
+Grid and selection, fixed now (config `backtest.option_a`):
+- Periods: tune on closed periods from 2017 to 2021; evaluate once on 2022 to 2026, each with a
+  fresh 2,000,000 USDG vault. Universes: the 5 vault stocks and all 35 Stock Token underlyings.
+- Dynamic Afterhours: tier sets {weekday+weekend, weekday+middle+weekend} x margin fraction
+  {0, 0.1, 0.2, 0.3, 0.4, 0.5} (bad case must fit cushion x (1 - f)) x lookahead {1, 3, 5, 10}.
+- No-hindsight fixed map: same tier sets x the same margin fractions; each January each stock
+  gets the highest tier whose limit covers its worst 1% closed-period gap over the previous 365
+  days (at least 60 observations, else the weekend tier); at least the weekend tier always.
+- Selection on the tuning period, same rule as M4 for both families: highest interest among
+  settings whose worst single event loses at most 0.10% of the vault; if none qualifies, the
+  smallest worst event.
+- Static blends 0% to 100% weekday in 5% steps, and the two pure tiers, reported on both periods.
+- Decision (from the rule above): the chosen dynamic setting wins only if on 2022 to 2026 it has
+  less bad debt than the chosen fixed map and equal or higher interest.

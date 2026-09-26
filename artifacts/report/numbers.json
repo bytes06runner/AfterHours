@@ -330,6 +330,31 @@
       "value": 2000000.0,
       "text": "2,000,000",
       "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    },
+    "market.block": {
+      "value": 73382409,
+      "text": "73,382,409",
+      "source": "artifacts/discovery/market_size.json"
+    },
+    "market.date": {
+      "value": "2026-09-26T20:50:32+00:00",
+      "text": "2026-09-26",
+      "source": "artifacts/discovery/market_size.json"
+    },
+    "market.stock_token_markets": {
+      "value": 149,
+      "text": "149",
+      "source": "artifacts/discovery/market_size.json"
+    },
+    "market.usdg_supplied": {
+      "value": 804926.000639,
+      "text": "804,926",
+      "source": "artifacts/discovery/market_size.json"
+    },
+    "market.usdg_borrowed": {
+      "value": 6114.673538000001,
+      "text": "6,115",
+      "source": "artifacts/discovery/market_size.json"
     }
   },
   "oracle": {

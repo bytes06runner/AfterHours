@@ -269,6 +269,25 @@ def sim_seed() -> None:
     )
 
 
+@app.command("market-size")
+def market_size_cmd() -> None:
+    """Supplied and borrowed across Stock Token Morpho markets on mainnet, at a recent block."""
+    from afterhours.discovery.market_size import read
+
+    _logging()
+    cfg = load_config()
+    doc = read(cfg)
+    out = cfg.path(cfg.paths.artifacts_dir) / "discovery" / "market_size.json"
+    out.write_text(json.dumps(doc, indent=2) + "\n")
+    u = doc["usdg_loan"]
+    typer.echo(
+        f"block {doc['block']} ({doc['block_time']}): {doc['stock_token_markets']} Stock Token "
+        f"markets ({doc['stock_token_markets_in_morpho_api_at_discovery']} in the API at M1); "
+        f"USDG supplied {u['supplied']:,.0f}, borrowed {u['borrowed']:,.0f}"
+    )
+    typer.echo(f"wrote {out}")
+
+
 @app.command("numbers")
 def numbers_cmd() -> None:
     """M12: write artifacts/report/numbers.json, the numbers the README and pitch quote."""

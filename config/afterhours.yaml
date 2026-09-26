@@ -115,6 +115,8 @@ discovery:
     morpho_address_book: https://raw.githubusercontent.com/morpho-org/sdks/main/packages/morpho-ts/src/addresses.ts
     morpho_addresses_docs: https://docs.morpho.org/get-started/resources/addresses/
     morpho_api: https://api.morpho.org/graphql
+    morpho_blue_interface: https://github.com/morpho-org/morpho-blue/blob/main/src/interfaces/IMorpho.sol
+    morpho_blue_events: https://github.com/morpho-org/morpho-blue/blob/main/src/libraries/EventsLib.sol
     uniswap_deployments: https://developers.uniswap.org/deployments.json
   oracle_study:
     weekends: 8
@@ -222,6 +224,21 @@ backtest:
   rate_spread_multipliers: [0.5, 1.0, 2.0]   # sensitivity: scale (weekday APY - weekend APY)
   turnover_sensitivity: [0.05, 0.2, 0.5, 1.0]  # sensitivity: share of loans that roll per session
   replay: { per_segment: 3, window_sessions: 5 }
+  # Option A (2026-09-27, decision rule in PROGRESS.md): tune on tuning_years only, evaluate
+  # once on evaluation_years. The middle tier's 86% LLTV is enabled on Robinhood Chain's Morpho
+  # Blue (EnableLltv events, rechecked with isLltvEnabled; deployments/fork.discovered.json).
+  option_a:
+    tuning_years: [2017, 2021]
+    evaluation_years: [2022, 2026]
+    tiers: { weekday: 0.915, middle: 0.86, weekend: 0.77 }
+    tier_sets: [[weekday, weekend], [weekday, middle, weekend]]
+    margin_fractions: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]   # bad case must fit cushion x (1 - f)
+    lookaheads: [1, 3, 5, 10]
+    blend_step: 0.05                                  # static weekday/weekend splits, 0 to 100%
+    # No-hindsight fixed map: each January, each stock gets the highest tier whose limit covers
+    # its worst `quantile` closed-period gap over the previous `window_days`; at least weekend.
+    fixed_map: { window_days: 365, quantile: 0.01, min_observations: 60 }
+    universes: [vault, stock_tokens]
 
 # Simulation harness (M7): lenders and borrowers seeded on fork and local chains. All simulated
 # activity is labelled Simulation in the UI.

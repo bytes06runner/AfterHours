@@ -177,6 +177,18 @@ def build(cfg: AfterhoursConfig) -> dict[str, Any]:
         v = replay["vaults"][k]["bad_debt_usdg"]
         n[f"replay.{k}.bad_debt"] = _entry(v, usd(v), src)
     n["replay.vault_usdg"] = _entry(replay["vault_usdg"], usd(replay["vault_usdg"]), src)
+    size_path = art / "discovery" / "market_size.json"
+    if size_path.exists():
+        src = "artifacts/discovery/market_size.json"
+        ms = json.loads(size_path.read_text())
+        u = ms["usdg_loan"]
+        n["market.block"] = _entry(ms["block"], count(ms["block"]), src)
+        n["market.date"] = _entry(ms["block_time"], ms["block_time"][:10], src)
+        n["market.stock_token_markets"] = _entry(
+            ms["stock_token_markets"], str(ms["stock_token_markets"]), src
+        )
+        n["market.usdg_supplied"] = _entry(u["supplied"], usd(u["supplied"]), src)
+        n["market.usdg_borrowed"] = _entry(u["borrowed"], usd(u["borrowed"]), src)
     return {"generated_from": "afterhours numbers", "numbers": n, "oracle": o}
 
 

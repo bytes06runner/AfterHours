@@ -152,6 +152,9 @@
           "title": "Max Worst Event Share",
           "type": "number"
         },
+        "option_a": {
+          "$ref": "#/$defs/OptionAConfig"
+        },
         "rate_spread_multipliers": {
           "items": {
             "minimum": 0,
@@ -243,7 +246,8 @@
         "max_worst_event_share",
         "rate_spread_multipliers",
         "turnover_sensitivity",
-        "replay"
+        "replay",
+        "option_a"
       ],
       "title": "BacktestConfig",
       "type": "object"
@@ -646,6 +650,16 @@
           "title": "Morpho Api",
           "type": "string"
         },
+        "morpho_blue_events": {
+          "pattern": "^https?://",
+          "title": "Morpho Blue Events",
+          "type": "string"
+        },
+        "morpho_blue_interface": {
+          "pattern": "^https?://",
+          "title": "Morpho Blue Interface",
+          "type": "string"
+        },
         "robinhood_assets_api": {
           "pattern": "^https?://",
           "title": "Robinhood Assets Api",
@@ -670,6 +684,8 @@
         "morpho_address_book",
         "morpho_addresses_docs",
         "morpho_api",
+        "morpho_blue_interface",
+        "morpho_blue_events",
         "uniswap_deployments"
       ],
       "title": "DiscoverySources",
@@ -733,6 +749,34 @@
         "cooldown_seconds"
       ],
       "title": "FaucetConfig",
+      "type": "object"
+    },
+    "FixedMapConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "min_observations": {
+          "exclusiveMinimum": 0,
+          "title": "Min Observations",
+          "type": "integer"
+        },
+        "quantile": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Quantile",
+          "type": "number"
+        },
+        "window_days": {
+          "exclusiveMinimum": 0,
+          "title": "Window Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "window_days",
+        "quantile",
+        "min_observations"
+      ],
+      "title": "FixedMapConfig",
       "type": "object"
     },
     "GapsConfig": {
@@ -990,6 +1034,120 @@
         "min_pool_depth_usd"
       ],
       "title": "OnchainSelection",
+      "type": "object"
+    },
+    "OptionAConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "blend_step": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Blend Step",
+          "type": "number"
+        },
+        "evaluation_years": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Evaluation Years",
+          "type": "array"
+        },
+        "fixed_map": {
+          "$ref": "#/$defs/FixedMapConfig"
+        },
+        "lookaheads": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "title": "Lookaheads",
+          "type": "array"
+        },
+        "margin_fractions": {
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Margin Fractions",
+          "type": "array"
+        },
+        "tier_sets": {
+          "items": {
+            "items": {
+              "enum": [
+                "weekday",
+                "middle",
+                "weekend"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Tier Sets",
+          "type": "array"
+        },
+        "tiers": {
+          "additionalProperties": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "propertyNames": {
+            "enum": [
+              "weekday",
+              "middle",
+              "weekend"
+            ]
+          },
+          "title": "Tiers",
+          "type": "object"
+        },
+        "tuning_years": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Tuning Years",
+          "type": "array"
+        },
+        "universes": {
+          "items": {
+            "enum": [
+              "vault",
+              "stock_tokens"
+            ],
+            "type": "string"
+          },
+          "title": "Universes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "tuning_years",
+        "evaluation_years",
+        "tiers",
+        "tier_sets",
+        "margin_fractions",
+        "lookaheads",
+        "blend_step",
+        "fixed_map",
+        "universes"
+      ],
+      "title": "OptionAConfig",
       "type": "object"
     },
     "OracleStudyConfig": {

@@ -68,8 +68,22 @@ class Plan:
     stock_limits: dict[str, float] = field(default_factory=dict)
 
 
-def allowed_tier(q: float, margin: float, tier: TierSpec) -> tuple[bool, str]:
-    """Whether a tier is allowed for a bad-case drop, with a plain-English reason."""
+def allowed_tier(
+    q: float, margin: float, tier: TierSpec, margin_fraction: float | None = None
+) -> tuple[bool, str]:
+    """Whether a tier is allowed for a bad-case drop, with a plain-English reason.
+
+    With `margin_fraction` the margin is that share of the tier's cushion (the bad case must fit
+    in cushion x (1 - fraction)); otherwise it is `margin` added to the bad case.
+    """
+    if margin_fraction is not None:
+        limit = tier.cushion * (1 - margin_fraction)
+        ok = q <= limit
+        verb = "fits inside" if ok else "exceeds"
+        return ok, (
+            f"bad-case drop {q:.1%} {verb} {1 - margin_fraction:.0%} of the {tier.name} tier "
+            f"cushion of {tier.cushion:.1%} ({limit:.1%}; LLTV {tier.lltv:.1%})"
+        )
     need = q + margin
     ok = need <= tier.cushion
     verb = "fits inside" if ok else "exceeds"
@@ -90,6 +104,7 @@ def solve(
     max_share_per_stock: float,
     depth_multiplier: float,
     idle_reserve_share: float = 0.0,
+    margin_fraction: float | None = None,
 ) -> Plan:
     """Solve the allocation LP. Units are USDG.
 
@@ -108,7 +123,7 @@ def solve(
     for s in stocks:
         for t in tiers:
             k = (s.symbol, t.name)
-            ok, why = allowed_tier(s.bad_case_drop, safety_margin, t)
+            ok, why = allowed_tier(s.bad_case_drop, safety_margin, t, margin_fraction)
             allowed[k], reasons[k] = ok, why
             b = s.borrowed.get(t.name, 0.0)
             lower[idx[k]] = b

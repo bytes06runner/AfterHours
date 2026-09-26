@@ -53,10 +53,16 @@ class SimParams:
     depth_multiplier: float
     depth_usd: dict[str, float]
     idle_reserve_share: float = 0.0
+    # Option A experiments (defaults keep the shipped two-tier, flat-margin behaviour).
+    middle: TierSpec | None = None
+    margin_fraction: float | None = None
 
     @property
-    def tiers(self) -> tuple[TierSpec, TierSpec]:
-        return (self.weekday, self.weekend)
+    def tiers(self) -> tuple[TierSpec, ...]:
+        return tuple(t for t in (self.weekday, self.middle, self.weekend) if t is not None)
+
+    def tier(self, name: str) -> TierSpec:
+        return next(t for t in self.tiers if t.name == name)
 
 
 def bad_debt_fraction(g: float, tier: TierSpec, low: float, high: float, grid: int) -> float:
@@ -88,7 +94,7 @@ class Ledger:
     bad_debt: float = 0.0
     worst_event: dict[str, Any] = field(default_factory=dict)
     tier_usd_hours: dict[str, float] = field(
-        default_factory=lambda: {"weekday": 0.0, "weekend": 0.0, "idle": 0.0}
+        default_factory=lambda: {"weekday": 0.0, "middle": 0.0, "weekend": 0.0, "idle": 0.0}
     )
     reallocations: int = 0
     events: list[dict[str, Any]] = field(default_factory=list)
@@ -103,6 +109,8 @@ def _target(
 ) -> tuple[dict[tuple[str, str], float], bool]:
     """Supply per (stock, tier) the strategy wants before this close, and whether it moves."""
     total = ledger.assets
+    if strategy.startswith("blend:"):
+        return _blend(float(strategy.split(":")[1]), p, stocks, ledger)
     # Static strategies use the same LP restricted to their one tier, so every strategy places
     # money equally efficiently and differences come from risk decisions alone.
     tiers = {
@@ -112,15 +120,16 @@ def _target(
     if strategy in ("always_weekday", "always_weekend"):
         risk = dict.fromkeys(stocks, 0.0)
     margin = p.safety_margin if strategy == "afterhours" else 0.0
+    fraction = p.margin_fraction if strategy == "afterhours" else None
     states = [
         StockState(
             symbol=s,
             bad_case_drop=risk[s],
             depth_usd=p.depth_usd.get(s, 1e18),
             rate=p.apy,
-            borrowed={t: ledger.borrowed.get((s, t), 0.0) for t in ("weekday", "weekend")},
-            cap={"weekday": total, "weekend": total},
-            prev={t: ledger.supply.get((s, t), 0.0) for t in ("weekday", "weekend")},
+            borrowed={t.name: ledger.borrowed.get((s, t.name), 0.0) for t in p.tiers},
+            cap={t.name: total for t in p.tiers},
+            prev={t.name: ledger.supply.get((s, t.name), 0.0) for t in p.tiers},
         )
         for s in stocks
     ]
@@ -134,10 +143,58 @@ def _target(
         max_share_per_stock=p.max_share_per_stock,
         depth_multiplier=p.depth_multiplier,
         idle_reserve_share=p.idle_reserve_share,
+        margin_fraction=fraction,
     )
     if plan.status != "optimal" or (not plan.execute and ledger.supply):
         return {k: max(v, ledger.borrowed.get(k, 0.0)) for k, v in ledger.supply.items()}, False
     return plan.allocation, True
+
+
+def _blend(
+    w: float, p: SimParams, stocks: Sequence[str], ledger: Ledger
+) -> tuple[dict[tuple[str, str], float], bool]:
+    """Static blend: each stock's money split w into the weekday tier and 1 - w into the weekend
+    tier, placed by the same LP (one pooled tier at the blended rate), never moved for risk."""
+    total = ledger.assets
+    pooled = TierSpec("pooled", p.weekday.lltv, p.weekday.allowance)
+    rate = {"pooled": w * p.apy["weekday"] + (1 - w) * p.apy["weekend"]}
+    states = [
+        StockState(
+            symbol=s,
+            bad_case_drop=0.0,
+            depth_usd=p.depth_usd.get(s, 1e18),
+            rate=rate,
+            borrowed={
+                "pooled": ledger.borrowed.get((s, "weekday"), 0.0)
+                + ledger.borrowed.get((s, "weekend"), 0.0)
+            },
+            cap={"pooled": total},
+            prev={
+                "pooled": ledger.supply.get((s, "weekday"), 0.0)
+                + ledger.supply.get((s, "weekend"), 0.0)
+            },
+        )
+        for s in stocks
+    ]
+    plan = solve(
+        states,
+        (pooled,),
+        total=total,
+        safety_margin=0.0,
+        turnover_penalty=p.turnover_penalty,
+        min_rebalance_usd=p.min_rebalance_usd,
+        max_share_per_stock=p.max_share_per_stock,
+        depth_multiplier=p.depth_multiplier,
+        idle_reserve_share=p.idle_reserve_share,
+    )
+    if plan.status != "optimal" or (not plan.execute and ledger.supply):
+        return {k: max(v, ledger.borrowed.get(k, 0.0)) for k, v in ledger.supply.items()}, False
+    out: dict[tuple[str, str], float] = {}
+    for s in stocks:
+        x = plan.allocation[(s, "pooled")]
+        for t, share in (("weekday", w), ("weekend", 1 - w)):
+            out[(s, t)] = max(share * x, ledger.borrowed.get((s, t), 0.0))
+    return out, True
 
 
 def run_strategy(
@@ -181,7 +238,7 @@ def run_strategy(
         for (s, t), b in list(ledger.borrowed.items()):
             if s not in g or b <= 0:
                 continue
-            tier = p.weekday if t == "weekday" else p.weekend
+            tier = p.tier(t)
             loss = b * bad_debt_fraction(g[s], tier, p.ltv_low, p.ltv_high, p.grid)
             period_bad += loss
             ledger.borrowed[(s, t)] = b - loss

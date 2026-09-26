@@ -198,6 +198,24 @@ class ReplayConfig(_Strict):
     window_sessions: PositiveInt
 
 
+class FixedMapConfig(_Strict):
+    window_days: PositiveInt
+    quantile: Fraction
+    min_observations: PositiveInt
+
+
+class OptionAConfig(_Strict):
+    tuning_years: tuple[int, int]
+    evaluation_years: tuple[int, int]
+    tiers: dict[Literal["weekday", "middle", "weekend"], Fraction]
+    tier_sets: list[list[Literal["weekday", "middle", "weekend"]]]
+    margin_fractions: list[Fraction]
+    lookaheads: list[PositiveInt]
+    blend_step: Annotated[float, Field(gt=0, le=1)]
+    fixed_map: FixedMapConfig
+    universes: list[Literal["vault", "stock_tokens"]]
+
+
 class BacktestConfig(_Strict):
     vault_usdg: Annotated[float, Field(gt=0)]
     supply_apy_by_lltv: dict[str, Annotated[float, Field(ge=0, lt=1)]]
@@ -214,6 +232,7 @@ class BacktestConfig(_Strict):
     rate_spread_multipliers: list[Annotated[float, Field(ge=0)]]
     turnover_sensitivity: list[Fraction]
     replay: ReplayConfig
+    option_a: OptionAConfig
 
     def apy(self, lltv: float) -> float:
         """Assumed supply APY for a tier LLTV."""
@@ -326,6 +345,8 @@ class DiscoverySources(_Strict):
     morpho_address_book: HttpUrlStr
     morpho_addresses_docs: HttpUrlStr
     morpho_api: HttpUrlStr
+    morpho_blue_interface: HttpUrlStr
+    morpho_blue_events: HttpUrlStr
     uniswap_deployments: HttpUrlStr
 
 
