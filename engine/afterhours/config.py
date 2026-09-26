@@ -242,6 +242,7 @@ class SimConfig(_Strict):
     borrow_share_of_market_supply: Fraction
     borrower_ltv_share_of_lltv: Range
     eth_per_actor: Annotated[float, Field(gt=0)]
+    testnet_eth_per_actor: Annotated[float, Field(gt=0)]
     faucet: FaucetConfig
 
 

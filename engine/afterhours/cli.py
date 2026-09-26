@@ -255,8 +255,10 @@ def sim_seed() -> None:
 
     _logging()
     cfg = load_config()
-    if not cfg.profile.local_rpc_port_env:
-        raise typer.BadParameter("seeding runs only on fork and local chains")
+    if not cfg.profile.local_rpc_port_env and cfg.profile.collateral_mode != "simulated":
+        raise typer.BadParameter("seeding needs Anvil or simulated tokens (testnet profiles)")
+    if cfg.profile.requires_human_go:
+        raise typer.BadParameter(f"{cfg.active_profile} needs an explicit human go first")
     seeder = Seeder(cfg, connect(cfg.node_url()), load_deployment(cfg))
     lenders = seeder.lenders()
     typer.echo(f"lenders: {len(lenders)}, {sum(x['usdg'] for x in lenders):,.0f} USDG")

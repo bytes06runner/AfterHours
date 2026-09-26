@@ -14,3 +14,6 @@ broadcast/*/31337/
 artifacts/model/lgbm_*.txt
 deployments/*.raw.json
 data/state/
+
+# Forge broadcast logs (rehearsals and local runs); deployments/*.json is the record.
+contracts/broadcast/

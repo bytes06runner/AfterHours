@@ -82,21 +82,25 @@ def plan(cfg: AfterhoursConfig, profile: str) -> dict[str, Any]:
     }
 
 
+def cast_wallet_new() -> str:
+    """A fresh throwaway private key from `cast wallet new` (never logged)."""
+    out = subprocess.run(
+        ["cast", "wallet", "new", "--json"], capture_output=True, text=True, check=True
+    )
+    doc = json.loads(out.stdout)
+    # Foundry 1.8 wraps the result in {"data": [...], ...}.
+    wallet = (doc.get("data") or doc) if isinstance(doc, dict) else doc
+    key: str = (wallet[0] if isinstance(wallet, list) else wallet)["private_key"]
+    return key
+
+
 def _throwaway_keys(cfg: AfterhoursConfig) -> dict[str, str]:
     """Throwaway keys from `cast wallet new`, cached; only for local and fork profiles."""
     path = cfg.path(cfg.data.cache_dir) / "throwaway-keys.json"
     if path.exists():
         keys: dict[str, str] = json.loads(path.read_text())
         return keys
-    keys = {}
-    for role in ROLES:
-        out = subprocess.run(
-            ["cast", "wallet", "new", "--json"], capture_output=True, text=True, check=True
-        )
-        doc = json.loads(out.stdout)
-        # Foundry 1.8 wraps the result in {"data": [...], ...}.
-        wallet = (doc.get("data") or doc) if isinstance(doc, dict) else doc
-        keys[role] = (wallet[0] if isinstance(wallet, list) else wallet)["private_key"]
+    keys = {role: cast_wallet_new() for role in ROLES}
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(keys))
     path.chmod(0o600)

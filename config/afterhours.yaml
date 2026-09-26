@@ -232,7 +232,8 @@ sim:
   borrowers_per_market: 2
   borrow_share_of_market_supply: 0.8      # borrowers take up to this share of each market's supply
   borrower_ltv_share_of_lltv: { low: 0.60, high: 0.95 }
-  eth_per_actor: 10
+  eth_per_actor: 10                        # Anvil only (anvil_setBalance)
+  testnet_eth_per_actor: 0.0005           # sent by the deployer to each testnet actor for gas
   # Browser faucet for the local demo only (simulated USDG, local chain): per request, and
   # at most once per address per cooldown.
   faucet: { usdg: 50000, eth: 1, cooldown_seconds: 60 }

@@ -1351,6 +1351,11 @@
         "seed": {
           "title": "Seed",
           "type": "integer"
+        },
+        "testnet_eth_per_actor": {
+          "exclusiveMinimum": 0,
+          "title": "Testnet Eth Per Actor",
+          "type": "number"
         }
       },
       "required": [
@@ -1361,6 +1366,7 @@
         "borrow_share_of_market_supply",
         "borrower_ltv_share_of_lltv",
         "eth_per_actor",
+        "testnet_eth_per_actor",
         "faucet"
       ],
       "title": "SimConfig",

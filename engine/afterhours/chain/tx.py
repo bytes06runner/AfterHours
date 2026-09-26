@@ -32,10 +32,18 @@ class Signer:
 
     def send(self, to: str, signature: str, *args: Any, timeout: float = 120) -> Sent:
         """Build, sign, send and wait for one transaction; raises if it reverts."""
+        return self._send(to, "0x" + encode_call(signature, *args).hex(), 0, timeout)
+
+    def transfer(self, to: str, wei: int, timeout: float = 120) -> Sent:
+        """Send native ETH."""
+        return self._send(to, "0x", wei, timeout)
+
+    def _send(self, to: str, data: str, value: int, timeout: float) -> Sent:
         tx: dict[str, Any] = {
             "from": self.address,
             "to": to_checksum_address(to),
-            "data": "0x" + encode_call(signature, *args).hex(),
+            "data": data,
+            "value": value,
             "nonce": self.w3.eth.get_transaction_count(self.address, "pending"),
             "chainId": int(self.w3.eth.chain_id),
         }

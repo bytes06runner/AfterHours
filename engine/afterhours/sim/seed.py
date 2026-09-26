@@ -1,13 +1,18 @@
-"""Seed simulated lenders and borrowers on a fork or local chain (Simulation).
+"""Seed simulated lenders and borrowers (Simulation).
 
-Actors are fixed addresses derived from a label and driven with Anvil's account impersonation,
-so no keys are created for them. On the local profile, USDG (sim) and Stock Tokens (sim) are
-minted by the deployer. On the fork, balances come from real holders (the deepest Uniswap
-pools), also through impersonation. Nothing here runs outside Anvil.
+Two ways to act as many accounts:
+- On Anvil (local and fork profiles), actors are fixed addresses derived from a label and driven
+  with account impersonation, so no keys exist for them. On the local profile, USDG (sim) and
+  Stock Tokens (sim) are minted by the deployer; on the fork, balances come from real holders
+  (the deepest Uniswap pools), also through impersonation.
+- On a public testnet with simulated tokens, each actor is a throwaway key from `cast wallet new`
+  (kept in the git-ignored state folder, mode 600) that signs real transactions. The deployer
+  mints its tokens and sends it `sim.testnet_eth_per_actor` testnet ETH for gas.
 """
 
 from __future__ import annotations
 
+import json
 import logging
 import random
 from dataclasses import dataclass
@@ -22,7 +27,7 @@ from afterhours.chain.abi import encode_call
 from afterhours.chain.rpc import Call, call_many
 from afterhours.chain.tx import Signer
 from afterhours.config import AfterhoursConfig
-from afterhours.deploy import role_keys
+from afterhours.deploy import cast_wallet_new, role_keys
 from afterhours.deployments import load_discovered
 
 log = logging.getLogger(__name__)
@@ -40,8 +45,15 @@ class Anvil:
 
     w3: Web3
 
-    def fund_eth(self, address: str, eth: float) -> None:
+    def address(self, label: str) -> str:
+        return actor(label)
+
+    def fund_eth(self, label_or_address: str, eth: float) -> None:
+        address = label_or_address if label_or_address.startswith("0x") else actor(label_or_address)
         self.w3.provider.make_request("anvil_setBalance", [address, hex(int(eth * 1e18))])  # type: ignore[arg-type]
+
+    def send(self, label: str, to: str, signature: str, *args: Any) -> str:
+        return self.send_as(actor(label), to, signature, *args)
 
     def send_as(self, sender: str, to: str, signature: str, *args: Any) -> str:
         """Send a transaction from any address (Anvil impersonation)."""
@@ -62,6 +74,37 @@ class Anvil:
             self.w3.provider.make_request("anvil_stopImpersonatingAccount", [sender])  # type: ignore[arg-type]
 
 
+class SignedActors:
+    """Actors with their own throwaway keys, for public testnets (no impersonation there)."""
+
+    def __init__(self, cfg: AfterhoursConfig, w3: Web3, funder: Signer) -> None:
+        self.w3 = w3
+        self.funder = funder
+        self.path = cfg.path(cfg.paths.state_dir) / f"testnet-actors-{cfg.active_profile}.json"
+        self.keys: dict[str, str] = json.loads(self.path.read_text()) if self.path.exists() else {}
+
+    def _signer(self, label: str) -> Signer:
+        if label not in self.keys:
+            self.keys[label] = cast_wallet_new()
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self.path.write_text(json.dumps(self.keys))
+            self.path.chmod(0o600)
+        return Signer(self.w3, self.keys[label])
+
+    def address(self, label: str) -> str:
+        return self._signer(label).address
+
+    def fund_eth(self, label: str, eth: float) -> None:
+        """Top the actor up to `eth` from the deployer."""
+        who = self.address(label)
+        need = int(eth * 1e18) - int(self.w3.eth.get_balance(who))  # type: ignore[arg-type]
+        if need > 0:
+            self.funder.transfer(who, need)
+
+    def send(self, label: str, to: str, signature: str, *args: Any) -> str:
+        return self._signer(label).send(to, signature, *args).tx_hash
+
+
 class Seeder:
     """Creates lenders and borrowers for the active profile."""
 
@@ -74,6 +117,15 @@ class Seeder:
         self.sim_collateral = bool(deployment["simulation"]["collateral"])
         keys = role_keys(cfg, cfg.active_profile)
         self.owner = Signer(w3, keys["DEPLOYER_PK"])
+        self.on_anvil = bool(cfg.profile.local_rpc_port_env)
+        if not self.on_anvil and not self.sim_collateral:
+            raise ValueError("off Anvil the seeder needs simulated tokens it can mint")
+        self.actors: Anvil | SignedActors = (
+            self.anvil if self.on_anvil else SignedActors(cfg, w3, self.owner)
+        )
+        self.eth_per_actor = (
+            cfg.sim.eth_per_actor if self.on_anvil else cfg.sim.testnet_eth_per_actor
+        )
         self.discovered = load_discovered(cfg, "fork")
 
     def _token_source(self, symbol: str) -> str:
@@ -99,13 +151,14 @@ class Seeder:
         dec = int(call_many(self.w3, [Call(loan, "decimals()(uint8)")])[0])
         out = []
         for i in range(self.cfg.sim.lenders):
-            who = actor(f"lender-{i}")
+            label = f"lender-{i}"
+            who = self.actors.address(label)
             r = self.cfg.sim.lender_deposit_usdg
             amount = int(self.rng.uniform(r.low, r.high)) * 10**dec
-            self.anvil.fund_eth(who, self.cfg.sim.eth_per_actor)
+            self.actors.fund_eth(label, self.eth_per_actor)
             self._give(loan, who, amount, "NVDA")  # on the fork, the NVDA/USDG pool also holds USDG
-            self.anvil.send_as(who, loan, "approve(address,uint256)", vault, amount)
-            self.anvil.send_as(who, vault, "deposit(uint256,address)(uint256)", amount, who)
+            self.actors.send(label, loan, "approve(address,uint256)", vault, amount)
+            self.actors.send(label, vault, "deposit(uint256,address)(uint256)", amount, who)
             out.append({"lender": who, "usdg": amount / 10**dec})
         return out
 
@@ -125,17 +178,18 @@ class Seeder:
             lltv = m.params[4] / WAD
             per = available / self.cfg.sim.borrowers_per_market
             for j in range(self.cfg.sim.borrowers_per_market):
-                who = actor(f"borrower-{m.symbol}-{m.tier}-{j}")
+                label = f"borrower-{m.symbol}-{m.tier}-{j}"
+                who = self.actors.address(label)
                 r = self.cfg.sim.borrower_ltv_share_of_lltv
                 ltv = lltv * self.rng.uniform(r.low, r.high)
                 borrow = int(per * unit)
                 collateral = borrow * 10**36 // int(ltv * WAD) * WAD // int(price)
-                self.anvil.fund_eth(who, self.cfg.sim.eth_per_actor)
+                self.actors.fund_eth(label, self.eth_per_actor)
                 self._give(m.params[1], who, collateral, m.symbol)
-                self.anvil.send_as(who, m.params[1], "approve(address,uint256)", morpho, collateral)
+                self.actors.send(label, m.params[1], "approve(address,uint256)", morpho, collateral)
                 params = m.params
-                self.anvil.send_as(
-                    who,
+                self.actors.send(
+                    label,
                     morpho,
                     f"supplyCollateral({PARAMS_TYPE},uint256,address,bytes)",
                     params,
@@ -143,8 +197,8 @@ class Seeder:
                     who,
                     b"",
                 )
-                self.anvil.send_as(
-                    who,
+                self.actors.send(
+                    label,
                     morpho,
                     f"borrow({PARAMS_TYPE},uint256,uint256,address,address)(uint256,uint256)",
                     params,
