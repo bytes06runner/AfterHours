@@ -1,0 +1,171 @@
+{
+  "id": "NVDA-2024-08-02-weekend",
+  "ticker": "NVDA",
+  "session_prev": "2024-08-02",
+  "session_next": "2024-08-05",
+  "segment": "weekend",
+  "g": -0.1417917020566749,
+  "hours_closed": 65.5,
+  "label": "historical stock prices, simulated vault",
+  "price_path": [
+    {
+      "date": "2024-07-26",
+      "open": 115.8691646723326,
+      "close": 112.747802734375
+    },
+    {
+      "date": "2024-07-29",
+      "open": 113.3760676606231,
+      "close": 111.2818603515625
+    },
+    {
+      "date": "2024-07-30",
+      "open": 111.21203931839821,
+      "close": 103.44355773925781
+    },
+    {
+      "date": "2024-07-31",
+      "open": 112.58823561538453,
+      "close": 116.69685363769531
+    },
+    {
+      "date": "2024-08-01",
+      "open": 117.20544905631927,
+      "close": 108.9084243774414
+    },
+    {
+      "date": "2024-08-02",
+      "open": 103.47347587762454,
+      "close": 106.9737777709961
+    },
+    {
+      "date": "2024-08-05",
+      "open": 91.80578374541406,
+      "close": 100.17261505126953
+    },
+    {
+      "date": "2024-08-06",
+      "open": 103.55326379264082,
+      "close": 103.9621353149414
+    },
+    {
+      "date": "2024-08-07",
+      "open": 107.51230522144884,
+      "close": 98.63688659667969
+    },
+    {
+      "date": "2024-08-08",
+      "open": 101.71833775867768,
+      "close": 104.68013763427734
+    },
+    {
+      "date": "2024-08-09",
+      "open": 105.34829623370402,
+      "close": 104.46075439453125
+    },
+    {
+      "date": "2024-08-12",
+      "open": 106.02640719898284,
+      "close": 108.71894836425781
+    }
+  ],
+  "periods": [
+    {
+      "session_prev": "2024-07-26",
+      "session_next": "2024-07-29",
+      "g": 0.005572303060559225,
+      "segment": "weekend",
+      "bad_case_drop": 0.04002823890661507
+    },
+    {
+      "session_prev": "2024-07-29",
+      "session_next": "2024-07-30",
+      "g": -0.0006274251072341253,
+      "segment": "overnight",
+      "bad_case_drop": 0.03898306549720476
+    },
+    {
+      "session_prev": "2024-07-30",
+      "session_next": "2024-07-31",
+      "g": 0.08840258471365625,
+      "segment": "overnight",
+      "bad_case_drop": 0.042772066683461354
+    },
+    {
+      "session_prev": "2024-07-31",
+      "session_next": "2024-08-01",
+      "g": 0.004358261622056769,
+      "segment": "overnight",
+      "bad_case_drop": 0.05263090563778514
+    },
+    {
+      "session_prev": "2024-08-01",
+      "session_next": "2024-08-02",
+      "g": -0.049903839219830215,
+      "segment": "overnight",
+      "bad_case_drop": 0.05431271526793926
+    },
+    {
+      "session_prev": "2024-08-02",
+      "session_next": "2024-08-05",
+      "g": -0.1417917020566749,
+      "segment": "weekend",
+      "bad_case_drop": 0.05293701051926722
+    },
+    {
+      "session_prev": "2024-08-05",
+      "session_next": "2024-08-06",
+      "g": 0.03374823288421713,
+      "segment": "overnight",
+      "bad_case_drop": 0.054409384587053126
+    },
+    {
+      "session_prev": "2024-08-06",
+      "session_next": "2024-08-07",
+      "g": 0.03414868207307009,
+      "segment": "overnight",
+      "bad_case_drop": 0.05373068642621791
+    },
+    {
+      "session_prev": "2024-08-07",
+      "session_next": "2024-08-08",
+      "g": 0.031240353059782455,
+      "segment": "overnight",
+      "bad_case_drop": 0.054036290062564954
+    },
+    {
+      "session_prev": "2024-08-08",
+      "session_next": "2024-08-09",
+      "g": 0.00638285938982075,
+      "segment": "overnight",
+      "bad_case_drop": 0.05498386197324534
+    },
+    {
+      "session_prev": "2024-08-09",
+      "session_next": "2024-08-12",
+      "g": 0.014987952303487706,
+      "segment": "weekend",
+      "bad_case_drop": 0.05331196145776217
+    }
+  ],
+  "vaults": {
+    "always_weekday": {
+      "bad_debt_usdg": 5729.378463254302,
+      "interest_usdg": 4872.238324520547,
+      "final_assets_usdg": 1999142.8598612659,
+      "events": [
+        {
+          "session_prev": "2024-08-02",
+          "bad_debt_usdg": 5729.378463254302
+        }
+      ]
+    },
+    "afterhours": {
+      "bad_debt_usdg": 0.0,
+      "interest_usdg": 3590.0703443835628,
+      "final_assets_usdg": 2003590.0703443824,
+      "events": []
+    }
+  },
+  "vault_usdg": 2000000.0
+}

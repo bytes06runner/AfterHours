@@ -11,10 +11,22 @@
       "rev": "55d2d99304fb3fb930c688462ae2ccabb1d533ad"
     }
   },
+  "lib/morpho-blue-irm": {
+    "tag": {
+      "name": "v1.1.0",
+      "rev": "ef5dcceb2463ab98a4d7bfa45b75fbfe8ca4bdb9"
+    }
+  },
   "lib/morpho-blue-oracles": {
     "tag": {
       "name": "v2.0.0",
       "rev": "07a9a6988b0e1b316ac2fa97ec62ad485fbd0041"
+    }
+  },
+  "lib/openzeppelin-contracts": {
+    "tag": {
+      "name": "v5.4.0",
+      "rev": "c64a1edb67b6e3f4a15cca8909c9482ad33a02b0"
     }
   },
   "lib/public-allocator": {

@@ -18,8 +18,8 @@
 - [x] M1 Discovery (2026-09-26; fork-block checks wait on BLOCKED 1)
 - [x] M2 Data and gap study (2026-09-26)
 - [x] M3 Model (2026-09-26; fallback applied: ships the EWMA baseline)
-- [ ] M4 Policy and backtest
-- [ ] M5 Contracts
+- [x] M4 Policy and backtest (2026-09-26)
+- [x] M5 Contracts (2026-09-26; pinned-block fork runs wait on BLOCKED 1)
 - [ ] M6 Bot and API
 - [ ] M7 Simulation harness
 - [ ] M8 Frontend foundation
@@ -148,3 +148,48 @@ Acceptance
 - `report_card.json` meets 7.4 or the fallback is applied and stated: pass (fallback applied; the report card's first sentence says so; README states it).
 
 Next: M4 backtest and tuning.
+
+### 2026-09-26 M4 Policy and backtest: done
+
+What was done
+- `engine/afterhours/policy/lp.py`: the SPEC 7.5 LP on HiGHS (allowed-tier rule with Morpho's verified incentive, borrowed floor, caps, per-stock limit from max share and pool depth, turnover penalty, minimum rebalance).
+- `engine/afterhours/backtest/`: economics simulator (borrower LTVs uniform over 60% to 98% of LLTV, bad debt from Morpho's liquidation formula, loans rolling a set share per session), the four strategies, a 60-point tuning grid, rate-spread and loan-turnover sensitivities, and 12 replay scenarios picked from the data (3 largest gaps per segment). Only held-out forecasts are used (2017 to 2026).
+- Three simulator problems found and fixed on the way, each covered by a test: static strategies were placing money less efficiently than the LP (now the same LP restricted to one tier); a market pulled to its borrowed floor wrongly re-lent repaid loans (now repaid loans are not replaced at 100% utilisation); reallocation counts included interest drift.
+- New policy setting `lookahead_closed_periods` (default 1 = SPEC 7.5). The allocator can only move unborrowed USDG, so one close of notice cannot shrink open loans (tested). Acting on the worst bad case over the next N closed periods lets loans roll off before a scheduled risky night; future forecasts use only what is known at the decision close (today's volatility rescales each future period's calibrated quantile).
+
+Tuned values (rule: highest Afterhours net yield among settings whose worst single event loses at most 0.1% of the vault; 18 of 60 settings qualified)
+- `morpho.lltv_tiers`: weekday 91.5%, weekend 77% (both enabled on Robinhood's Morpho).
+- `policy.safety_margin` 0.05, `policy.lookahead_closed_periods` 3.
+- `backtest.vault_usdg` 2M, sized to measured Uniswap depth.
+
+Results (`artifacts/backtest/results.json`, historical stock prices, simulated vault, 2,445 closed periods 2017-01-03 to 2026-09-25, NVDA SPY META SGOV USO)
+| Strategy | Net yield | Bad debt | Worst event |
+| --- | --- | --- | --- |
+| Always weekday tier | 9.13% | $111,676 | 0.72% of vault (META earnings 2022-10-26) |
+| Always weekend tier | 7.19% | $7,499 | 0.12% |
+| Afterhours | 7.74% | $5,127 | 0.07% |
+| Perfect foresight (same lookahead) | 9.25% | $68,268 | 0.46% |
+- Afterhours beats always-weekend on both yield and bad debt in every sensitivity (rate spread 0.5x to 2x; loan turnover 5% to 100% per session). With faster loan turnover its bad debt falls further ($818 at 100%).
+- Assumptions (rates by LLTV, 85% utilisation, 20% loan turnover, borrower LTV spread) are in config and in the artifact; Stock Token markets on Robinhood show almost no borrowing today, so there are no live rates to copy.
+
+Acceptance
+- Backtest artifacts for all four strategies: pass. Tuned values recorded with reasons: pass (config comments and this entry).
+
+### 2026-09-26 M5 Contracts: done (pinned-block fork runs pending BLOCKED 1)
+
+What was done
+- `AfterhoursReasonRegistry` (SPEC interface; Ownable2Step; allocator-only `logReason`; seq starts at 1; rejects an empty hash), `SimOracle` (Morpho IOracle scaling 10^(36 + loan decimals - collateral decimals), Chainlink-style read), `SimStockToken` and `SimUSDG` (labelled "(sim)").
+- `script/DeployAfterhours.s.sol`: reads a plan built from config and the discovered file by `afterhours deploy`; reuses or self-deploys Morpho (Morpho Blue, Adaptive Curve IRM, Vault V2 factory, Market V1 adapter factory), creates one oracle and two markets per token, creates the Vault V2 with owner, curator, allocator and sentinel (guardian) roles, adds the adapter, sets absolute and relative caps (35% per stock), performance fee, then one-day timelocks on cap raises, adapter changes, allocator changes and fees; deploys the registry; writes the deployment JSON. `afterhours deploy` adds tier metadata (b and cushion) to `deployments/<profile>.json`.
+- New `local` profile (plain Anvil, self-deployed Morpho, simulated oracle and collateral) so M6 and M7 can run while the archive RPC is missing. `make local-chain`, `make fork`, `make deploy`.
+- Compiler settings now match morpho-org/vault-v2 (via_ir, 100k runs); otherwise VaultV2Factory is over 24 KB. Our self-built Morpho is 15,582 bytes, the same as the one on Robinhood Chain.
+
+Evidence
+- `forge test --no-match-path "test/fork/*"`: 22 passed (registry incl. fuzz, sim contracts, and a local end-to-end deployment: allocator moves only unborrowed money, cannot raise caps or add adapters; curator raise waits 1 day; guardian cap cut blocks allocation; 35% stock cap enforced; deployment JSON written).
+- `FORK_RPC_URL=<public> forge test --match-path test/fork/DeployFork.t.sol`: 2 passed at the chain head: the deploy script runs against Robinhood's real Morpho, Chainlink oracle factory, Vault V2 factory and USDG; oracle price equals the feed answer x 1e16; a real closing-bell move (deposit, allocate, borrow $60k, move the unborrowed $40k to the weekend tier, log a reason).
+- `make deploy PROFILE=local`: 10 markets, vault, adapter, registry; `deployments/local.json`.
+
+Acceptance
+- `forge test` green including fork tests: pass at the chain head; the run pinned to `fork_block` needs the archive RPC (BLOCKED 1).
+- `make deploy PROFILE=fork` writes `deployments/fork.json`: pending BLOCKED 1 (`make fork` needs the archive RPC). Verified the same script against the real contracts in the fork test above; `deployments/fork.plan.json` is written.
+
+Next: M6 bot and API (developed on the local profile, then the fork once unblocked).

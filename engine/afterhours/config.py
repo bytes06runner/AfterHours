@@ -46,6 +46,11 @@ class PathsConfig(_Strict):
     env_file: str
 
 
+class LocalNodeConfig(_Strict):
+    url_template: Annotated[str, StringConstraints(pattern=r"^https?://.*\{port\}")]
+    port_env: EnvName
+
+
 class ProfileConfig(_Strict):
     chain: str
     rpc_env: EnvName
@@ -88,6 +93,7 @@ class VaultConfig(_Strict):
     max_share_per_stock: Fraction
     depth_multiplier: Annotated[float, Field(gt=0)]
     max_slippage: Fraction
+    market_cap_usdg: Annotated[float, Field(gt=0)]
 
 
 class OnchainSelection(_Strict):
@@ -201,7 +207,10 @@ class BacktestConfig(_Strict):
     depth_source: Literal["discovered", "none"]
     tier_pairs_to_tune: list[tuple[Fraction, Fraction]]
     safety_margins_to_tune: list[Fraction]
+    lookaheads_to_tune: list[PositiveInt]
+    max_worst_event_share: Fraction
     rate_spread_multipliers: list[Annotated[float, Field(ge=0)]]
+    turnover_sensitivity: list[Fraction]
     replay: ReplayConfig
 
     def apy(self, lltv: float) -> float:
@@ -216,6 +225,7 @@ class PolicyConfig(_Strict):
     safety_margin: Fraction
     turnover_penalty: Annotated[float, Field(ge=0)]
     min_rebalance_usd: Annotated[float, Field(ge=0)]
+    lookahead_closed_periods: PositiveInt
 
 
 class TriggersConfig(_Strict):
@@ -297,6 +307,7 @@ class AfterhoursConfig(BaseSettings):
 
     active_profile: str
     paths: PathsConfig
+    local_node: LocalNodeConfig
     profiles: dict[str, ProfileConfig]
     chains: dict[str, ChainConfig]
     morpho: MorphoConfig
@@ -354,6 +365,16 @@ class AfterhoursConfig(BaseSettings):
         if not url:
             raise KeyError(f"set {prof.rpc_env} in .env; chain {prof.chain} has no public RPC")
         return url
+
+    def node_url(self, profile: str | None = None) -> str:
+        """RPC the bot and deploy use: the local Anvil node for fork/local, else upstream."""
+        prof = self.profiles[profile or self.active_profile]
+        if prof.local_rpc_port_env:
+            port = os.environ.get(prof.local_rpc_port_env)
+            if not port:
+                raise KeyError(f"set {prof.local_rpc_port_env} (see .env.example)")
+            return self.local_node.url_template.format(port=port)
+        return self.rpc_url(profile)
 
     def path(self, relative: str) -> Path:
         """Resolve a repo-relative path from config against the repository root."""

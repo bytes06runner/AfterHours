@@ -5,9 +5,15 @@ libs = ["lib"]
 test = "test"
 script = "script"
 optimizer = true
-optimizer_runs = 999999
+optimizer_runs = 100000
+via_ir = true                # as morpho-org/vault-v2 compiles; VaultV2Factory exceeds 24 KB otherwise
+bytecode_hash = "none"
 evm_version = "cancun"
-fs_permissions = [{ access = "read", path = "../deployments" }]
+fs_permissions = [
+  { access = "read-write", path = "../deployments" },
+  { access = "read-write", path = "./cache" },
+  { access = "read", path = "./out" },
+]
 # Fork tests read their RPC and block from the environment, which `make` fills from
 # config/afterhours.yaml (fork_block) and .env (the RPC named by rpc_env).
 

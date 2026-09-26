@@ -3,3 +3,5 @@ morpho-blue/=lib/morpho-blue/
 vault-v2/=lib/vault-v2/
 morpho-blue-oracles/=lib/morpho-blue-oracles/
 public-allocator/=lib/public-allocator/
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+morpho-blue-irm/=lib/morpho-blue-irm/

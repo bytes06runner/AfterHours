@@ -1,0 +1,176 @@
+{
+  "id": "META-2022-02-02-earnings",
+  "ticker": "META",
+  "session_prev": "2022-02-02",
+  "session_next": "2022-02-03",
+  "segment": "earnings",
+  "g": -0.24256968129013312,
+  "hours_closed": 17.5,
+  "label": "historical stock prices, simulated vault",
+  "price_path": [
+    {
+      "date": "2022-01-26",
+      "open": 304.09739417477607,
+      "close": 291.8348388671875
+    },
+    {
+      "date": "2022-01-27",
+      "open": 294.9252995982087,
+      "close": 291.8448181152344
+    },
+    {
+      "date": "2022-01-28",
+      "open": 292.81549576317013,
+      "close": 298.84771728515625
+    },
+    {
+      "date": "2022-01-31",
+      "open": 297.82750439466724,
+      "close": 310.2881774902344
+    },
+    {
+      "date": "2022-02-01",
+      "open": 311.5758130573624,
+      "close": 315.97369384765625
+    },
+    {
+      "date": "2022-02-02",
+      "open": 324.7100413304929,
+      "close": 319.9357604980469
+    },
+    {
+      "date": "2022-02-03",
+      "open": 242.32904504071928,
+      "close": 235.50440979003906
+    },
+    {
+      "date": "2022-02-04",
+      "open": 232.74089135665187,
+      "close": 234.8407745361328
+    },
+    {
+      "date": "2022-02-07",
+      "open": 235.4449621196371,
+      "close": 222.77630615234375
+    },
+    {
+      "date": "2022-02-08",
+      "open": 218.75484365988038,
+      "close": 218.0911865234375
+    },
+    {
+      "date": "2022-02-09",
+      "open": 222.07306595112937,
+      "close": 229.799072265625
+    },
+    {
+      "date": "2022-02-10",
+      "open": 226.10444116008378,
+      "close": 225.90634155273438
+    }
+  ],
+  "periods": [
+    {
+      "session_prev": "2022-01-26",
+      "session_next": "2022-01-27",
+      "g": 0.010589759409868282,
+      "segment": "overnight",
+      "bad_case_drop": 0.034006538778269715
+    },
+    {
+      "session_prev": "2022-01-27",
+      "session_next": "2022-01-28",
+      "g": 0.003326006109015456,
+      "segment": "overnight",
+      "bad_case_drop": 0.032970565176843006
+    },
+    {
+      "session_prev": "2022-01-28",
+      "session_next": "2022-01-31",
+      "g": -0.003413821928295091,
+      "segment": "weekend",
+      "bad_case_drop": 0.03321429890694983
+    },
+    {
+      "session_prev": "2022-01-31",
+      "session_next": "2022-02-01",
+      "g": 0.00414980544068122,
+      "segment": "overnight",
+      "bad_case_drop": 0.14859280510549838
+    },
+    {
+      "session_prev": "2022-02-01",
+      "session_next": "2022-02-02",
+      "g": 0.02764897095214769,
+      "segment": "overnight",
+      "bad_case_drop": 0.1469818161168929
+    },
+    {
+      "session_prev": "2022-02-02",
+      "session_next": "2022-02-03",
+      "g": -0.24256968129013312,
+      "segment": "earnings",
+      "bad_case_drop": 0.14389971559263193
+    },
+    {
+      "session_prev": "2022-02-03",
+      "session_next": "2022-02-04",
+      "g": -0.011734465761600643,
+      "segment": "overnight",
+      "bad_case_drop": 0.09349557658525971
+    },
+    {
+      "session_prev": "2022-02-04",
+      "session_next": "2022-02-07",
+      "g": 0.0025727541765168116,
+      "segment": "weekend",
+      "bad_case_drop": 0.09065110976453333
+    },
+    {
+      "session_prev": "2022-02-07",
+      "session_next": "2022-02-08",
+      "g": -0.018051571829695967,
+      "segment": "overnight",
+      "bad_case_drop": 0.08087451472233306
+    },
+    {
+      "session_prev": "2022-02-08",
+      "session_next": "2022-02-09",
+      "g": 0.0182578649379026,
+      "segment": "overnight",
+      "bad_case_drop": 0.07888084305196545
+    },
+    {
+      "session_prev": "2022-02-09",
+      "session_next": "2022-02-10",
+      "g": -0.016077658926623495,
+      "segment": "overnight",
+      "bad_case_drop": 0.08892899082189255
+    }
+  ],
+  "vaults": {
+    "always_weekday": {
+      "bad_debt_usdg": 23493.591728191248,
+      "interest_usdg": 2499.474810616438,
+      "final_assets_usdg": 1979005.8830824255,
+      "events": [
+        {
+          "session_prev": "2022-02-02",
+          "bad_debt_usdg": 23493.591728191248
+        }
+      ]
+    },
+    "afterhours": {
+      "bad_debt_usdg": 2018.2939367127613,
+      "interest_usdg": 1728.0228729284936,
+      "final_assets_usdg": 1999709.7289362159,
+      "events": [
+        {
+          "session_prev": "2022-02-02",
+          "bad_debt_usdg": 2018.2939367127613
+        }
+      ]
+    }
+  },
+  "vault_usdg": 2000000.0
+}

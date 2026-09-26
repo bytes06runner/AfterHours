@@ -1,0 +1,176 @@
+{
+  "id": "META-2022-10-26-earnings",
+  "ticker": "META",
+  "session_prev": "2022-10-26",
+  "session_next": "2022-10-27",
+  "segment": "earnings",
+  "g": -0.2452627779928216,
+  "hours_closed": 17.5,
+  "label": "historical stock prices, simulated vault",
+  "price_path": [
+    {
+      "date": "2022-10-19",
+      "open": 131.62927838527787,
+      "close": 131.96604919433594
+    },
+    {
+      "date": "2022-10-20",
+      "open": 131.66892385855354,
+      "close": 130.28221130371094
+    },
+    {
+      "date": "2022-10-21",
+      "open": 125.11170081056022,
+      "close": 128.77659606933594
+    },
+    {
+      "date": "2022-10-24",
+      "open": 126.04281094840454,
+      "close": 128.4893798828125
+    },
+    {
+      "date": "2022-10-25",
+      "open": 129.63838212507324,
+      "close": 136.20547485351562
+    },
+    {
+      "date": "2022-10-26",
+      "open": 130.43076463637212,
+      "close": 128.5884246826172
+    },
+    {
+      "date": "2022-10-27",
+      "open": 97.05047042723778,
+      "close": 97.01084899902344
+    },
+    {
+      "date": "2022-10-28",
+      "open": 98.63529568612601,
+      "close": 98.25889587402344
+    },
+    {
+      "date": "2022-10-31",
+      "open": 97.2881929542423,
+      "close": 92.27619934082031
+    },
+    {
+      "date": "2022-11-01",
+      "open": 93.43511047806369,
+      "close": 94.2968521118164
+    },
+    {
+      "date": "2022-11-02",
+      "open": 93.31624220877565,
+      "close": 89.68106079101562
+    },
+    {
+      "date": "2022-11-03",
+      "open": 89.22542689905643,
+      "close": 88.0665283203125
+    }
+  ],
+  "periods": [
+    {
+      "session_prev": "2022-10-19",
+      "session_next": "2022-10-20",
+      "g": -0.002251528613581799,
+      "segment": "overnight",
+      "bad_case_drop": 0.042826392658542864
+    },
+    {
+      "session_prev": "2022-10-20",
+      "session_next": "2022-10-21",
+      "g": -0.03968700286409277,
+      "segment": "overnight",
+      "bad_case_drop": 0.04179417289167573
+    },
+    {
+      "session_prev": "2022-10-21",
+      "session_next": "2022-10-24",
+      "g": -0.021228897209392583,
+      "segment": "weekend",
+      "bad_case_drop": 0.04074979077435436
+    },
+    {
+      "session_prev": "2022-10-24",
+      "session_next": "2022-10-25",
+      "g": 0.008942390750960705,
+      "segment": "overnight",
+      "bad_case_drop": 0.17041264874332682
+    },
+    {
+      "session_prev": "2022-10-25",
+      "session_next": "2022-10-26",
+      "g": -0.0423970491887643,
+      "segment": "overnight",
+      "bad_case_drop": 0.18974650456237208
+    },
+    {
+      "session_prev": "2022-10-26",
+      "session_next": "2022-10-27",
+      "g": -0.2452627779928216,
+      "segment": "earnings",
+      "bad_case_drop": 0.2057198905793187
+    },
+    {
+      "session_prev": "2022-10-27",
+      "session_next": "2022-10-28",
+      "g": 0.016745000212490924,
+      "segment": "overnight",
+      "bad_case_drop": 0.09156184837411147
+    },
+    {
+      "session_prev": "2022-10-28",
+      "session_next": "2022-10-31",
+      "g": -0.009879033456936637,
+      "segment": "weekend",
+      "bad_case_drop": 0.08885373153083195
+    },
+    {
+      "session_prev": "2022-10-31",
+      "session_next": "2022-11-01",
+      "g": 0.012559155508377273,
+      "segment": "overnight",
+      "bad_case_drop": 0.07914442333073336
+    },
+    {
+      "session_prev": "2022-11-01",
+      "session_next": "2022-11-02",
+      "g": -0.010399179623493238,
+      "segment": "overnight",
+      "bad_case_drop": 0.07720202186576434
+    },
+    {
+      "session_prev": "2022-11-02",
+      "session_next": "2022-11-03",
+      "g": -0.005080603283908136,
+      "segment": "overnight",
+      "bad_case_drop": 0.08809438493490666
+    }
+  ],
+  "vaults": {
+    "always_weekday": {
+      "bad_debt_usdg": 24300.293704517164,
+      "interest_usdg": 2499.474810616438,
+      "final_assets_usdg": 1978199.1811060996,
+      "events": [
+        {
+          "session_prev": "2022-10-26",
+          "bad_debt_usdg": 24300.293704517164
+        }
+      ]
+    },
+    "afterhours": {
+      "bad_debt_usdg": 2227.6288735205735,
+      "interest_usdg": 1728.0228729284936,
+      "final_assets_usdg": 1999500.393999408,
+      "events": [
+        {
+          "session_prev": "2022-10-26",
+          "bad_debt_usdg": 2227.6288735205735
+        }
+      ]
+    }
+  },
+  "vault_usdg": 2000000.0
+}

@@ -91,10 +91,24 @@
           "title": "Loan Turnover Per Session",
           "type": "number"
         },
+        "lookaheads_to_tune": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "title": "Lookaheads To Tune",
+          "type": "array"
+        },
         "ltv_grid_points": {
           "exclusiveMinimum": 0,
           "title": "Ltv Grid Points",
           "type": "integer"
+        },
+        "max_worst_event_share": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Max Worst Event Share",
+          "type": "number"
         },
         "rate_spread_multipliers": {
           "items": {
@@ -151,6 +165,15 @@
           "title": "Tier Pairs To Tune",
           "type": "array"
         },
+        "turnover_sensitivity": {
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Turnover Sensitivity",
+          "type": "array"
+        },
         "utilization": {
           "maximum": 1,
           "minimum": 0,
@@ -174,7 +197,10 @@
         "depth_source",
         "tier_pairs_to_tune",
         "safety_margins_to_tune",
+        "lookaheads_to_tune",
+        "max_worst_event_share",
         "rate_spread_multipliers",
+        "turnover_sensitivity",
         "replay"
       ],
       "title": "BacktestConfig",
@@ -690,6 +716,27 @@
       "title": "LltvTiers",
       "type": "object"
     },
+    "LocalNodeConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "port_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Port Env",
+          "type": "string"
+        },
+        "url_template": {
+          "pattern": "^https?://.*\\{port\\}",
+          "title": "Url Template",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url_template",
+        "port_env"
+      ],
+      "title": "LocalNodeConfig",
+      "type": "object"
+    },
     "ModelConfig": {
       "additionalProperties": false,
       "properties": {
@@ -857,6 +904,11 @@
     "PolicyConfig": {
       "additionalProperties": false,
       "properties": {
+        "lookahead_closed_periods": {
+          "exclusiveMinimum": 0,
+          "title": "Lookahead Closed Periods",
+          "type": "integer"
+        },
         "min_rebalance_usd": {
           "minimum": 0,
           "title": "Min Rebalance Usd",
@@ -877,7 +929,8 @@
       "required": [
         "safety_margin",
         "turnover_penalty",
-        "min_rebalance_usd"
+        "min_rebalance_usd",
+        "lookahead_closed_periods"
       ],
       "title": "PolicyConfig",
       "type": "object"
@@ -1143,6 +1196,11 @@
           "title": "Depth Multiplier",
           "type": "number"
         },
+        "market_cap_usdg": {
+          "exclusiveMinimum": 0,
+          "title": "Market Cap Usdg",
+          "type": "number"
+        },
         "max_share_per_stock": {
           "maximum": 1,
           "minimum": 0,
@@ -1189,7 +1247,8 @@
         "performance_fee_bps",
         "max_share_per_stock",
         "depth_multiplier",
-        "max_slippage"
+        "max_slippage",
+        "market_cap_usdg"
       ],
       "title": "VaultConfig",
       "type": "object"
@@ -1276,6 +1335,9 @@
     "gaps": {
       "$ref": "#/$defs/GapsConfig"
     },
+    "local_node": {
+      "$ref": "#/$defs/LocalNodeConfig"
+    },
     "model": {
       "$ref": "#/$defs/ModelConfig"
     },
@@ -1311,6 +1373,7 @@
   "required": [
     "active_profile",
     "paths",
+    "local_node",
     "profiles",
     "chains",
     "morpho",

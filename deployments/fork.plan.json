@@ -1,0 +1,67 @@
+{
+  "profile": "fork",
+  "self_deploy_morpho": false,
+  "sim_oracle": false,
+  "sim_collateral": false,
+  "morpho": {
+    "blue": "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010",
+    "irm": "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+    "vault_v2_factory": "0x0FBad98595b0186dA120E41f77C102beb49f803c",
+    "adapter_factory": "0x79370Ed003CE325C088E530d5e8655c99c2993e1",
+    "oracle_factory": "0xB7c16F6F8cF531447Bf27Ca7220f981E79C9cdF2"
+  },
+  "loan_token": {
+    "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "decimals": 6
+  },
+  "tiers": {
+    "weekday_wad": "915000000000000000",
+    "weekend_wad": "770000000000000000"
+  },
+  "tokens": {
+    "symbols": [
+      "NVDA",
+      "SPY",
+      "META",
+      "SGOV",
+      "USO"
+    ],
+    "addresses": [
+      "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+      "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+      "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344"
+    ],
+    "feeds": [
+      "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
+      "0x319724394D3A0e3669269846abE664Cd621f9f6A",
+      "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
+      "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+      "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c"
+    ],
+    "decimals": [
+      18,
+      18,
+      18,
+      18,
+      18
+    ],
+    "initial_prices_8": [
+      22566018707,
+      77232802713,
+      74865014464,
+      10116851865,
+      14869830000
+    ]
+  },
+  "vault": {
+    "name": "Afterhours USDG",
+    "symbol": "ahUSDG",
+    "performance_fee_wad": "100000000000000000",
+    "timelock_seconds": 86400,
+    "market_cap_assets": "1000000000000",
+    "collateral_relative_cap_wad": "350000000000000000"
+  },
+  "salt": "0x8650c271603c0dbe1bc354c5074e0aeb2002ce3f8851e2444b66a2d4d6a10d19"
+}

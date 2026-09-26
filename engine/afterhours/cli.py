@@ -174,5 +174,35 @@ def backtest_cmd() -> None:
     )
 
 
+@app.command("deploy")
+def deploy_cmd(
+    plan_only: Annotated[bool, typer.Option(help="Write the plan file and stop.")] = False,
+) -> None:
+    """M5: deploy markets, vault, adapter and registry for the active profile."""
+    from afterhours import deploy as dep
+    from afterhours.deployments import deployment_path
+
+    cfg = load_config()
+    profile = cfg.active_profile
+    if cfg.profile.requires_human_go:
+        raise typer.BadParameter(f"{profile} needs an explicit human go in PROGRESS.md first")
+    plan_doc = dep.plan(cfg, profile)
+    plan_path = deployment_path(cfg, profile).with_suffix(".plan.json")
+    plan_path.write_text(json.dumps(plan_doc, indent=2) + "\n")
+    if plan_only:
+        typer.echo(f"wrote {plan_path}")
+        return
+    rpc = cfg.node_url(profile)
+    keys = dep.role_keys(cfg, profile)
+    if cfg.profile.local_rpc_port_env:
+        dep.fund_local(rpc, list(dep.addresses(keys).values()), 1000 * 10**18)
+    raw_path = deployment_path(cfg, profile).with_suffix(".raw.json")
+    dep.run_script(cfg, profile, plan_path, raw_path, rpc, keys)
+    doc = dep.finalise(cfg, profile, raw_path, plan_doc)
+    typer.echo(
+        f"deployed {profile}: vault {doc['vault']['address']}, {len(doc['markets'])} markets"
+    )
+
+
 if __name__ == "__main__":
     app()

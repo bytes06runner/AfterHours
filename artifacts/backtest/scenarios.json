@@ -1,0 +1,113 @@
+{
+  "label": "historical stock prices, simulated vault",
+  "scenarios": [
+    {
+      "id": "NVDA-2023-05-24-earnings",
+      "ticker": "NVDA",
+      "session_prev": "2023-05-24",
+      "session_next": "2023-05-25",
+      "segment": "earnings",
+      "g": 0.26147749276288956,
+      "hours_closed": 17.5
+    },
+    {
+      "id": "META-2022-10-26-earnings",
+      "ticker": "META",
+      "session_prev": "2022-10-26",
+      "session_next": "2022-10-27",
+      "segment": "earnings",
+      "g": -0.2452627779928216,
+      "hours_closed": 17.5
+    },
+    {
+      "id": "META-2022-02-02-earnings",
+      "ticker": "META",
+      "session_prev": "2022-02-02",
+      "session_next": "2022-02-03",
+      "segment": "earnings",
+      "g": -0.24256968129013312,
+      "hours_closed": 17.5
+    },
+    {
+      "id": "NVDA-2020-09-04-holiday",
+      "ticker": "NVDA",
+      "session_prev": "2020-09-04",
+      "session_next": "2020-09-08",
+      "segment": "holiday",
+      "g": -0.07035051329497788,
+      "hours_closed": 89.5
+    },
+    {
+      "id": "USO-2021-11-24-holiday",
+      "ticker": "USO",
+      "session_prev": "2021-11-24",
+      "session_next": "2021-11-26",
+      "segment": "holiday",
+      "g": -0.06352897582684824,
+      "hours_closed": 41.5
+    },
+    {
+      "id": "USO-2020-09-04-holiday",
+      "ticker": "USO",
+      "session_prev": "2020-09-04",
+      "session_next": "2020-09-08",
+      "segment": "holiday",
+      "g": -0.057172958787421346,
+      "hours_closed": 89.5
+    },
+    {
+      "id": "USO-2020-03-06-weekend",
+      "ticker": "USO",
+      "session_prev": "2020-03-06",
+      "session_next": "2020-03-09",
+      "segment": "weekend",
+      "g": -0.21878573547847802,
+      "hours_closed": 64.5
+    },
+    {
+      "id": "NVDA-2019-01-25-weekend",
+      "ticker": "NVDA",
+      "session_prev": "2019-01-25",
+      "session_next": "2019-01-28",
+      "segment": "weekend",
+      "g": -0.14736176898955244,
+      "hours_closed": 65.5
+    },
+    {
+      "id": "NVDA-2024-08-02-weekend",
+      "ticker": "NVDA",
+      "session_prev": "2024-08-02",
+      "session_next": "2024-08-05",
+      "segment": "weekend",
+      "g": -0.1417917020566749,
+      "hours_closed": 65.5
+    },
+    {
+      "id": "USO-2020-04-20-overnight",
+      "ticker": "USO",
+      "session_prev": "2020-04-20",
+      "session_next": "2020-04-21",
+      "segment": "overnight",
+      "g": -0.1493333180745443,
+      "hours_closed": 17.5
+    },
+    {
+      "id": "USO-2026-04-07-overnight",
+      "ticker": "USO",
+      "session_prev": "2026-04-07",
+      "session_next": "2026-04-08",
+      "segment": "overnight",
+      "g": -0.13774626318250283,
+      "hours_closed": 17.5
+    },
+    {
+      "id": "USO-2026-04-01-overnight",
+      "ticker": "USO",
+      "session_prev": "2026-04-01",
+      "session_next": "2026-04-02",
+      "segment": "overnight",
+      "g": 0.1223306340765451,
+      "hours_closed": 17.5
+    }
+  ]
+}

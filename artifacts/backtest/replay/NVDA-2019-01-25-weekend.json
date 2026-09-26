@@ -1,0 +1,171 @@
+{
+  "id": "NVDA-2019-01-25-weekend",
+  "ticker": "NVDA",
+  "session_prev": "2019-01-25",
+  "session_next": "2019-01-28",
+  "segment": "weekend",
+  "g": -0.14736176898955244,
+  "hours_closed": 65.5,
+  "label": "historical stock prices, simulated vault",
+  "price_path": [
+    {
+      "date": "2019-01-17",
+      "open": 3.6485304526702196,
+      "close": 3.7526609897613525
+    },
+    {
+      "date": "2019-01-18",
+      "open": 3.8023761723039584,
+      "close": 3.8815252780914307
+    },
+    {
+      "date": "2019-01-22",
+      "open": 3.851350487859088,
+      "close": 3.6796956062316895
+    },
+    {
+      "date": "2019-01-23",
+      "open": 3.7348530468309113,
+      "close": 3.6925575733184814
+    },
+    {
+      "date": "2019-01-24",
+      "open": 3.776899835858294,
+      "close": 3.9040331840515137
+    },
+    {
+      "date": "2019-01-25",
+      "open": 3.844671836656973,
+      "close": 3.961169481277466
+    },
+    {
+      "date": "2019-01-28",
+      "open": 3.3774445392489905,
+      "close": 3.4135563373565674
+    },
+    {
+      "date": "2019-01-29",
+      "open": 3.367550107581684,
+      "close": 3.255009889602661
+    },
+    {
+      "date": "2019-01-30",
+      "open": 3.330944362099958,
+      "close": 3.398221254348755
+    },
+    {
+      "date": "2019-01-31",
+      "open": 3.3950053487845215,
+      "close": 3.555529832839966
+    },
+    {
+      "date": "2019-02-01",
+      "open": 3.57408105945596,
+      "close": 3.5797698497772217
+    },
+    {
+      "date": "2019-02-04",
+      "open": 3.5955991333519037,
+      "close": 3.689836263656616
+    }
+  ],
+  "periods": [
+    {
+      "session_prev": "2019-01-17",
+      "session_next": "2019-01-18",
+      "g": 0.013247981280016363,
+      "segment": "overnight",
+      "bad_case_drop": 0.06140101028475542
+    },
+    {
+      "session_prev": "2019-01-18",
+      "session_next": "2019-01-22",
+      "g": -0.007773951751044561,
+      "segment": "holiday",
+      "bad_case_drop": 0.06112700036438015
+    },
+    {
+      "session_prev": "2019-01-22",
+      "session_next": "2019-01-23",
+      "g": 0.014989674826855426,
+      "segment": "overnight",
+      "bad_case_drop": 0.04526323270808972
+    },
+    {
+      "session_prev": "2019-01-23",
+      "session_next": "2019-01-24",
+      "g": 0.022841150304398594,
+      "segment": "overnight",
+      "bad_case_drop": 0.043896354581113586
+    },
+    {
+      "session_prev": "2019-01-24",
+      "session_next": "2019-01-25",
+      "g": -0.015205133920746294,
+      "segment": "overnight",
+      "bad_case_drop": 0.045506671557528855
+    },
+    {
+      "session_prev": "2019-01-25",
+      "session_next": "2019-01-28",
+      "g": -0.14736176898955244,
+      "segment": "weekend",
+      "bad_case_drop": 0.04343497776370844
+    },
+    {
+      "session_prev": "2019-01-28",
+      "session_next": "2019-01-29",
+      "g": -0.013477507100559616,
+      "segment": "overnight",
+      "bad_case_drop": 0.060104514674781284
+    },
+    {
+      "session_prev": "2019-01-29",
+      "session_next": "2019-01-30",
+      "g": 0.023328492100700204,
+      "segment": "overnight",
+      "bad_case_drop": 0.059890083282138705
+    },
+    {
+      "session_prev": "2019-01-30",
+      "session_next": "2019-01-31",
+      "g": -0.0009463496704689156,
+      "segment": "overnight",
+      "bad_case_drop": 0.05937655897581561
+    },
+    {
+      "session_prev": "2019-01-31",
+      "session_next": "2019-02-01",
+      "g": 0.005217570232332047,
+      "segment": "overnight",
+      "bad_case_drop": 0.05924931042780614
+    },
+    {
+      "session_prev": "2019-02-01",
+      "session_next": "2019-02-04",
+      "g": 0.004421871862982263,
+      "segment": "weekend",
+      "bad_case_drop": 0.05760773928284964
+    }
+  ],
+  "vaults": {
+    "always_weekday": {
+      "bad_debt_usdg": 6804.1410626178285,
+      "interest_usdg": 5158.840578904109,
+      "final_assets_usdg": 1998354.699516286,
+      "events": [
+        {
+          "session_prev": "2019-01-25",
+          "bad_debt_usdg": 6804.1410626178285
+        }
+      ]
+    },
+    "afterhours": {
+      "bad_debt_usdg": 0.0,
+      "interest_usdg": 3801.250952876713,
+      "final_assets_usdg": 2003801.2509528757,
+      "events": []
+    }
+  },
+  "vault_usdg": 2000000.0
+}

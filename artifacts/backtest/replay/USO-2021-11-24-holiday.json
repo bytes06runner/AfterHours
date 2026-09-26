@@ -1,0 +1,166 @@
+{
+  "id": "USO-2021-11-24-holiday",
+  "ticker": "USO",
+  "session_prev": "2021-11-24",
+  "session_next": "2021-11-26",
+  "segment": "holiday",
+  "g": -0.06352897582684824,
+  "hours_closed": 41.5,
+  "label": "historical stock prices, simulated vault",
+  "price_path": [
+    {
+      "date": "2021-11-17",
+      "open": 55.86000061035156,
+      "close": 55.0
+    },
+    {
+      "date": "2021-11-18",
+      "open": 55.369998931884766,
+      "close": 55.54999923706055
+    },
+    {
+      "date": "2021-11-19",
+      "open": 54.84000015258789,
+      "close": 53.779998779296875
+    },
+    {
+      "date": "2021-11-22",
+      "open": 53.9900016784668,
+      "close": 54.45000076293945
+    },
+    {
+      "date": "2021-11-23",
+      "open": 55.45000076293945,
+      "close": 56.20000076293945
+    },
+    {
+      "date": "2021-11-24",
+      "open": 55.810001373291016,
+      "close": 55.880001068115234
+    },
+    {
+      "date": "2021-11-26",
+      "open": 52.33000183105469,
+      "close": 49.630001068115234
+    },
+    {
+      "date": "2021-11-29",
+      "open": 51.970001220703125,
+      "close": 50.16999816894531
+    },
+    {
+      "date": "2021-11-30",
+      "open": 48.619998931884766,
+      "close": 47.90999984741211
+    },
+    {
+      "date": "2021-12-01",
+      "open": 49.09000015258789,
+      "close": 47.040000915527344
+    },
+    {
+      "date": "2021-12-02",
+      "open": 46.529998779296875,
+      "close": 48.290000915527344
+    },
+    {
+      "date": "2021-12-03",
+      "open": 49.70000076293945,
+      "close": 48.0
+    }
+  ],
+  "periods": [
+    {
+      "session_prev": "2021-11-17",
+      "session_next": "2021-11-18",
+      "g": 0.006727253306995751,
+      "segment": "overnight",
+      "bad_case_drop": 0.049505897012027
+    },
+    {
+      "session_prev": "2021-11-18",
+      "session_next": "2021-11-19",
+      "g": -0.012781261822213952,
+      "segment": "overnight",
+      "bad_case_drop": 0.04860165883529081
+    },
+    {
+      "session_prev": "2021-11-19",
+      "session_next": "2021-11-22",
+      "g": 0.003904851319014302,
+      "segment": "weekend",
+      "bad_case_drop": 0.05327509713625772
+    },
+    {
+      "session_prev": "2021-11-22",
+      "session_next": "2021-11-23",
+      "g": 0.018365472653595116,
+      "segment": "overnight",
+      "bad_case_drop": 0.026990588457453255
+    },
+    {
+      "session_prev": "2021-11-23",
+      "session_next": "2021-11-24",
+      "g": -0.006939490824804717,
+      "segment": "overnight",
+      "bad_case_drop": 0.055473165084923566
+    },
+    {
+      "session_prev": "2021-11-24",
+      "session_next": "2021-11-26",
+      "g": -0.06352897582684824,
+      "segment": "holiday",
+      "bad_case_drop": 0.05395566084307135
+    },
+    {
+      "session_prev": "2021-11-26",
+      "session_next": "2021-11-29",
+      "g": 0.04714890393365767,
+      "segment": "weekend",
+      "bad_case_drop": 0.10369243533665713
+    },
+    {
+      "session_prev": "2021-11-29",
+      "session_next": "2021-11-30",
+      "g": -0.03089494306619245,
+      "segment": "overnight",
+      "bad_case_drop": 0.05171591090308867
+    },
+    {
+      "session_prev": "2021-11-30",
+      "session_next": "2021-12-01",
+      "g": 0.02462952011968156,
+      "segment": "overnight",
+      "bad_case_drop": 0.05322760840533696
+    },
+    {
+      "session_prev": "2021-12-01",
+      "session_next": "2021-12-02",
+      "g": -0.010841881936743847,
+      "segment": "overnight",
+      "bad_case_drop": 0.09995170875038283
+    },
+    {
+      "session_prev": "2021-12-02",
+      "session_next": "2021-12-03",
+      "g": 0.029198588127562708,
+      "segment": "overnight",
+      "bad_case_drop": 0.09884500929439721
+    }
+  ],
+  "vaults": {
+    "always_weekday": {
+      "bad_debt_usdg": 0.0,
+      "interest_usdg": 2257.1920014554794,
+      "final_assets_usdg": 2002257.192001456,
+      "events": []
+    },
+    "afterhours": {
+      "bad_debt_usdg": 0.0,
+      "interest_usdg": 1663.1941063356167,
+      "final_assets_usdg": 2001663.1941063358,
+      "events": []
+    }
+  },
+  "vault_usdg": 2000000.0
+}

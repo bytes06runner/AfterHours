@@ -75,21 +75,31 @@ def test_bad_debt_matches_closed_form_for_one_borrower() -> None:
     assert bad_debt_fraction(-0.2, WEEKDAY, 0.98, 0.98, 1) == pytest.approx(1 - 0.8 / (ltv * lif))
 
 
-def test_afterhours_avoids_the_known_crash_better_than_weekday() -> None:
-    gaps = [0.0] * 30 + [-0.25] + [0.0] * 5
-    data = periods(gaps)
-    risky = {data["session_prev"].iloc[30]}
+def _risk_before_crash(data: pd.DataFrame, crash: int, notice: int):  # type: ignore[no-untyped-def]
+    risky = set(data["session_prev"].iloc[max(0, crash - notice + 1) : crash + 1])
 
     def fc(row: object) -> float:
         return 0.30 if row.session_prev in risky else 0.02  # type: ignore[attr-defined]
 
+    return fc
+
+
+def test_one_close_of_notice_cannot_shrink_open_loans() -> None:
+    data = periods([0.0] * 30 + [-0.25] + [0.0] * 5)
     p = params()
-    wd = run_strategy("always_weekday", p, data, fc)
-    ah = run_strategy("afterhours", p, data, fc)
-    pf = run_strategy("perfect_foresight", p, data, fc)
+    wd = run_strategy("always_weekday", p, data, _risk_before_crash(data, 30, 1))
+    ah = run_strategy("afterhours", p, data, _risk_before_crash(data, 30, 1))
     assert wd.bad_debt > 0
-    assert ah.bad_debt < wd.bad_debt  # only the unborrowed part could move
-    assert ah.bad_debt > 0  # loans already made stay exposed
-    assert pf.bad_debt <= ah.bad_debt + 1e-9
+    assert ah.bad_debt == pytest.approx(wd.bad_debt)  # loans already made stay exposed
+
+
+def test_earlier_notice_lets_loans_roll_off() -> None:
+    data = periods([0.0] * 30 + [-0.25] + [0.0] * 5)
+    p = params()
+    wd = run_strategy("always_weekday", p, data, _risk_before_crash(data, 30, 1))
+    ah = run_strategy("afterhours", p, data, _risk_before_crash(data, 30, 10))
+    # Flagged 10 closes ahead, the vault pulls at the first; 9 sessions of 20% roll-off follow
+    # before the crash, leaving 0.8^9 (about 13%) of the loans.
+    assert ah.bad_debt == pytest.approx(wd.bad_debt * 0.8**9, rel=0.02)
     s = summarise(ah, p, years=36 / 365)
     assert s["share_of_time"]["weekday"] > s["share_of_time"]["weekend"]

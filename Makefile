@@ -20,7 +20,7 @@ endif
 AH := uv run --quiet afterhours
 WEB := pnpm --filter @afterhours/web
 
-.PHONY: help setup gen-schema discover verify-discovered fork deploy seed engine api web up demo report \
+.PHONY: help setup gen-schema discover verify-discovered local-chain fork deploy seed engine api web up demo report \
         test test-py test-web test-sol test-config lint lint-py lint-web lint-sol lint-hardcode
 
 help: ## List commands
@@ -50,11 +50,17 @@ verify-discovered: ## Re-check the discovered file with plain cast calls
 
 # ---------------------------------------------------------------- stack (later milestones)
 
-fork: ## Start Anvil forking the active profile's chain at the configured block
-	@echo "make fork arrives with M1 (needs a verified fork_block)." >&2; exit 2
+fork: ## Start Anvil forking the active profile's chain at the configured block (needs an archive RPC)
+	@rpc_env=$$($(AH) config get profiles.fork.rpc_env | tr -d '"'); \
+	block=$$($(AH) config get profiles.fork.fork_block); \
+	[ -n "$${!rpc_env}" ] || { echo "set $$rpc_env in .env to an archive RPC (see PROGRESS.md BLOCKED)" >&2; exit 1; }; \
+	anvil --fork-url "$${!rpc_env}" --fork-block-number "$$block" --port "$${ANVIL_PORT}"
+
+local-chain: ## Start a plain local Anvil chain for the local profile (simulation)
+	anvil --port "$${ANVIL_PORT}"
 
 deploy: ## Deploy markets, vault, registry; write deployments/<profile>.json
-	@echo "make deploy arrives with M5." >&2; exit 2
+	$(AH) deploy
 
 seed: ## Create simulated lenders and borrowers on the fork
 	@echo "make seed arrives with M7." >&2; exit 2

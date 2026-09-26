@@ -98,22 +98,18 @@ def _target(
     p: SimParams,
     stocks: Sequence[str],
     ledger: Ledger,
-    q: Mapping[str, float],
-    g: Mapping[str, float],
-) -> dict[tuple[str, str], float]:
-    """Supply per (stock, tier) the strategy wants before this close."""
+    risk: Mapping[str, float],
+) -> tuple[dict[tuple[str, str], float], bool]:
+    """Supply per (stock, tier) the strategy wants before this close, and whether it moves."""
     total = ledger.assets
+    # Static strategies use the same LP restricted to their one tier, so every strategy places
+    # money equally efficiently and differences come from risk decisions alone.
+    tiers = {
+        "always_weekday": (p.weekday,),
+        "always_weekend": (p.weekend,),
+    }.get(strategy, p.tiers)
     if strategy in ("always_weekday", "always_weekend"):
-        tier = "weekday" if strategy == "always_weekday" else "weekend"
-        per = min(p.max_share_per_stock, 1 / len(stocks)) * total
-        out = {}
-        for s in stocks:
-            limit = min(per, p.depth_multiplier * p.depth_usd.get(s, float("inf")))
-            for t in ("weekday", "weekend"):
-                b = ledger.borrowed.get((s, t), 0.0)
-                out[(s, t)] = max(b, limit if t == tier else 0.0)
-        return out
-    risk = q if strategy == "afterhours" else {s: max(0.0, -g[s]) for s in stocks}
+        risk = dict.fromkeys(stocks, 0.0)
     margin = p.safety_margin if strategy == "afterhours" else 0.0
     states = [
         StockState(
@@ -129,7 +125,7 @@ def _target(
     ]
     plan = solve(
         states,
-        p.tiers,
+        tiers,
         total=total,
         safety_margin=margin,
         turnover_penalty=p.turnover_penalty,
@@ -137,32 +133,31 @@ def _target(
         max_share_per_stock=p.max_share_per_stock,
         depth_multiplier=p.depth_multiplier,
     )
-    if plan.status != "optimal" or not plan.execute:
-        return {
-            k: max(v, ledger.borrowed.get(k, 0.0)) for k, v in ledger.supply.items()
-        } or plan.allocation
-    return plan.allocation
+    if plan.status != "optimal" or (not plan.execute and ledger.supply):
+        return {k: max(v, ledger.borrowed.get(k, 0.0)) for k, v in ledger.supply.items()}, False
+    return plan.allocation, True
 
 
 def run_strategy(
     strategy: str,
     p: SimParams,
     periods: pd.DataFrame,
-    forecast: Callable[[Any], float],
+    risk: Callable[[Any], float],
 ) -> Ledger:
-    """Simulate one strategy over `periods` (one row per ticker and closed period)."""
+    """Simulate one strategy over `periods` (one row per ticker and closed period).
+
+    `risk(row)` is the bad-case drop (positive) the strategy acts on before that close:
+    the ex-ante forecast for Afterhours, the realised drop for perfect foresight, unused for
+    the static strategies.
+    """
     ledger = Ledger(assets=p.vault_usdg)
     for session_prev, rows in periods.groupby("session_prev", sort=True):
         records: list[dict[str, Any]] = rows.to_dict("records")  # type: ignore[assignment]
         stocks: list[str] = [r["ticker"] for r in records]
         g: dict[str, float] = {r["ticker"]: float(r["g"]) for r in records}
-        q = {r["ticker"]: forecast(Row(r)) for r in records}
-        target = _target(strategy, p, stocks, ledger, q, g)
-        moved = sum(
-            abs(target.get(k, 0.0) - ledger.supply.get(k, 0.0))
-            for k in set(target) | set(ledger.supply)
-        )
-        if moved >= p.min_rebalance_usd and ledger.supply:
+        q = {r["ticker"]: risk(Row(r)) for r in records}
+        target, executed = _target(strategy, p, stocks, ledger, q)
+        if executed and ledger.supply:
             ledger.reallocations += 1
         # Stocks absent from this period keep only what is lent out.
         for k in list(ledger.supply):
@@ -207,7 +202,12 @@ def run_strategy(
         ledger.tier_usd_hours["idle"] += max(ledger.assets - placed, 0.0) * hours
         for k, v in ledger.supply.items():
             b = ledger.borrowed.get(k, 0.0)
-            ledger.borrowed[k] = min(v, (1 - p.turnover) * b + p.turnover * p.utilization * v)
+            if v <= b * (1 + 1e-9):
+                # Pulled to the borrowed floor: the market sits at 100% utilisation and the
+                # allocator sweeps freed liquidity every hour, so repaid loans are not replaced.
+                ledger.borrowed[k] = (1 - p.turnover) * b
+            else:
+                ledger.borrowed[k] = min(v, (1 - p.turnover) * b + p.turnover * p.utilization * v)
     return ledger
 
 

@@ -16,6 +16,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 from afterhours.backtest.sim import (
@@ -54,13 +55,51 @@ def depth_by_symbol(cfg: AfterhoursConfig) -> dict[str, float]:
     }
 
 
-def simulate_all(p: SimParams, periods: pd.DataFrame, fc: Callable[[Any], float]) -> dict[str, Any]:
-    """Every strategy under one parameter set."""
+def lookahead_risk(
+    periods: pd.DataFrame, drop_col: str, horizon: int, *, ex_ante: bool
+) -> dict[Any, float]:
+    """Worst drop over each ticker's next `horizon` closed periods, keyed by (ticker, session_prev).
+
+    With `ex_ante`, a future period's calibrated drop is rescaled from its own EWMA volatility
+    to the volatility known today (sigma_k / sigma_j), so only information available at the
+    decision close is used. The segment (earnings dates are scheduled) and closed hours of
+    future periods are known in advance.
+    """
+    out: dict[Any, float] = {}
+    for ticker, unsorted in periods.groupby("ticker", sort=False):
+        part = unsorted.sort_values("session_prev")
+        drops = part[drop_col].to_numpy(dtype=float)
+        sigma = part["ewma_sigma"].to_numpy(dtype=float)
+        keys = list(zip([ticker] * len(part), part["session_prev"], strict=True))
+        for k in range(len(part)):
+            window = slice(k, min(k + horizon, len(part)))
+            d = drops[window]
+            if ex_ante:
+                ratio = sigma[k] / sigma[window]
+                d = d * np.where(np.isfinite(ratio) & (ratio > 0), ratio, 1.0)
+            out[keys[k]] = float(np.nanmax(d)) if d.size else 0.0
+    return out
+
+
+def simulate_all(p: SimParams, periods: pd.DataFrame, horizon: int) -> dict[str, Any]:
+    """Every strategy under one parameter set and lookahead."""
+    ah = lookahead_risk(periods, "forecast_drop", horizon, ex_ante=True)
+    pf = lookahead_risk(periods, "realised_drop", horizon, ex_ante=False)
+
+    def risk_for(table: dict[Any, float]) -> Callable[[Any], float]:
+        return lambda row: table[(row.ticker, row.session_prev)]
+
     years = (
         pd.to_datetime(periods["session_next"].max())
         - pd.to_datetime(periods["session_prev"].min())
     ).days / 365.25
-    return {s: summarise(run_strategy(s, p, periods, fc), p, years) for s in STRATEGIES}
+    fns = {
+        "always_weekday": risk_for(ah),
+        "always_weekend": risk_for(ah),
+        "afterhours": risk_for(ah),
+        "perfect_foresight": risk_for(pf),
+    }
+    return {s: summarise(run_strategy(s, p, periods, fns[s]), p, years) for s in STRATEGIES}
 
 
 def select_scenarios(periods: pd.DataFrame, per_segment: int) -> list[dict[str, Any]]:
@@ -159,40 +198,84 @@ def run(
     ]
     periods = periods.sort_values(["session_prev", "ticker"]).reset_index(drop=True)
 
-    def fc(row: Any) -> float:
-        return max(0.0, -float(fmap[(row.ticker, row.session_prev)]))
+    periods = periods.assign(
+        forecast_drop=[
+            max(0.0, -float(fmap[(t, sp)]))
+            for t, sp in zip(periods["ticker"], periods["session_prev"], strict=True)
+        ],
+        realised_drop=np.maximum(0.0, -periods["g"].to_numpy(dtype=float)),
+    )
 
     depth = depth_by_symbol(cfg)
     tuning: list[dict[str, Any]] = []
     for wd, we in b.tier_pairs_to_tune:
         for m in b.safety_margins_to_tune:
-            p = params_from(b, cfg.policy, cfg.vault, wd, we, m, depth)
-            res = simulate_all(p, periods, fc)
-            tuning.append(
-                {"weekday_lltv": wd, "weekend_lltv": we, "safety_margin": m, "results": res}
-            )
-            log.info(
-                "tuned %s/%s m=%s afterhours=%.4f weekday=%.4f",
-                wd,
-                we,
-                m,
-                res["afterhours"]["net_lender_yield_annualised"],
-                res["always_weekday"]["net_lender_yield_annualised"],
-            )
-    best = max(tuning, key=lambda r: r["results"]["afterhours"]["net_lender_yield_annualised"])
+            for h in b.lookaheads_to_tune:
+                p = params_from(b, cfg.policy, cfg.vault, wd, we, m, depth)
+                res = simulate_all(p, periods, h)
+                tuning.append(
+                    {
+                        "weekday_lltv": wd,
+                        "weekend_lltv": we,
+                        "safety_margin": m,
+                        "lookahead": h,
+                        "results": res,
+                    }
+                )
+                log.info(
+                    "tuned %s/%s m=%s h=%s afterhours=%.4f weekday=%.4f bad=%.0f",
+                    wd,
+                    we,
+                    m,
+                    h,
+                    res["afterhours"]["net_lender_yield_annualised"],
+                    res["always_weekday"]["net_lender_yield_annualised"],
+                    res["afterhours"]["bad_debt_usdg"],
+                )
+
+    def worst_share(r: dict[str, Any]) -> float:
+        return float(r["results"]["afterhours"]["worst_event"].get("share_of_vault", 0.0))
+
+    eligible = [r for r in tuning if worst_share(r) <= b.max_worst_event_share]
+    best = (
+        max(eligible, key=lambda r: r["results"]["afterhours"]["net_lender_yield_annualised"])
+        if eligible
+        else min(tuning, key=worst_share)
+    )
     chosen: tuple[float, float, float] = (
         float(best["weekday_lltv"]),
         float(best["weekend_lltv"]),
         float(best["safety_margin"]),
     )
-    sensitivity = []
+    horizon = int(best["lookahead"])
+    sensitivity: list[dict[str, Any]] = []
     for mult in b.rate_spread_multipliers:
-        p = params_from(b, cfg.policy, cfg.vault, chosen[0], chosen[1], chosen[2], depth, mult)
+        p = params_from(b, cfg.policy, cfg.vault, *chosen, depth, mult)
         sensitivity.append(
-            {"rate_spread_multiplier": mult, "apy": p.apy, "results": simulate_all(p, periods, fc)}
+            {
+                "kind": "rate_spread",
+                "value": mult,
+                "apy": p.apy,
+                "results": simulate_all(p, periods, horizon),
+            }
+        )
+    for turnover in b.turnover_sensitivity:
+        p = params_from(b, cfg.policy, cfg.vault, *chosen, depth)
+        p = SimParams(**{**p.__dict__, "turnover": turnover})
+        sensitivity.append(
+            {
+                "kind": "loan_turnover",
+                "value": turnover,
+                "results": simulate_all(p, periods, horizon),
+            }
         )
     p = params_from(b, cfg.policy, cfg.vault, *chosen, depth)
-    main = simulate_all(p, periods, fc)
+    main = simulate_all(p, periods, horizon)
+    risk_table = lookahead_risk(periods, "forecast_drop", horizon, ex_ante=True)
+
+    def fc(row: Any) -> float:
+        return risk_table[(row.ticker, row.session_prev)]
+
     scenarios = select_scenarios(periods, b.replay.per_segment)
     out_dir = cfg.path(cfg.paths.artifacts_dir) / "backtest"
     (out_dir / "replay").mkdir(parents=True, exist_ok=True)
@@ -226,7 +309,12 @@ def run(
             "weekday_lltv": chosen[0],
             "weekend_lltv": chosen[1],
             "safety_margin": chosen[2],
-            "rule": "highest Afterhours net lender yield across the tuning grid",
+            "lookahead_closed_periods": horizon,
+            "rule": (
+                "highest Afterhours net lender yield among settings whose worst single event "
+                f"loses at most {b.max_worst_event_share:.2%} of the vault"
+            ),
+            "eligible_settings": len(eligible),
         },
         "strategies": main,
         "tuning": tuning,

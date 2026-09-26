@@ -1,0 +1,166 @@
+{
+  "id": "NVDA-2020-09-04-holiday",
+  "ticker": "NVDA",
+  "session_prev": "2020-09-04",
+  "session_next": "2020-09-08",
+  "segment": "holiday",
+  "g": -0.07035051329497788,
+  "hours_closed": 89.5,
+  "label": "historical stock prices, simulated vault",
+  "price_path": [
+    {
+      "date": "2020-08-28",
+      "open": 12.602455329358637,
+      "close": 13.07249927520752
+    },
+    {
+      "date": "2020-08-31",
+      "open": 13.107296770619834,
+      "close": 13.29794979095459
+    },
+    {
+      "date": "2020-09-01",
+      "open": 13.406856687261872,
+      "close": 13.746006965637207
+    },
+    {
+      "date": "2020-09-02",
+      "open": 14.6239656123547,
+      "close": 14.268654823303223
+    },
+    {
+      "date": "2020-09-03",
+      "open": 13.753712472441025,
+      "close": 12.944875717163086
+    },
+    {
+      "date": "2020-09-04",
+      "open": 12.714383643840854,
+      "close": 12.554009437561035
+    },
+    {
+      "date": "2020-09-08",
+      "open": 11.67082842971862,
+      "close": 11.848360061645508
+    },
+    {
+      "date": "2020-09-09",
+      "open": 12.332718082144563,
+      "close": 12.64600944519043
+    },
+    {
+      "date": "2020-09-10",
+      "open": 12.918767098090333,
+      "close": 12.244943618774414
+    },
+    {
+      "date": "2020-09-11",
+      "open": 12.417751873748696,
+      "close": 12.098493576049805
+    },
+    {
+      "date": "2020-09-14",
+      "open": 13.010022440993444,
+      "close": 12.802404403686523
+    },
+    {
+      "date": "2020-09-15",
+      "open": 13.207941722010666,
+      "close": 12.920510292053223
+    }
+  ],
+  "periods": [
+    {
+      "session_prev": "2020-08-28",
+      "session_next": "2020-08-31",
+      "g": 0.002661885434433353,
+      "segment": "weekend",
+      "bad_case_drop": 0.04382305018550068
+    },
+    {
+      "session_prev": "2020-08-31",
+      "session_next": "2020-09-01",
+      "g": 0.008189750902906967,
+      "segment": "overnight",
+      "bad_case_drop": 0.027279725395224417
+    },
+    {
+      "session_prev": "2020-09-01",
+      "session_next": "2020-09-02",
+      "g": 0.06387008597567623,
+      "segment": "overnight",
+      "bad_case_drop": 0.027904564192984045
+    },
+    {
+      "session_prev": "2020-09-02",
+      "session_next": "2020-09-03",
+      "g": -0.03608906075863616,
+      "segment": "overnight",
+      "bad_case_drop": 0.02883672552549294
+    },
+    {
+      "session_prev": "2020-09-03",
+      "session_next": "2020-09-04",
+      "g": -0.017805661356534386,
+      "segment": "overnight",
+      "bad_case_drop": 0.038228153317517825
+    },
+    {
+      "session_prev": "2020-09-04",
+      "session_next": "2020-09-08",
+      "g": -0.07035051329497788,
+      "segment": "holiday",
+      "bad_case_drop": 0.03797133756737159
+    },
+    {
+      "session_prev": "2020-09-08",
+      "session_next": "2020-09-09",
+      "g": 0.04087975196390059,
+      "segment": "overnight",
+      "bad_case_drop": 0.03945150596527969
+    },
+    {
+      "session_prev": "2020-09-09",
+      "session_next": "2020-09-10",
+      "g": 0.021568673824108098,
+      "segment": "overnight",
+      "bad_case_drop": 0.0644806391607713
+    },
+    {
+      "session_prev": "2020-09-10",
+      "session_next": "2020-09-11",
+      "g": 0.014112621532150316,
+      "segment": "overnight",
+      "bad_case_drop": 0.0638844207503318
+    },
+    {
+      "session_prev": "2020-09-11",
+      "session_next": "2020-09-14",
+      "g": 0.07534234400455464,
+      "segment": "weekend",
+      "bad_case_drop": 0.062132514524880375
+    },
+    {
+      "session_prev": "2020-09-14",
+      "session_next": "2020-09-15",
+      "g": 0.03167665272371534,
+      "segment": "overnight",
+      "bad_case_drop": 0.041912609473422194
+    }
+  ],
+  "vaults": {
+    "always_weekday": {
+      "bad_debt_usdg": 0.0,
+      "interest_usdg": 5158.840578904109,
+      "final_assets_usdg": 2005158.8405789037,
+      "events": []
+    },
+    "afterhours": {
+      "bad_debt_usdg": 0.0,
+      "interest_usdg": 3801.250952876713,
+      "final_assets_usdg": 2003801.2509528757,
+      "events": []
+    }
+  },
+  "vault_usdg": 2000000.0
+}
