@@ -24,7 +24,7 @@
 - [x] M7 Simulation harness (2026-09-26; local profile, fork run waits on BLOCKED 1)
 - [x] M8 Frontend foundation (2026-09-26)
 - [x] M9 Frontend pages (2026-09-26; local profile, fork run waits on BLOCKED 1)
-- [ ] M10 End-to-end hardening
+- [x] M10 End-to-end hardening (2026-09-27; local profile)
 - [ ] M11 Live deployments
 - [ ] M12 Submission assets
 
@@ -315,3 +315,29 @@ Evidence
 - `make e2e`: deposit and withdraw pass on the local chain. Verify on chain: matched in the browser (M9 in-progress entry).
 - `make test-integration`: 2 passed. vitest 25 passed (every committed replay artifact parses with the page schema). ruff, mypy, eslint, tsc, prettier, forge fmt, lint-hardcode clean.
 - Deposit and withdraw on the fork wait on BLOCKED 1; accepted on the local profile, labelled Simulation.
+
+### 2026-09-27 M10 End-to-end hardening: accepted
+
+Done
+- Playwright suite (`make e2e`, `scripts/e2e.sh`), desktop 1440 and mobile 390 projects, against the running stack:
+  - `demo.spec.ts`: landing, a forced close-out through the admin endpoint until money moves, the new telegram in the ledger, Verify on chain shows "Matched onchain", the vault board.
+  - `vault.spec.ts`: faucet, deposit 1,000 USDG and withdraw 400 through the UI with an in-page test wallet (fresh random address per run).
+  - `pages.spec.ts`: all six pages render live data with nothing left loading, no alerts, no console errors, no horizontal scroll.
+  - `states.spec.ts`: API unreachable on every page shows what happened and "Retrying in 10 seconds."; empty ledger names the next plan; empty replay list says so.
+  - `motion.spec.ts`: with reduced motion the story is not pinned, the ticker is static, the close preview still works, the replay offers "Jump to the gap".
+- `afterhours data fetch`: prices and earnings for the five vault stocks only; `make demo` calls it so a clean clone needs no full data build.
+
+Bugs the suite found, fixed
+- Every page crashed to the Next error screen when the API was down, if the wallet had been opened: RainbowKit's button rendered outside the wagmi providers. The button now waits for them.
+- wagmi with `ssr: false` reconnects during render and updated RainbowKit's modal mid-render (React error on the vault page); now `ssr: true`, which reconnects in an effect.
+- Error messages said "Retrying shortly" but failed queries never refetched. They now refetch every 10 seconds and say so.
+- The replay page showed "Loading" forever with no scenarios.
+- `make` read `.env.example` after the caller's environment, so ports passed by tests or a second checkout were ignored and a second demo reused the running chain. Environment now wins in both make and the scripts.
+
+Clean-clone run (documented in README "Run it")
+- `git clone` into a scratch folder, no `.env`: `make setup` exit 0 in 5 min 31 s; `DEMO_EXIT=1 ANVIL_PORT=18545 API_PORT=18000 WEB_PORT=13000 make demo` exit 0 in 1 min 12 s, closing-bell result `"derisked": true` with reasons anchored, on its own ports while another stack ran.
+
+Evidence
+- `make e2e`: 32 passed (1.4 min); vault and pages specs 39 of 39 over three repeats.
+- `make test-integration`: 2 passed. vitest 25 passed. `make lint` clean.
+- Fork and testnet runs wait on BLOCKED 1 and M11.

@@ -67,7 +67,9 @@ export default function WalletProviders({
       chains: [chain],
       connectors,
       transports: { [chain.id]: http() },
-      ssr: false,
+      // ssr: true makes wagmi reconnect in an effect; with false it reconnects during render,
+      // which updates RainbowKit's modal mid-render (a React error on the vault page).
+      ssr: true,
     });
   }, [pub]);
   const theme = useMemo(() => {
