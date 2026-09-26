@@ -16,7 +16,7 @@
 
 - [x] M0 Bootstrap (2026-09-26, `d185414`)
 - [x] M1 Discovery (2026-09-26; fork-block checks wait on BLOCKED 1)
-- [ ] M2 Data and gap study
+- [x] M2 Data and gap study (2026-09-26)
 - [ ] M3 Model
 - [ ] M4 Policy and backtest
 - [ ] M5 Contracts
@@ -101,3 +101,22 @@ Acceptance
 Files: `engine/afterhours/{chain,discovery}/`, `scripts/verify-discovered.sh`, `contracts/test/fork/`, `config/afterhours.yaml`, `deployments/fork.discovered.json`, `artifacts/discovery/`, `docs/findings/m1-discovery.md`.
 
 Next: M2 gap study (dataset is built), then M3 results and M4.
+
+### 2026-09-26 M2 Data and gap study: done
+
+What was done
+- Providers in config order with a Parquet cache and manifest (`data/cache/manifest.json`): prices from yfinance (Stooq and Alpha Vantage as fallbacks), split and dividend adjusted because Stock Tokens reinvest dividends; earnings with before-open or after-close timing.
+- Universe: current S&P 500 constituents (survivorship bias noted in the artifact) plus every Stock Token with a feed: 523 tickers.
+- Dataset: one row per ticker and closed period, target `g = open_next / close_prev - 1`, segments (earnings > holiday > weekend > overnight) and the SPEC 7.3 features plus an EWMA volatility column.
+- Lookahead test: every price after a cutoff is rewritten at random; all features on rows up to the cutoff must be identical (`engine/tests/test_dataset.py::test_no_lookahead`).
+
+Evidence
+- `uv run afterhours data build`: 2,032,976 rows, 523 tickers, 2010-01-04 to 2026-09-25; prices 524/524 from yfinance; earnings 517 from yfinance (6 ETFs have none); timing known for all but 59 of ~44,000 events. Runtime about 20 minutes, mostly earnings requests (under the 20-minute threshold, so no Kaggle).
+- `uv run afterhours gaps`: `artifacts/gaps/summary.json`, `gap_hist_{selected,universe}.png`, `gap_tail_{selected,universe}.png`.
+- Headline (universe): earnings nights open down 5% or more 8.94% of the time and 10% or more 2.05%; 1% quantile -13.1%. Weekends: 10% or more down 0.14% vs 0.03% for overnights; 1% quantile -3.5% vs -2.8%.
+- Selected tokens: worst gaps META -24.5% (earnings, 2022-10-26), META -24.3% (earnings, 2022-02-02), USO -21.9% (weekend, 2020-03-06).
+
+Acceptance
+- `artifacts/gaps/summary.json` and figures by segment for the selected tokens: pass.
+
+Next: M3 (model runs are done; write up).
