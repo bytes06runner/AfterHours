@@ -231,7 +231,7 @@ def run_strategy(
                 sum(v for (_s, tt), v in ledger.supply.items() if tt == t),
                 sum(v for (_s, tt), v in ledger.borrowed.items() if tt == t),
             )
-            for t in ("weekday", "weekend")
+            for t in ("weekday", "middle", "weekend")
         }
         hours = float(rows["hours_closed"].iloc[0])
         period_bad = 0.0
@@ -273,6 +273,8 @@ def run_strategy(
                     "session_prev": str(session_prev),
                     "weekday_supply": exposure["weekday"][0],
                     "weekday_lent": exposure["weekday"][1],
+                    "middle_supply": exposure["middle"][0],
+                    "middle_lent": exposure["middle"][1],
                     "weekend_supply": exposure["weekend"][0],
                     "weekend_lent": exposure["weekend"][1],
                     "idle": max(ledger.assets - placed, 0.0),

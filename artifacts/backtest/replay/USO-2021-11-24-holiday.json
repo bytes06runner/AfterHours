@@ -76,10 +76,10 @@
       "g": 0.006727253306995751,
       "segment": "overnight",
       "bad_case_drop": 0.049505897012027,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-11-18",
@@ -87,10 +87,10 @@
       "g": -0.012781261822213952,
       "segment": "overnight",
       "bad_case_drop": 0.04860165883529081,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-11-19",
@@ -98,21 +98,21 @@
       "g": 0.003904851319014302,
       "segment": "weekend",
       "bad_case_drop": 0.05327509713625772,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-11-22",
       "session_next": "2021-11-23",
       "g": 0.018365472653595116,
       "segment": "overnight",
-      "bad_case_drop": 0.026990588457453255,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "bad_case_drop": 0.051644451023360495,
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-11-23",
@@ -120,10 +120,10 @@
       "g": -0.006939490824804717,
       "segment": "overnight",
       "bad_case_drop": 0.055473165084923566,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-11-24",
@@ -131,10 +131,10 @@
       "g": -0.06352897582684824,
       "segment": "holiday",
       "bad_case_drop": 0.05395566084307135,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-11-26",
@@ -142,32 +142,32 @@
       "g": 0.04714890393365767,
       "segment": "weekend",
       "bad_case_drop": 0.10369243533665713,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-11-29",
       "session_next": "2021-11-30",
       "g": -0.03089494306619245,
       "segment": "overnight",
-      "bad_case_drop": 0.05171591090308867,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "bad_case_drop": 0.09924712319886345,
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-11-30",
       "session_next": "2021-12-01",
       "g": 0.02462952011968156,
       "segment": "overnight",
-      "bad_case_drop": 0.05322760840533696,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "bad_case_drop": 0.10213199576332375,
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-12-01",
@@ -175,10 +175,10 @@
       "g": -0.010841881936743847,
       "segment": "overnight",
       "bad_case_drop": 0.09995170875038283,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     },
     {
       "session_prev": "2021-12-02",
@@ -186,10 +186,10 @@
       "g": 0.029198588127562708,
       "segment": "overnight",
       "bad_case_drop": 0.09884500929439721,
-      "allowed": {
-        "weekday": false,
-        "weekend": true
-      }
+      "rating": 0.11919439586500549,
+      "mapped_tier": "weekend",
+      "pulled": false,
+      "pull_limit": 0.10375939849624058
     }
   ],
   "vaults": {
@@ -203,6 +203,8 @@
           "session_prev": "2021-11-17",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1462318.6308993152,
@@ -215,6 +217,8 @@
           "session_prev": "2021-11-18",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1462458.61179863,
@@ -227,6 +231,8 @@
           "session_prev": "2021-11-19",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1462878.5544965756,
@@ -239,6 +245,8 @@
           "session_prev": "2021-11-22",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1463018.5353958905,
@@ -251,6 +259,8 @@
           "session_prev": "2021-11-23",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1463158.5162952058,
@@ -263,6 +273,8 @@
           "session_prev": "2021-11-24",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1463438.478093836,
@@ -275,6 +287,8 @@
           "session_prev": "2021-11-26",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1463875.9184041955,
@@ -287,6 +301,8 @@
           "session_prev": "2021-11-29",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1464015.8993035108,
@@ -299,6 +315,8 @@
           "session_prev": "2021-11-30",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1464155.8802028256,
@@ -311,6 +329,8 @@
           "session_prev": "2021-12-01",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1464295.861102141,
@@ -323,6 +343,8 @@
           "session_prev": "2021-12-02",
           "weekday_supply": 537821.35,
           "weekday_lent": 457148.14749999996,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 0,
           "weekend_lent": 0,
           "idle": 1464435.8420014558,
@@ -343,6 +365,8 @@
           "session_prev": "2021-11-17",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1462281.7938205479,
@@ -355,6 +379,8 @@
           "session_prev": "2021-11-18",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1462384.9376410958,
@@ -367,6 +393,8 @@
           "session_prev": "2021-11-19",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1462694.3691027397,
@@ -379,6 +407,8 @@
           "session_prev": "2021-11-22",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1462797.5129232877,
@@ -391,6 +421,8 @@
           "session_prev": "2021-11-23",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1462900.6567438357,
@@ -403,6 +435,8 @@
           "session_prev": "2021-11-24",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1463106.9443849316,
@@ -415,6 +449,8 @@
           "session_prev": "2021-11-26",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1463429.2688241438,
@@ -427,6 +463,8 @@
           "session_prev": "2021-11-29",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1463532.4126446918,
@@ -439,6 +477,8 @@
           "session_prev": "2021-11-30",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1463635.5564652397,
@@ -451,6 +491,8 @@
           "session_prev": "2021-12-01",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1463738.7002857877,
@@ -463,6 +505,8 @@
           "session_prev": "2021-12-02",
           "weekday_supply": 0,
           "weekday_lent": 0,
+          "middle_supply": 0,
+          "middle_lent": 0,
           "weekend_supply": 537821.35,
           "weekend_lent": 457148.14749999996,
           "idle": 1463841.8441063357,
@@ -476,15 +520,19 @@
   },
   "vault_usdg": 2000000.0,
   "settings": {
-    "weekday_lltv": 0.915,
-    "weekend_lltv": 0.77,
-    "safety_margin": 0.05,
-    "lookahead_closed_periods": 3
+    "policy": "option_b",
+    "map_fraction": 0.4,
+    "pullback_fraction": 0.4,
+    "lookahead_closed_periods": 5
   },
   "tiers": {
     "weekday": {
       "lltv": 0.915,
       "cushion": 0.061056952283222235
+    },
+    "middle": {
+      "lltv": 0.86,
+      "cushion": 0.10229645093945713
     },
     "weekend": {
       "lltv": 0.77,

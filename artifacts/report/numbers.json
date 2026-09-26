@@ -322,14 +322,490 @@
       "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
     },
     "replay.afterhours.bad_debt": {
-      "value": 2227.6288735205735,
-      "text": "2,228",
+      "value": 9953.400301370233,
+      "text": "9,953",
       "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
     },
     "replay.vault_usdg": {
       "value": 2000000.0,
       "text": "2,000,000",
       "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    },
+    "verdict.rule": {
+      "value": "The dynamic strategy wins only if, on 2022 to 2026, it has less bad debt than the no-hindsight fixed map at equal or higher interest.",
+      "text": "The dynamic strategy wins only if, on 2022 to 2026, it has less bad debt than the no-hindsight fixed map at equal or higher interest.",
+      "source": "PROGRESS.md (pre-registered)"
+    },
+    "verdict.result": {
+      "value": "The dynamic strategy has less bad debt but less interest in both universes, so under the rule it does not win. Option B applies.",
+      "text": "The dynamic strategy has less bad debt but less interest in both universes, so under the rule it does not win. Option B applies.",
+      "source": "PROGRESS.md"
+    },
+    "b5.eval_first": {
+      "value": "2022-01-03",
+      "text": "2022-01-03",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.eval_last": {
+      "value": "2026-09-24",
+      "text": "2026-09-24",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.eval_closed_periods": {
+      "value": 1186,
+      "text": "1,186",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.stocks": {
+      "value": 5,
+      "text": "5",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.b.yield": {
+      "value": 0.09119861158960862,
+      "text": "9.12%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.b.bad_debt": {
+      "value": 5848.815352269908,
+      "text": "5,849",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.b.interest": {
+      "value": 1026091.245134337,
+      "text": "1,026,091",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.b.worst": {
+      "value": 0.0010748246525901029,
+      "text": "0.107%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.fixed_map.yield": {
+      "value": 0.09132367935626662,
+      "text": "9.13%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.fixed_map.bad_debt": {
+      "value": 8481.556723542715,
+      "text": "8,482",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.fixed_map.interest": {
+      "value": 1030359.2017344927,
+      "text": "1,030,359",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.fixed_map.worst": {
+      "value": 0.0019870065962678705,
+      "text": "0.199%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.dynamic.yield": {
+      "value": 0.08672948258764035,
+      "text": "8.67%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.dynamic.bad_debt": {
+      "value": 748.3393061987398,
+      "text": "748",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.dynamic.interest": {
+      "value": 963014.7235826162,
+      "text": "963,015",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.dynamic.worst": {
+      "value": 0.00019832204047164127,
+      "text": "0.020%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.blend.yield": {
+      "value": 0.09092815736129789,
+      "text": "9.09%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.blend.bad_debt": {
+      "value": 11132.420754142027,
+      "text": "11,132",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.blend.interest": {
+      "value": 1027841.1455603614,
+      "text": "1,027,841",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.blend.worst": {
+      "value": 0.0022007352858133948,
+      "text": "0.220%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.always_weekday.yield": {
+      "value": 0.0933969201027971,
+      "text": "9.34%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.always_weekday.bad_debt": {
+      "value": 12520.642454892739,
+      "text": "12,521",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.always_weekday.interest": {
+      "value": 1061606.9745077195,
+      "text": "1,061,607",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.always_weekday.worst": {
+      "value": 0.002471547243773512,
+      "text": "0.247%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.always_weekend.yield": {
+      "value": 0.06880816574629578,
+      "text": "6.88%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.always_weekend.bad_debt": {
+      "value": 594.9571150501743,
+      "text": "595",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.always_weekend.interest": {
+      "value": 739125.4657461727,
+      "text": "739,125",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.always_weekend.worst": {
+      "value": 0.00026376663926407784,
+      "text": "0.026%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.blend.weekday_share": {
+      "value": 0.9,
+      "text": "90%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.chosen.map_fraction": {
+      "value": 0.4,
+      "text": "40%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.chosen.pullback_fraction": {
+      "value": 0.4,
+      "text": "40%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.chosen.lookahead": {
+      "value": 5,
+      "text": "5",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.tuning_worst": {
+      "value": 0.005412283690470184,
+      "text": "0.541%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.fixed_map.tuning_smallest_worst": {
+      "value": 0.00542753236512591,
+      "text": "0.543%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b5.settings_tuned": {
+      "value": 144,
+      "text": "144",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.settings_meeting_cap": {
+      "value": 0,
+      "text": "0",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.b.time_weekday": {
+      "value": 0.7321662986372736,
+      "text": "73%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.b.time_middle": {
+      "value": 0.19484024522313115,
+      "text": "19%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.b.time_weekend": {
+      "value": 0.01915589648304763,
+      "text": "2%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b5.b.time_idle": {
+      "value": 0.05383755965654759,
+      "text": "5%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.eval_first": {
+      "value": "2022-01-03",
+      "text": "2022-01-03",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.eval_last": {
+      "value": "2026-09-24",
+      "text": "2026-09-24",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.eval_closed_periods": {
+      "value": 1186,
+      "text": "1,186",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.stocks": {
+      "value": 35,
+      "text": "35",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.b.yield": {
+      "value": 0.09366526087963845,
+      "text": "9.37%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.b.bad_debt": {
+      "value": 4443.964208489479,
+      "text": "4,444",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.b.interest": {
+      "value": 1057065.9995861845,
+      "text": "1,057,066",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.b.worst": {
+      "value": 0.0008342298091830236,
+      "text": "0.083%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.fixed_map.yield": {
+      "value": 0.0927888620062085,
+      "text": "9.28%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.fixed_map.bad_debt": {
+      "value": 13379.701414360998,
+      "text": "13,380",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.fixed_map.interest": {
+      "value": 1054466.102178209,
+      "text": "1,054,466",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.fixed_map.worst": {
+      "value": 0.0024394852699800946,
+      "text": "0.244%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.dynamic.yield": {
+      "value": 0.09038523980818125,
+      "text": "9.04%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.dynamic.bad_debt": {
+      "value": 1338.7484084497407,
+      "text": "1,339",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.dynamic.interest": {
+      "value": 1010963.6507009882,
+      "text": "1,010,964",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.dynamic.worst": {
+      "value": 0.00025152506693447554,
+      "text": "0.025%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.blend.yield": {
+      "value": 0.09338838181107456,
+      "text": "9.34%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.blend.bad_debt": {
+      "value": 12646.113214925163,
+      "text": "12,646",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.blend.interest": {
+      "value": 1061619.9963121833,
+      "text": "1,061,620",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.blend.worst": {
+      "value": 0.002439429014677306,
+      "text": "0.244%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.always_weekday.yield": {
+      "value": 0.09338838181107456,
+      "text": "9.34%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.always_weekday.bad_debt": {
+      "value": 12646.113214925163,
+      "text": "12,646",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.always_weekday.interest": {
+      "value": 1061619.9963121833,
+      "text": "1,061,620",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.always_weekday.worst": {
+      "value": 0.002439429014677306,
+      "text": "0.244%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.always_weekend.yield": {
+      "value": 0.06880971539993741,
+      "text": "6.88%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.always_weekend.bad_debt": {
+      "value": 580.828716698359,
+      "text": "581",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.always_weekend.interest": {
+      "value": 739130.0895600059,
+      "text": "739,130",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.always_weekend.worst": {
+      "value": 0.0002602143022675605,
+      "text": "0.026%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.blend.weekday_share": {
+      "value": 1.0,
+      "text": "100%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.chosen.map_fraction": {
+      "value": 0.3,
+      "text": "30%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.chosen.pullback_fraction": {
+      "value": 0.2,
+      "text": "20%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.chosen.lookahead": {
+      "value": 10,
+      "text": "10",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.tuning_worst": {
+      "value": 0.005372973852373935,
+      "text": "0.537%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.fixed_map.tuning_smallest_worst": {
+      "value": 0.005375489387155836,
+      "text": "0.538%",
+      "source": "artifacts/backtest/option_a.json"
+    },
+    "b35.settings_tuned": {
+      "value": 144,
+      "text": "144",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.settings_meeting_cap": {
+      "value": 0,
+      "text": "0",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.b.time_weekday": {
+      "value": 0.8931600475379199,
+      "text": "89%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.b.time_middle": {
+      "value": 0.05632586275269263,
+      "text": "6%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.b.time_weekend": {
+      "value": 0.0,
+      "text": "0%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "b35.b.time_idle": {
+      "value": 0.05051408970938748,
+      "text": "5%",
+      "source": "artifacts/backtest/option_b.json"
+    },
+    "option_a.tuning_years": {
+      "value": [
+        2017,
+        2021
+      ],
+      "text": "2017 to 2021",
+      "source": "config"
+    },
+    "option_a.evaluation_years": {
+      "value": [
+        2022,
+        2026
+      ],
+      "text": "2022 to 2026",
+      "source": "config"
+    },
+    "tiers.middle.lltv": {
+      "value": 0.86,
+      "text": "86.0%",
+      "source": "config (enabled onchain, M1)"
+    },
+    "tiers.middle.cushion": {
+      "value": 0.10229645093945713,
+      "text": "10.2%",
+      "source": "config (enabled onchain, M1)"
+    },
+    "policy.map_limit.weekday": {
+      "value": 0.03663417136993334,
+      "text": "3.7%",
+      "source": "config policy (option B)"
+    },
+    "assumed_apy.weekday": {
+      "value": 0.095,
+      "text": "9.5%",
+      "source": "config backtest.supply_apy_by_lltv"
+    },
+    "policy.map_limit.middle": {
+      "value": 0.061377870563674275,
+      "text": "6.1%",
+      "source": "config policy (option B)"
+    },
+    "assumed_apy.middle": {
+      "value": 0.085,
+      "text": "8.5%",
+      "source": "config backtest.supply_apy_by_lltv"
+    },
+    "policy.map_limit.weekend": {
+      "value": 0.10375939849624058,
+      "text": "10.4%",
+      "source": "config policy (option B)"
+    },
+    "assumed_apy.weekend": {
+      "value": 0.07,
+      "text": "7.0%",
+      "source": "config backtest.supply_apy_by_lltv"
+    },
+    "policy.pull_limit": {
+      "value": 0.10375939849624058,
+      "text": "10.4%",
+      "source": "config policy (option B)"
+    },
+    "policy.lookahead": {
+      "value": 5,
+      "text": "5",
+      "source": "config policy"
     },
     "market.block": {
       "value": 73382409,

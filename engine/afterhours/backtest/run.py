@@ -31,7 +31,6 @@ from afterhours.config import AfterhoursConfig
 from afterhours.deployments import load_discovered
 from afterhours.features.dataset import SEGMENTS
 from afterhours.features.gaps import code_version
-from afterhours.policy.lp import allowed_tier
 
 log = logging.getLogger(__name__)
 LABEL = "historical stock prices, simulated vault"
@@ -132,8 +131,13 @@ def replay_series(
     p: SimParams,
     fc: Callable[[Any], float],
     window: int,
+    forecast: Callable[[Any], float] | None = None,
+    describe: Callable[[Any], dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Price path and both vaults (ordinary = always weekday, Afterhours) around one event."""
+    """Price path and both vaults (ordinary = always weekday, Afterhours) around one event.
+
+    `fc` is what the strategy acts on; `forecast` (default `fc`) is the bad case shown for each
+    night and `describe` adds the policy's view of each night."""
     tick = (
         periods[periods["ticker"] == scenario["ticker"]]
         .sort_values("session_prev")
@@ -167,7 +171,8 @@ def replay_series(
             "session_next": str(r.session_next),
             "g": float(r.g),
             "segment": r.segment,
-            "bad_case_drop": fc(r),
+            "bad_case_drop": (forecast or fc)(r),
+            **(describe(r) if describe else {}),
         }
         for r in (Row(rec) for rec in local.to_dict("records"))
     ]
@@ -338,11 +343,14 @@ def write_replays(
     prices: dict[str, pd.DataFrame],
     selected: list[str],
 ) -> list[str]:
-    """Regenerate scenarios and replays with the settings already chosen in results.json."""
+    """Regenerate scenarios and replays for the shipped policy (option B, config `policy`)."""
+    from afterhours.backtest.option_a import fixed_map_ratings, params
+    from afterhours.backtest.option_b import b_risk
+    from afterhours.policy.option_b import decide
+
     b = cfg.backtest
+    pol = cfg.policy
     out_dir = cfg.path(cfg.paths.artifacts_dir) / "backtest"
-    results = json.loads((out_dir / "results.json").read_text())
-    chosen = results["chosen"]
     _, fseries = forecasts(card, heldout, cfg.model.target_alpha)
     fmap = fseries.to_dict()
     periods = data[data["ticker"].isin(selected)]
@@ -357,38 +365,53 @@ def write_replays(
         ],
         realised_drop=np.maximum(0.0, -periods["g"].to_numpy(dtype=float)),
     )
-    p = params_from(
-        b,
-        cfg.policy,
-        cfg.vault,
-        float(chosen["weekday_lltv"]),
-        float(chosen["weekend_lltv"]),
-        float(chosen["safety_margin"]),
-        depth_by_symbol(cfg),
-    )
-    table = lookahead_risk(
-        periods, "forecast_drop", int(chosen["lookahead_closed_periods"]), ex_ante=True
-    )
+    p = params(cfg, b.option_b.tier_set, pol.map_fraction)
+    table = lookahead_risk(periods, "forecast_drop", pol.lookahead_closed_periods, ex_ante=True)
+    ratings = fixed_map_ratings(cfg, data, selected)
+    fc = b_risk(p, ratings, table, pol.map_fraction, pol.pullback_fraction)
 
-    def fc(row: Any) -> float:
+    def forecast(row: Any) -> float:
         return table[(row.ticker, row.session_prev)]
+
+    def describe(row: Any) -> dict[str, Any]:
+        year = int(str(row.session_prev)[:4])
+        d = decide(
+            row.ticker,
+            ratings.get((row.ticker, year)),
+            year,
+            forecast(row),
+            p.tiers,
+            pol.map_fraction,
+            pol.pullback_fraction,
+        )
+        return {
+            "rating": d.rating,
+            "mapped_tier": d.mapped_tier,
+            "pulled": d.pulled,
+            "pull_limit": d.pull_limit,
+        }
 
     scenarios = select_scenarios(periods, b.replay.per_segment)
     (out_dir / "replay").mkdir(parents=True, exist_ok=True)
     written = []
     for sc in scenarios:
-        doc = replay_series(sc, periods, prices[sc["ticker"]], p, fc, b.replay.window_sessions)
+        doc = replay_series(
+            sc,
+            periods,
+            prices[sc["ticker"]],
+            p,
+            fc,
+            b.replay.window_sessions,
+            forecast=forecast,
+            describe=describe,
+        )
         doc["settings"] = {
-            k: chosen[k]
-            for k in ("weekday_lltv", "weekend_lltv", "safety_margin", "lookahead_closed_periods")
+            "policy": "option_b",
+            "map_fraction": pol.map_fraction,
+            "pullback_fraction": pol.pullback_fraction,
+            "lookahead_closed_periods": pol.lookahead_closed_periods,
         }
-        tiers = {"weekday": p.weekday, "weekend": p.weekend}
-        doc["tiers"] = {n: {"lltv": t.lltv, "cushion": t.cushion} for n, t in tiers.items()}
-        for step in doc["periods"]:
-            step["allowed"] = {
-                n: allowed_tier(step["bad_case_drop"], p.safety_margin, t)[0]
-                for n, t in tiers.items()
-            }
+        doc["tiers"] = {t.name: {"lltv": t.lltv, "cushion": t.cushion} for t in p.tiers}
         path = out_dir / "replay" / f"{sc['id']}.json"
         path.write_text(json.dumps(doc, indent=2, default=str) + "\n")
         written.append(str(path))

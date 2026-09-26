@@ -48,3 +48,12 @@ def test_oracle_summary_counts_window_updates() -> None:
     assert o["feeds_without_update"] == 1
     assert o["feeds_with_update"] == ["B"]
     assert o["max_seconds_after_window_opened"] == 90
+
+
+def test_verdict_is_quoted_verbatim_from_progress() -> None:
+    from afterhours.config import REPO_ROOT
+    from afterhours.numbers import VERDICT_RESULT, VERDICT_RULE
+
+    text = " ".join((REPO_ROOT / "PROGRESS.md").read_text().split())
+    assert VERDICT_RULE in text
+    assert VERDICT_RESULT in text

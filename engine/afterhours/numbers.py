@@ -15,6 +15,16 @@ from zoneinfo import ZoneInfo
 from afterhours.config import AfterhoursConfig
 from afterhours.policy.lp import TierSpec, tier_spec
 
+# The pre-registered verdict, verbatim from PROGRESS.md (tests/test_numbers.py checks it is there).
+VERDICT_RULE = (
+    "The dynamic strategy wins only if, on 2022 to 2026, it has less bad debt than the "
+    "no-hindsight fixed map at equal or higher interest."
+)
+VERDICT_RESULT = (
+    "The dynamic strategy has less bad debt but less interest in both universes, so under the "
+    "rule it does not win. Option B applies."
+)
+
 
 def pct(x: float, digits: int = 1) -> str:
     return f"{x * 100:.{digits}f}%"
@@ -177,6 +187,103 @@ def build(cfg: AfterhoursConfig) -> dict[str, Any]:
         v = replay["vaults"][k]["bad_debt_usdg"]
         n[f"replay.{k}.bad_debt"] = _entry(v, usd(v), src)
     n["replay.vault_usdg"] = _entry(replay["vault_usdg"], usd(replay["vault_usdg"]), src)
+    a_path = art / "backtest" / "option_a.json"
+    b_path = art / "backtest" / "option_b.json"
+    if a_path.exists() and b_path.exists():
+        a_doc = json.loads(a_path.read_text())
+        b_doc = json.loads(b_path.read_text())
+        n["verdict.rule"] = _entry(VERDICT_RULE, VERDICT_RULE, "PROGRESS.md (pre-registered)")
+        n["verdict.result"] = _entry(VERDICT_RESULT, VERDICT_RESULT, "PROGRESS.md")
+        src_a, src_b = "artifacts/backtest/option_a.json", "artifacts/backtest/option_b.json"
+        for u, pre in (("vault", "b5"), ("stock_tokens", "b35")):
+            bu, au = b_doc["universes"][u], a_doc["universes"][u]
+            ev = au["periods"]["evaluation"]
+            n[f"{pre}.eval_first"] = _entry(ev["first"], ev["first"], src_a)
+            n[f"{pre}.eval_last"] = _entry(ev["last"], ev["last"], src_a)
+            n[f"{pre}.eval_closed_periods"] = _entry(
+                ev["closed_periods"], count(ev["closed_periods"]), src_a
+            )
+            n[f"{pre}.stocks"] = _entry(len(au["tickers"]), str(len(au["tickers"])), src_a)
+            rows = {
+                "b": (bu["evaluation"], src_b),
+                "fixed_map": (au["evaluation"]["fixed_map"], src_a),
+                "dynamic": (au["evaluation"]["afterhours"], src_a),
+                "blend": (bu["compare_on_evaluation"]["nearest_blend"], src_a),
+                "always_weekday": (bu["compare_on_evaluation"]["always_weekday"], src_a),
+                "always_weekend": (bu["compare_on_evaluation"]["always_weekend"], src_a),
+            }
+            for k, (r, src_r) in rows.items():
+                w = (r.get("worst_event") or {}).get("share_of_vault", 0.0)
+                n[f"{pre}.{k}.yield"] = _entry(
+                    r["net_lender_yield_annualised"],
+                    pct(r["net_lender_yield_annualised"], 2),
+                    src_r,
+                )
+                n[f"{pre}.{k}.bad_debt"] = _entry(
+                    r["bad_debt_usdg"], usd(r["bad_debt_usdg"]), src_r
+                )
+                n[f"{pre}.{k}.interest"] = _entry(
+                    r["interest_usdg"], usd(r["interest_usdg"]), src_r
+                )
+                n[f"{pre}.{k}.worst"] = _entry(w, pct(w, 3), src_r)
+            blend_w = bu["compare_on_evaluation"]["nearest_blend"]["w"]
+            n[f"{pre}.blend.weekday_share"] = _entry(blend_w, pct(blend_w, 0), src_a)
+            c = bu["chosen"]
+            n[f"{pre}.chosen.map_fraction"] = _entry(
+                c["map_fraction"], pct(c["map_fraction"], 0), src_b
+            )
+            n[f"{pre}.chosen.pullback_fraction"] = _entry(
+                c["pullback_fraction"], pct(c["pullback_fraction"], 0), src_b
+            )
+            n[f"{pre}.chosen.lookahead"] = _entry(c["lookahead"], str(c["lookahead"]), src_b)
+            n[f"{pre}.tuning_worst"] = _entry(
+                (bu["tuning_result"].get("worst_event") or {}).get("share_of_vault", 0.0),
+                pct((bu["tuning_result"].get("worst_event") or {}).get("share_of_vault", 0.0), 3),
+                src_b,
+            )
+            fm_tune = [x for x in au["grid"]["tuning"] if x["kind"] == "fixed_map"]
+            smallest = min(x["worst_event_share"] for x in fm_tune)
+            n[f"{pre}.fixed_map.tuning_smallest_worst"] = _entry(smallest, pct(smallest, 3), src_a)
+            n[f"{pre}.settings_tuned"] = _entry(bu["settings"], str(bu["settings"]), src_b)
+            n[f"{pre}.settings_meeting_cap"] = _entry(
+                bu["settings_meeting_cap_on_tuning"],
+                str(bu["settings_meeting_cap_on_tuning"]),
+                src_b,
+            )
+            t = bu["evaluation"]["share_of_time"]
+            for tier in ("weekday", "middle", "weekend", "idle"):
+                n[f"{pre}.b.time_{tier}"] = _entry(
+                    t.get(tier, 0.0), pct(t.get(tier, 0.0), 0), src_b
+                )
+        oa = cfg.backtest.option_a
+        n["option_a.tuning_years"] = _entry(
+            list(oa.tuning_years), f"{oa.tuning_years[0]} to {oa.tuning_years[1]}", "config"
+        )
+        n["option_a.evaluation_years"] = _entry(
+            list(oa.evaluation_years),
+            f"{oa.evaluation_years[0]} to {oa.evaluation_years[1]}",
+            "config",
+        )
+        mid = tier_spec("middle", oa.tiers["middle"])
+        n["tiers.middle.lltv"] = _entry(mid.lltv, pct(mid.lltv), "config (enabled onchain, M1)")
+        n["tiers.middle.cushion"] = _entry(
+            mid.cushion, pct(mid.cushion), "config (enabled onchain, M1)"
+        )
+        pol = cfg.policy
+        for name, lltv in cfg.morpho.lltv_tiers.ordered():
+            spec = tier_spec(name, lltv)
+            lim = spec.cushion * (1 - pol.map_fraction)
+            n[f"policy.map_limit.{name}"] = _entry(lim, pct(lim), "config policy (option B)")
+            apy = cfg.backtest.apy(lltv)
+            n[f"assumed_apy.{name}"] = _entry(apy, pct(apy), "config backtest.supply_apy_by_lltv")
+        pull = max(tier_spec(nm, v).cushion for nm, v in cfg.morpho.lltv_tiers.ordered()) * (
+            1 - pol.pullback_fraction
+        )
+        n["policy.pull_limit"] = _entry(pull, pct(pull), "config policy (option B)")
+        n["policy.lookahead"] = _entry(
+            pol.lookahead_closed_periods, str(pol.lookahead_closed_periods), "config policy"
+        )
+
     size_path = art / "discovery" / "market_size.json"
     if size_path.exists():
         src = "artifacts/discovery/market_size.json"

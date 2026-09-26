@@ -386,7 +386,47 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
         bt = ctx.artifact("backtest", "results.json")
         gaps = ctx.artifact("gaps", "summary.json")
         study = ctx.artifact("discovery", "oracle_study.json")
+        a_doc = ctx.artifact("backtest", "option_a.json")
+        b_doc = ctx.artifact("backtest", "option_b.json")
+        numbers = ctx.artifact("report", "numbers.json")["numbers"]
+
+        def point(r: dict[str, Any]) -> dict[str, float]:
+            return {
+                "yield": r["net_lender_yield_annualised"],
+                "worst": float((r.get("worst_event") or {}).get("share_of_vault", 0.0)),
+                "bad_debt": r["bad_debt_usdg"],
+                "interest": r["interest_usdg"],
+            }
+
+        def universe(u: str) -> dict[str, Any]:
+            au, bu = a_doc["universes"][u], b_doc["universes"][u]
+            return {
+                "stocks": len(au["tickers"]),
+                "evaluation": au["periods"]["evaluation"],
+                "b": point(bu["evaluation"]) | {"share_of_time": bu["evaluation"]["share_of_time"]},
+                "b_chosen": bu["chosen"],
+                "b_met_cap_on_tuning": bu["met_cap_on_tuning"],
+                "fixed_map": point(au["evaluation"]["fixed_map"]),
+                "dynamic": point(au["evaluation"]["afterhours"]),
+                "nearest_blend": point(bu["compare_on_evaluation"]["nearest_blend"])
+                | {"w": bu["compare_on_evaluation"]["nearest_blend"]["w"]},
+                "blends": [point(x) | {"w": x["w"]} for x in au["blends"]["evaluation"]],
+            }
+
         return {
+            "decision": {
+                "rule": numbers["verdict.rule"]["text"],
+                "result": numbers["verdict.result"]["text"],
+                "tuning_years": numbers["option_a.tuning_years"]["text"],
+                "evaluation_years": numbers["option_a.evaluation_years"]["text"],
+                "cap": cfg.backtest.max_worst_event_share,
+                "label": b_doc["label"],
+                "second_evaluation_note": b_doc["note"],
+                "universes": {u: universe(u) for u in ("vault", "stock_tokens")},
+                "assumed_apy": {
+                    name: cfg.backtest.apy(lltv) for name, lltv in cfg.morpho.lltv_tiers.ordered()
+                },
+            },
             "oracle": {k: v for k, v in oracle_summary(study).items() if k != "updates"},
             "model": {
                 k: card[k]
