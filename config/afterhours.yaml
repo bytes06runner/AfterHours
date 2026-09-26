@@ -239,6 +239,15 @@ backtest:
     # its worst `quantile` closed-period gap over the previous `window_days`; at least weekend.
     fixed_map: { window_days: 365, quantile: 0.01, min_observations: 60 }
     universes: [vault, stock_tokens]
+  # Option B (2026-09-27, pre-registered in PROGRESS.md): the fixed map over all three tiers,
+  # re-rated each January from trailing data only, plus a pullback: on a night when the
+  # forecast bad case exceeds every tier's cushion x (1 - pullback fraction), unborrowed money
+  # goes idle. No per-night moves between tiers.
+  option_b:
+    tier_set: [weekday, middle, weekend]
+    map_fractions: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+    pullback_fractions: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+    lookaheads: [1, 3, 5, 10]
 
 # Simulation harness (M7): lenders and borrowers seeded on fork and local chains. All simulated
 # activity is labelled Simulation in the UI.

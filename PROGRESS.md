@@ -512,3 +512,29 @@ Facts for the record, not grounds to change the rule:
   weekday tier far more often: 70% of money-time in the weekday tier on evaluation (vault stocks).
 - Checked for artefacts: in the 35-stock universe 11 to 13 stocks each hold over 1% of the money;
   SPY and SGOV hold about 55% in every strategy because measured depth caps the others.
+
+### 2026-09-27 Option B: definition and pre-registered grid (before any B run)
+
+This is the second evaluation on the 2022 to 2026 held-out window (the first was option A,
+commit e7a4e62). B was defined after seeing A's held-out results.
+
+Definition (confirmed by the team):
+- Tier placement: the no-hindsight fixed map over all three enabled tiers (91.5%, 86%, 77%
+  LLTV). Each January each stock gets the highest tier whose cushion x (1 - map fraction)
+  covers its worst 1% closed-period gap over the previous 365 days (at least 60 observations,
+  else the weekend tier); never below the weekend tier.
+- Pullback: on a night when the forecast bad case (the worst of the next `lookahead` closed
+  periods) exceeds every tier's cushion x (1 - pullback fraction), that stock's unborrowed money
+  goes idle. Otherwise the stock stays in its mapped tier. No per-night moves between tiers.
+- Same LP, caps, idle reserve and simulator as option A.
+
+Grid (config `backtest.option_b`): map fraction {0, 0.1, 0.2, 0.3, 0.4, 0.5} x pullback fraction
+{0, 0.1, 0.2, 0.3, 0.4, 0.5} x lookahead {1, 3, 5, 10}; both universes (5 vault stocks, 35 Stock
+Tokens).
+
+Selection on 2017 to 2021 (the M4 rule): highest net lender yield among settings whose worst
+single event loses at most 0.10% of the vault; if none qualifies, the smallest worst event.
+Evaluate the chosen setting once on 2022 to 2026 with a fresh vault.
+
+Correction on option A: A's pre-registration said "highest interest", not the M4 rule's
+"highest net lender yield". Whether that changed A's choice is checked below after B runs.

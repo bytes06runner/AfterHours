@@ -216,6 +216,13 @@ class OptionAConfig(_Strict):
     universes: list[Literal["vault", "stock_tokens"]]
 
 
+class OptionBConfig(_Strict):
+    tier_set: list[Literal["weekday", "middle", "weekend"]]
+    map_fractions: list[Fraction]
+    pullback_fractions: list[Fraction]
+    lookaheads: list[PositiveInt]
+
+
 class BacktestConfig(_Strict):
     vault_usdg: Annotated[float, Field(gt=0)]
     supply_apy_by_lltv: dict[str, Annotated[float, Field(ge=0, lt=1)]]
@@ -233,6 +240,7 @@ class BacktestConfig(_Strict):
     turnover_sensitivity: list[Fraction]
     replay: ReplayConfig
     option_a: OptionAConfig
+    option_b: OptionBConfig
 
     def apy(self, lltv: float) -> float:
         """Assumed supply APY for a tier LLTV."""

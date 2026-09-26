@@ -155,6 +155,9 @@
         "option_a": {
           "$ref": "#/$defs/OptionAConfig"
         },
+        "option_b": {
+          "$ref": "#/$defs/OptionBConfig"
+        },
         "rate_spread_multipliers": {
           "items": {
             "minimum": 0,
@@ -247,7 +250,8 @@
         "rate_spread_multipliers",
         "turnover_sensitivity",
         "replay",
-        "option_a"
+        "option_a",
+        "option_b"
       ],
       "title": "BacktestConfig",
       "type": "object"
@@ -1148,6 +1152,57 @@
         "universes"
       ],
       "title": "OptionAConfig",
+      "type": "object"
+    },
+    "OptionBConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "lookaheads": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "title": "Lookaheads",
+          "type": "array"
+        },
+        "map_fractions": {
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Map Fractions",
+          "type": "array"
+        },
+        "pullback_fractions": {
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Pullback Fractions",
+          "type": "array"
+        },
+        "tier_set": {
+          "items": {
+            "enum": [
+              "weekday",
+              "middle",
+              "weekend"
+            ],
+            "type": "string"
+          },
+          "title": "Tier Set",
+          "type": "array"
+        }
+      },
+      "required": [
+        "tier_set",
+        "map_fractions",
+        "pullback_fractions",
+        "lookaheads"
+      ],
+      "title": "OptionBConfig",
       "type": "object"
     },
     "OracleStudyConfig": {
