@@ -25,8 +25,10 @@ endif
 AH := uv run --quiet afterhours
 WEB := pnpm --filter @afterhours/web
 
-.PHONY: help setup gen-schema discover verify-discovered local-chain screens lighthouse e2e fork deploy seed engine api web up demo report \
-        test test-py test-web test-sol test-config test-integration lint lint-py lint-web lint-sol lint-hardcode
+NAME ?= closing_bell
+
+.PHONY: help setup scenario gen-schema discover verify-discovered local-chain screens lighthouse e2e fork deploy seed engine api web up demo report \
+        test test-py test-web test-sol test-config test-integration lint lint-py lint-web lint-sol lint-hardcode lint-numbers
 
 help: ## List commands
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -66,6 +68,9 @@ local-chain: ## Start a plain local Anvil chain for the local profile (simulatio
 
 deploy: ## Deploy markets, vault, registry; write deployments/<profile>.json
 	$(AH) deploy
+
+scenario: ## Run a scripted scenario on the running local stack: NAME=closing_bell | earnings_shock | oracle_drift
+	$(AH) sim scenario $(NAME)
 
 seed: ## Create simulated lenders and borrowers (Anvil, or testnets with simulated tokens)
 	$(AH) sim seed
@@ -111,7 +116,7 @@ test-config:
 test-integration: ## Deploy, seed and run the API on a throwaway Anvil chain (M6 acceptance)
 	uv run pytest -m integration engine/tests/integration -q
 
-lint: lint-py lint-web lint-sol lint-hardcode ## All linters
+lint: lint-py lint-web lint-sol lint-hardcode lint-numbers ## All linters
 
 lint-py:
 	uv run ruff check .
@@ -133,6 +138,9 @@ lighthouse: ## Lighthouse on the production build for every page (needs make up 
 
 screens: ## Screenshot QA of pages at 1440/1024/390 in the current phase (needs make up running)
 	./scripts/screens.sh
+
+lint-numbers: ## README and video scripts quote only numbers from artifacts/report/numbers.json
+	python3 scripts/check-numbers.py
 
 lint-hardcode: ## Fail on addresses or URLs outside config/ and deployments/
 	./scripts/lint-hardcode.sh

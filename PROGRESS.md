@@ -46,8 +46,8 @@
 - [x] M8 Frontend foundation (2026-09-26)
 - [x] M9 Frontend pages (2026-09-26; local profile, fork run waits on BLOCKED 1)
 - [x] M10 End-to-end hardening (2026-09-27; local profile)
-- [ ] M11 Live deployments
-- [ ] M12 Submission assets
+- [ ] M11 Live deployments (rehearsed on forks of both testnets; BLOCKED 2)
+- [x] M12 Submission assets (2026-09-27; items marked TEAM and the testnet links remain)
 
 ## Log
 
@@ -376,3 +376,34 @@ Evidence (2026-09-27)
 
 Open: real testnet deploys and hosting (BLOCKED 2).
 
+### 2026-09-27 M12 Submission assets
+
+Done
+- Submission requirements read from Colosseum's own FAQ and hackathon page, recorded with sources in `docs/findings/m12-submission.md`.
+- `afterhours numbers` writes `artifacts/report/numbers.json`: 64 numbers with their text and source artifact. `make lint-numbers` (part of `make lint`) fails if the README or a video script quotes a percentage or thousands-separated number that is not in it.
+- README rewritten: problem with measured numbers, how it works, results, architecture diagram, run guide, deployments, limitations, prior work.
+- Video scripts with shot lists: `docs/video/demo.md` (2:45, under the 3:00 limit) and `docs/video/pitch.md` (2:30, inside 2:00 to 3:00). `make scenario NAME=closing_bell` rings the bell on camera.
+- Brand: code-drawn mark (`web/src/app/icon.svg`, now the favicon), `artifacts/brand/logo-512.png` and `wordmark-1200x630.png` (`web/scripts/brand.ts`).
+- Builder update drafts for every milestone in `updates/` (11 files).
+
+Fixed along the way
+- The landing page said every Stock Token feed stopped moving over the weekends. The oracle study says 32 of 35 feeds posted nothing between Friday 20:00 and Sunday 20:00 New York; AMD, SGOV and SNDK posted 5 updates in all, each within 105 seconds of Friday 20:00. The sentence is now generated from the study (served in `/v1/report-card`).
+
+Submission checklist (every field from Colosseum's FAQ, `docs/findings/m12-submission.md`)
+- [x] 1. Product name and brief description: "Afterhours: a lending vault for Robinhood Stock Tokens that lends at full speed while the stock market is open and calm, moves lender money to safer Morpho markets before the market closes into risk, and writes the reason for every move onchain." (README first paragraph.)
+- [x] 2. Blockchains and tools: Robinhood Chain (primary) and Arbitrum; Morpho Blue and Morpho Vault V2; Chainlink price feeds; USDG; Robinhood Stock Tokens; Uniswap v3 and v4 quoters for sell depth; Foundry, Python (FastAPI, LightGBM, SciPy HiGHS), Next.js, wagmi and RainbowKit, Playwright.
+- [ ] 3. Teammates, backgrounds and previous experience. TEAM: each teammate needs a Colosseum account; the team leader adds them in the submission.
+- [ ] 4. Where the team is located. TEAM.
+- [x] 5. Logo or graphic: `artifacts/brand/logo-512.png`, `artifacts/brand/wordmark-1200x630.png`.
+- [ ] 6. GitHub repository link. TEAM: the repository has no remote yet. Create a GitHub repository (public encouraged; a private one needs access for Colosseum's reviewers) and push, or ask me to once it exists.
+- [ ] 7. Presentation video, 2 to 3 minutes. Script and shot list ready (`docs/video/pitch.md`); TEAM fills in the market, quotes, team and ask lines, then records.
+- [ ] 8. Demo video, 3 minutes or less. Script and shot list ready (`docs/video/demo.md`); TEAM records it with `make up`.
+- [ ] 9. Go-to-market, demand validation, distribution. TEAM: KICKOFF.md asks for 3 calls with DeFi lenders or vault curators; their quotes and any numbers on demand go in the pitch and the form. We have no traction to claim.
+- [x] Prior work disclosure: README "Prior work" (repository started 2026-09-26, after the hackathon opened on 2026-09-14; open-source protocols composed, not written).
+- [ ] Testnet deployment addresses and links in README: BLOCKED 2.
+- [ ] Builder updates: drafts in `updates/`. Colosseum's FAQ describes weekly updates as one-minute videos; TEAM can read the drafts as scripts (edit them in your own voice first).
+- [ ] Pre-submission audit on 2026-10-10 (KICKOFF.md): clean-clone `make demo`, every number checked against `artifacts/`, every simulated element labelled, testnet links checked, honest limitations in the README.
+- [ ] Submit by 2026-10-11 (target; hard deadline 2026-10-12 23:59 PDT). TEAM, as team leader in the Colosseum portal.
+
+Evidence
+- `make lint`: clean, including lint-numbers and lint-hardcode. `make test`: Python 49 passed, vitest 25, forge 22 passed (2 fork tests skipped without a fork URL). `make e2e`: 32 passed.

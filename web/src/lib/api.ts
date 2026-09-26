@@ -266,6 +266,16 @@ const Hist = z.object({
 });
 
 export const ReportCardSchema = z.object({
+  oracle: z.object({
+    weekends: z.number(),
+    feeds: z.number(),
+    feeds_without_update: z.number(),
+    feeds_with_update: z.array(z.string()),
+    updates_in_window: z.number(),
+    max_seconds_after_window_opened: z.number().nullable(),
+    first_weekend_close: z.string().nullable(),
+    last_weekend_close: z.string().nullable(),
+  }),
   model: z.object({
     first_sentence: z.string(),
     label: z.string(),

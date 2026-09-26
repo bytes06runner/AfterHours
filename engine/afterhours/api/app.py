@@ -27,6 +27,7 @@ from afterhours.data.pipeline import make_cache
 from afterhours.deployments import load_deployment
 from afterhours.explain.reason import canonical
 from afterhours.explain.verify import verify_card
+from afterhours.numbers import oracle_summary
 from afterhours.policy.lp import allowed_tier, tier_spec
 from afterhours.public_config import public_config
 from afterhours.risk.live import LiveRisk, session_state, upcoming_periods
@@ -358,7 +359,9 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
         card = ctx.artifact("model", "report_card.json")
         bt = ctx.artifact("backtest", "results.json")
         gaps = ctx.artifact("gaps", "summary.json")
+        study = ctx.artifact("discovery", "oracle_study.json")
         return {
+            "oracle": {k: v for k, v in oracle_summary(study).items() if k != "updates"},
             "model": {
                 k: card[k]
                 for k in (

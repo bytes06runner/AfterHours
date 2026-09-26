@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Afterhours</title>
+  <rect width="64" height="64" rx="12" fill="#0E1430"/>
+  <path d="M46 10a7 7 0 1 0 7.6 9.4A5.6 5.6 0 0 1 46 10z" fill="#E7E3D8"/>
+  <rect x="31" y="12" width="2" height="5" fill="#F1C76B"/>
+  <path d="M32 16c-7 0-8.5 7-8.5 14.5L20 38h24l-3.5-7.5C40.5 23 39 16 32 16z" fill="#F1C76B"/>
+  <circle cx="32" cy="41.5" r="3" fill="#F1C76B"/>
+  <path d="M16 48h32M12 52h40" stroke="#F1C76B" stroke-width="2"/>
+</svg>

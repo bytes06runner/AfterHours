@@ -50,7 +50,8 @@ function GapVisual({ rc, vault }: { rc: ReportCard; vault: Vault }) {
       <figcaption className="mt-2 text-[14px]">
         Earnings-night gaps, {rc.gaps.period.first_close.slice(0, 4)} to{" "}
         {rc.gaps.period.last_open.slice(0, 4)}, {earn.n.toLocaleString("en-US")} nights. Red: drops
-        past the weekday tier&apos;s cushion. Ends include everything beyond 20%.
+        past the weekday tier&apos;s cushion. Ends include everything beyond{" "}
+        {formatPct(h.edges[h.edges.length - 1], 0)}.
       </figcaption>
     </figure>
   );

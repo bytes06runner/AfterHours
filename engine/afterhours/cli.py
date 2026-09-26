@@ -269,6 +269,14 @@ def sim_seed() -> None:
     )
 
 
+@app.command("numbers")
+def numbers_cmd() -> None:
+    """M12: write artifacts/report/numbers.json, the numbers the README and pitch quote."""
+    from afterhours.numbers import write
+
+    typer.echo(f"wrote {write(load_config())}")
+
+
 @app.command("api")
 def api_cmd() -> None:
     """Start the FastAPI service (host and port from the env vars named in config)."""

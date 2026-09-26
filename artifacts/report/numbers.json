@@ -1,0 +1,377 @@
+{
+  "generated_from": "afterhours numbers",
+  "numbers": {
+    "gaps.universe_tickers": {
+      "value": 523,
+      "text": "523",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "gaps.closed_periods": {
+      "value": 2032976,
+      "text": "2,032,976",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "gaps.earnings_nights": {
+      "value": 31120,
+      "text": "31,120",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "gaps.threshold_0.05": {
+      "value": 0.05,
+      "text": "5%",
+      "source": "artifacts/gaps/summary.json (drop thresholds)"
+    },
+    "gaps.earnings_share_drop_0.05": {
+      "value": 0.08939588688946015,
+      "text": "8.9%",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "gaps.all_share_drop_0.05": {
+      "value": 0.004230743501152989,
+      "text": "0.42%",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "gaps.threshold_0.1": {
+      "value": 0.1,
+      "text": "10%",
+      "source": "artifacts/gaps/summary.json (drop thresholds)"
+    },
+    "gaps.earnings_share_drop_0.1": {
+      "value": 0.020533419023136247,
+      "text": "2.1%",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "gaps.all_share_drop_0.1": {
+      "value": 0.0007653804078356065,
+      "text": "0.08%",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "gaps.threshold_0.2": {
+      "value": 0.2,
+      "text": "20%",
+      "source": "artifacts/gaps/summary.json (drop thresholds)"
+    },
+    "gaps.earnings_share_drop_0.2": {
+      "value": 0.0022172236503856043,
+      "text": "0.2%",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "gaps.all_share_drop_0.2": {
+      "value": 8.657259111765215e-05,
+      "text": "0.01%",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "gaps.first_year": {
+      "value": "2010",
+      "text": "2010",
+      "source": "artifacts/gaps/summary.json"
+    },
+    "oracle.weekends": {
+      "value": 8,
+      "text": "8",
+      "source": "artifacts/discovery/oracle_study.json"
+    },
+    "oracle.feeds": {
+      "value": 35,
+      "text": "35",
+      "source": "artifacts/discovery/oracle_study.json"
+    },
+    "oracle.feeds_without_update": {
+      "value": 32,
+      "text": "32",
+      "source": "artifacts/discovery/oracle_study.json"
+    },
+    "oracle.updates_in_window": {
+      "value": 5,
+      "text": "5",
+      "source": "artifacts/discovery/oracle_study.json"
+    },
+    "oracle.feeds_with_update": {
+      "value": [
+        "AMD",
+        "SGOV",
+        "SNDK"
+      ],
+      "text": "AMD, SGOV, SNDK",
+      "source": "artifacts/discovery/oracle_study.json"
+    },
+    "oracle.max_seconds_after_window_opened": {
+      "value": 105.0,
+      "text": "105",
+      "source": "artifacts/discovery/oracle_study.json"
+    },
+    "model.shipped": {
+      "value": "ewma_normal",
+      "text": "ewma_normal",
+      "source": "artifacts/model/report_card.json"
+    },
+    "model.first_sentence": {
+      "value": "The model missed acceptance, so Afterhours ships the best baseline (ewma_normal).",
+      "text": "The model missed acceptance, so Afterhours ships the best baseline (ewma_normal).",
+      "source": "artifacts/model/report_card.json"
+    },
+    "model.alpha": {
+      "value": 0.01,
+      "text": "1%",
+      "source": "artifacts/model/report_card.json"
+    },
+    "model.heldout_periods": {
+      "value": 1229403,
+      "text": "1,229,403",
+      "source": "artifacts/model/report_card.json"
+    },
+    "model.miss_rate_overall": {
+      "value": 0.013022580878686647,
+      "text": "1.30%",
+      "source": "artifacts/model/report_card.json"
+    },
+    "model.miss_rate_earnings": {
+      "value": 0.010814517830765985,
+      "text": "1.08%",
+      "source": "artifacts/model/report_card.json"
+    },
+    "model.miss_rate_weekend": {
+      "value": 0.017257318952234205,
+      "text": "1.73%",
+      "source": "artifacts/model/report_card.json"
+    },
+    "model.miss_rate_overnight": {
+      "value": 0.011363226702575467,
+      "text": "1.14%",
+      "source": "artifacts/model/report_card.json"
+    },
+    "model.miss_rate_holiday": {
+      "value": 0.02743425423837795,
+      "text": "2.74%",
+      "source": "artifacts/model/report_card.json"
+    },
+    "model.folds": {
+      "value": 10,
+      "text": "10",
+      "source": "artifacts/model/report_card.json"
+    },
+    "backtest.first": {
+      "value": "2017-01-03",
+      "text": "2017-01-03",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.last": {
+      "value": "2026-09-25",
+      "text": "2026-09-25",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.closed_periods": {
+      "value": 2445,
+      "text": "2,445",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.vault_usdg": {
+      "value": 2000000.0,
+      "text": "2,000,000",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.selected": {
+      "value": [
+        "NVDA",
+        "SPY",
+        "META",
+        "SGOV",
+        "USO"
+      ],
+      "text": "NVDA, SPY, META, SGOV, USO",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.always_weekday.yield": {
+      "value": 0.08838650134337822,
+      "text": "8.84%",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.always_weekday.bad_debt": {
+      "value": 108747.74345130891,
+      "text": "108,748",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.always_weekday.bad_debt_events": {
+      "value": 21,
+      "text": "21",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.always_weekday.worst_event_share": {
+      "value": 0.007374149390373178,
+      "text": "0.74%",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.always_weekend.yield": {
+      "value": 0.06854527728360571,
+      "text": "6.85%",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.always_weekend.bad_debt": {
+      "value": 7490.969109198877,
+      "text": "7,491",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.always_weekend.bad_debt_events": {
+      "value": 5,
+      "text": "5",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.always_weekend.worst_event_share": {
+      "value": 0.0011839096036396712,
+      "text": "0.12%",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.afterhours.yield": {
+      "value": 0.0746670189089591,
+      "text": "7.47%",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.afterhours.bad_debt": {
+      "value": 5122.165789815664,
+      "text": "5,122",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.afterhours.bad_debt_events": {
+      "value": 16,
+      "text": "16",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.afterhours.worst_event_share": {
+      "value": 0.0007338225924563494,
+      "text": "0.07%",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.perfect_foresight.yield": {
+      "value": 0.089643938746502,
+      "text": "8.96%",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.perfect_foresight.bad_debt": {
+      "value": 65615.23031923271,
+      "text": "65,615",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.perfect_foresight.bad_debt_events": {
+      "value": 21,
+      "text": "21",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.perfect_foresight.worst_event_share": {
+      "value": 0.004673256297307905,
+      "text": "0.47%",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.max_worst_event_share": {
+      "value": 0.001,
+      "text": "0.10%",
+      "source": "artifacts/backtest/results.json"
+    },
+    "backtest.bad_debt_ratio_weekday_vs_afterhours": {
+      "value": 21.230812885348353,
+      "text": "21",
+      "source": "artifacts/backtest/results.json"
+    },
+    "tiers.weekday.lltv": {
+      "value": 0.915,
+      "text": "91.5%",
+      "source": "config/afterhours.yaml (backtest-chosen tiers)"
+    },
+    "tiers.weekday.cushion": {
+      "value": 0.061056952283222235,
+      "text": "6.1%",
+      "source": "config/afterhours.yaml (backtest-chosen tiers)"
+    },
+    "tiers.weekend.lltv": {
+      "value": 0.77,
+      "text": "77.0%",
+      "source": "config/afterhours.yaml (backtest-chosen tiers)"
+    },
+    "tiers.weekend.cushion": {
+      "value": 0.17293233082706763,
+      "text": "17.3%",
+      "source": "config/afterhours.yaml (backtest-chosen tiers)"
+    },
+    "policy.safety_margin": {
+      "value": 0.05,
+      "text": "5%",
+      "source": "config/afterhours.yaml (backtest-chosen tiers)"
+    },
+    "replay.id": {
+      "value": "META-2022-10-26-earnings",
+      "text": "META-2022-10-26-earnings",
+      "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    },
+    "replay.ticker": {
+      "value": "META",
+      "text": "META",
+      "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    },
+    "replay.date": {
+      "value": "2022-10-26",
+      "text": "2022-10-26",
+      "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    },
+    "replay.gap": {
+      "value": -0.2452627779928216,
+      "text": "24.5%",
+      "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    },
+    "replay.always_weekday.bad_debt": {
+      "value": 24300.293704517164,
+      "text": "24,300",
+      "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    },
+    "replay.afterhours.bad_debt": {
+      "value": 2227.6288735205735,
+      "text": "2,228",
+      "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    },
+    "replay.vault_usdg": {
+      "value": 2000000.0,
+      "text": "2,000,000",
+      "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    }
+  },
+  "oracle": {
+    "weekends": 8,
+    "first_weekend_close": "2026-07-31T20:00:00+00:00",
+    "last_weekend_close": "2026-09-18T20:00:00+00:00",
+    "feeds": 35,
+    "feeds_without_update": 32,
+    "feeds_with_update": [
+      "AMD",
+      "SGOV",
+      "SNDK"
+    ],
+    "updates_in_window": 5,
+    "updates": [
+      {
+        "symbol": "SNDK",
+        "at": "2026-08-08T00:00:19+00:00",
+        "seconds_after_open": 19.0
+      },
+      {
+        "symbol": "SGOV",
+        "at": "2026-08-15T00:01:29+00:00",
+        "seconds_after_open": 89.0
+      },
+      {
+        "symbol": "SGOV",
+        "at": "2026-09-12T00:01:25+00:00",
+        "seconds_after_open": 85.0
+      },
+      {
+        "symbol": "SGOV",
+        "at": "2026-09-19T00:01:45+00:00",
+        "seconds_after_open": 105.0
+      },
+      {
+        "symbol": "AMD",
+        "at": "2026-08-01T00:00:03+00:00",
+        "seconds_after_open": 3.0
+      }
+    ],
+    "max_seconds_after_window_opened": 105.0,
+    "window": "Friday 20:00 to Sunday 20:00 New York"
+  }
+}
