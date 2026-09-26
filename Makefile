@@ -7,9 +7,14 @@ SHELL := /bin/bash
 # Toolchains installed without Homebrew live in the home folder.
 export PATH := $(HOME)/.local/bin:$(HOME)/.foundry/bin:$(PATH)
 
-# Load .env.example (non-secret defaults such as ports) then .env, without printing either.
--include .env.example
--include .env
+# Load .env, then .env.example for anything still unset, without printing either. Variables
+# already in the environment win (tests and callers pass their own ports), hence ?= and not an
+# include, which would override them.
+define _newline
+
+
+endef
+$(eval $(subst ;;,$(_newline),$(shell sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=\(.*\)$$/\1 ?= \2;;/p' .env .env.example 2>/dev/null)))
 export
 
 PROFILE ?=
