@@ -79,6 +79,15 @@ def data_build() -> None:
     typer.echo(json.dumps(manifest, indent=2))
 
 
+@data_app.command("fetch")
+def data_fetch(symbols: Annotated[list[str] | None, typer.Argument()] = None) -> None:
+    """Prices and earnings for the vault's stocks only (enough for the bot, API and demo)."""
+    from afterhours.data.pipeline import fetch_symbols, vault_symbols
+
+    rows = fetch_symbols(load_config(), symbols or vault_symbols(load_config()))
+    typer.echo(json.dumps(rows))
+
+
 @app.command("gaps")
 def gaps_cmd() -> None:
     """M2: write the gap study (artifacts/gaps) from the cached dataset."""

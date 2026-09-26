@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from collections import Counter
 from datetime import UTC, date, datetime, timedelta
@@ -24,6 +25,30 @@ DATASET_KEY = "dataset/gaps"
 def make_cache(cfg: AfterhoursConfig) -> ParquetCache:
     """The configured Parquet cache."""
     return ParquetCache(cfg.path(cfg.data.cache_dir), timedelta(hours=cfg.data.cache_max_age_hours))
+
+
+def vault_symbols(cfg: AfterhoursConfig) -> list[str]:
+    """The stocks the vault lends against, as chosen by the backtest."""
+    results = cfg.path(cfg.paths.artifacts_dir) / "backtest" / "results.json"
+    selected: list[str] = json.loads(results.read_text())["selected"]
+    return selected
+
+
+def fetch_symbols(cfg: AfterhoursConfig, symbols: list[str]) -> dict[str, int]:
+    """Prices and earnings for a few symbols only (what the live risk engine reads).
+
+    A clean clone has no cache; `make demo` calls this so it does not need the full M2 build.
+    Returns price rows per symbol.
+    """
+    cache = make_cache(cfg)
+    start = date.fromisoformat(cfg.universe.history_start)
+    with httpx.Client(timeout=60, headers={"user-agent": cfg.discovery.user_agent}, follow_redirects=True) as client:
+        prices = load_prices(cfg, cache, build_price_providers(cfg, client), symbols, start)
+        load_earnings(cfg, cache, client, [s for s in symbols if s in prices], start)
+    missing = [s for s in symbols if s not in prices]
+    if missing:
+        raise RuntimeError(f"no prices for {', '.join(missing)}")
+    return {s: len(prices[s]) for s in symbols}
 
 
 def build(cfg: AfterhoursConfig) -> tuple[pd.DataFrame, dict[str, Any]]:
