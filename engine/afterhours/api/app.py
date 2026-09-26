@@ -369,6 +369,7 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                     "calibration_curves",
                     "variants_tried",
                     "code_version",
+                    "config",
                 )
             }
             | {"model_version": card["production"]["model_version"], "folds": len(card["folds"])},
