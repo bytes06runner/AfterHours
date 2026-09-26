@@ -9,6 +9,7 @@ paths:
   artifacts_dir: artifacts
   deployments_dir: deployments
   env_file: .env
+  state_dir: data/state                 # bot and API state (git-ignored with data/)
 
 # Local node used by the fork and local profiles (Anvil).
 local_node:
@@ -216,6 +217,17 @@ backtest:
   rate_spread_multipliers: [0.5, 1.0, 2.0]   # sensitivity: scale (weekday APY - weekend APY)
   turnover_sensitivity: [0.05, 0.2, 0.5, 1.0]  # sensitivity: share of loans that roll per session
   replay: { per_segment: 3, window_sessions: 5 }
+
+# Simulation harness (M7): lenders and borrowers seeded on fork and local chains. All simulated
+# activity is labelled Simulation in the UI.
+sim:
+  seed: 11
+  lenders: 5
+  lender_deposit_usdg: { low: 150000, high: 450000 }
+  borrowers_per_market: 2
+  borrow_share_of_market_supply: 0.8      # borrowers take up to this share of each market's supply
+  borrower_ltv_share_of_lltv: { low: 0.60, high: 0.95 }
+  eth_per_actor: 10
 
 schedule:
   hourly: true

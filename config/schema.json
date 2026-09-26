@@ -891,12 +891,17 @@
         "env_file": {
           "title": "Env File",
           "type": "string"
+        },
+        "state_dir": {
+          "title": "State Dir",
+          "type": "string"
         }
       },
       "required": [
         "artifacts_dir",
         "deployments_dir",
-        "env_file"
+        "env_file",
+        "state_dir"
       ],
       "title": "PathsConfig",
       "type": "object"
@@ -1048,6 +1053,27 @@
       "title": "ProfileConfig",
       "type": "object"
     },
+    "Range": {
+      "additionalProperties": false,
+      "properties": {
+        "high": {
+          "minimum": 0,
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "minimum": 0,
+          "title": "Low",
+          "type": "number"
+        }
+      },
+      "required": [
+        "low",
+        "high"
+      ],
+      "title": "Range",
+      "type": "object"
+    },
     "ReplayConfig": {
       "additionalProperties": false,
       "properties": {
@@ -1103,6 +1129,53 @@
         "triggers"
       ],
       "title": "ScheduleConfig",
+      "type": "object"
+    },
+    "SimConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "borrow_share_of_market_supply": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Borrow Share Of Market Supply",
+          "type": "number"
+        },
+        "borrower_ltv_share_of_lltv": {
+          "$ref": "#/$defs/Range"
+        },
+        "borrowers_per_market": {
+          "exclusiveMinimum": 0,
+          "title": "Borrowers Per Market",
+          "type": "integer"
+        },
+        "eth_per_actor": {
+          "exclusiveMinimum": 0,
+          "title": "Eth Per Actor",
+          "type": "number"
+        },
+        "lender_deposit_usdg": {
+          "$ref": "#/$defs/Range"
+        },
+        "lenders": {
+          "exclusiveMinimum": 0,
+          "title": "Lenders",
+          "type": "integer"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seed",
+        "lenders",
+        "lender_deposit_usdg",
+        "borrowers_per_market",
+        "borrow_share_of_market_supply",
+        "borrower_ltv_share_of_lltv",
+        "eth_per_actor"
+      ],
+      "title": "SimConfig",
       "type": "object"
     },
     "TriggersConfig": {
@@ -1360,6 +1433,9 @@
     "schedule": {
       "$ref": "#/$defs/ScheduleConfig"
     },
+    "sim": {
+      "$ref": "#/$defs/SimConfig"
+    },
     "universe": {
       "$ref": "#/$defs/UniverseConfig"
     },
@@ -1385,6 +1461,7 @@
     "model",
     "policy",
     "backtest",
+    "sim",
     "schedule",
     "api",
     "web",

@@ -44,6 +44,7 @@ class PathsConfig(_Strict):
     artifacts_dir: str
     deployments_dir: str
     env_file: str
+    state_dir: str
 
 
 class LocalNodeConfig(_Strict):
@@ -221,6 +222,21 @@ class BacktestConfig(_Strict):
         return self.supply_apy_by_lltv[key]
 
 
+class Range(_Strict):
+    low: Annotated[float, Field(ge=0)]
+    high: Annotated[float, Field(ge=0)]
+
+
+class SimConfig(_Strict):
+    seed: int
+    lenders: PositiveInt
+    lender_deposit_usdg: Range
+    borrowers_per_market: PositiveInt
+    borrow_share_of_market_supply: Fraction
+    borrower_ltv_share_of_lltv: Range
+    eth_per_actor: Annotated[float, Field(gt=0)]
+
+
 class PolicyConfig(_Strict):
     safety_margin: Fraction
     turnover_penalty: Annotated[float, Field(ge=0)]
@@ -320,6 +336,7 @@ class AfterhoursConfig(BaseSettings):
     model: ModelConfig
     policy: PolicyConfig
     backtest: BacktestConfig
+    sim: SimConfig
     schedule: ScheduleConfig
     api: ApiConfig
     web: WebConfig
@@ -429,6 +446,8 @@ def load_config(path: Path | None = None, *, load_env_file: bool = True) -> Afte
     if load_env_file:
         env_file = REPO_ROOT / str(raw.get("paths", {}).get("env_file", ".env"))
         load_dotenv(env_file, override=False)
+        # Non-secret defaults (ports, hosts) from the example file, as `make` does.
+        load_dotenv(env_file.with_name(env_file.name + ".example"), override=False)
     return AfterhoursConfig(**raw)
 
 

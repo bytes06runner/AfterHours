@@ -62,8 +62,8 @@ local-chain: ## Start a plain local Anvil chain for the local profile (simulatio
 deploy: ## Deploy markets, vault, registry; write deployments/<profile>.json
 	$(AH) deploy
 
-seed: ## Create simulated lenders and borrowers on the fork
-	@echo "make seed arrives with M7." >&2; exit 2
+seed: ## Create simulated lenders and borrowers on the fork or local chain
+	$(AH) sim seed
 
 engine: ## Run the data pipeline, model and scheduler
 	@echo "make engine arrives with M2 and M6." >&2; exit 2

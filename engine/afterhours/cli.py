@@ -204,5 +204,50 @@ def deploy_cmd(
     )
 
 
+bot_app = typer.Typer(no_args_is_help=True, help="Allocator bot.")
+app.add_typer(bot_app, name="bot")
+sim_app = typer.Typer(no_args_is_help=True, help="Simulation harness (fork and local chains only).")
+app.add_typer(sim_app, name="sim")
+
+
+def _logging() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+
+
+@bot_app.command("once")
+def bot_once(
+    trigger: Annotated[str, typer.Option(help="Label recorded with the cycle.")] = "manual",
+    dry_run: Annotated[bool, typer.Option(help="Plan without sending transactions.")] = False,
+) -> None:
+    """Run one planning cycle now."""
+    from afterhours.bot.allocator import Allocator, dump
+
+    _logging()
+    typer.echo(dump(Allocator(load_config()).run_cycle(trigger, execute=not dry_run)))
+
+
+@sim_app.command("seed")
+def sim_seed() -> None:
+    """Seed lenders, let the bot allocate, then seed borrowers."""
+    from afterhours.bot.allocator import Allocator
+    from afterhours.chain.rpc import connect
+    from afterhours.deployments import load_deployment
+    from afterhours.sim.seed import Seeder
+
+    _logging()
+    cfg = load_config()
+    if not cfg.profile.local_rpc_port_env:
+        raise typer.BadParameter("seeding runs only on fork and local chains")
+    seeder = Seeder(cfg, connect(cfg.node_url()), load_deployment(cfg))
+    lenders = seeder.lenders()
+    typer.echo(f"lenders: {len(lenders)}, {sum(x['usdg'] for x in lenders):,.0f} USDG")
+    Allocator(cfg).run_cycle("seed")
+    borrowers = seeder.borrowers()
+    typer.echo(
+        f"borrowers: {len(borrowers)}, {sum(x['usdg'] for x in borrowers):,.0f} USDG borrowed"
+    )
+
+
 if __name__ == "__main__":
     app()

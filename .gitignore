@@ -13,3 +13,4 @@ broadcast/*/31337/
 .DS_Store
 artifacts/model/lgbm_*.txt
 deployments/*.raw.json
+data/state/

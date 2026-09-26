@@ -20,6 +20,11 @@ dependencies = [
   "lightgbm>=4.5",
   "scikit-learn>=1.5",
   "scipy>=1.14",
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.32",
+  "sse-starlette>=2.1",
+  "apscheduler>=3.10,<4",
+  "rfc8785>=0.1.4",
 ]
 
 [project.scripts]
