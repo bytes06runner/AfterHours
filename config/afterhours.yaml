@@ -1,0 +1,99 @@
+# Afterhours configuration. Non-secret values only; secrets and per-machine values live in .env.
+# Validated against config/schema.json, which is generated from engine/afterhours/config.py
+# (run `make gen-schema` after changing the model).
+# Values that are unknown until discovery are null and are filled in M1 with evidence, never guessed.
+
+active_profile: fork
+
+paths:
+  artifacts_dir: artifacts
+  deployments_dir: deployments
+  env_file: .env
+
+profiles:
+  fork:
+    chain: robinhood
+    rpc_env: RH_MAINNET_RPC_URL
+    fork_block: null
+    local_rpc_port_env: ANVIL_PORT
+    oracle_mode: chainlink
+    collateral_mode: native
+  rh-testnet:
+    chain: robinhood-testnet
+    rpc_env: RH_TESTNET_RPC_URL
+    oracle_mode: simulated
+    collateral_mode: simulated
+  rh-mainnet:
+    chain: robinhood
+    rpc_env: RH_MAINNET_RPC_URL
+    oracle_mode: chainlink
+    collateral_mode: native
+    requires_human_go: true
+  arb-sepolia:
+    chain: arbitrum-sepolia
+    rpc_env: ARB_SEPOLIA_RPC_URL
+    oracle_mode: simulated
+    collateral_mode: simulated
+  arb-one:
+    chain: arbitrum
+    rpc_env: ARB_ONE_RPC_URL
+    oracle_mode: chainlink
+    collateral_mode: native
+    requires_human_go: true
+
+chains:
+  robinhood: { chain_id: null, explorer_url: null, explorer_api_url: null }
+  robinhood-testnet: { chain_id: null, explorer_url: null, explorer_api_url: null, faucet_url: null }
+  arbitrum: { chain_id: null, explorer_url: null }
+  arbitrum-sepolia: { chain_id: null, explorer_url: null, faucet_url: null }
+
+morpho:
+  source: discovered
+  vault_kind: null
+  lltv_tiers: { weekday: null, weekend: null }
+  liquidation_incentive: { verify_from: "morpho-blue ConstantsLib + MathLib" }
+
+vault:
+  name: Afterhours USDG
+  symbol: ahUSDG
+  performance_fee_bps: 1000
+  timelock_seconds: null
+  max_share_per_stock: 0.35
+  depth_multiplier: 0.5
+  max_slippage: 0.02
+
+universe:
+  onchain_selection: { max_tokens: 5, min_pool_depth_usd: 250000 }
+  training_universe_source: sp500
+  training_universe_url_env: null
+  explicit_tickers: []
+  history_start: "2010-01-01"
+
+data:
+  providers: [yfinance, stooq, alphavantage]
+  earnings_providers: [yfinance, finnhub, alphavantage]
+  exchange_calendar: XNYS
+  cache_dir: data/cache
+
+model:
+  quantiles: [0.01, 0.05]
+  target_alpha: 0.01
+  conformal: { method: cqr, mondrian_segments: [earnings, weekend, holiday, overnight] }
+  lightgbm: { num_leaves: 31, learning_rate: 0.05, n_estimators: 800, min_child_samples: 50 }
+  walk_forward: { train_years: 6, calibrate_years: 1, test_years: 1 }
+
+policy:
+  safety_margin: 0.02
+  turnover_penalty: 0.0005
+  min_rebalance_usd: 1000
+
+schedule:
+  hourly: true
+  pre_close_minutes: 120
+  post_open_minutes: 30
+  pre_earnings_hours: 24
+  triggers: { shock_move_pct: 0.03, shock_window_min: 15, divergence_pct: 0.02, stale_minutes: 90 }
+
+api: { host_env: API_HOST, port_env: API_PORT, cors_origins_env: CORS_ORIGINS, admin_token_env: ADMIN_TOKEN }
+web: { api_base_url_env: NEXT_PUBLIC_API_BASE_URL, walletconnect_project_id_env: NEXT_PUBLIC_WC_PROJECT_ID }
+alerts: { webhook_env: ALERT_WEBHOOK_URL }

@@ -1,0 +1,789 @@
+{
+  "$defs": {
+    "AlertsConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "webhook_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Webhook Env",
+          "type": "string"
+        }
+      },
+      "required": [
+        "webhook_env"
+      ],
+      "title": "AlertsConfig",
+      "type": "object"
+    },
+    "ApiConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "admin_token_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Admin Token Env",
+          "type": "string"
+        },
+        "cors_origins_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Cors Origins Env",
+          "type": "string"
+        },
+        "host_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Host Env",
+          "type": "string"
+        },
+        "port_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Port Env",
+          "type": "string"
+        }
+      },
+      "required": [
+        "host_env",
+        "port_env",
+        "cors_origins_env",
+        "admin_token_env"
+      ],
+      "title": "ApiConfig",
+      "type": "object"
+    },
+    "ChainConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "chain_id": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chain Id"
+        },
+        "explorer_api_url": {
+          "anyOf": [
+            {
+              "pattern": "^https?://",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Explorer Api Url"
+        },
+        "explorer_url": {
+          "anyOf": [
+            {
+              "pattern": "^https?://",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Explorer Url"
+        },
+        "faucet_url": {
+          "anyOf": [
+            {
+              "pattern": "^https?://",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Faucet Url"
+        }
+      },
+      "title": "ChainConfig",
+      "type": "object"
+    },
+    "ConformalConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "const": "cqr",
+          "title": "Method",
+          "type": "string"
+        },
+        "mondrian_segments": {
+          "items": {
+            "enum": [
+              "earnings",
+              "weekend",
+              "holiday",
+              "overnight"
+            ],
+            "type": "string"
+          },
+          "title": "Mondrian Segments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "method",
+        "mondrian_segments"
+      ],
+      "title": "ConformalConfig",
+      "type": "object"
+    },
+    "DataConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "cache_dir": {
+          "title": "Cache Dir",
+          "type": "string"
+        },
+        "earnings_providers": {
+          "items": {
+            "enum": [
+              "yfinance",
+              "finnhub",
+              "alphavantage"
+            ],
+            "type": "string"
+          },
+          "title": "Earnings Providers",
+          "type": "array"
+        },
+        "exchange_calendar": {
+          "title": "Exchange Calendar",
+          "type": "string"
+        },
+        "providers": {
+          "items": {
+            "enum": [
+              "yfinance",
+              "stooq",
+              "alphavantage"
+            ],
+            "type": "string"
+          },
+          "title": "Providers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "providers",
+        "earnings_providers",
+        "exchange_calendar",
+        "cache_dir"
+      ],
+      "title": "DataConfig",
+      "type": "object"
+    },
+    "LightGbmConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "learning_rate": {
+          "exclusiveMinimum": 0,
+          "title": "Learning Rate",
+          "type": "number"
+        },
+        "min_child_samples": {
+          "exclusiveMinimum": 0,
+          "title": "Min Child Samples",
+          "type": "integer"
+        },
+        "n_estimators": {
+          "exclusiveMinimum": 0,
+          "title": "N Estimators",
+          "type": "integer"
+        },
+        "num_leaves": {
+          "exclusiveMinimum": 0,
+          "title": "Num Leaves",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "num_leaves",
+        "learning_rate",
+        "n_estimators",
+        "min_child_samples"
+      ],
+      "title": "LightGbmConfig",
+      "type": "object"
+    },
+    "LiquidationIncentiveConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "verify_from": {
+          "title": "Verify From",
+          "type": "string"
+        }
+      },
+      "required": [
+        "verify_from"
+      ],
+      "title": "LiquidationIncentiveConfig",
+      "type": "object"
+    },
+    "LltvTiers": {
+      "additionalProperties": false,
+      "properties": {
+        "weekday": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weekday"
+        },
+        "weekend": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weekend"
+        }
+      },
+      "title": "LltvTiers",
+      "type": "object"
+    },
+    "ModelConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "conformal": {
+          "$ref": "#/$defs/ConformalConfig"
+        },
+        "lightgbm": {
+          "$ref": "#/$defs/LightGbmConfig"
+        },
+        "quantiles": {
+          "items": {
+            "exclusiveMaximum": 1,
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "title": "Quantiles",
+          "type": "array"
+        },
+        "target_alpha": {
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "title": "Target Alpha",
+          "type": "number"
+        },
+        "walk_forward": {
+          "$ref": "#/$defs/WalkForwardConfig"
+        }
+      },
+      "required": [
+        "quantiles",
+        "target_alpha",
+        "conformal",
+        "lightgbm",
+        "walk_forward"
+      ],
+      "title": "ModelConfig",
+      "type": "object"
+    },
+    "MorphoConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "liquidation_incentive": {
+          "$ref": "#/$defs/LiquidationIncentiveConfig"
+        },
+        "lltv_tiers": {
+          "$ref": "#/$defs/LltvTiers"
+        },
+        "source": {
+          "enum": [
+            "discovered",
+            "self-deployed"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "vault_kind": {
+          "anyOf": [
+            {
+              "enum": [
+                "metamorpho",
+                "vault-v2"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vault Kind"
+        }
+      },
+      "required": [
+        "source",
+        "lltv_tiers",
+        "liquidation_incentive"
+      ],
+      "title": "MorphoConfig",
+      "type": "object"
+    },
+    "OnchainSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "max_tokens": {
+          "exclusiveMinimum": 0,
+          "title": "Max Tokens",
+          "type": "integer"
+        },
+        "min_pool_depth_usd": {
+          "minimum": 0,
+          "title": "Min Pool Depth Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "max_tokens",
+        "min_pool_depth_usd"
+      ],
+      "title": "OnchainSelection",
+      "type": "object"
+    },
+    "PathsConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts_dir": {
+          "title": "Artifacts Dir",
+          "type": "string"
+        },
+        "deployments_dir": {
+          "title": "Deployments Dir",
+          "type": "string"
+        },
+        "env_file": {
+          "title": "Env File",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifacts_dir",
+        "deployments_dir",
+        "env_file"
+      ],
+      "title": "PathsConfig",
+      "type": "object"
+    },
+    "PolicyConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "min_rebalance_usd": {
+          "minimum": 0,
+          "title": "Min Rebalance Usd",
+          "type": "number"
+        },
+        "safety_margin": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Safety Margin",
+          "type": "number"
+        },
+        "turnover_penalty": {
+          "minimum": 0,
+          "title": "Turnover Penalty",
+          "type": "number"
+        }
+      },
+      "required": [
+        "safety_margin",
+        "turnover_penalty",
+        "min_rebalance_usd"
+      ],
+      "title": "PolicyConfig",
+      "type": "object"
+    },
+    "ProfileConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "chain": {
+          "title": "Chain",
+          "type": "string"
+        },
+        "collateral_mode": {
+          "enum": [
+            "native",
+            "simulated"
+          ],
+          "title": "Collateral Mode",
+          "type": "string"
+        },
+        "fork_block": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fork Block"
+        },
+        "local_rpc_port_env": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Local Rpc Port Env"
+        },
+        "oracle_mode": {
+          "enum": [
+            "chainlink",
+            "simulated"
+          ],
+          "title": "Oracle Mode",
+          "type": "string"
+        },
+        "requires_human_go": {
+          "default": false,
+          "title": "Requires Human Go",
+          "type": "boolean"
+        },
+        "rpc_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Rpc Env",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chain",
+        "rpc_env",
+        "oracle_mode",
+        "collateral_mode"
+      ],
+      "title": "ProfileConfig",
+      "type": "object"
+    },
+    "ScheduleConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "hourly": {
+          "title": "Hourly",
+          "type": "boolean"
+        },
+        "post_open_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Post Open Minutes",
+          "type": "integer"
+        },
+        "pre_close_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Pre Close Minutes",
+          "type": "integer"
+        },
+        "pre_earnings_hours": {
+          "exclusiveMinimum": 0,
+          "title": "Pre Earnings Hours",
+          "type": "integer"
+        },
+        "triggers": {
+          "$ref": "#/$defs/TriggersConfig"
+        }
+      },
+      "required": [
+        "hourly",
+        "pre_close_minutes",
+        "post_open_minutes",
+        "pre_earnings_hours",
+        "triggers"
+      ],
+      "title": "ScheduleConfig",
+      "type": "object"
+    },
+    "TriggersConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "divergence_pct": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Divergence Pct",
+          "type": "number"
+        },
+        "shock_move_pct": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Shock Move Pct",
+          "type": "number"
+        },
+        "shock_window_min": {
+          "exclusiveMinimum": 0,
+          "title": "Shock Window Min",
+          "type": "integer"
+        },
+        "stale_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Stale Minutes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "shock_move_pct",
+        "shock_window_min",
+        "divergence_pct",
+        "stale_minutes"
+      ],
+      "title": "TriggersConfig",
+      "type": "object"
+    },
+    "UniverseConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "explicit_tickers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Explicit Tickers",
+          "type": "array"
+        },
+        "history_start": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "History Start",
+          "type": "string"
+        },
+        "onchain_selection": {
+          "$ref": "#/$defs/OnchainSelection"
+        },
+        "training_universe_source": {
+          "enum": [
+            "sp500",
+            "explicit"
+          ],
+          "title": "Training Universe Source",
+          "type": "string"
+        },
+        "training_universe_url_env": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Training Universe Url Env"
+        }
+      },
+      "required": [
+        "onchain_selection",
+        "training_universe_source",
+        "history_start"
+      ],
+      "title": "UniverseConfig",
+      "type": "object"
+    },
+    "VaultConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "depth_multiplier": {
+          "exclusiveMinimum": 0,
+          "title": "Depth Multiplier",
+          "type": "number"
+        },
+        "max_share_per_stock": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Max Share Per Stock",
+          "type": "number"
+        },
+        "max_slippage": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Max Slippage",
+          "type": "number"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "performance_fee_bps": {
+          "maximum": 10000,
+          "minimum": 0,
+          "title": "Performance Fee Bps",
+          "type": "integer"
+        },
+        "symbol": {
+          "title": "Symbol",
+          "type": "string"
+        },
+        "timelock_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timelock Seconds"
+        }
+      },
+      "required": [
+        "name",
+        "symbol",
+        "performance_fee_bps",
+        "max_share_per_stock",
+        "depth_multiplier",
+        "max_slippage"
+      ],
+      "title": "VaultConfig",
+      "type": "object"
+    },
+    "WalkForwardConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "calibrate_years": {
+          "exclusiveMinimum": 0,
+          "title": "Calibrate Years",
+          "type": "integer"
+        },
+        "test_years": {
+          "exclusiveMinimum": 0,
+          "title": "Test Years",
+          "type": "integer"
+        },
+        "train_years": {
+          "exclusiveMinimum": 0,
+          "title": "Train Years",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "train_years",
+        "calibrate_years",
+        "test_years"
+      ],
+      "title": "WalkForwardConfig",
+      "type": "object"
+    },
+    "WebConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "api_base_url_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Api Base Url Env",
+          "type": "string"
+        },
+        "walletconnect_project_id_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Walletconnect Project Id Env",
+          "type": "string"
+        }
+      },
+      "required": [
+        "api_base_url_env",
+        "walletconnect_project_id_env"
+      ],
+      "title": "WebConfig",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The whole configuration. Build it with `load_config`, not directly.",
+  "properties": {
+    "active_profile": {
+      "title": "Active Profile",
+      "type": "string"
+    },
+    "alerts": {
+      "$ref": "#/$defs/AlertsConfig"
+    },
+    "api": {
+      "$ref": "#/$defs/ApiConfig"
+    },
+    "chains": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ChainConfig"
+      },
+      "title": "Chains",
+      "type": "object"
+    },
+    "data": {
+      "$ref": "#/$defs/DataConfig"
+    },
+    "model": {
+      "$ref": "#/$defs/ModelConfig"
+    },
+    "morpho": {
+      "$ref": "#/$defs/MorphoConfig"
+    },
+    "paths": {
+      "$ref": "#/$defs/PathsConfig"
+    },
+    "policy": {
+      "$ref": "#/$defs/PolicyConfig"
+    },
+    "profiles": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ProfileConfig"
+      },
+      "title": "Profiles",
+      "type": "object"
+    },
+    "schedule": {
+      "$ref": "#/$defs/ScheduleConfig"
+    },
+    "universe": {
+      "$ref": "#/$defs/UniverseConfig"
+    },
+    "vault": {
+      "$ref": "#/$defs/VaultConfig"
+    },
+    "web": {
+      "$ref": "#/$defs/WebConfig"
+    }
+  },
+  "required": [
+    "active_profile",
+    "paths",
+    "profiles",
+    "chains",
+    "morpho",
+    "vault",
+    "universe",
+    "data",
+    "model",
+    "policy",
+    "schedule",
+    "api",
+    "web",
+    "alerts"
+  ],
+  "title": "Afterhours configuration",
+  "type": "object"
+}

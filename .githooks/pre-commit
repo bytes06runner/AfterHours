@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Fast checks before every commit. Full suite: make lint test.
+set -euo pipefail
+export PATH="$HOME/.local/bin:$HOME/.foundry/bin:$PATH"
+./scripts/lint-hardcode.sh
+uv run --quiet ruff check .
+uv run --quiet ruff format --check .
+if git diff --cached --name-only | grep -q '^engine/afterhours/config.py$'; then
+  uv run --quiet pytest engine/tests/test_config.py
+fi
+if git diff --cached --name-only | grep -q '^contracts/.*\.sol$'; then
+  (cd contracts && forge fmt --check)
+fi

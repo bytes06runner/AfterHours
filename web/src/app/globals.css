@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+/* Placeholder until M8 builds the full token system from docs/DESIGN.md. */
+:root {
+  --limestone: #e4e0d5;
+  --ink: #1d1f33;
+}
+
+body {
+  background: var(--limestone);
+  color: var(--ink);
+  font-family: var(--font-text), sans-serif;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.stub {
+  max-width: 72ch;
+  margin: 0 auto;
+  padding: 96px 16px;
+}
+
+.stub h1 {
+  font-family: var(--font-display), serif;
+  font-size: 48px;
+  letter-spacing: -0.01em;
+}

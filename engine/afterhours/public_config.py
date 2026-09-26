@@ -1,0 +1,47 @@
+"""The public, secret-free slice of configuration served to the web app.
+
+Served by `GET /v1/config/public` and printed by `afterhours config public`.
+The web app parses it with the zod schema in `web/src/lib/config.ts`; keep both in step.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from afterhours.config import AfterhoursConfig
+from afterhours.deployments import load_deployment, load_discovered
+
+
+def public_config(cfg: AfterhoursConfig) -> dict[str, Any]:
+    """Build the public config document for the active profile."""
+    profile = cfg.profile
+    chain = cfg.chain
+    return {
+        "profile": cfg.active_profile,
+        "chain": {
+            "key": profile.chain,
+            "chain_id": chain.chain_id,
+            "explorer_url": chain.explorer_url,
+        },
+        "simulation": {
+            "oracle": profile.oracle_mode == "simulated",
+            "collateral": profile.collateral_mode == "simulated",
+        },
+        "vault": {"name": cfg.vault.name, "symbol": cfg.vault.symbol},
+        "exchange_calendar": cfg.data.exchange_calendar,
+        "deployment": load_deployment(cfg),
+        "discovered": _addresses_only(load_discovered(cfg)),
+    }
+
+
+def _addresses_only(discovered: dict[str, Any]) -> dict[str, Any]:
+    """Strip evidence blobs; the web needs addresses, not verification logs."""
+    out: dict[str, Any] = {}
+    for key, value in discovered.items():
+        if isinstance(value, dict) and "address" in value:
+            out[key] = value["address"]
+        elif isinstance(value, dict):
+            nested = _addresses_only(value)
+            if nested:
+                out[key] = nested
+    return out
