@@ -304,6 +304,22 @@ def option_a_cmd(
     typer.echo(f"wrote {write(cfg, data, jobs)}")
 
 
+@app.command("option-b")
+def option_b_cmd(
+    jobs: Annotated[int, typer.Option(help="Worker processes (0: all cores but one)")] = 0,
+) -> None:
+    """Option B: fixed map plus pullback, tuned then evaluated once (PROGRESS.md)."""
+    from afterhours.backtest.option_b import write
+    from afterhours.data.pipeline import DATASET_KEY, make_cache
+
+    _logging()
+    cfg = load_config()
+    data = make_cache(cfg).get(DATASET_KEY, allow_stale=True)
+    if data is None:
+        raise typer.BadParameter("no dataset; run `afterhours data build` first")
+    typer.echo(f"wrote {write(cfg, data, jobs)}")
+
+
 @app.command("numbers")
 def numbers_cmd() -> None:
     """M12: write artifacts/report/numbers.json, the numbers the README and pitch quote."""

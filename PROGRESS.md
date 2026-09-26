@@ -538,3 +538,34 @@ Evaluate the chosen setting once on 2022 to 2026 with a fresh vault.
 
 Correction on option A: A's pre-registration said "highest interest", not the M4 rule's
 "highest net lender yield". Whether that changed A's choice is checked below after B runs.
+
+### 2026-09-27 Option B result (second evaluation on 2022 to 2026)
+
+`afterhours option-b` (576 runs, `artifacts/backtest/option_b.json`), definition and grid
+pre-registered in commit 8f31b8e. Historical stock prices, simulated vault, fresh 2,000,000 USDG
+vault per period.
+
+Chosen on 2017 to 2021: 5 vault stocks map fraction 0.4, pullback fraction 0.4, lookahead 5;
+35 Stock Tokens 0.3, 0.2, 10. No B setting met the 0.10% worst-event cap in tuning (0 of 144 in
+each universe; the smallest worst event was 0.541% and 0.537%), so the fallback (smallest worst
+event) chose them.
+
+Evaluation, 2022-01-03 to 2026-09-24:
+
+| Strategy | 5 vault stocks: yield, bad debt, worst event | 35 Stock Tokens: yield, bad debt, worst event |
+| --- | --- | --- |
+| B (fixed map + pullback) | 9.12%, 5,849, 0.107% | 9.37%, 4,444, 0.083% |
+| Static blend nearest B's yield | 90% weekday: 9.09%, 11,132, 0.220% | 100% weekday: 9.34%, 12,646, 0.244% |
+| No-hindsight fixed map (option A's choice) | 9.13%, 8,482, 0.199% | 9.28%, 13,380, 0.244% |
+| Dynamic Afterhours (documented alternative) | 8.67%, 748, 0.020% | 9.04%, 1,339, 0.025% |
+| Always weekday | 9.34%, 12,521, 0.247% | 9.34%, 12,646, 0.244% |
+| Always weekend | 6.88%, 595, 0.026% | 6.88%, 581, 0.026% |
+
+B's money-time on evaluation (vault stocks): weekday 73%, middle 19%, weekend 2%, idle 5%.
+On the 5 vault stocks B's worst event (0.107%) is above the 0.10% cap.
+
+Option A selection check: selecting A by net lender yield (the M4 rule) instead of interest picks
+the same settings in both families and universes, so A's verdict is unchanged.
+
+Ships: B, per the rule. Next: three tiers in the deploy, the bot on B's policy, then the report
+card, landing chart, README, pitch.md and demo.md.

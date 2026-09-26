@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import logging
 import multiprocessing as mp
+from collections.abc import Sequence
 from dataclasses import replace
 from datetime import date, timedelta
 from typing import Any
@@ -35,7 +36,7 @@ log = logging.getLogger(__name__)
 _W: dict[str, Any] = {}
 
 
-def params(cfg: AfterhoursConfig, tier_set: list[str], fraction: float | None) -> SimParams:
+def params(cfg: AfterhoursConfig, tier_set: Sequence[str], fraction: float | None) -> SimParams:
     oa = cfg.backtest.option_a
     base = params_from(
         cfg.backtest,
