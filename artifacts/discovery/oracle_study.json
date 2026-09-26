@@ -1,0 +1,3598 @@
+{
+  "calendar": "XNYS",
+  "now": "2026-09-26T11:17:50+00:00",
+  "periods": [
+    {
+      "kind": "weekend",
+      "close": "2026-07-31T20:00:00+00:00",
+      "open": "2026-08-03T13:30:00+00:00",
+      "hours": 65.5,
+      "from_block": 24411898,
+      "to_block": 26835058,
+      "updates": 1382
+    },
+    {
+      "kind": "weekend",
+      "close": "2026-08-07T20:00:00+00:00",
+      "open": "2026-08-10T13:30:00+00:00",
+      "hours": 65.5,
+      "from_block": 30445569,
+      "to_block": 32871286,
+      "updates": 902
+    },
+    {
+      "kind": "weekend",
+      "close": "2026-08-14T20:00:00+00:00",
+      "open": "2026-08-17T13:30:00+00:00",
+      "hours": 65.5,
+      "from_block": 36487185,
+      "to_block": 38909451,
+      "updates": 649
+    },
+    {
+      "kind": "weekend",
+      "close": "2026-08-21T20:00:00+00:00",
+      "open": "2026-08-24T13:30:00+00:00",
+      "hours": 65.5,
+      "from_block": 42515975,
+      "to_block": 44938998,
+      "updates": 890
+    },
+    {
+      "kind": "weekend",
+      "close": "2026-08-28T20:00:00+00:00",
+      "open": "2026-08-31T13:30:00+00:00",
+      "hours": 65.5,
+      "from_block": 48531439,
+      "to_block": 50936806,
+      "updates": 642
+    },
+    {
+      "kind": "weekend",
+      "close": "2026-09-04T20:00:00+00:00",
+      "open": "2026-09-08T13:30:00+00:00",
+      "hours": 89.5,
+      "from_block": 54497362,
+      "to_block": 57762687,
+      "updates": 907
+    },
+    {
+      "kind": "weekend",
+      "close": "2026-09-11T20:00:00+00:00",
+      "open": "2026-09-14T13:30:00+00:00",
+      "hours": 65.5,
+      "from_block": 60487314,
+      "to_block": 62879874,
+      "updates": 809
+    },
+    {
+      "kind": "weekend",
+      "close": "2026-09-18T20:00:00+00:00",
+      "open": "2026-09-21T13:30:00+00:00",
+      "hours": 65.5,
+      "from_block": 66458218,
+      "to_block": 68869597,
+      "updates": 786
+    },
+    {
+      "kind": "overnight",
+      "close": "2026-09-14T20:00:00+00:00",
+      "open": "2026-09-15T13:30:00+00:00",
+      "hours": 17.5,
+      "from_block": 63038818,
+      "to_block": 63729136,
+      "updates": 571
+    },
+    {
+      "kind": "overnight",
+      "close": "2026-09-15T20:00:00+00:00",
+      "open": "2026-09-16T13:30:00+00:00",
+      "hours": 17.5,
+      "from_block": 63885643,
+      "to_block": 64581047,
+      "updates": 515
+    },
+    {
+      "kind": "overnight",
+      "close": "2026-09-16T20:00:00+00:00",
+      "open": "2026-09-17T13:30:00+00:00",
+      "hours": 17.5,
+      "from_block": 64741904,
+      "to_block": 65439340,
+      "updates": 765
+    },
+    {
+      "kind": "overnight",
+      "close": "2026-09-17T20:00:00+00:00",
+      "open": "2026-09-18T13:30:00+00:00",
+      "hours": 17.5,
+      "from_block": 65600504,
+      "to_block": 66297450,
+      "updates": 601
+    },
+    {
+      "kind": "overnight",
+      "close": "2026-09-21T20:00:00+00:00",
+      "open": "2026-09-22T13:30:00+00:00",
+      "hours": 17.5,
+      "from_block": 69031381,
+      "to_block": 69727241,
+      "updates": 810
+    },
+    {
+      "kind": "overnight",
+      "close": "2026-09-22T20:00:00+00:00",
+      "open": "2026-09-23T13:30:00+00:00",
+      "hours": 17.5,
+      "from_block": 69888655,
+      "to_block": 70585604,
+      "updates": 751
+    },
+    {
+      "kind": "overnight",
+      "close": "2026-09-23T20:00:00+00:00",
+      "open": "2026-09-24T13:30:00+00:00",
+      "hours": 17.5,
+      "from_block": 70746902,
+      "to_block": 71442146,
+      "updates": 740
+    },
+    {
+      "kind": "overnight",
+      "close": "2026-09-24T20:00:00+00:00",
+      "open": "2026-09-25T13:30:00+00:00",
+      "hours": 17.5,
+      "from_block": 71603294,
+      "to_block": 72299309,
+      "updates": 546
+    }
+  ],
+  "feeds": [
+    {
+      "symbol": "DELL",
+      "proxy": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
+      "aggregators": [
+        "0xD6ed4e7D4ABA1111EB42A349899b5c72EE1C9FEF"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 18,
+        "after_hours": 5,
+        "overnight": 81,
+        "pre_market": 35,
+        "after_open": 124
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 21,
+        "after_hours": 7,
+        "overnight": 48,
+        "pre_market": 47,
+        "after_open": 89
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:33:45+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:40+00:00",
+          "oracle_move_across_frozen": 0.021571
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:25:51+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:52+00:00",
+          "oracle_move_across_frozen": 0.00183
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T19:57:52+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:48+00:00",
+          "oracle_move_across_frozen": 0.005638
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:58:56+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:48+00:00",
+          "oracle_move_across_frozen": 0.005321
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T20:34:12+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:31+00:00",
+          "oracle_move_across_frozen": -0.001983
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T20:26:19+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:46+00:00",
+          "oracle_move_across_frozen": -0.001162
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T23:22:28+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:45+00:00",
+          "oracle_move_across_frozen": -0.014497
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:57:22+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:44+00:00",
+          "oracle_move_across_frozen": 0.004201
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.021571
+    },
+    {
+      "symbol": "SPCX",
+      "proxy": "0xB265810950ba6c5C0Ff821c9963014a56fD8Bffb",
+      "aggregators": [
+        "0x5eaa223c585F40CDcA2D119ea91B97C491245631"
+      ],
+      "weekend_updates_by_segment": {
+        "overnight": 39,
+        "pre_market": 57,
+        "after_open": 107,
+        "before_close": 20,
+        "after_hours": 12
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 17,
+        "pre_market": 13,
+        "after_open": 54,
+        "after_hours": 4,
+        "overnight": 6
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:46+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T23:30:09+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:23+00:00",
+          "oracle_move_across_frozen": 0.009978
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:28:39+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:29+00:00",
+          "oracle_move_across_frozen": -0.005217
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:48:34+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:40+00:00",
+          "oracle_move_across_frozen": -0.007996
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:29:04+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:25+00:00",
+          "oracle_move_across_frozen": -0.003935
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:54:14+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:38+00:00",
+          "oracle_move_across_frozen": 0.009292
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T23:39:52+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:39+00:00",
+          "oracle_move_across_frozen": -0.008427
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T23:07:55+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:27+00:00",
+          "oracle_move_across_frozen": 0.004778
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.009978
+    },
+    {
+      "symbol": "SPY",
+      "proxy": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
+      "aggregators": [
+        "0x78BCB218fA04B9b3a278eBc865Ed320BF8DEFBAc"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 1,
+        "after_hours": 1,
+        "overnight": 8,
+        "after_open": 3
+      },
+      "overnight_updates_by_segment": {
+        "overnight": 5,
+        "pre_market": 3,
+        "after_open": 3,
+        "before_close": 1,
+        "after_hours": 1
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:36:43+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:32+00:00",
+          "oracle_move_across_frozen": 0.006894
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:24+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:23+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:19+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:33+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:51+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:26+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:26+00:00",
+          "oracle_move_across_frozen": null
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.006894
+    },
+    {
+      "symbol": "QQQ",
+      "proxy": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
+      "aggregators": [
+        "0x25e996ce8b3529885D429241156e83e7b7744049"
+      ],
+      "weekend_updates_by_segment": {
+        "overnight": 15,
+        "pre_market": 3,
+        "after_open": 5,
+        "before_close": 1
+      },
+      "overnight_updates_by_segment": {
+        "overnight": 5,
+        "after_open": 6,
+        "before_close": 2,
+        "after_hours": 2,
+        "pre_market": 5
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:50+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:51+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:19+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:47+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:31+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:31+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:25+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:50:26+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:48+00:00",
+          "oracle_move_across_frozen": 0.004116
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.004116
+    },
+    {
+      "symbol": "TSM",
+      "proxy": "0x874cF94aa8eC88Fd9560094dD065f2fB3E41Fc2F",
+      "aggregators": [
+        "0x2B3A9A18998e9464760658233ab093e6aEbF45d0"
+      ],
+      "weekend_updates_by_segment": {
+        "overnight": 33,
+        "pre_market": 23,
+        "after_open": 30,
+        "before_close": 2
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 5,
+        "after_hours": 3,
+        "overnight": 16,
+        "after_open": 14,
+        "pre_market": 11
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:27+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:51+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:30+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:28+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:50+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:35+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:37+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:57:46+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:38+00:00",
+          "oracle_move_across_frozen": 0.000749
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.000749
+    },
+    {
+      "symbol": "INTC",
+      "proxy": "0x3f390C5C24628Ac7C489515402235FeAD71D1913",
+      "aggregators": [
+        "0x95fB52f75aEcBCa8E12aA4403f840C8bc18CFbd4"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 19,
+        "after_hours": 5,
+        "overnight": 83,
+        "pre_market": 88,
+        "after_open": 91
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 15,
+        "overnight": 46,
+        "pre_market": 66,
+        "after_open": 78,
+        "after_hours": 18
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T22:05:44+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:21+00:00",
+          "oracle_move_across_frozen": 0.02866
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T20:01:55+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:18+00:00",
+          "oracle_move_across_frozen": 0.003862
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:37:49+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:44+00:00",
+          "oracle_move_across_frozen": 0.008665
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:42:28+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:38+00:00",
+          "oracle_move_across_frozen": 0.006396
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:55:30+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:38+00:00",
+          "oracle_move_across_frozen": -0.018429
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:51:50+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:48+00:00",
+          "oracle_move_across_frozen": 0.023294
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:02:41+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:28+00:00",
+          "oracle_move_across_frozen": -0.039503
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:11:01+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:35+00:00",
+          "oracle_move_across_frozen": 0.020174
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.039503
+    },
+    {
+      "symbol": "MSFT",
+      "proxy": "0x45C3C877C15E6BA2EBB19eA114Ea508d14C1Af2E",
+      "aggregators": [
+        "0xc3b117F52cf17Dd4369eaF5eaf7cF0E2f91b4E30"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 4,
+        "after_hours": 2,
+        "overnight": 13,
+        "pre_market": 12,
+        "after_open": 25
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 7,
+        "overnight": 5,
+        "after_open": 32,
+        "pre_market": 8,
+        "after_hours": 3
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:48:35+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:25+00:00",
+          "oracle_move_across_frozen": 0.004467
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:26+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:29+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:37:16+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:38+00:00",
+          "oracle_move_across_frozen": 0.00122
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:32:53+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:32+00:00",
+          "oracle_move_across_frozen": -0.002817
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:30+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:47+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:41:53+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:44+00:00",
+          "oracle_move_across_frozen": -0.001116
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.004467
+    },
+    {
+      "symbol": "RGTI",
+      "proxy": "0x2A045cF1C49c61c166C036d2f06FA2D2d984f765",
+      "aggregators": [
+        "0x42B1C5174cE84Be751A23489d7DbDc969Bc17eA2"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 31,
+        "after_hours": 7,
+        "overnight": 53,
+        "pre_market": 101,
+        "after_open": 130
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 17,
+        "overnight": 38,
+        "pre_market": 74,
+        "after_open": 90,
+        "after_hours": 25
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T22:26:13+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:31+00:00",
+          "oracle_move_across_frozen": 0.017994
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:59:00+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:24+00:00",
+          "oracle_move_across_frozen": -0.001394
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:03:45+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:39+00:00",
+          "oracle_move_across_frozen": 0.009046
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:57:48+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:41+00:00",
+          "oracle_move_across_frozen": 0.005035
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T21:09:39+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:28+00:00",
+          "oracle_move_across_frozen": -0.013594
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T21:34:37+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:28+00:00",
+          "oracle_move_across_frozen": 0.000156
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:58:50+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:40+00:00",
+          "oracle_move_across_frozen": -0.006406
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:36:46+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:37+00:00",
+          "oracle_move_across_frozen": 0.006645
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.017994
+    },
+    {
+      "symbol": "META",
+      "proxy": "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
+      "aggregators": [
+        "0xc190B6164B9e320A6400cdaB0085a2e0E2b9738e"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 7,
+        "after_hours": 2,
+        "overnight": 18,
+        "pre_market": 34,
+        "after_open": 44
+      },
+      "overnight_updates_by_segment": {
+        "after_hours": 5,
+        "overnight": 18,
+        "pre_market": 33,
+        "after_open": 67,
+        "before_close": 11
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:00:16+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:41+00:00",
+          "oracle_move_across_frozen": 0.005026
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:51+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:27+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T22:40:15+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:29+00:00",
+          "oracle_move_across_frozen": 0.001109
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:31+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:11:51+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:49+00:00",
+          "oracle_move_across_frozen": -0.000361
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:50:22+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:43+00:00",
+          "oracle_move_across_frozen": -0.009374
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:53:36+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:23+00:00",
+          "oracle_move_across_frozen": 0.007722
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.009374
+    },
+    {
+      "symbol": "SNDK",
+      "proxy": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
+      "aggregators": [
+        "0x7B2FdfcEa772f093DD33b3aCF8EE294B368f6c23"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 27,
+        "after_hours": 25,
+        "overnight": 111,
+        "pre_market": 123,
+        "after_open": 139,
+        "frozen": 1
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 21,
+        "after_hours": 13,
+        "overnight": 45,
+        "pre_market": 39,
+        "after_open": 85
+      },
+      "frozen_updates": 1,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T22:38:38+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:26+00:00",
+          "oracle_move_across_frozen": 0.021815
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T20:08:14+00:00",
+          "updates_inside_frozen": 1,
+          "inside_frozen_detail": [
+            {
+              "at": "2026-08-08T00:00:19+00:00",
+              "change_vs_previous": 0.005149838775509785
+            }
+          ],
+          "first_update_after_frozen": "2026-08-10T00:00:43+00:00",
+          "oracle_move_across_frozen": 0.004109
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T23:20:28+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:50+00:00",
+          "oracle_move_across_frozen": 0.004961
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:45:18+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:24+00:00",
+          "oracle_move_across_frozen": 0.014668
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:41:26+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:52+00:00",
+          "oracle_move_across_frozen": -0.019459
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T20:36:35+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:27+00:00",
+          "oracle_move_across_frozen": 0.027028
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:56+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:03:22+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:44+00:00",
+          "oracle_move_across_frozen": 0.002078
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.027028
+    },
+    {
+      "symbol": "AMZN",
+      "proxy": "0xD5a1508ceD74c084eBf3cBe853e2C968fB2a651C",
+      "aggregators": [
+        "0x93503dFc97157cdB8aADcCaf70452621d598FDeb"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 5,
+        "after_hours": 1,
+        "overnight": 12,
+        "pre_market": 21,
+        "after_open": 29
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 7,
+        "overnight": 6,
+        "after_open": 21,
+        "after_hours": 3,
+        "pre_market": 15
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:56:07+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:26+00:00",
+          "oracle_move_across_frozen": 0.009548
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:46+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:23+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:03:04+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:23+00:00",
+          "oracle_move_across_frozen": 0.000617
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:30:33+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:42+00:00",
+          "oracle_move_across_frozen": -0.004942
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:46:08+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:48+00:00",
+          "oracle_move_across_frozen": -0.004578
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:38+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:38+00:00",
+          "oracle_move_across_frozen": null
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.009548
+    },
+    {
+      "symbol": "CRCL",
+      "proxy": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
+      "aggregators": [
+        "0x901D8DF245E48Dfc82D6483FC45b5BE6ddc5281a"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 20,
+        "after_hours": 15,
+        "overnight": 112,
+        "pre_market": 104,
+        "after_open": 155
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 27,
+        "after_hours": 39,
+        "overnight": 70,
+        "pre_market": 98,
+        "after_open": 128
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:01:17+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:42+00:00",
+          "oracle_move_across_frozen": 0.006704
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:56:22+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:51+00:00",
+          "oracle_move_across_frozen": 0.001659
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:12:31+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:21+00:00",
+          "oracle_move_across_frozen": 0.005524
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T23:43:31+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:50+00:00",
+          "oracle_move_across_frozen": 0.009306
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T20:08:49+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:44+00:00",
+          "oracle_move_across_frozen": 0.006132
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:23+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:51:21+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:42+00:00",
+          "oracle_move_across_frozen": -0.017829
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:28:54+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:46+00:00",
+          "oracle_move_across_frozen": 0.000545
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.017829
+    },
+    {
+      "symbol": "USAR",
+      "proxy": "0xA994d3684e8400A6c8078226925779FdeE682DD9",
+      "aggregators": [
+        "0x76ba75c6c362900B275D9D4d5C422F0275e85578"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 35,
+        "after_hours": 20,
+        "overnight": 82,
+        "pre_market": 65,
+        "after_open": 137
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 23,
+        "overnight": 27,
+        "pre_market": 47,
+        "after_open": 65,
+        "after_hours": 7
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:21:29+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:36+00:00",
+          "oracle_move_across_frozen": 0.020829
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T22:11:08+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:48+00:00",
+          "oracle_move_across_frozen": 5.9e-05
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:05:00+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:20+00:00",
+          "oracle_move_across_frozen": 0.009665
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T20:06:13+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:31+00:00",
+          "oracle_move_across_frozen": 0.012624
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T21:09:24+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:31+00:00",
+          "oracle_move_across_frozen": 0.00332
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T23:27:20+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:43+00:00",
+          "oracle_move_across_frozen": 0.019616
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T23:03:10+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:22+00:00",
+          "oracle_move_across_frozen": -0.010629
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T22:44:29+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:31+00:00",
+          "oracle_move_across_frozen": 0.0108
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.020829
+    },
+    {
+      "symbol": "GOOGL",
+      "proxy": "0xF6f373a037c30F0e5010d854385cA89185AE638b",
+      "aggregators": [
+        "0x11eD6d598eF565DDA86fAfE7E779303e7CC6b2Bd"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 3,
+        "after_hours": 5,
+        "overnight": 12,
+        "pre_market": 20,
+        "after_open": 29
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 7,
+        "overnight": 12,
+        "pre_market": 17,
+        "after_open": 24,
+        "after_hours": 2
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:00:21+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:29+00:00",
+          "oracle_move_across_frozen": 0.009191
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:41+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T23:20:06+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:23+00:00",
+          "oracle_move_across_frozen": 0.003154
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:20+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T22:36:26+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:31+00:00",
+          "oracle_move_across_frozen": -0.002234
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:37+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:42+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:11:48+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:40+00:00",
+          "oracle_move_across_frozen": 0.001346
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.009191
+    },
+    {
+      "symbol": "SGOV",
+      "proxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+      "aggregators": [
+        "0x0E96B7708487f91baAC09697593D3e8bf253f2d8"
+      ],
+      "weekend_updates_by_segment": {
+        "overnight": 8,
+        "frozen": 3
+      },
+      "overnight_updates_by_segment": {
+        "overnight": 8
+      },
+      "frozen_updates": 3,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:47+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:21+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 1,
+          "inside_frozen_detail": [
+            {
+              "at": "2026-08-15T00:01:29+00:00",
+              "change_vs_previous": null
+            }
+          ],
+          "first_update_after_frozen": "2026-08-17T00:00:50+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:32+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:41+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:37+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 1,
+          "inside_frozen_detail": [
+            {
+              "at": "2026-09-12T00:01:25+00:00",
+              "change_vs_previous": null
+            }
+          ],
+          "first_update_after_frozen": "2026-09-14T00:00:42+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 1,
+          "inside_frozen_detail": [
+            {
+              "at": "2026-09-19T00:01:45+00:00",
+              "change_vs_previous": null
+            }
+          ],
+          "first_update_after_frozen": "2026-09-21T00:00:27+00:00",
+          "oracle_move_across_frozen": null
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": null
+    },
+    {
+      "symbol": "BABA",
+      "proxy": "0x62Cc8F9b5f56a33c9C8A60c8B92779f523c4E984",
+      "aggregators": [
+        "0xFf5F85e4888782e66f1dd9cabaDF4822Fbeb1439"
+      ],
+      "weekend_updates_by_segment": {
+        "overnight": 81,
+        "pre_market": 24,
+        "after_open": 29,
+        "after_hours": 2
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 3,
+        "overnight": 68,
+        "after_open": 22,
+        "pre_market": 12
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:23+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:28+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:26+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T23:27:38+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:39+00:00",
+          "oracle_move_across_frozen": -0.020651
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:25+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:25+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:45+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:50:45+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:19+00:00",
+          "oracle_move_across_frozen": 0.006882
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.020651
+    },
+    {
+      "symbol": "CLSK",
+      "proxy": "0x810c12D3a554Bc47fd39597Fe3b3AAC4941F50eF",
+      "aggregators": [
+        "0xEff19B88E3c72f046e4a19A1E62544D5869d4275"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 40,
+        "after_hours": 7,
+        "overnight": 73,
+        "pre_market": 62,
+        "after_open": 159
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 44,
+        "after_hours": 5,
+        "overnight": 69,
+        "pre_market": 59,
+        "after_open": 139
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:34:53+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:47+00:00",
+          "oracle_move_across_frozen": 0.013343
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T20:49:26+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:19+00:00",
+          "oracle_move_across_frozen": -0.000222
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T19:58:29+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:19+00:00",
+          "oracle_move_across_frozen": 0.000414
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T21:27:17+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:38+00:00",
+          "oracle_move_across_frozen": 0.002639
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:56:40+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:30+00:00",
+          "oracle_move_across_frozen": -0.005572
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:50:50+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:47+00:00",
+          "oracle_move_across_frozen": -0.005226
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T20:37:33+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:53+00:00",
+          "oracle_move_across_frozen": -0.012633
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T23:40:41+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:24+00:00",
+          "oracle_move_across_frozen": 0.012836
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.013343
+    },
+    {
+      "symbol": "PLTR",
+      "proxy": "0x820ABedFF239034956B7A9d2F0a331f9F075eB4c",
+      "aggregators": [
+        "0x315afd0f71D5407B99ad19ab001a67af40fbAAF4"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 7,
+        "overnight": 28,
+        "pre_market": 32,
+        "after_open": 63,
+        "after_hours": 1
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 10,
+        "after_hours": 7,
+        "overnight": 12,
+        "after_open": 70,
+        "pre_market": 17
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T19:19:23+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:50+00:00",
+          "oracle_move_across_frozen": 0.008304
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:53:34+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:29+00:00",
+          "oracle_move_across_frozen": -0.001136
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T19:22:28+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:37+00:00",
+          "oracle_move_across_frozen": 0.001175
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:42:17+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:39+00:00",
+          "oracle_move_across_frozen": 0.004864
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T22:14:21+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:44+00:00",
+          "oracle_move_across_frozen": -0.000884
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:05:33+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:26+00:00",
+          "oracle_move_across_frozen": 0.006516
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:30+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:58:14+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:36+00:00",
+          "oracle_move_across_frozen": 0.000292
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.008304
+    },
+    {
+      "symbol": "MU",
+      "proxy": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
+      "aggregators": [
+        "0xA088FaD0A0A62693aF068E2EdB80B1578c8A9365"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 14,
+        "after_hours": 5,
+        "overnight": 82,
+        "pre_market": 70,
+        "after_open": 98
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 7,
+        "after_hours": 4,
+        "overnight": 25,
+        "pre_market": 35,
+        "after_open": 44
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T23:53:55+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:47+00:00",
+          "oracle_move_across_frozen": 0.03133
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:01:56+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:21+00:00",
+          "oracle_move_across_frozen": 0.003127
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T19:57:52+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:47+00:00",
+          "oracle_move_across_frozen": 0.011235
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T22:02:03+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:53+00:00",
+          "oracle_move_across_frozen": 0.005723
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T22:42:24+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:46+00:00",
+          "oracle_move_across_frozen": -0.014736
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:56:56+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:54+00:00",
+          "oracle_move_across_frozen": 0.016923
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:46+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:55:34+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:21+00:00",
+          "oracle_move_across_frozen": 0.005191
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.03133
+    },
+    {
+      "symbol": "RKLB",
+      "proxy": "0x045477BF65Aef6f4F2386ad0164579e48381CC74",
+      "aggregators": [
+        "0x59aB60B1D63DE8b282852573D18a3a99c04C787c"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 16,
+        "after_hours": 5,
+        "overnight": 61,
+        "pre_market": 66,
+        "after_open": 126
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 19,
+        "after_hours": 15,
+        "overnight": 47,
+        "pre_market": 58,
+        "after_open": 107
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:57:58+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:53+00:00",
+          "oracle_move_across_frozen": 0.017741
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T22:50:36+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:26+00:00",
+          "oracle_move_across_frozen": 0.008638
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T19:41:39+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:30+00:00",
+          "oracle_move_across_frozen": 0.005352
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T21:07:31+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:52+00:00",
+          "oracle_move_across_frozen": 0.002895
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:26:55+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:34+00:00",
+          "oracle_move_across_frozen": -0.004505
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:24:21+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:49+00:00",
+          "oracle_move_across_frozen": 0.007535
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:57:44+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:30+00:00",
+          "oracle_move_across_frozen": -0.004604
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:55:28+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:50+00:00",
+          "oracle_move_across_frozen": 0.005185
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.017741
+    },
+    {
+      "symbol": "CRWV",
+      "proxy": "0xe1b3aABCAFAd1c94708dc1367dcfF8Aa4407487C",
+      "aggregators": [
+        "0xd9C04B7353421fC4deb1614Ed13Fe10D90E586cc"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 25,
+        "after_hours": 10,
+        "overnight": 75,
+        "pre_market": 81,
+        "after_open": 131
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 29,
+        "after_hours": 19,
+        "overnight": 43,
+        "pre_market": 125,
+        "after_open": 102
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T22:12:20+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:45+00:00",
+          "oracle_move_across_frozen": 0.013978
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T23:59:54+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:31+00:00",
+          "oracle_move_across_frozen": 0.003232
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:01:00+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:20+00:00",
+          "oracle_move_across_frozen": 0.009759
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T22:51:22+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:41+00:00",
+          "oracle_move_across_frozen": 0.00413
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:44:16+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:42+00:00",
+          "oracle_move_across_frozen": -0.009827
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T20:43:53+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:50+00:00",
+          "oracle_move_across_frozen": 0.007487
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:57:26+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:30+00:00",
+          "oracle_move_across_frozen": -0.018575
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:37:00+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:36+00:00",
+          "oracle_move_across_frozen": 0.005042
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.018575
+    },
+    {
+      "symbol": "AMD",
+      "proxy": "0x943A29E7ae51A4798823ca9eEd2ed533B2A22C72",
+      "aggregators": [
+        "0xdAD54b8Ee51Af258e5A6Faa9a84a3300f4775f7d"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 15,
+        "after_hours": 6,
+        "frozen": 1,
+        "overnight": 48,
+        "pre_market": 49,
+        "after_open": 76
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 10,
+        "overnight": 27,
+        "pre_market": 33,
+        "after_open": 50,
+        "after_hours": 5
+      },
+      "frozen_updates": 1,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T23:21:02+00:00",
+          "updates_inside_frozen": 1,
+          "inside_frozen_detail": [
+            {
+              "at": "2026-08-01T00:00:03+00:00",
+              "change_vs_previous": -0.0050080033431646465
+            }
+          ],
+          "first_update_after_frozen": "2026-08-03T00:00:19+00:00",
+          "oracle_move_across_frozen": 0.019071
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:57:36+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:30+00:00",
+          "oracle_move_across_frozen": 0.001275
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:05:05+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:25+00:00",
+          "oracle_move_across_frozen": 0.002945
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:25+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:58:07+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:26+00:00",
+          "oracle_move_across_frozen": -0.003787
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:56:16+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:44+00:00",
+          "oracle_move_across_frozen": 0.002839
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:08:57+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:48+00:00",
+          "oracle_move_across_frozen": -0.028341
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:57:55+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:29+00:00",
+          "oracle_move_across_frozen": 0.006606
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.028341
+    },
+    {
+      "symbol": "EWY",
+      "proxy": "0xEFdf54610B62A7753Ec30bDc380847c12D32e1D1",
+      "aggregators": [
+        "0x105Cbe427BBD3225826a450f67EA80FeC6417F93"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 9,
+        "after_hours": 4,
+        "overnight": 89,
+        "pre_market": 38,
+        "after_open": 32
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 8,
+        "after_hours": 7,
+        "overnight": 34,
+        "pre_market": 24,
+        "after_open": 19
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T23:35:13+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:30+00:00",
+          "oracle_move_across_frozen": 0.034545
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:11:16+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:46+00:00",
+          "oracle_move_across_frozen": -0.002083
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:46+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:36:43+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:32+00:00",
+          "oracle_move_across_frozen": 0.012769
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T22:29:33+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:55+00:00",
+          "oracle_move_across_frozen": -0.013524
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T22:05:05+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:26+00:00",
+          "oracle_move_across_frozen": 0.017126
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:38+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:12:06+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:24+00:00",
+          "oracle_move_across_frozen": 0.008733
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.034545
+    },
+    {
+      "symbol": "NVDA",
+      "proxy": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
+      "aggregators": [
+        "0xC9d16E4f2569b9E3ea0468fD85844953713DC2a2"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 6,
+        "after_hours": 3,
+        "overnight": 19,
+        "pre_market": 17,
+        "after_open": 32
+      },
+      "overnight_updates_by_segment": {
+        "after_hours": 3,
+        "pre_market": 10,
+        "overnight": 7,
+        "after_open": 16,
+        "before_close": 3
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:53:32+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:22+00:00",
+          "oracle_move_across_frozen": 0.010735
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:55:37+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:31+00:00",
+          "oracle_move_across_frozen": 0.002079
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:22+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:57:46+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:39+00:00",
+          "oracle_move_across_frozen": 0.011737
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:56:29+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:54+00:00",
+          "oracle_move_across_frozen": -0.008161
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:54+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T20:03:43+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:29+00:00",
+          "oracle_move_across_frozen": -0.011158
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:55:32+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:20+00:00",
+          "oracle_move_across_frozen": 0.001597
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.011737
+    },
+    {
+      "symbol": "USO",
+      "proxy": "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c",
+      "aggregators": [
+        "0xa6aC45e27D19f91c55109191D71CfBA4A9f5fBe1"
+      ],
+      "weekend_updates_by_segment": {
+        "after_hours": 18,
+        "overnight": 61,
+        "pre_market": 59,
+        "after_open": 11,
+        "before_close": 4
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 9,
+        "after_hours": 6,
+        "overnight": 44,
+        "pre_market": 71,
+        "after_open": 10
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T22:48:04+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:22+00:00",
+          "oracle_move_across_frozen": -0.077545
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T21:18:53+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:51+00:00",
+          "oracle_move_across_frozen": 0.024248
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:29+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T21:23:36+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:22+00:00",
+          "oracle_move_across_frozen": -0.008243
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T23:13:34+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:56+00:00",
+          "oracle_move_across_frozen": 0.02511
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T20:35:19+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:46+00:00",
+          "oracle_move_across_frozen": 0.014283
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:23+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T23:50:32+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:49+00:00",
+          "oracle_move_across_frozen": -0.003964
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.077545
+    },
+    {
+      "symbol": "COIN",
+      "proxy": "0xA3a468A452940B7D6b69991207B508c609a98Ef2",
+      "aggregators": [
+        "0x30398b0B0df82a009bB2D507BC7fE1dc6d3ca294"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 24,
+        "after_hours": 16,
+        "overnight": 63,
+        "pre_market": 74,
+        "after_open": 101
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 26,
+        "after_hours": 18,
+        "overnight": 45,
+        "pre_market": 70,
+        "after_open": 94
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:01:37+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:27+00:00",
+          "oracle_move_across_frozen": 0.015204
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:43:04+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:29+00:00",
+          "oracle_move_across_frozen": 0.002925
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:02:18+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:44+00:00",
+          "oracle_move_across_frozen": 0.003455
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T23:48:10+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:23+00:00",
+          "oracle_move_across_frozen": -0.000404
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T20:02:21+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:46+00:00",
+          "oracle_move_across_frozen": 0.003535
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:58:31+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:23+00:00",
+          "oracle_move_across_frozen": -0.004572
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:40:30+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:34+00:00",
+          "oracle_move_across_frozen": -0.010145
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:57:46+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:38+00:00",
+          "oracle_move_across_frozen": 0.005002
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.015204
+    },
+    {
+      "symbol": "NBIS",
+      "proxy": "0xE1D87B116Ba0fe898998f1D140339D1fA1E09705",
+      "aggregators": [
+        "0xE50c4775FeFc1E3C9206771dd0056AEe30F51b2F"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 36,
+        "after_hours": 17,
+        "overnight": 113,
+        "pre_market": 119,
+        "after_open": 149
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 32,
+        "after_hours": 20,
+        "overnight": 63,
+        "pre_market": 89,
+        "after_open": 114
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T23:46:38+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:25+00:00",
+          "oracle_move_across_frozen": 0.054035
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T23:45:09+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:28+00:00",
+          "oracle_move_across_frozen": 0.008878
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T19:56:23+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:48+00:00",
+          "oracle_move_across_frozen": 0.009342
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:10:20+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:43+00:00",
+          "oracle_move_across_frozen": 0.014279
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:53:53+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:48+00:00",
+          "oracle_move_across_frozen": -0.016078
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T20:15:58+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:21+00:00",
+          "oracle_move_across_frozen": 0.008541
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:51+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:36:25+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:47+00:00",
+          "oracle_move_across_frozen": 0.007909
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.054035
+    },
+    {
+      "symbol": "IONQ",
+      "proxy": "0x22EfeC4919baf55F360E0EDee4AbEB26DE4971eb",
+      "aggregators": [
+        "0x886E11c1053289Eed882C734e1864EfE3430BC24"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 30,
+        "after_hours": 14,
+        "overnight": 59,
+        "pre_market": 68,
+        "after_open": 143
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 31,
+        "after_hours": 54,
+        "overnight": 57,
+        "pre_market": 100,
+        "after_open": 93
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T22:28:12+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:30+00:00",
+          "oracle_move_across_frozen": 0.028301
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T20:01:55+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:19+00:00",
+          "oracle_move_across_frozen": 0.006316
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:17:52+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:47+00:00",
+          "oracle_move_across_frozen": 0.010449
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T22:53:30+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:49+00:00",
+          "oracle_move_across_frozen": 0.01003
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T20:03:20+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:28+00:00",
+          "oracle_move_across_frozen": -0.015894
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T20:04:17+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:27+00:00",
+          "oracle_move_across_frozen": 0.004172
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:33:35+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:38+00:00",
+          "oracle_move_across_frozen": -0.007009
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:16:21+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:43+00:00",
+          "oracle_move_across_frozen": 0.005328
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.028301
+    },
+    {
+      "symbol": "ORCL",
+      "proxy": "0x0e6a64a2B58A6693a531E6c555f3A5d042eEA844",
+      "aggregators": [
+        "0x4a9aBC759e0B7b0ba98b5fd39c419A5D3e962aAf"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 14,
+        "after_hours": 7,
+        "overnight": 49,
+        "pre_market": 40,
+        "after_open": 81
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 10,
+        "overnight": 14,
+        "pre_market": 34,
+        "after_open": 61,
+        "after_hours": 6
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T20:58:48+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:26+00:00",
+          "oracle_move_across_frozen": 0.011423
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:55:25+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:36+00:00",
+          "oracle_move_across_frozen": 0.001877
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T19:36:33+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:49+00:00",
+          "oracle_move_across_frozen": 0.005564
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:33:54+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:29+00:00",
+          "oracle_move_across_frozen": 0.005779
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T20:02:40+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:30+00:00",
+          "oracle_move_across_frozen": -0.003461
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T20:19:51+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:48+00:00",
+          "oracle_move_across_frozen": 0.019076
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T22:10:45+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:46+00:00",
+          "oracle_move_across_frozen": -0.006908
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:56:34+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:22+00:00",
+          "oracle_move_across_frozen": 0.00095
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.019076
+    },
+    {
+      "symbol": "AAPL",
+      "proxy": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
+      "aggregators": [
+        "0xBb11A21267cFDb63d4935d99a499133DD1744ACb"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 9,
+        "after_hours": 2,
+        "overnight": 11,
+        "pre_market": 14,
+        "after_open": 26
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 7,
+        "overnight": 2,
+        "after_open": 12,
+        "pre_market": 6
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:24:41+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:31+00:00",
+          "oracle_move_across_frozen": 0.009503
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:21+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:49+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:19+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:24+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:51:26+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:54+00:00",
+          "oracle_move_across_frozen": -0.000629
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:51:28+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:49+00:00",
+          "oracle_move_across_frozen": -0.002511
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:20+00:00",
+          "oracle_move_across_frozen": null
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.009503
+    },
+    {
+      "symbol": "GME",
+      "proxy": "0x27C71df6A64fB476468EdF256CF72c038baB5B67",
+      "aggregators": [
+        "0xf83Cde62D1Cd90dE8d2Bf3332B90c590985aD679"
+      ],
+      "weekend_updates_by_segment": {
+        "overnight": 27,
+        "pre_market": 106,
+        "after_open": 52,
+        "after_hours": 2,
+        "before_close": 6
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 16,
+        "after_hours": 12,
+        "after_open": 50,
+        "overnight": 9,
+        "pre_market": 19
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:21+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T20:13:02+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:26+00:00",
+          "oracle_move_across_frozen": 0.005806
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:30+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:44+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:51:54+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:49+00:00",
+          "oracle_move_across_frozen": 0.003905
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:11:08+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:31+00:00",
+          "oracle_move_across_frozen": -0.002686
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:50:45+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:36+00:00",
+          "oracle_move_across_frozen": 0.001894
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:18:46+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:38+00:00",
+          "oracle_move_across_frozen": 0.001253
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.005806
+    },
+    {
+      "symbol": "MSTR",
+      "proxy": "0x396118bdFB181e6240E74D243F266B061c0edc3D",
+      "aggregators": [
+        "0x55bd01F666c99E4590E084FdEfF88041BB50CCD1"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 32,
+        "after_hours": 15,
+        "overnight": 110,
+        "pre_market": 110,
+        "after_open": 111
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 23,
+        "after_hours": 34,
+        "overnight": 84,
+        "pre_market": 87,
+        "after_open": 103
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T20:07:59+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:20+00:00",
+          "oracle_move_across_frozen": 0.016477
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:50:36+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:30+00:00",
+          "oracle_move_across_frozen": 0.011761
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T22:16:55+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:47+00:00",
+          "oracle_move_across_frozen": 0.006027
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T23:50:57+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:45+00:00",
+          "oracle_move_across_frozen": -0.005588
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T22:48:16+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:33+00:00",
+          "oracle_move_across_frozen": -0.001662
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T21:57:41+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:31+00:00",
+          "oracle_move_across_frozen": -0.004177
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:55:55+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:45+00:00",
+          "oracle_move_across_frozen": -0.016855
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T23:41:26+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:43+00:00",
+          "oracle_move_across_frozen": 0.020682
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.020682
+    },
+    {
+      "symbol": "TSLA",
+      "proxy": "0x4A1166a659A55625345e9515b32adECea5547C38",
+      "aggregators": [
+        "0x7A6b81ba7FbCB90104d8C496158Cf383cD7233b1"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 8,
+        "after_hours": 2,
+        "overnight": 23,
+        "pre_market": 20,
+        "after_open": 47
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 8,
+        "after_hours": 2,
+        "overnight": 14,
+        "pre_market": 17,
+        "after_open": 53
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T21:00:47+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:47+00:00",
+          "oracle_move_across_frozen": 0.009219
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:06:24+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:20+00:00",
+          "oracle_move_across_frozen": 0.00315
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:54+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:56:19+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:42+00:00",
+          "oracle_move_across_frozen": 0.011539
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:54:49+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:44+00:00",
+          "oracle_move_across_frozen": -0.005874
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:49+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:39+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:48:47+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:39+00:00",
+          "oracle_move_across_frozen": 0.003835
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.011539
+    },
+    {
+      "symbol": "SLV",
+      "proxy": "0x209b73908e92Ae021826eD79609845451Ecba2ce",
+      "aggregators": [
+        "0xcdF6F7043b3aF6Afa0CAAACe1230B355096B5386"
+      ],
+      "weekend_updates_by_segment": {
+        "overnight": 57,
+        "pre_market": 24,
+        "after_open": 17,
+        "before_close": 5,
+        "after_hours": 1
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 8,
+        "after_hours": 6,
+        "overnight": 44,
+        "pre_market": 32,
+        "after_open": 7
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:41+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:50:46+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:46+00:00",
+          "oracle_move_across_frozen": -0.001216
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T19:08:35+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:26+00:00",
+          "oracle_move_across_frozen": 0.002995
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T20:21:14+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:31+00:00",
+          "oracle_move_across_frozen": 0.004713
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-28T19:27:32+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:58+00:00",
+          "oracle_move_across_frozen": -0.000666
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:27:46+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:44+00:00",
+          "oracle_move_across_frozen": 0.004308
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:56+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T19:56:35+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:22+00:00",
+          "oracle_move_across_frozen": 0.001086
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.004713
+    },
+    {
+      "symbol": "ASML",
+      "proxy": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
+      "aggregators": [
+        "0xF795030a46ad6CA4b07Bf5fB704dC36039118c9F"
+      ],
+      "weekend_updates_by_segment": {
+        "before_close": 10,
+        "overnight": 53,
+        "pre_market": 31,
+        "after_open": 35,
+        "after_hours": 3
+      },
+      "overnight_updates_by_segment": {
+        "before_close": 6,
+        "after_hours": 4,
+        "overnight": 33,
+        "pre_market": 30,
+        "after_open": 28
+      },
+      "frozen_updates": 0,
+      "weekends": [
+        {
+          "close": "2026-07-31T20:00:00+00:00",
+          "open": "2026-08-03T13:30:00+00:00",
+          "last_update_before_frozen": "2026-07-31T19:59:36+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-03T00:00:27+00:00",
+          "oracle_move_across_frozen": 0.01402
+        },
+        {
+          "close": "2026-08-07T20:00:00+00:00",
+          "open": "2026-08-10T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-07T19:01:44+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-10T00:00:43+00:00",
+          "oracle_move_across_frozen": 0.00057
+        },
+        {
+          "close": "2026-08-14T20:00:00+00:00",
+          "open": "2026-08-17T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-14T20:01:19+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-17T00:00:43+00:00",
+          "oracle_move_across_frozen": 0.000867
+        },
+        {
+          "close": "2026-08-21T20:00:00+00:00",
+          "open": "2026-08-24T13:30:00+00:00",
+          "last_update_before_frozen": "2026-08-21T19:42:33+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-24T00:00:21+00:00",
+          "oracle_move_across_frozen": 0.003428
+        },
+        {
+          "close": "2026-08-28T20:00:00+00:00",
+          "open": "2026-08-31T13:30:00+00:00",
+          "last_update_before_frozen": null,
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-08-31T00:00:34+00:00",
+          "oracle_move_across_frozen": null
+        },
+        {
+          "close": "2026-09-04T20:00:00+00:00",
+          "open": "2026-09-08T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-04T19:50:52+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-08T00:00:49+00:00",
+          "oracle_move_across_frozen": 0.009333
+        },
+        {
+          "close": "2026-09-11T20:00:00+00:00",
+          "open": "2026-09-14T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-11T19:24:09+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-14T00:00:24+00:00",
+          "oracle_move_across_frozen": -0.015226
+        },
+        {
+          "close": "2026-09-18T20:00:00+00:00",
+          "open": "2026-09-21T13:30:00+00:00",
+          "last_update_before_frozen": "2026-09-18T20:02:05+00:00",
+          "updates_inside_frozen": 0,
+          "inside_frozen_detail": [],
+          "first_update_after_frozen": "2026-09-21T00:00:40+00:00",
+          "oracle_move_across_frozen": 0.001318
+        }
+      ],
+      "max_abs_oracle_move_across_frozen": 0.015226
+    }
+  ],
+  "latest_update": {
+    "DELL": "2026-09-25T19:36:10+00:00",
+    "SPCX": "2026-09-25T19:32:38+00:00",
+    "SPY": "2026-09-25T16:03:00+00:00",
+    "QQQ": "2026-09-25T16:03:35+00:00",
+    "TSM": "2026-09-25T16:59:26+00:00",
+    "INTC": "2026-09-25T19:36:05+00:00",
+    "MSFT": "2026-09-25T17:20:17+00:00",
+    "RGTI": "2026-09-25T19:57:10+00:00",
+    "META": "2026-09-25T23:42:33+00:00",
+    "SNDK": "2026-09-25T17:03:52+00:00",
+    "AMZN": "2026-09-25T16:01:12+00:00",
+    "CRCL": "2026-09-25T23:06:19+00:00",
+    "USAR": "2026-09-25T19:56:44+00:00",
+    "GOOGL": "2026-09-25T16:41:55+00:00",
+    "SGOV": "2026-09-26T00:01:27+00:00",
+    "BABA": "2026-09-25T19:51:56+00:00",
+    "CLSK": "2026-09-25T19:50:14+00:00",
+    "PLTR": "2026-09-25T19:32:13+00:00",
+    "MU": "2026-09-25T17:02:14+00:00",
+    "RKLB": "2026-09-25T18:30:29+00:00",
+    "CRWV": "2026-09-25T21:41:31+00:00",
+    "AMD": "2026-09-25T16:02:46+00:00",
+    "EWY": "2026-09-25T17:43:07+00:00",
+    "NVDA": "2026-09-25T19:56:05+00:00",
+    "USO": "2026-09-25T20:46:51+00:00",
+    "COIN": "2026-09-25T19:40:14+00:00",
+    "NBIS": "2026-09-25T22:24:45+00:00",
+    "IONQ": "2026-09-25T23:18:56+00:00",
+    "ORCL": "2026-09-25T19:30:54+00:00",
+    "AAPL": "2026-09-25T19:49:25+00:00",
+    "GME": "2026-09-25T20:01:50+00:00",
+    "MSTR": "2026-09-25T19:55:51+00:00",
+    "TSLA": "2026-09-25T19:02:24+00:00",
+    "SLV": "2026-09-25T18:35:14+00:00",
+    "ASML": "2026-09-25T16:04:19+00:00"
+  }
+}

@@ -71,6 +71,115 @@
       "title": "ApiConfig",
       "type": "object"
     },
+    "BacktestConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "borrower_ltv_share_of_lltv": {
+          "$ref": "#/$defs/BorrowerLtv"
+        },
+        "depth_source": {
+          "enum": [
+            "discovered",
+            "none"
+          ],
+          "title": "Depth Source",
+          "type": "string"
+        },
+        "loan_turnover_per_session": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Loan Turnover Per Session",
+          "type": "number"
+        },
+        "ltv_grid_points": {
+          "exclusiveMinimum": 0,
+          "title": "Ltv Grid Points",
+          "type": "integer"
+        },
+        "rate_spread_multipliers": {
+          "items": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Rate Spread Multipliers",
+          "type": "array"
+        },
+        "replay": {
+          "$ref": "#/$defs/ReplayConfig"
+        },
+        "safety_margins_to_tune": {
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Safety Margins To Tune",
+          "type": "array"
+        },
+        "session_hours": {
+          "exclusiveMinimum": 0,
+          "title": "Session Hours",
+          "type": "number"
+        },
+        "supply_apy_by_lltv": {
+          "additionalProperties": {
+            "exclusiveMaximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Supply Apy By Lltv",
+          "type": "object"
+        },
+        "tier_pairs_to_tune": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Tier Pairs To Tune",
+          "type": "array"
+        },
+        "utilization": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Utilization",
+          "type": "number"
+        },
+        "vault_usdg": {
+          "exclusiveMinimum": 0,
+          "title": "Vault Usdg",
+          "type": "number"
+        }
+      },
+      "required": [
+        "vault_usdg",
+        "supply_apy_by_lltv",
+        "utilization",
+        "loan_turnover_per_session",
+        "borrower_ltv_share_of_lltv",
+        "ltv_grid_points",
+        "session_hours",
+        "depth_source",
+        "tier_pairs_to_tune",
+        "safety_margins_to_tune",
+        "rate_spread_multipliers",
+        "replay"
+      ],
+      "title": "BacktestConfig",
+      "type": "object"
+    },
     "BaselinesConfig": {
       "additionalProperties": false,
       "properties": {
@@ -91,6 +200,29 @@
         "min_ticker_segment_rows"
       ],
       "title": "BaselinesConfig",
+      "type": "object"
+    },
+    "BorrowerLtv": {
+      "additionalProperties": false,
+      "properties": {
+        "high": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Low",
+          "type": "number"
+        }
+      },
+      "required": [
+        "low",
+        "high"
+      ],
+      "title": "BorrowerLtv",
       "type": "object"
     },
     "ChainConfig": {
@@ -185,11 +317,20 @@
           },
           "title": "Mondrian Segments",
           "type": "array"
+        },
+        "normalize": {
+          "enum": [
+            "none",
+            "ewma"
+          ],
+          "title": "Normalize",
+          "type": "string"
         }
       },
       "required": [
         "method",
-        "mondrian_segments"
+        "mondrian_segments",
+        "normalize"
       ],
       "title": "ConformalConfig",
       "type": "object"
@@ -587,6 +728,14 @@
           "title": "Target Alpha",
           "type": "number"
         },
+        "target_scaling": {
+          "enum": [
+            "none",
+            "ewma"
+          ],
+          "title": "Target Scaling",
+          "type": "string"
+        },
         "walk_forward": {
           "$ref": "#/$defs/WalkForwardConfig"
         }
@@ -600,7 +749,8 @@
         "baselines",
         "acceptance",
         "seed",
-        "n_jobs"
+        "n_jobs",
+        "target_scaling"
       ],
       "title": "ModelConfig",
       "type": "object"
@@ -845,6 +995,27 @@
       "title": "ProfileConfig",
       "type": "object"
     },
+    "ReplayConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "per_segment": {
+          "exclusiveMinimum": 0,
+          "title": "Per Segment",
+          "type": "integer"
+        },
+        "window_sessions": {
+          "exclusiveMinimum": 0,
+          "title": "Window Sessions",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "per_segment",
+        "window_sessions"
+      ],
+      "title": "ReplayConfig",
+      "type": "object"
+    },
     "ScheduleConfig": {
       "additionalProperties": false,
       "properties": {
@@ -1086,6 +1257,9 @@
     "api": {
       "$ref": "#/$defs/ApiConfig"
     },
+    "backtest": {
+      "$ref": "#/$defs/BacktestConfig"
+    },
     "chains": {
       "additionalProperties": {
         "$ref": "#/$defs/ChainConfig"
@@ -1147,6 +1321,7 @@
     "gaps",
     "model",
     "policy",
+    "backtest",
     "schedule",
     "api",
     "web",

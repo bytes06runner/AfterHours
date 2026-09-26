@@ -2,12 +2,20 @@
 
 ## BLOCKED
 
-Nothing yet.
+1. **Archive RPC for Robinhood Chain mainnet (needed for the fork).** The public RPC
+   (`rpc.mainnet.chain.robinhood.com`) serves state for only about the last 1,000 blocks
+   (under 16 minutes; `cast code ... --block head-10000` fails with "historical state ... is not
+   available"). Anvil cannot fork at the pinned `fork_block` (72388902, Friday 2026-09-25
+   13:00 ET) without an archive node. Please create `.env` from `.env.example` and set
+   `RH_MAINNET_RPC_URL` to an archive-capable endpoint (Robinhood's docs recommend Alchemy:
+   one app for Robinhood Chain mainnet). Also set `RH_TESTNET_RPC_URL` and the Arbitrum URLs while
+   you are there. Blocks: fork-block checks in M1, fork tests in M5, M6 and M7 on the fork.
+   Unblocked meanwhile: discovery at head, the oracle study (logs only), M2 to M4, M5 unit tests.
 
 ## Milestones
 
 - [x] M0 Bootstrap (2026-09-26, `d185414`)
-- [ ] M1 Discovery
+- [x] M1 Discovery (2026-09-26; fork-block checks wait on BLOCKED 1)
 - [ ] M2 Data and gap study
 - [ ] M3 Model
 - [ ] M4 Policy and backtest
@@ -60,3 +68,36 @@ Notes
 - Forge tests are skipped with a message until M5 adds the first `.t.sol`.
 
 Next: M1 discovery.
+
+### 2026-09-26 M1 Discovery: done (fork-block checks pending an archive RPC)
+
+What was done
+- `afterhours discover` (`engine/afterhours/discovery/`): fetches Robinhood's token page and assets API, Chainlink's feed directory, Morpho's SDK address book and API, and Uniswap's `deployments.json`; checks every address onchain; measures Uniswap sell depth with the official quoters; studies weekend oracle updates. Writes `deployments/fork.discovered.json` (every address with source URL and evidence) and `artifacts/discovery/oracle_study.json`.
+- `scripts/verify-discovered.sh` (`make verify-discovered`): independent check with plain `cast` calls.
+- `contracts/test/fork/StockTokenTransfer.t.sol`: deciding fact 2 as a fork test.
+- Config filled with verified values: chain ids and explorers for all four networks, public RPCs, `fork_block` 72388902 (Friday 2026-09-25 13:00 New York time), `vault_kind: vault-v2`, per-profile `morpho_source`, timelock one day (source allows 0; reason in config), `stale_minutes` 1470 (feeds use a 24 h heartbeat). SPEC updated for the per-profile Morpho source.
+- Full write-up: `docs/findings/m1-discovery.md`.
+
+The three deciding facts
+1. Weekend oracles: frozen. 8 weekends x 35 feeds: nothing after Friday 20:00 New York time except closing prints within 105 seconds, silent until Sunday 20:00. Feeds do update in the weeknight overnight session. On restart, feeds move 0.89% on average and up to 7.75% (USO).
+2. Transfers: unrestricted. 10 of 10 fork tests pass for the 5 selected tokens (fresh accounts, arbitrary contract, Morpho collateral in and out). `collateral_mode: native`.
+3. Vault: Vault V2 factory on Robinhood Chain (isVaultV2 true for 45 of 45 listed vaults). Neither testnet has Morpho: testnets self-deploy.
+
+Evidence
+- `uv run afterhours discover`: 0 failures; head block 73,040,830; selected NVDA, SPY, META, SGOV, USO (sell depth at 2%: $2.20M, $1.46M, $1.28M, $1.20M, $1.08M).
+- `make verify-discovered`: 81 passed, 0 failed.
+- `FORK_RPC_URL=<public> STOCK_SYMBOL=<s> forge test --match-path test/fork/StockTokenTransfer.t.sol`: 10 passed.
+- Enabled LLTVs: 0, 38.5, 62.5, 77, 86, 91.5, 94.5, 96.5, 98%. Liquidation incentive formula verified in source and bytecode.
+
+Other findings
+- Public RPC keeps only minutes of state (BLOCKED 1). Two bugs found and fixed on the way: calls pinned to an old block silently returned nothing, and load-balanced nodes lag the head. RPC errors now raise; only reverts count as failed calls.
+- Stock Token lending on Robinhood is early: 6,115 USDG borrowed across all Stock Token/USDG markets. No live rates to copy.
+
+Acceptance
+- `deployments/fork.discovered.json` with evidence for every address: pass (checks at `fork_block` are recorded as skipped until an archive RPC is set).
+- `cast`-based verification script passes: pass (81/81).
+- Decisions recorded: pass.
+
+Files: `engine/afterhours/{chain,discovery}/`, `scripts/verify-discovered.sh`, `contracts/test/fork/`, `config/afterhours.yaml`, `deployments/fork.discovered.json`, `artifacts/discovery/`, `docs/findings/m1-discovery.md`.
+
+Next: M2 gap study (dataset is built), then M3 results and M4.

@@ -5,6 +5,10 @@ For a lower-quantile forecast q(x) at level alpha, the conformity score is s = q
 c_k for segment k is the ceil((n_k + 1)(1 - alpha)) / n_k empirical quantile of the scores,
 and the calibrated forecast is q(x) - c_k. With exchangeable data this gives a miss rate of
 at most alpha within each segment (Romano, Patterson and Candes 2019; Vovk's Mondrian CP).
+
+With a local `scale` (normalised scores, Lei et al. 2018) the score is (q(x) - y) / scale(x)
+and the forecast is q(x) - c_k * scale(x), so the correction grows with the volatility regime
+instead of staying a fixed return.
 """
 
 from __future__ import annotations
@@ -33,9 +37,15 @@ class MondrianCQR:
     corrections: dict[str, float] = field(default_factory=dict)
     counts: dict[str, int] = field(default_factory=dict)
 
-    def fit(self, q_cal: np.ndarray, y_cal: np.ndarray, seg_cal: pd.Series) -> MondrianCQR:
+    def fit(
+        self,
+        q_cal: np.ndarray,
+        y_cal: np.ndarray,
+        seg_cal: pd.Series,
+        scale: np.ndarray | None = None,
+    ) -> MondrianCQR:
         """Learn corrections from calibration forecasts and outcomes."""
-        scores = q_cal - y_cal
+        scores = (q_cal - y_cal) / (scale if scale is not None else 1.0)
         seg = seg_cal.to_numpy()
         overall = _conformal_quantile(scores, self.alpha)
         for s in self.segments:
@@ -47,7 +57,7 @@ class MondrianCQR:
         self.corrections["_overall"] = overall
         return self
 
-    def apply(self, q: np.ndarray, seg: pd.Series) -> np.ndarray:
-        """Calibrated forecasts q - c_segment."""
+    def apply(self, q: np.ndarray, seg: pd.Series, scale: np.ndarray | None = None) -> np.ndarray:
+        """Calibrated forecasts q - c_segment (times the local scale when normalised)."""
         c = seg.map(self.corrections).fillna(self.corrections["_overall"]).to_numpy(dtype=float)
-        return q - c
+        return q - c * (scale if scale is not None else 1.0)

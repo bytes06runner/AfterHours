@@ -73,8 +73,10 @@ chains:
     faucet_url: https://arbitrum.faucet.dev
 
 morpho:
-  vault_kind: null
-  lltv_tiers: { weekday: null, weekend: null }
+  # M1: Robinhood Chain has a Vault V2 factory and no MetaMorpho factory (Morpho SDK address
+  # book, verified onchain with isVaultV2 on a live vault).
+  vault_kind: vault-v2
+  lltv_tiers: { weekday: 0.86, weekend: 0.625 }   # starting point; tuned in M4
   liquidation_incentive: { verify_from: "morpho-blue ConstantsLib + MathLib" }
 
 # Onchain discovery (M1). Every address we use is fetched from one of these sources by
@@ -107,7 +109,10 @@ vault:
   name: Afterhours USDG
   symbol: ahUSDG
   performance_fee_bps: 1000
-  timelock_seconds: null
+  # Vault V2 timelocks are per function, start at 0 and have no minimum in source (VaultV2.sol,
+  # vault-v2 tag 2026-08-13). We set one day on cap raises and adapter changes so the SPEC's
+  # trust boundary holds: the curator cannot raise risk without a public wait.
+  timelock_seconds: 86400
   max_share_per_stock: 0.35
   depth_multiplier: 0.5
   max_slippage: 0.02
@@ -147,25 +152,49 @@ gaps:
 model:
   quantiles: [0.01, 0.05]
   target_alpha: 0.01
-  conformal: { method: cqr, mondrian_segments: [earnings, weekend, holiday, overnight] }
+  # normalize: "ewma" divides conformity scores by the EWMA gap scale (locally weighted CQR),
+  # "none" uses plain additive scores. Both were run in M3; see artifacts/model/variants.
+  conformal: { method: cqr, mondrian_segments: [earnings, weekend, holiday, overnight], normalize: ewma }
   lightgbm: { num_leaves: 31, learning_rate: 0.05, n_estimators: 800, min_child_samples: 50 }
   walk_forward: { train_years: 6, calibrate_years: 1, test_years: 1 }
   baselines: { ewma_lambda: 0.94, min_ticker_segment_rows: 30 }
   acceptance: { overall_coverage_tolerance: 0.01, earnings_coverage_tolerance: 0.02 }
   seed: 7
   n_jobs: -1
+  # "ewma": LightGBM learns quantiles of g / (ewma_sigma * sqrt(hours_closed / 24)) and the
+  # forecast is scaled back. "none": raw g. Both were run in M3; see artifacts/model/variants.
+  target_scaling: ewma
 
 policy:
   safety_margin: 0.02
   turnover_penalty: 0.0005
   min_rebalance_usd: 1000
 
+# Backtest and replay (M4). Historical stock prices, simulated vault. Rates, utilisation and
+# borrower behaviour are ASSUMPTIONS: Stock Token markets on Robinhood Chain show ~0% utilisation
+# today (M1), so there is no live rate to copy. Results are reported with a sensitivity sweep.
+backtest:
+  vault_usdg: 10000000
+  supply_apy_by_lltv: { "0.385": 0.035, "0.625": 0.055, "0.77": 0.07, "0.86": 0.085, "0.915": 0.095 }
+  utilization: 0.85
+  loan_turnover_per_session: 0.2        # share of each tier's loans that roll every session
+  borrower_ltv_share_of_lltv: { low: 0.60, high: 0.98 }  # borrower LTV ~ U[low, high] x LLTV
+  ltv_grid_points: 200
+  session_hours: 6.5
+  depth_source: discovered              # per-stock depth from deployments/<profile>.discovered.json
+  tier_pairs_to_tune: [[0.86, 0.625], [0.915, 0.77], [0.77, 0.385], [0.625, 0.385], [0.86, 0.385]]
+  safety_margins_to_tune: [0.0, 0.02, 0.05]
+  rate_spread_multipliers: [0.5, 1.0, 2.0]   # sensitivity: scale (weekday APY - weekend APY)
+  replay: { per_segment: 3, window_sessions: 5 }
+
 schedule:
   hourly: true
   pre_close_minutes: 120
   post_open_minutes: 30
   pre_earnings_hours: 24
-  triggers: { shock_move_pct: 0.03, shock_window_min: 15, divergence_pct: 0.02, stale_minutes: 90 }
+  # stale_minutes: M1 found Stock Token feeds update on a 0.5% move or a 24 h heartbeat, so a calm
+  # feed can be hours old while the market is open. Stale means past the heartbeat plus 30 minutes.
+  triggers: { shock_move_pct: 0.03, shock_window_min: 15, divergence_pct: 0.02, stale_minutes: 1470 }
 
 api: { host_env: API_HOST, port_env: API_PORT, cors_origins_env: CORS_ORIGINS, admin_token_env: ADMIN_TOKEN }
 web: { api_base_url_env: NEXT_PUBLIC_API_BASE_URL, walletconnect_project_id_env: NEXT_PUBLIC_WC_PROJECT_ID }

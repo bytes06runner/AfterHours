@@ -34,9 +34,22 @@ contract StockTokenTransferForkTest is Test {
         string memory base = string.concat(".stock_tokens.", symbol);
         token = IERC20(vm.parseJsonAddress(doc, string.concat(base, ".address")));
         morpho = IMorpho(vm.parseJsonAddress(doc, ".core.morpho_blue.address"));
-        // A Uniswap v3 pool is a real holder of the token; pools[] is sorted by depth.
-        holder = vm.parseJsonAddress(doc, string.concat(base, ".pools[0].address_or_id"));
+        holder = realHolder(base);
         marketId = vm.parseJsonBytes32(doc, string.concat(base, ".morpho_markets[0].market_id"));
+    }
+
+    /// A real holder: the deepest Uniswap v3 pool, else the v4 PoolManager (it custodies every
+    /// v4 pool's tokens). pools[] is sorted by depth.
+    function realHolder(string memory base) internal view returns (address) {
+        for (uint256 i; i < 40; ++i) {
+            string memory key = string.concat(base, ".pools[", vm.toString(i), "]");
+            if (!vm.keyExistsJson(doc, key)) break;
+            string memory version = vm.parseJsonString(doc, string.concat(key, ".version"));
+            if (keccak256(bytes(version)) == keccak256("v3")) {
+                return vm.parseJsonAddress(doc, string.concat(key, ".address_or_id"));
+            }
+        }
+        return vm.parseJsonAddress(doc, ".core.uniswap_v4_pool_manager.address");
     }
 
     function test_transfersBetweenFreshAccountsAndIntoAContract() public {

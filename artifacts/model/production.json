@@ -1,0 +1,62 @@
+{
+  "target_scaling": "ewma",
+  "features": [
+    "hours_closed",
+    "seg_earnings",
+    "seg_holiday",
+    "seg_weekend",
+    "seg_overnight",
+    "rv5",
+    "rv20",
+    "rv60",
+    "hist_q01",
+    "hist_q05",
+    "hist_seg_q05",
+    "vix",
+    "vix_chg5",
+    "days_since_earnings",
+    "market_ret1",
+    "ret1",
+    "sector_code",
+    "ewma_sigma"
+  ],
+  "segments": [
+    "earnings",
+    "holiday",
+    "weekend",
+    "overnight"
+  ],
+  "quantiles": [
+    0.01,
+    0.05
+  ],
+  "train_years": [
+    2020,
+    2026
+  ],
+  "calibrate_years": [
+    2026,
+    2027
+  ],
+  "corrections": {
+    "0.01": {
+      "earnings": 1.2579503683695379,
+      "holiday": 0.2283906335319356,
+      "weekend": 0.28837121092617435,
+      "overnight": 0.4118009884333247,
+      "_overall": 0.38470231338451016
+    },
+    "0.05": {
+      "earnings": 0.13760426253223465,
+      "holiday": 0.20970677485038136,
+      "weekend": 0.17586659486736628,
+      "overnight": 0.29349461136983773,
+      "_overall": 0.26345796274738736
+    }
+  },
+  "rows": {
+    "train": 767398,
+    "calibrate": 95387
+  },
+  "model_version": "f8b69f297a249dd1"
+}

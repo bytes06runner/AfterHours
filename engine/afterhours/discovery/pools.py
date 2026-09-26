@@ -15,6 +15,7 @@ from typing import Any
 
 from eth_utils import to_checksum_address
 from web3 import Web3
+from web3.types import BlockIdentifier
 
 from afterhours.chain.abi import address_topic, get_logs
 from afterhours.chain.rpc import Call, call_many
@@ -169,7 +170,7 @@ def measure_depth(
     quote_decimals: dict[str, int],
     probes_usd: Sequence[float],
     max_slippage: float,
-    block: int,
+    block: BlockIdentifier,
 ) -> None:
     """Fill `probes` and `depth_usd` on each pool by quoting sells of token for quote."""
     calls: list[Call] = []

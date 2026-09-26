@@ -405,6 +405,9 @@ def discover(cfg: AfterhoursConfig, *, run_oracle_study: bool = True) -> dict[st
         max_range=d.oracle_study.max_log_block_range * 20,
     )
     all_pools = [p for p in v3 + v4 if quote_price.get(p.quote)]
+    # Thousands of quotes outlast a non-archive node's state window, so quote at the head
+    # and record the range of blocks the measurement spanned.
+    fresh("depth_start")
     pools.measure_depth(
         w3,
         all_pools,
@@ -416,8 +419,9 @@ def discover(cfg: AfterhoursConfig, *, run_oracle_study: bool = True) -> dict[st
         quote_decimals=quote_dec,
         probes_usd=d.pool_scan.depth_probe_usd,
         max_slippage=cfg.vault.max_slippage,
-        block=fresh("depth"),
+        block="latest",
     )
+    fresh("depth_end")
     for it in stock.values():
         mine = [p for p in all_pools if p.token.lower() == it.address.lower()]
         it.extra["pools"] = [p.to_json() for p in sorted(mine, key=lambda p: -p.depth_usd)]

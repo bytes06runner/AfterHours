@@ -63,7 +63,8 @@ afterhours/
   contracts/            Foundry: src/, script/, test/, lib/ (morpho, openzeppelin via forge install)
   engine/afterhours/    config.py, data/, universe/, features/, model/, policy/, explain/, bot/, sim/, api/, cli.py
   engine/tests/
-  backtest/             replay + economics simulator, scenario selection
+  engine/afterhours/backtest/  replay + economics simulator, scenario selection (inside the engine
+                        package so there is one Python package; changed in M4)
   web/                  Next.js app (see DESIGN.md)
   ops/kaggle/           only if ever needed
   artifacts/            generated reports, figures, screenshots (committed when small)
@@ -98,8 +99,9 @@ chains:                                  # every value filled and verified in M1
   arbitrum: { chain_id: null, explorer_url: null }
   arbitrum-sepolia: { chain_id: null, explorer_url: null, faucet_url: null }
 
+# Changed in M1: Morpho's source is per profile (profiles.<p>.morpho_source), because M1 found
+# Morpho deployed on Robinhood Chain mainnet but on neither testnet.
 morpho:
-  source: discovered                     # discovered | self-deployed (fallback)
   vault_kind: null                       # metamorpho | vault-v2, decided in M1
   lltv_tiers: { weekday: null, weekend: null }   # chosen from Morpho's enabled LLTV list
   liquidation_incentive: { verify_from: "morpho-blue ConstantsLib + MathLib" }
@@ -151,6 +153,11 @@ alerts: { webhook_env: ALERT_WEBHOOK_URL }
 ```
 
 Numeric defaults above are starting points to be tuned in M4. Record the final values and why in PROGRESS.md.
+
+Added in M1 and M2 (see config/afterhours.yaml for the full, validated set): `chains.*.public_rpc_url`,
+a `discovery` section naming every primary source and the pool depth probes, `data.sources` and
+provider settings, a `gaps` section for the gap study, and a `backtest` section whose rates and
+borrower behaviour are labelled assumptions.
 
 ## 6. Onchain design
 

@@ -61,8 +61,32 @@ def _slice(frame: pd.DataFrame, years: pd.Series, span: tuple[int, int]) -> pd.D
     return frame[(years >= span[0]) & (years < span[1])]
 
 
-def fit_lgbm(cfg: AfterhoursConfig, train: pd.DataFrame, alpha: float) -> Any:
-    """One LightGBM quantile model."""
+def gap_scale(frame: pd.DataFrame) -> np.ndarray:
+    """EWMA daily volatility scaled by closed hours: the natural size of a gap."""
+    sigma = frame["ewma_sigma"].to_numpy(dtype=float)
+    scale = sigma * np.sqrt(frame["hours_closed"].to_numpy(dtype=float) / 24)
+    fill = float(np.nanmedian(scale)) if np.isfinite(scale).any() else 0.01
+    return np.where(np.isfinite(scale) & (scale > 0), scale, fill)
+
+
+class QuantileModel:
+    """LightGBM quantile regression, optionally on the volatility-standardised gap."""
+
+    def __init__(self, booster_model: Any, scaling: str) -> None:
+        self.model = booster_model
+        self.scaling = scaling
+
+    @property
+    def booster_(self) -> Any:
+        return self.model.booster_
+
+    def predict(self, frame: pd.DataFrame) -> np.ndarray:
+        raw = np.asarray(self.model.predict(frame[FEATURES]), dtype=float)
+        return raw * gap_scale(frame) if self.scaling == "ewma" else raw
+
+
+def fit_lgbm(cfg: AfterhoursConfig, train: pd.DataFrame, alpha: float) -> QuantileModel:
+    """One LightGBM quantile model on raw or volatility-standardised gaps."""
     import lightgbm as lgb
 
     lg = cfg.model.lightgbm
@@ -77,8 +101,11 @@ def fit_lgbm(cfg: AfterhoursConfig, train: pd.DataFrame, alpha: float) -> Any:
         n_jobs=cfg.model.n_jobs,
         verbose=-1,
     )
-    model.fit(train[FEATURES], train["g"])
-    return model
+    target = train["g"].to_numpy(dtype=float)
+    if cfg.model.target_scaling == "ewma":
+        target = target / gap_scale(train)
+    model.fit(train[FEATURES], target)
+    return QuantileModel(model, cfg.model.target_scaling)
 
 
 def predict_all(
@@ -86,7 +113,7 @@ def predict_all(
 ) -> dict[str, np.ndarray]:
     """Raw forecasts of the model and every baseline for `target` rows."""
     return {
-        "model": np.asarray(model.predict(target[FEATURES]), dtype=float),
+        "model": model.predict(target),
         "global_segment": baselines.global_segment(train, target, alpha),
         "ticker_segment": baselines.ticker_segment(
             train, target, alpha, cfg.model.baselines.min_ticker_segment_rows
@@ -144,10 +171,14 @@ def run(cfg: AfterhoursConfig, data: pd.DataFrame) -> dict[str, Any]:
             raw_te = predict_all(cfg, tr, te, alpha, model)
             doc[f"q{alpha:g}"] = {}
             for name in ("model", *BASELINES):
+                norm = cfg.model.conformal.normalize == "ewma"
                 cqr = MondrianCQR(alpha, SEGMENTS).fit(
-                    raw_cal[name], ca["g"].to_numpy(), ca["segment"]
+                    raw_cal[name],
+                    ca["g"].to_numpy(),
+                    ca["segment"],
+                    gap_scale(ca) if norm else None,
                 )
-                cal_te = cqr.apply(raw_te[name], te["segment"])
+                cal_te = cqr.apply(raw_te[name], te["segment"], gap_scale(te) if norm else None)
                 fold_out[f"{name}_raw_q{alpha:g}"] = raw_te[name]
                 fold_out[f"{name}_q{alpha:g}"] = cal_te
                 doc[f"q{alpha:g}"][name] = {

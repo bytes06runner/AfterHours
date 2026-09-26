@@ -41,6 +41,7 @@ FEATURES = [
     "market_ret1",
     "ret1",
     "sector_code",
+    "ewma_sigma",
 ]
 
 

@@ -11,3 +11,4 @@ cache/
 broadcast/*/31337/
 *.log
 .DS_Store
+artifacts/model/lgbm_*.txt

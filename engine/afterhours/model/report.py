@@ -43,10 +43,16 @@ def train_production(cfg: AfterhoursConfig, data: pd.DataFrame, out: Path) -> di
         raw = wf.predict_all(cfg, train, cal, alpha, model)
         corrections[f"{alpha:g}"] = (
             MondrianCQR(alpha, SEGMENTS)
-            .fit(raw["model"], cal["g"].to_numpy(), cal["segment"])
+            .fit(
+                raw["model"],
+                cal["g"].to_numpy(),
+                cal["segment"],
+                wf.gap_scale(cal) if cfg.model.conformal.normalize == "ewma" else None,
+            )
             .corrections
         )
-    meta = {
+    meta: dict[str, Any] = {
+        "target_scaling": cfg.model.target_scaling,
         "features": FEATURES,
         "segments": SEGMENTS,
         "quantiles": cfg.model.quantiles,
@@ -100,6 +106,25 @@ def calibration_figures(curves: dict[str, Any], out: Path) -> list[Path]:
     return written
 
 
+def variants(out: Path) -> list[dict[str, Any]]:
+    """Earlier configurations kept for disclosure (artifacts/model/variants/*.json)."""
+    found = []
+    for path in sorted((out / "variants").glob("*.json")):
+        doc = json.loads(path.read_text())
+        acc = doc["acceptance"]
+        found.append(
+            {
+                "file": f"variants/{path.name}",
+                "target_scaling": doc["config"].get("target_scaling", "none"),
+                "conformal_normalize": doc["config"]["conformal"].get("normalize", "none"),
+                "shipped": acc["shipped"],
+                "model_pinball": acc["pinball_vs_baselines"]["ewma_normal"]["model"],
+                "miss_rate_overall": acc["coverage_overall"]["miss_rate"],
+            }
+        )
+    return found
+
+
 def build_report(
     cfg: AfterhoursConfig, data: pd.DataFrame, data_manifest: dict[str, Any]
 ) -> dict[str, Any]:
@@ -133,6 +158,7 @@ def build_report(
         "folds": result["folds"],
         "feature_importance_gain_share": result["feature_importance_gain_share"],
         "production": production,
+        "variants_tried": variants(out),
     }
     (out / "report_card.json").write_text(json.dumps(card, indent=2, default=str) + "\n")
     pooled.to_parquet(cfg.path(cfg.data.cache_dir) / "heldout_predictions.parquet")

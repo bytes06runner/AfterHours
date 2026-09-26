@@ -138,5 +138,41 @@ def model_cmd() -> None:
     )
 
 
+@app.command("backtest")
+def backtest_cmd() -> None:
+    """M4: four strategies, tuning sweep, sensitivity and replay scenarios."""
+    from afterhours.backtest.run import load_inputs, run
+    from afterhours.data.pipeline import DATASET_KEY, make_cache
+    from afterhours.data.universe import stock_token_tickers
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
+    cfg = load_config()
+    cache = make_cache(cfg)
+    data = cache.get(DATASET_KEY, allow_stale=True)
+    if data is None:
+        raise typer.BadParameter("no dataset; run `afterhours data build` first")
+    heldout, card = load_inputs(cfg)
+    _, selected = stock_token_tickers(cfg)
+    prices = {t: cache.get(f"prices/{t}", allow_stale=True) for t in selected}
+    res = run(
+        cfg, data, heldout, card, {t: f for t, f in prices.items() if f is not None}, selected
+    )
+    typer.echo(
+        json.dumps(
+            {
+                "chosen": res["chosen"],
+                "strategies": {
+                    k: {
+                        m: v[m]
+                        for m in ("net_lender_yield_annualised", "bad_debt_usdg", "bad_debt_events")
+                    }
+                    for k, v in res["strategies"].items()
+                },
+            },
+            indent=2,
+        )
+    )
+
+
 if __name__ == "__main__":
     app()

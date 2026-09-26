@@ -135,6 +135,7 @@ class GapsConfig(_Strict):
 class ConformalConfig(_Strict):
     method: Literal["cqr"]
     mondrian_segments: list[Literal["earnings", "weekend", "holiday", "overnight"]]
+    normalize: Literal["none", "ewma"]
 
 
 class LightGbmConfig(_Strict):
@@ -170,12 +171,45 @@ class ModelConfig(_Strict):
     acceptance: AcceptanceConfig
     seed: int
     n_jobs: int
+    target_scaling: Literal["none", "ewma"]
 
     @model_validator(mode="after")
     def _alpha_is_a_quantile(self) -> ModelConfig:
         if self.target_alpha not in self.quantiles:
             raise ValueError("model.target_alpha must be one of model.quantiles")
         return self
+
+
+class BorrowerLtv(_Strict):
+    low: Fraction
+    high: Fraction
+
+
+class ReplayConfig(_Strict):
+    per_segment: PositiveInt
+    window_sessions: PositiveInt
+
+
+class BacktestConfig(_Strict):
+    vault_usdg: Annotated[float, Field(gt=0)]
+    supply_apy_by_lltv: dict[str, Annotated[float, Field(ge=0, lt=1)]]
+    utilization: Fraction
+    loan_turnover_per_session: Fraction
+    borrower_ltv_share_of_lltv: BorrowerLtv
+    ltv_grid_points: PositiveInt
+    session_hours: Annotated[float, Field(gt=0)]
+    depth_source: Literal["discovered", "none"]
+    tier_pairs_to_tune: list[tuple[Fraction, Fraction]]
+    safety_margins_to_tune: list[Fraction]
+    rate_spread_multipliers: list[Annotated[float, Field(ge=0)]]
+    replay: ReplayConfig
+
+    def apy(self, lltv: float) -> float:
+        """Assumed supply APY for a tier LLTV."""
+        key = f"{lltv:g}"
+        if key not in self.supply_apy_by_lltv:
+            raise KeyError(f"backtest.supply_apy_by_lltv has no entry for LLTV {key}")
+        return self.supply_apy_by_lltv[key]
 
 
 class PolicyConfig(_Strict):
@@ -273,6 +307,7 @@ class AfterhoursConfig(BaseSettings):
     gaps: GapsConfig
     model: ModelConfig
     policy: PolicyConfig
+    backtest: BacktestConfig
     schedule: ScheduleConfig
     api: ApiConfig
     web: WebConfig
