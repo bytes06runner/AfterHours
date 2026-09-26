@@ -74,7 +74,21 @@ class ChainConfig(_Strict):
 
 class LltvTiers(_Strict):
     weekday: Fraction | None = None
+    middle: Fraction | None = None
     weekend: Fraction | None = None
+
+    def ordered(self) -> list[tuple[str, float]]:
+        """Configured tiers, highest LLTV first."""
+        tiers = [
+            (n, v)
+            for n, v in (
+                ("weekday", self.weekday),
+                ("middle", self.middle),
+                ("weekend", self.weekend),
+            )
+            if v is not None
+        ]
+        return sorted(tiers, key=lambda x: -x[1])
 
 
 class LiquidationIncentiveConfig(_Strict):
@@ -294,7 +308,8 @@ class DemoConfig(_Strict):
 
 
 class PolicyConfig(_Strict):
-    safety_margin: Fraction
+    map_fraction: Fraction
+    pullback_fraction: Fraction
     turnover_penalty: Annotated[float, Field(ge=0)]
     min_rebalance_usd: Annotated[float, Field(ge=0)]
     min_rebalance_share_of_tvl: Fraction

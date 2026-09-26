@@ -37,7 +37,7 @@ def set_time(w3: Web3, when: datetime) -> None:
 
 
 def closing_bell(cfg: AfterhoursConfig, max_closes: int) -> dict[str, Any]:
-    """Advance bell by bell until a stock loses the weekday tier and money leaves it.
+    """Advance bell by bell until the pullback fires for a stock and its unborrowed money leaves.
 
     A settling cycle first absorbs rebalancing caused by seeding (new borrowers change live
     rates), so the scenario reports risk-driven moves only.
@@ -45,7 +45,7 @@ def closing_bell(cfg: AfterhoursConfig, max_closes: int) -> dict[str, Any]:
     bot = Allocator(cfg)
     w3 = bot.w3
     settle = bot.run_cycle("settle")
-    allowed = dict(settle.plan["allowed"])
+    pulled_before = {s for s, d in settle.plan["decisions"].items() if d["pulled"]}
     steps = []
     for _ in range(max_closes):
         now = bot.now()
@@ -55,18 +55,15 @@ def closing_bell(cfg: AfterhoursConfig, max_closes: int) -> dict[str, Any]:
             check = now + timedelta(seconds=1)
         set_time(w3, check)
         result = bot.run_cycle("pre_close")
-        flipped = [
-            k.split(":")[0]
-            for k, v in result.plan["allowed"].items()
-            if k.endswith(":weekday") and allowed.get(k) and not v
-        ]
-        allowed = dict(result.plan["allowed"])
+        pulled_now = {s for s, d in result.plan["decisions"].items() if d["pulled"]}
+        flipped = sorted(pulled_now - pulled_before)
+        pulled_before = pulled_now
         steps.append(
             {
                 "at": check.isoformat(),
                 "executed": result.executed,
                 "reasons": result.reasons,
-                "lost_weekday_tier": flipped,
+                "pulled_back": flipped,
                 "allocation": result.plan["allocation"],
             }
         )

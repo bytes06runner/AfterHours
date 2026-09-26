@@ -23,8 +23,9 @@ contract DeployAfterhoursTest is Test {
     address internal lender = makeAddr("lender");
     address internal borrower = makeAddr("borrower");
 
-    uint256 internal constant WEEKDAY = 0.86e18;
-    uint256 internal constant WEEKEND = 0.625e18;
+    uint256 internal constant WEEKDAY = 0.915e18;
+    uint256 internal constant MIDDLE = 0.86e18;
+    uint256 internal constant WEEKEND = 0.77e18;
 
     function setUp() public {
         script = new DeployAfterhours();
@@ -39,6 +40,10 @@ contract DeployAfterhoursTest is Test {
         uint256[] memory prices = new uint256[](2);
         prices[0] = 225e8;
         prices[1] = 770e8;
+        string[] memory tierNames = new string[](3);
+        (tierNames[0], tierNames[1], tierNames[2]) = ("weekday", "middle", "weekend");
+        uint256[] memory tierLltvs = new uint256[](3);
+        (tierLltvs[0], tierLltvs[1], tierLltvs[2]) = (WEEKDAY, MIDDLE, WEEKEND);
         DeployAfterhours.Plan memory p = DeployAfterhours.Plan({
             selfDeployMorpho: true,
             simOracle: true,
@@ -50,8 +55,8 @@ contract DeployAfterhoursTest is Test {
             oracleFactory: address(0),
             loanToken: address(0),
             loanDecimals: 6,
-            weekdayLltv: WEEKDAY,
-            weekendLltv: WEEKEND,
+            tierNames: tierNames,
+            tierLltvs: tierLltvs,
             symbols: symbols,
             tokens: none,
             feeds: none,
@@ -86,9 +91,11 @@ contract DeployAfterhoursTest is Test {
     }
 
     function test_deploysTwoTiersPerTokenWithRoles() public view {
-        assertEq(r.marketIds.length, 4);
+        assertEq(r.marketIds.length, 6);
         assertEq(r.marketLltvs[0], WEEKDAY);
-        assertEq(r.marketLltvs[1], WEEKEND);
+        assertEq(r.marketLltvs[1], MIDDLE);
+        assertEq(r.marketLltvs[2], WEEKEND);
+        assertEq(r.marketTiers[1], "middle");
         assertEq(vault.owner(), r.owner);
         assertEq(vault.curator(), r.curator);
         assertTrue(vault.isAllocator(r.allocator));
@@ -105,7 +112,7 @@ contract DeployAfterhoursTest is Test {
         // 300,000 USDG vault; 100,000 to NVDA's weekday market stays under the 35% stock cap.
         _deposit(300_000e6);
         MarketParams memory weekday = _params(0);
-        MarketParams memory weekend = _params(1);
+        MarketParams memory weekend = _params(2);
         vm.prank(r.allocator);
         vault.allocate(r.adapter, abi.encode(weekday), 100_000e6);
 
@@ -199,6 +206,6 @@ contract DeployAfterhoursTest is Test {
         script.write(r, path);
         string memory json = vm.readFile(path);
         assertEq(vm.parseJsonAddress(json, ".vault"), r.vault);
-        assertEq(vm.parseJsonBytes32Array(json, ".market_ids").length, 4);
+        assertEq(vm.parseJsonBytes32Array(json, ".market_ids").length, 6);
     }
 }

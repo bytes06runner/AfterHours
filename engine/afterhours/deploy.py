@@ -57,8 +57,8 @@ def plan(cfg: AfterhoursConfig, profile: str) -> dict[str, Any]:
         },
         "loan_token": {"address": usdg, "decimals": 6},
         "tiers": {
-            "weekday_wad": str(round(lltv.weekday * WAD)),
-            "weekend_wad": str(round(lltv.weekend * WAD)),
+            "names": [n for n, _ in lltv.ordered()],
+            "lltvs_wad": [str(round(v * WAD)) for _, v in lltv.ordered()],
         },
         "tokens": {
             "symbols": selected,
@@ -169,8 +169,8 @@ def finalise(
     raw = json.loads(raw_path.read_text())
     lltv = cfg.morpho.lltv_tiers
     tiers = {}
-    for name, value in (("weekday", lltv.weekday), ("weekend", lltv.weekend)):
-        spec = tier_spec(name, float(value or 0))
+    for name, value in lltv.ordered():
+        spec = tier_spec(name, float(value))
         tiers[name] = {
             "lltv": spec.lltv,
             "liquidation_allowance_b": spec.allowance,

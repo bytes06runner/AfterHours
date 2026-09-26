@@ -19,10 +19,10 @@ from afterhours.backtest.run import LABEL, forecasts, load_inputs, lookahead_ris
 from afterhours.backtest.sim import SimParams, run_strategy, summarise
 from afterhours.config import AfterhoursConfig
 from afterhours.features.gaps import code_version
+from afterhours.policy.option_b import decide
 
 log = logging.getLogger(__name__)
 _W: dict[str, Any] = {}
-PULLED = 1.0  # a bad case no tier admits: the stock's unborrowed money goes idle
 
 
 def b_risk(
@@ -33,14 +33,19 @@ def b_risk(
     pullback_fraction: float,
 ) -> Any:
     """The drop B hands the LP for one stock and night (the LP's margin is the map fraction)."""
-    floor = min(t.cushion for t in p.tiers if t.name == "weekend") * (1 - map_fraction)
-    pull_limit = max(t.cushion for t in p.tiers) * (1 - pullback_fraction)
 
     def risk(r: Any) -> float:
-        if table[(r.ticker, r.session_prev)] > pull_limit:
-            return PULLED
-        rating = ratings.get((r.ticker, int(str(r.session_prev)[:4])), floor)
-        return min(rating, floor)
+        year = int(str(r.session_prev)[:4])
+        d = decide(
+            r.ticker,
+            ratings.get((r.ticker, year)),
+            year,
+            table[(r.ticker, r.session_prev)],
+            p.tiers,
+            map_fraction,
+            pullback_fraction,
+        )
+        return d.lp_drop
 
     return risk
 

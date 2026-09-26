@@ -97,7 +97,7 @@ morpho:
   # Tuned in M4 (artifacts/backtest/results.json): highest Afterhours net yield among the 60
   # settings whose worst single event lost at most 0.1% of the vault. Both LLTVs are enabled on
   # Robinhood's Morpho (M1).
-  lltv_tiers: { weekday: 0.915, weekend: 0.77 }
+  lltv_tiers: { weekday: 0.915, middle: 0.86, weekend: 0.77 }   # option B ships three tiers (PROGRESS.md)
   liquidation_incentive: { verify_from: "morpho-blue ConstantsLib + MathLib" }
 
 # Onchain discovery (M1). Every address we use is fetched from one of these sources by
@@ -190,13 +190,16 @@ model:
   target_scaling: ewma
 
 policy:
-  safety_margin: 0.05                   # tuned in M4 (grid 0, 0.02, 0.05)
+  # Option B (shipped; PROGRESS.md 2026-09-27): yearly tier map plus pullback, settings chosen on
+  # 2017 to 2021 for the 5 vault stocks (artifacts/backtest/option_b.json).
+  map_fraction: 0.4                     # a stock's rating must fit its tier's cushion x (1 - 0.4)
+  pullback_fraction: 0.4                # unborrowed money goes idle above every cushion x (1 - 0.4)
   turnover_penalty: 0.0005
   min_rebalance_usd: 1000               # floor; the bot also needs min_rebalance_share_of_tvl
   min_rebalance_share_of_tvl: 0.01      # rate-driven moves under 1% of the vault wait; risk moves never wait
-  # Act on the worst bad case over the next N closed periods, so loans have time to roll off
-  # before a scheduled risky night (earnings). 1 = only the next period (the SPEC 7.5 rule).
-  lookahead_closed_periods: 3           # tuned in M4 (grid 1, 3, 5, 10); 1 is the SPEC 7.5 rule
+  # The pullback acts on the worst bad case over the next N closed periods, so loans have time
+  # to roll off before a scheduled risky night (earnings).
+  lookahead_closed_periods: 5           # option B, chosen on 2017 to 2021 (grid 1, 3, 5, 10)
   # Vault V2 pays withdrawals from idle cash and its liquidity market only, so keep a reserve.
   idle_reserve_share: 0.05
   # The liquidity market receives new deposits at once; it needs this much room under its stock cap.
@@ -265,12 +268,15 @@ sim:
   faucet: { usdg: 50000, eth: 1, cooldown_seconds: 60 }
 
 # The scripted demo (M7). Runs on `profile`: local until an archive RPC allows the fork.
-# start: Tuesday 2026-08-18 13:00 New York. Found by scanning Tuesdays from June 2025 to
-# September 2026 for weeks where SPY sits in the weekday tier on Tuesday and its weekend bad case
-# pushes it out at Wednesday's pre-close check (30 of 68 weeks qualify; this is the latest full one).
+# start: Tuesday 2025-04-22 13:00 New York, a past week replayed on a local chain. Under option B
+# money moves on pullback nights for stocks that hold money. By its 2025 rating (2024 data only)
+# META may use the 91.5% tier with SPY and SGOV, so the vault holds it. META reported on
+# 2025-04-30 after the close; from the 2025-04-24 pre-close check its forecast bad case over the
+# next 5 closed periods (31.1%) exceeds every tier's limit (10.4%), so its unborrowed money goes
+# idle. (A 2026 week shows no such move: in 2026 the stocks that hold money are never pulled.)
 demo:
   profile: local
-  start: "2026-08-18T17:00:00Z"
+  start: "2025-04-22T17:00:00Z"
   max_closes: 5
   earnings_shock: { symbol: META, pct: -0.245 }   # META after 2022-10-26 earnings (M2 gap study)
   oracle_drift: { symbol: NVDA, step_pct: -0.012, steps: 5, minutes_per_step: 3 }

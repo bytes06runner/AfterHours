@@ -37,7 +37,7 @@ interface IChainlinkOracleV2Factory {
 /// @notice Deploys Afterhours for one profile from a plan file written by `afterhours deploy plan`
 /// (addresses and parameters come from config and the discovered file, never from literals).
 /// Steps: Morpho (reuse or self-deploy), loan token and collateral (real or simulated), one oracle
-/// and two markets (weekday, weekend tiers) per Stock Token, a Vault V2 with a Market V1 adapter,
+/// and one market per configured tier (for example weekday, middle, weekend) per Stock Token, a Vault V2 with a Market V1 adapter,
 /// roles, caps and timelocks, and the reason registry. Writes the deployment JSON.
 contract DeployAfterhours is Script {
     using stdJson for string;
@@ -63,8 +63,8 @@ contract DeployAfterhours is Script {
         address oracleFactory;
         address loanToken;
         uint8 loanDecimals;
-        uint256 weekdayLltv;
-        uint256 weekendLltv;
+        string[] tierNames;
+        uint256[] tierLltvs;
         string[] symbols;
         address[] tokens;
         address[] feeds;
@@ -123,8 +123,8 @@ contract DeployAfterhours is Script {
         p.oracleFactory = json.readAddress(".morpho.oracle_factory");
         p.loanToken = json.readAddress(".loan_token.address");
         p.loanDecimals = uint8(json.readUint(".loan_token.decimals"));
-        p.weekdayLltv = json.readUint(".tiers.weekday_wad");
-        p.weekendLltv = json.readUint(".tiers.weekend_wad");
+        p.tierNames = json.readStringArray(".tiers.names");
+        p.tierLltvs = json.readUintArray(".tiers.lltvs_wad");
         p.symbols = json.readStringArray(".tokens.symbols");
         p.tokens = json.readAddressArray(".tokens.addresses");
         p.feeds = json.readAddressArray(".tokens.feeds");
@@ -174,34 +174,36 @@ contract DeployAfterhours is Script {
         r.morpho = vm.deployCode("Morpho.sol:Morpho", abi.encode(r.owner));
         r.irm = vm.deployCode("AdaptiveCurveIrm.sol:AdaptiveCurveIrm", abi.encode(r.morpho));
         IMorpho(r.morpho).enableIrm(r.irm);
-        IMorpho(r.morpho).enableLltv(p.weekdayLltv);
-        IMorpho(r.morpho).enableLltv(p.weekendLltv);
+        for (uint256 t; t < p.tierLltvs.length; ++t) {
+            IMorpho(r.morpho).enableLltv(p.tierLltvs[t]);
+        }
         r.vaultFactory = address(new VaultV2Factory());
         r.adapterFactory = address(new MorphoMarketV1AdapterV2Factory(r.morpho, r.irm));
     }
 
     function _markets(Plan memory p, Result memory r) internal {
         uint256 n = p.symbols.length;
-        r.marketSymbols = new string[](2 * n);
-        r.marketTiers = new string[](2 * n);
-        r.marketIds = new bytes32[](2 * n);
-        r.marketCollateral = new address[](2 * n);
-        r.marketOracles = new address[](2 * n);
-        r.marketLltvs = new uint256[](2 * n);
+        uint256 k = p.tierLltvs.length;
+        r.marketSymbols = new string[](k * n);
+        r.marketTiers = new string[](k * n);
+        r.marketIds = new bytes32[](k * n);
+        r.marketCollateral = new address[](k * n);
+        r.marketOracles = new address[](k * n);
+        r.marketLltvs = new uint256[](k * n);
         for (uint256 i; i < n; ++i) {
             address collateral = p.simCollateral
                 ? address(new SimStockToken(r.owner, p.symbols[i], uint8(p.tokenDecimals[i])))
                 : p.tokens[i];
             address oracle = _oracle(p, r, i);
-            for (uint256 t; t < 2; ++t) {
-                uint256 lltv = t == 0 ? p.weekdayLltv : p.weekendLltv;
+            for (uint256 t; t < k; ++t) {
+                uint256 lltv = p.tierLltvs[t];
                 MarketParams memory mp = MarketParams(r.loanToken, collateral, oracle, r.irm, lltv);
                 if (IMorpho(r.morpho).market(mp.id()).lastUpdate == 0) {
                     IMorpho(r.morpho).createMarket(mp);
                 }
-                uint256 j = 2 * i + t;
+                uint256 j = k * i + t;
                 r.marketSymbols[j] = p.symbols[i];
-                r.marketTiers[j] = t == 0 ? "weekday" : "weekend";
+                r.marketTiers[j] = p.tierNames[t];
                 r.marketIds[j] = Id.unwrap(mp.id());
                 r.marketCollateral[j] = collateral;
                 r.marketOracles[j] = oracle;

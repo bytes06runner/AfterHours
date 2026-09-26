@@ -15,8 +15,16 @@
     "decimals": 6
   },
   "tiers": {
-    "weekday_wad": "915000000000000000",
-    "weekend_wad": "770000000000000000"
+    "names": [
+      "weekday",
+      "middle",
+      "weekend"
+    ],
+    "lltvs_wad": [
+      "915000000000000000",
+      "860000000000000000",
+      "770000000000000000"
+    ]
   },
   "tokens": {
     "symbols": [

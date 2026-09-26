@@ -1,9 +1,12 @@
 """The allocator: one planning cycle, from chain state to executed moves and anchored reasons.
 
-A cycle reads the vault onchain, forecasts each stock's bad case over the next
-`policy.lookahead_closed_periods` closed periods, solves the allocation LP, executes the changes
-(deallocations before allocations, only unborrowed money moves), and logs one reason card per
-stock that moved to the registry. Every step emits an event for the API's event stream.
+The policy is option B (`policy/option_b.py`): each stock may use the tiers its yearly rating
+allows (trailing data only), and on a night when the forecast bad case over the next
+`policy.lookahead_closed_periods` closed periods exceeds every tier's limit, its unborrowed money
+goes idle. A cycle reads the vault onchain, applies that policy through the allocation LP,
+executes the changes (deallocations before allocations, only unborrowed money moves), and logs
+one reason card per stock that moved to the registry. Every step emits an event for the API's
+event stream.
 """
 
 from __future__ import annotations
@@ -27,12 +30,12 @@ from afterhours.data.pipeline import make_cache
 from afterhours.deploy import role_keys
 from afterhours.deployments import load_deployment, load_discovered
 from afterhours.explain.reason import VAULT_SUBJECT, build_card, reason_hash
-from afterhours.policy.lp import Plan, StockState, solve, tier_spec
+from afterhours.policy.lp import Plan, StockState, TierSpec, solve, tier_spec
+from afterhours.policy.option_b import Decision, decide, live_ratings, reason
 from afterhours.risk.live import Forecast, LiveRisk, session_state
 from afterhours.state import Store
 
 log = logging.getLogger(__name__)
-TIERS = ("weekday", "weekend")
 DUST_UNITS = 2  # stay a hair inside caps and withdrawable amounts
 
 
@@ -73,11 +76,9 @@ class Allocator:
         self.risk = LiveRisk(cfg, make_cache(cfg))
         keys = role_keys(cfg, self.profile)
         self.allocator = Signer(self.w3, keys["ALLOCATOR_PK"])
-        tiers = self.deployment["tiers"]
-        self.tiers = [
-            tier_spec("weekday", tiers["weekday"]["lltv"]),
-            tier_spec("weekend", tiers["weekend"]["lltv"]),
-        ]
+        self.tiers = deployed_tiers(self.deployment)
+        self.tier_names = [t.name for t in self.tiers]
+        self._ratings: dict[int, dict[str, float | None]] = {}
         self.depth = {
             s: float(v.get("depth_usd_at_max_slippage", 0.0))
             for s, v in load_discovered(cfg, "fork").get("stock_tokens", {}).items()
@@ -99,11 +100,41 @@ class Allocator:
         h = self.cfg.policy.lookahead_closed_periods
         return {s: self.risk.forecast(s, now, h) for s in self.symbols()}
 
+    def ratings(self, year: int) -> dict[str, float | None]:
+        """Option B's yearly ratings (cached per year)."""
+        if year not in self._ratings:
+            fm = self.cfg.backtest.option_a.fixed_map
+            self._ratings[year] = live_ratings(
+                {s: self.risk.cache.get(f"prices/{s}", allow_stale=True) for s in self.symbols()},
+                year,
+                fm.window_days,
+                fm.quantile,
+                fm.min_observations,
+            )
+        return self._ratings[year]
+
+    def decisions(self, now: datetime, driving: dict[str, Forecast]) -> dict[str, Decision]:
+        p = self.cfg.policy
+        ratings = self.ratings(now.year)
+        return {
+            s: decide(
+                s,
+                ratings.get(s),
+                now.year,
+                driving[s].bad_case_drop,
+                self.tiers,
+                p.map_fraction,
+                p.pullback_fraction,
+            )
+            for s in self.symbols()
+        }
+
     def plan(
         self, state: VaultState, forecasts: dict[str, list[Forecast]]
     ) -> tuple[Plan, dict[str, Forecast]]:
-        """Solve the LP for the current state and forecasts."""
+        """Solve the LP for the current state under option B."""
         driving = {s: max(fs, key=lambda f: f.bad_case_drop) for s, fs in forecasts.items()}
+        self.last_decisions = self.decisions(self.now(state), driving)
         by_key = {(m.symbol, m.tier): m for m in state.markets}
         # Live supply rates once anything is borrowed; the backtest's assumed rates only at cold
         # start. Mixing the two makes the planner chase empty markets.
@@ -118,14 +149,14 @@ class Allocator:
             stocks.append(
                 StockState(
                     symbol=s,
-                    bad_case_drop=driving[s].bad_case_drop,
+                    bad_case_drop=self.last_decisions[s].lp_drop,
                     depth_usd=self.depth.get(s, 1e18)
                     if not self.deployment["simulation"]["collateral"]
                     else 1e18,
                     rate=rate,
-                    borrowed={t: by_key[(s, t)].lent_out for t in TIERS},
-                    cap={t: by_key[(s, t)].absolute_cap for t in TIERS},
-                    prev={t: by_key[(s, t)].vault_supply for t in TIERS},
+                    borrowed={t: by_key[(s, t)].lent_out for t in self.tier_names},
+                    cap={t: by_key[(s, t)].absolute_cap for t in self.tier_names},
+                    prev={t: by_key[(s, t)].vault_supply for t in self.tier_names},
                 )
             )
         p = self.cfg.policy
@@ -133,13 +164,19 @@ class Allocator:
             stocks,
             self.tiers,
             total=state.total_assets,
-            safety_margin=p.safety_margin,
+            safety_margin=0.0,
             turnover_penalty=p.turnover_penalty,
             min_rebalance_usd=p.min_rebalance_usd,
             max_share_per_stock=self.cfg.vault.max_share_per_stock * (1 - 1e-6),
             depth_multiplier=self.cfg.vault.depth_multiplier,
             idle_reserve_share=p.idle_reserve_share,
+            margin_fraction=p.map_fraction,
         )
+        # The LP's generic reason text talks about bad-case drops; B's reasons say what B did.
+        for s, d in self.last_decisions.items():
+            text = reason(d, self.tiers, p.map_fraction, p.lookahead_closed_periods)
+            for name in self.tier_names:
+                plan.reasons[(s, name)] = text
         return plan, driving
 
     def run_cycle(self, trigger: str, *, execute: bool = True) -> CycleResult:
@@ -155,7 +192,7 @@ class Allocator:
         self.store.emit("vault_updated", state.to_json())
         forecasts = self.forecasts(now)
         plan, driving = self.plan(state, forecasts)
-        plan_doc = plan_json(plan, driving, state, now, trigger)
+        plan_doc = plan_json(plan, driving, state, now, trigger, self.last_decisions)
         last = self.store.read("plan")
         if last is None or last.get("allocation") != plan_doc["allocation"]:
             self.store.emit("plan_changed", plan_doc)
@@ -236,7 +273,8 @@ class Allocator:
     def _route_liquidity(
         self, state: VaultState, plan: Plan, driving: dict[str, Forecast], result: CycleResult
     ) -> None:
-        """Point deposits and withdrawals at the safest allowed weekend-tier market (SPEC 6.3)."""
+        """Point deposits and withdrawals at the safest allowed lowest-LLTV market (SPEC 6.3)."""
+        lowest = min(self.tiers, key=lambda t: t.lltv)
         # Deposits land in the liquidity market at once, so it must have room under the stock cap
         # (Vault V2 reverts with RelativeCapExceeded otherwise). No such market: deposits stay idle.
         cap = self.cfg.vault.max_share_per_stock * state.total_assets
@@ -247,7 +285,7 @@ class Allocator:
         allowed = [
             m
             for m in state.markets
-            if m.tier == "weekend"
+            if m.tier == lowest.name
             and plan.allowed.get((m.symbol, m.tier))
             and cap - held[m.symbol] >= room_needed
         ]
@@ -288,9 +326,10 @@ class Allocator:
             amount_usdg=0.0,
             forecast=f,
             rule=(
-                f"New deposits and withdrawals now use {target.symbol}'s weekend tier market, the "
-                f"safest allowed market: bad case {f.bad_case_drop:.1%} against a cushion of "
-                f"{self.tiers[1].cushion:.1%}."
+                f"New deposits and withdrawals now use {target.symbol}'s {lowest.name} tier "
+                f"market, the safest allowed market: bad case {f.bad_case_drop:.1%} against a "
+                "cushion of "
+                f"{lowest.cushion:.1%}."
             ),
             created_at=self.now(),
         )
@@ -342,14 +381,15 @@ class Allocator:
         self, plan: Plan, symbol: str, out_tier: str | None, in_tier: str | None, state: VaultState
     ) -> str:
         """Plain-English cause of a move: risk first, then rates, then limits."""
-        if out_tier in ("weekday", "weekend") and not plan.allowed[(symbol, out_tier)]:
-            text = plan.reasons[(symbol, out_tier)]
-            return text[0].upper() + text[1:] + ". Only money not lent out can move."
-        if in_tier in ("weekday", "weekend") and out_tier not in ("weekday", "weekend"):
-            text = plan.reasons[(symbol, in_tier)]
-            return f"Placed idle USDG where it is allowed: {text}."
+        tiers = self.tier_names
+        if out_tier in tiers and not plan.allowed[(symbol, out_tier)]:
+            return plan.reasons[(symbol, out_tier)]
+        if in_tier in tiers and out_tier not in tiers:
+            return (
+                f"Placed idle USDG where the tier map allows it. {plan.reasons[(symbol, in_tier)]}"
+            )
         rates = {(m.symbol, m.tier): m.supply_apy for m in state.markets}
-        if out_tier in ("weekday", "weekend") and in_tier in ("weekday", "weekend"):
+        if out_tier in tiers and in_tier in tiers:
             return (
                 f"Moved toward a higher supply rate: {in_tier} {_pct(rates[(symbol, in_tier)])} "
                 f"vs {out_tier} {_pct(rates[(symbol, out_tier)])} ({self.rate_source} rates)."
@@ -400,11 +440,37 @@ def _pct(x: float) -> str:
     return f"{x:.2%}"
 
 
+def deployed_tiers(deployment: dict[str, Any]) -> list[TierSpec]:
+    """The deployment's tiers, highest LLTV first."""
+    tiers = deployment["tiers"]
+    return [
+        tier_spec(name, float(v["lltv"]))
+        for name, v in sorted(tiers.items(), key=lambda kv: -float(kv[1]["lltv"]))
+    ]
+
+
 def plan_json(
-    plan: Plan, driving: dict[str, Forecast], state: VaultState, now: datetime, trigger: str
+    plan: Plan,
+    driving: dict[str, Forecast],
+    state: VaultState,
+    now: datetime,
+    trigger: str,
+    decisions: dict[str, Decision] | None = None,
 ) -> dict[str, Any]:
     """JSON view of a plan."""
     return {
+        "policy": "option_b",
+        "decisions": {
+            s: {
+                "rating": d.rating,
+                "rating_year": d.rating_year,
+                "mapped_tier": d.mapped_tier,
+                "forecast_bad_case": d.forecast_bad_case,
+                "pull_limit": d.pull_limit,
+                "pulled": d.pulled,
+            }
+            for s, d in (decisions or {}).items()
+        },
         "trigger": trigger,
         "now": now.isoformat(),
         "status": plan.status,

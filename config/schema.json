@@ -868,6 +868,20 @@
     "LltvTiers": {
       "additionalProperties": false,
       "properties": {
+        "middle": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Middle"
+        },
         "weekday": {
           "anyOf": [
             {
@@ -1275,6 +1289,12 @@
           "title": "Lookahead Closed Periods",
           "type": "integer"
         },
+        "map_fraction": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Map Fraction",
+          "type": "number"
+        },
         "min_rebalance_share_of_tvl": {
           "maximum": 1,
           "minimum": 0,
@@ -1286,10 +1306,10 @@
           "title": "Min Rebalance Usd",
           "type": "number"
         },
-        "safety_margin": {
+        "pullback_fraction": {
           "maximum": 1,
           "minimum": 0,
-          "title": "Safety Margin",
+          "title": "Pullback Fraction",
           "type": "number"
         },
         "turnover_penalty": {
@@ -1299,7 +1319,8 @@
         }
       },
       "required": [
-        "safety_margin",
+        "map_fraction",
+        "pullback_fraction",
         "turnover_penalty",
         "min_rebalance_usd",
         "min_rebalance_share_of_tvl",

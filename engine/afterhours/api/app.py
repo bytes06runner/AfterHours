@@ -20,6 +20,7 @@ from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 from web3 import Web3
 
+from afterhours.bot.allocator import deployed_tiers
 from afterhours.bot.vault_state import read_state
 from afterhours.chain.rpc import Call, call_many, connect
 from afterhours.config import AfterhoursConfig, load_config
@@ -28,7 +29,8 @@ from afterhours.deployments import load_deployment
 from afterhours.explain.reason import canonical
 from afterhours.explain.verify import verify_card
 from afterhours.numbers import oracle_summary
-from afterhours.policy.lp import allowed_tier, tier_spec
+from afterhours.policy.option_b import allowed_tiers, decide, live_ratings
+from afterhours.policy.option_b import reason as b_reason
 from afterhours.public_config import public_config
 from afterhours.risk.live import LiveRisk, session_state, upcoming_periods
 from afterhours.state import Store
@@ -253,38 +255,62 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     def risk() -> dict[str, Any]:
         now = ctx.now()
         d = ctx.deployment
-        tiers = (
-            [tier_spec(n, float(d["tiers"][n]["lltv"])) for n in ("weekday", "weekend")]
-            if d
-            else []
-        )
+        tiers = deployed_tiers(d) if d else []
         symbols = list(dict.fromkeys(m["symbol"] for m in d.get("markets", []))) if d else []
+        pol = cfg.policy
+        fm = cfg.backtest.option_a.fixed_map
+        ratings = live_ratings(
+            {s: ctx.risk.cache.get(f"prices/{s}", allow_stale=True) for s in symbols},
+            now.year,
+            fm.window_days,
+            fm.quantile,
+            fm.min_observations,
+        )
         out = []
         for s in symbols:
-            fs = ctx.risk.forecast(s, now, cfg.policy.lookahead_closed_periods)
+            fs = ctx.risk.forecast(s, now, pol.lookahead_closed_periods)
             worst = max(fs, key=lambda f: f.bad_case_drop)
-            allowed = {
-                t.name: dict(
-                    zip(
-                        ("allowed", "reason"),
-                        allowed_tier(worst.bad_case_drop, cfg.policy.safety_margin, t),
-                        strict=True,
-                    )
-                )
-                for t in tiers
-            }
+            dec = decide(
+                s,
+                ratings.get(s),
+                now.year,
+                worst.bad_case_drop,
+                tiers,
+                pol.map_fraction,
+                pol.pullback_fraction,
+            )
+            text = b_reason(dec, tiers, pol.map_fraction, pol.lookahead_closed_periods)
+            ok = allowed_tiers(dec, tiers, pol.map_fraction)
             out.append(
                 {
                     "symbol": s,
                     "next": fs[0].to_json(),
                     "worst_in_lookahead": worst.to_json(),
-                    "tiers": allowed,
+                    "tiers": {t.name: {"allowed": ok[t.name], "reason": text} for t in tiers},
+                    "policy": {
+                        "rating": dec.rating,
+                        "rating_year": dec.rating_year,
+                        "mapped_tier": dec.mapped_tier,
+                        "pull_limit": dec.pull_limit,
+                        "pulled": dec.pulled,
+                        "reason": text,
+                    },
                 }
             )
         return {
             "now": now.isoformat(),
-            "lookahead_closed_periods": cfg.policy.lookahead_closed_periods,
-            "safety_margin": cfg.policy.safety_margin,
+            "policy": "option_b",
+            "lookahead_closed_periods": pol.lookahead_closed_periods,
+            "map_fraction": pol.map_fraction,
+            "pullback_fraction": pol.pullback_fraction,
+            "tier_limits": {
+                t.name: {
+                    "lltv": t.lltv,
+                    "cushion": t.cushion,
+                    "map_limit": t.cushion * (1 - pol.map_fraction),
+                }
+                for t in tiers
+            },
             "stocks": out,
         }
 
