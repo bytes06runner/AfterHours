@@ -20,7 +20,7 @@ endif
 AH := uv run --quiet afterhours
 WEB := pnpm --filter @afterhours/web
 
-.PHONY: help setup gen-schema discover verify-discovered local-chain screens fork deploy seed engine api web up demo report \
+.PHONY: help setup gen-schema discover verify-discovered local-chain screens lighthouse e2e fork deploy seed engine api web up demo report \
         test test-py test-web test-sol test-config test-integration lint lint-py lint-web lint-sol lint-hardcode
 
 help: ## List commands
@@ -119,6 +119,12 @@ lint-web:
 
 lint-sol:
 	cd contracts && forge fmt --check
+
+e2e: ## Playwright E2E against the running stack (make up)
+	cd web && WEB_BASE_URL="http://localhost:$$WEB_PORT" ANVIL_RPC_URL="http://127.0.0.1:$$ANVIL_PORT" pnpm exec playwright test  # hardcode-ok: local stack
+
+lighthouse: ## Lighthouse on the production build for every page (needs make up running)
+	./scripts/lighthouse.sh
 
 screens: ## Screenshot QA of pages at 1440/1024/390 in the current phase (needs make up running)
 	./scripts/screens.sh

@@ -89,10 +89,13 @@
           "title": "Sse Poll Seconds",
           "type": "number"
         },
-        "web_port_env": {
-          "pattern": "^[A-Z][A-Z0-9_]*$",
-          "title": "Web Port Env",
-          "type": "string"
+        "web_port_envs": {
+          "items": {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          "title": "Web Port Envs",
+          "type": "array"
         }
       },
       "required": [
@@ -101,7 +104,7 @@
         "cors_origins_env",
         "admin_token_env",
         "local_web_origin_templates",
-        "web_port_env",
+        "web_port_envs",
         "sse_poll_seconds",
         "sse_heartbeat_seconds",
         "almanac_max_days",

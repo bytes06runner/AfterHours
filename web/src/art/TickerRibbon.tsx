@@ -13,7 +13,7 @@ export function TickerRibbon({ className = "flex" }: { className?: string }) {
       className={`ticker ${className}`}
       role="marquee"
       aria-label={label}
-      style={{ fontSize: "17px" }}
+      style={{ fontSize: "19px" }}
     >
       <div className="ticker-track">
         {items.length === 0 ? (

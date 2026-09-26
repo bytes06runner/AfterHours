@@ -242,6 +242,13 @@ a {
   transform: translateY(1px);
 }
 
+/* RainbowKit's connect button sits on brass: make its label large text so ink on day brass
+   meets AA, like our own .btn. */
+[data-testid="rk-connect-button"] {
+  font-size: 1.1875rem !important;
+  font-weight: 700 !important;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;

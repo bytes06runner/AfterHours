@@ -23,7 +23,7 @@
 - [x] M6 Bot and API (2026-09-26; accepted on the local profile, fork run waits on BLOCKED 1)
 - [x] M7 Simulation harness (2026-09-26; local profile, fork run waits on BLOCKED 1)
 - [x] M8 Frontend foundation (2026-09-26)
-- [ ] M9 Frontend pages
+- [x] M9 Frontend pages (2026-09-26; local profile, fork run waits on BLOCKED 1)
 - [ ] M10 End-to-end hardening
 - [ ] M11 Live deployments
 - [ ] M12 Submission assets
@@ -295,3 +295,23 @@ Evidence
 - vitest 12 passed; eslint and tsc clean; Python tests, ruff and mypy clean.
 
 Next: Almanac, Replay, Report card, landing scroll story; screenshot loop for every page.
+
+### 2026-09-26 M9 Frontend pages: accepted
+
+Done
+- Report card (`/report-card`): the first sentence is the artifact's own fallback statement; acceptance table (the LightGBM model misses pinball vs the EWMA baseline), calibration plot per segment for the shipped forecaster, held-out miss rate and pinball for all four forecasters by segment, backtest table for the four strategies, sensitivity table, gap tail curves, methods with numbers read from the model config.
+- Replay (`/replay`): scenario picker (list on wide screens, select on phones), one price timeline of the real path with night bands you can click or scrub, "Ordinary vault" and "Afterhours" stages with split-flap bad debt counters, and the reason Afterhours would have written at each close. Opens on the worst drop. Labelled "historical stock prices, simulated vault".
+- Almanac (`/almanac`): ruled-paper spread of the next 14 days, closed periods as night bands, earnings bells, each stock's bad-case bar against the weekday and weekend limits (cushion minus margin), a list layout on phones; clicking a stock opens its RiskGauge, drivers and tier reasons.
+- Landing scroll story: gap histogram from the M2 study, the two fixed settings from the backtest, the vault's board now, the latest telegram, the replay teaser, the report card numbers. GSAP ScrollTrigger is loaded only on wide screens without reduced motion; otherwise each step shows its visual inline.
+- Engine: replay files carry per-period series for both vaults, tier cushions and allowed tiers; `/v1/report-card` serves gap histograms, tail curves and the model config.
+
+Fixed along the way
+- The demo integration test shared the running stack's chain, deployments and state because `demo.sh` sourced `.env.example` over the test's ports. Scripts now load env files without overriding what the caller set (`scripts/env.sh`), and the test uses its own deployments and state directories.
+- Lighthouse found contrast failures (ticker text and RainbowKit's button at 16 to 17 px on day brass, tier labels on the surface colour) and layout shift on the almanac; fixed. Heavy modules (the verifier) no longer load on pages that only need driver bars.
+
+Evidence
+- Screenshots: `artifacts/screens/{landing,vault,almanac,ledger,replay,report-card}/{day,night}-{1440,1024,390}.png` and `landing/bell-*.png`; no horizontal overflow at any width.
+- `make lighthouse` (production build, mobile): landing 91/100, vault 88/100, almanac 93/100, ledger 89/98, replay 92/100, report card 87/100 (performance/accessibility); best practices 100 on all.
+- `make e2e`: deposit and withdraw pass on the local chain. Verify on chain: matched in the browser (M9 in-progress entry).
+- `make test-integration`: 2 passed. vitest 25 passed (every committed replay artifact parses with the page schema). ruff, mypy, eslint, tsc, prettier, forge fmt, lint-hardcode clean.
+- Deposit and withdraw on the fork wait on BLOCKED 1; accepted on the local profile, labelled Simulation.

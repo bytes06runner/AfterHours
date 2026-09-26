@@ -299,7 +299,7 @@ class ApiConfig(_Strict):
     local_web_origin_templates: list[
         Annotated[str, StringConstraints(pattern=r"^https?://.*\{port\}")]
     ]
-    web_port_env: EnvName
+    web_port_envs: list[EnvName]
     sse_poll_seconds: Annotated[float, Field(gt=0)]
     sse_heartbeat_seconds: Annotated[float, Field(gt=0)]
     almanac_max_days: PositiveInt

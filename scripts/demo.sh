@@ -2,10 +2,11 @@
 # make demo: chain at the demo start time, deploy, seed, API, bot scheduler, web app, then the
 # scripted closing-bell scenario. Everything on the local profile is labelled Simulation.
 # DEMO_EXIT=1 stops everything after the scenario (used by tests); otherwise Ctrl-C to stop.
+# DEMO_SKIP_WEB=1 leaves out the web app (tests; a second next dev would share web/.next).
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 export PATH="$HOME/.local/bin:$HOME/.foundry/bin:$PATH"
-set -a; [ -f .env.example ] && . ./.env.example; [ -f .env ] && . ./.env; set +a
+. scripts/env.sh
 
 AH="uv run --quiet afterhours"
 export AFTERHOURS_ACTIVE_PROFILE="${AFTERHOURS_ACTIVE_PROFILE:-$($AH config get demo.profile | tr -d '"')}"
@@ -13,6 +14,7 @@ profile="$AFTERHOURS_ACTIVE_PROFILE"
 start=$($AH config get demo.start | tr -d '"')
 start_ts=$(uv run --quiet python -c "from datetime import datetime; print(int(datetime.fromisoformat('$start'.replace('Z','+00:00')).timestamp()))")
 state_dir=$($AH config get paths.state_dir | tr -d '"')/$profile
+mkdir -p "$(dirname "$state_dir")"
 
 if [ -z "${ADMIN_TOKEN:-}" ]; then
   mkdir -p data/cache
@@ -38,7 +40,7 @@ $AH sim seed
 $AH api >"$state_dir.api.log" 2>&1 & pids+=($!)
 $AH bot run >"$state_dir.bot.log" 2>&1 & pids+=($!)
 api="http://$API_HOST:$API_PORT"  # hardcode-ok: scheme only
-if [ -d web/node_modules ]; then
+if [ -d web/node_modules ] && [ "${DEMO_SKIP_WEB:-0}" != "1" ]; then
   NEXT_PUBLIC_API_BASE_URL="$api" pnpm --filter @afterhours/web exec next dev --port "$WEB_PORT" \
     >"$state_dir.web.log" 2>&1 & pids+=($!)
 fi

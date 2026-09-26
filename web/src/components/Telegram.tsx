@@ -3,20 +3,15 @@
 import type { Card } from "@/lib/api";
 import { formatPct, formatUsd } from "@/lib/time";
 
+import { TornEdge } from "@/art/TornEdge";
+
+import { DriverBars } from "./DriverBars";
 import { VerifyBadge } from "./VerifyBadge";
 
 const TIER = { weekday: "weekday tier", weekend: "weekend tier", idle: "idle" } as Record<
   string,
   string
 >;
-const FEATURE: Record<string, string> = {
-  stock_volatility: "Stock volatility",
-  closed_hours: "Hours closed",
-  segment_earnings: "Earnings night",
-  segment_weekend: "Weekend",
-  segment_holiday: "Holiday",
-  segment_overnight: "Overnight",
-};
 
 function when(iso: string): string {
   return new Intl.DateTimeFormat("en-US", {
@@ -27,64 +22,6 @@ function when(iso: string): string {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(iso));
-}
-
-/** Torn bottom edge, drawn once and stretched. */
-export function TornEdge() {
-  const teeth = Array.from(
-    { length: 40 },
-    (_, i) => `L${i * 10 + 5} ${i % 2 ? 2 : 8} L${(i + 1) * 10} ${i % 3 ? 4 : 1}`,
-  ).join(" ");
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 400 10"
-      preserveAspectRatio="none"
-      className="block h-[10px] w-full"
-    >
-      <path d={`M0 0 ${teeth} L400 0 Z`} fill="var(--c-surface)" />
-    </svg>
-  );
-}
-
-/** Signed contribution bars: brass adds to the bad case, verdigris takes away. */
-export function DriverBars({
-  drivers,
-}: {
-  drivers: { feature: string; value: number; detail: string }[];
-}) {
-  const scale = Math.max(...drivers.map((d) => Math.abs(d.value)), 1e-9);
-  return (
-    <ul className="mt-2 flex flex-col gap-2">
-      {drivers.map((d) => (
-        <li
-          key={d.feature}
-          className="grid grid-cols-[9rem_1fr_4rem] items-center gap-3 text-[14px]"
-          title={d.detail}
-        >
-          <span>{FEATURE[d.feature] ?? d.feature}</span>
-          <span className="relative h-3 rounded-full bg-bg">
-            <span
-              className="absolute top-0 h-3 rounded-full"
-              style={{
-                left: d.value < 0 ? `${50 - (50 * Math.abs(d.value)) / scale}%` : "50%",
-                width: `${(50 * Math.abs(d.value)) / scale}%`,
-                background: d.value < 0 ? "var(--c-safe)" : "var(--c-brass)",
-              }}
-            />
-            <span
-              aria-hidden="true"
-              className="absolute left-1/2 top-[-3px] h-[18px] border-l-[1.25px] border-ink"
-            />
-          </span>
-          <span className="text-right font-semibold">
-            {d.value >= 0 ? "+" : "−"}
-            {formatPct(Math.abs(d.value))}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
 }
 
 /** A reason card printed as a telegram slip. */

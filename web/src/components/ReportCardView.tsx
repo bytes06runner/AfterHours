@@ -8,21 +8,10 @@
 import { CalibrationPlot } from "@/charts/CalibrationPlot";
 import { TailChart } from "@/charts/TailChart";
 import { SEGMENT_KEYS, STRATEGIES, type ReportCard, type StrategyKey } from "@/lib/api";
+import { FORECASTERS, STRATEGY_NAMES } from "@/lib/names";
 import { useReportCard } from "@/lib/queries";
 import { formatPct, formatUsd } from "@/lib/time";
 
-export const FORECASTERS: Record<string, string> = {
-  model: "LightGBM quantile model",
-  global_segment: "Segment quantile",
-  ticker_segment: "Stock and segment quantile",
-  ewma_normal: "EWMA volatility",
-};
-export const STRATEGY_NAMES: Record<StrategyKey, string> = {
-  always_weekday: "Always weekday tier",
-  always_weekend: "Always weekend tier",
-  afterhours: "Afterhours",
-  perfect_foresight: "Perfect foresight",
-};
 const SEGMENT_NAMES: Record<string, string> = {
   overall: "All closed periods",
   earnings: "Earnings nights",

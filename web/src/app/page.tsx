@@ -1,5 +1,6 @@
 import { Hero } from "@/components/Hero";
 import { SunburstDivider } from "@/art/SunburstDivider";
+import { LandingStory } from "@/components/LandingStory";
 
 export default function Home() {
   return (
@@ -14,6 +15,9 @@ export default function Home() {
           20:00 to Sunday 20:00 New York time. Afterhours lends aggressively when the market is open
           and calm, and moves lender money to safer markets before it closes into risk.
         </p>
+        <div className="mt-12">
+          <LandingStory />
+        </div>
       </section>
     </>
   );

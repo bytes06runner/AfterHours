@@ -15,8 +15,9 @@ import type { Replay, ReplayPoint, Scenario } from "@/lib/api";
 import { useReplay, useScenarios } from "@/lib/queries";
 import { formatPct, formatUsd } from "@/lib/time";
 
+import { TornEdge } from "@/art/TornEdge";
+
 import { SplitFlap } from "./SplitFlap";
-import { TornEdge } from "./Telegram";
 
 const SEGMENT: Record<string, string> = {
   earnings: "Earnings night",
@@ -366,7 +367,9 @@ export function ReplayView() {
         {list.length > 0 ? (
           <Picker scenarios={list} selected={id} onSelect={setPicked} />
         ) : (
-          <p aria-busy="true">Loading scenarios.</p>
+          <p aria-busy="true" className="min-h-[112px]">
+            Loading scenarios.
+          </p>
         )}
         {replay.data ? (
           <Theatre key={replay.data.id} replay={replay.data} />

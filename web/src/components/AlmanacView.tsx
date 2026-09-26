@@ -16,7 +16,7 @@ import { useAlmanac, useRisk, useVault } from "@/lib/queries";
 import { formatPct } from "@/lib/time";
 
 import { RiskGauge } from "./RiskGauge";
-import { DriverBars } from "./Telegram";
+import { DriverBars } from "./DriverBars";
 
 const DAYS = 14;
 const TZ = "America/New_York";
@@ -234,12 +234,17 @@ function Spread({
                       fill={COLOR[v]}
                     />
                     {b - a > 34 && (
+                      // Tall bars carry their label inside, so it never runs into the night band.
                       <text
                         x={a + 2}
-                        y={yv(f.bad_case_drop) - 3}
+                        y={
+                          yv(f.bad_case_drop) - y0 < 12
+                            ? yv(f.bad_case_drop) + 12
+                            : yv(f.bad_case_drop) - 3
+                        }
                         fontSize={11}
                         fontWeight={700}
-                        fill="var(--c-text)"
+                        fill={yv(f.bad_case_drop) - y0 < 12 ? "var(--c-bg)" : "var(--c-text)"}
                       >
                         {formatPct(f.bad_case_drop)}
                       </text>
@@ -366,10 +371,12 @@ function Detail({
             <ul className="mt-2 flex flex-col gap-2 text-[16px]">
               {Object.entries(stock.tiers).map(([t, v]) => (
                 <li key={t}>
-                  <span
-                    className="font-semibold"
-                    style={{ color: v.allowed ? "var(--c-safe)" : "var(--c-risk)" }}
-                  >
+                  <span className="font-semibold">
+                    <span
+                      aria-hidden="true"
+                      className="mr-2 inline-block h-3 w-3 rounded-full align-baseline"
+                      style={{ background: v.allowed ? "var(--c-safe)" : "var(--c-risk)" }}
+                    />
                     {t === "weekday" ? "Weekday tier" : "Weekend tier"}{" "}
                     {v.allowed ? "open" : "closed"}:
                   </span>{" "}
@@ -418,41 +425,43 @@ export function AlmanacView() {
         for one closed period, set against how far each tier can fall before lenders lose money,
         less the {margin !== undefined ? formatPct(margin, 0) : ""} safety margin.
       </p>
-      {limits && (
-        <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[14px]">
-          <li className="flex items-center gap-2">
-            <span
-              aria-hidden="true"
-              className="inline-block h-3 w-3"
-              style={{ background: COLOR.weekday }}
-            />
-            Under {formatPct(limits.weekday)}: both tiers open
-          </li>
-          <li className="flex items-center gap-2">
-            <span
-              aria-hidden="true"
-              className="inline-block h-3 w-3"
-              style={{ background: COLOR.weekend }}
-            />
-            Under {formatPct(limits.weekend)}: weekend tier only
-          </li>
-          <li className="flex items-center gap-2">
-            <span
-              aria-hidden="true"
-              className="inline-block h-3 w-3"
-              style={{ background: COLOR.none }}
-            />
-            Above: neither tier
-          </li>
-          <li className="flex items-center gap-2">
-            <svg width="14" height="16" aria-hidden="true">
-              <BellIcon x={7} y={1} />
-            </svg>
-            Earnings
-          </li>
-        </ul>
-      )}
-      <div className="mt-6">
+      <div className="min-h-[56px] md:min-h-[28px]">
+        {limits && (
+          <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[14px]">
+            <li className="flex items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="inline-block h-3 w-3"
+                style={{ background: COLOR.weekday }}
+              />
+              Under {formatPct(limits.weekday)}: both tiers open
+            </li>
+            <li className="flex items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="inline-block h-3 w-3"
+                style={{ background: COLOR.weekend }}
+              />
+              Under {formatPct(limits.weekend)}: weekend tier only
+            </li>
+            <li className="flex items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="inline-block h-3 w-3"
+                style={{ background: COLOR.none }}
+              />
+              Above: neither tier
+            </li>
+            <li className="flex items-center gap-2">
+              <svg width="14" height="16" aria-hidden="true">
+                <BellIcon x={7} y={1} />
+              </svg>
+              Earnings
+            </li>
+          </ul>
+        )}
+      </div>
+      <div className="mt-6 min-h-[380px]">
         {almanac.isError || vault.isError ? (
           <p role="alert">Can&apos;t load the almanac. Retrying shortly.</p>
         ) : almanac.data && limits ? (

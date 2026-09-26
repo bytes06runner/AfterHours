@@ -119,8 +119,8 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     app = FastAPI(title="Afterhours API", version="1")
     origins = [o.strip() for o in (cfg.env(cfg.api.cors_origins_env) or "").split(",") if o.strip()]
     if not origins:
-        port = cfg.env(cfg.api.web_port_env) or ""
-        origins = [t.format(port=port) for t in cfg.api.local_web_origin_templates] if port else []
+        ports = [p for p in (cfg.env(e) for e in cfg.api.web_port_envs) if p]
+        origins = [t.format(port=p) for p in ports for t in cfg.api.local_web_origin_templates]
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,

@@ -264,7 +264,7 @@ api:
   cors_origins_env: CORS_ORIGINS          # comma separated; empty means the local web origins below
   admin_token_env: ADMIN_TOKEN
   local_web_origin_templates: ["http://127.0.0.1:{port}", "http://localhost:{port}"]
-  web_port_env: WEB_PORT
+  web_port_envs: [WEB_PORT, WEB_PREVIEW_PORT]   # dev server and the production preview (Lighthouse)
   sse_poll_seconds: 0.5
   sse_heartbeat_seconds: 15
   almanac_max_days: 60

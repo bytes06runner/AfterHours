@@ -1,10 +1,13 @@
+import { randomBytes } from "node:crypto";
+
 import { expect, test } from "@playwright/test";
 
 import { injectTestWallet } from "./wallet";
 
 const RPC = process.env.ANVIL_RPC_URL ?? "";
-// A fresh test address (no key needed on Anvil; the wallet impersonates it).
-const ACCOUNT = "0x000000000000000000000000000000000000a11c";
+// A fresh test address per run (no key needed on Anvil; the wallet impersonates it), so the
+// faucet's per-address cooldown never blocks a rerun.
+const ACCOUNT = `0x${randomBytes(20).toString("hex")}`;
 
 test("deposit and withdraw USDG on the local chain", async ({ page }) => {
   test.skip(!RPC, "needs ANVIL_RPC_URL and a running stack (make up)");

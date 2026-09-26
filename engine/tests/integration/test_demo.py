@@ -7,6 +7,7 @@ import os
 import shutil
 import socket
 import subprocess
+from pathlib import Path
 
 import pytest
 
@@ -21,13 +22,22 @@ def _free_port() -> int:
         return int(s.getsockname()[1])
 
 
-def test_make_demo_derisks_and_anchors_a_reason() -> None:
+def test_make_demo_derisks_and_anchors_a_reason(tmp_path: Path) -> None:
     if not shutil.which("anvil"):
         pytest.skip("anvil not installed")
+    # Own chain port, deployments and state, so a running `make up` stack is never touched.
+    port = _free_port()
+    deploy_dir = REPO_ROOT / "contracts" / "cache" / f"it-demo-deployments-{port}"
+    deploy_dir.mkdir(parents=True)
+    shutil.copy(REPO_ROOT / "deployments" / "fork.discovered.json", deploy_dir)
+    state_dir = tmp_path / "state"
     env = {
         **os.environ,
+        "AFTERHOURS_PATHS__DEPLOYMENTS_DIR": str(deploy_dir.relative_to(REPO_ROOT)),
+        "AFTERHOURS_PATHS__STATE_DIR": str(state_dir),
         "DEMO_EXIT": "1",
-        "ANVIL_PORT": str(_free_port()),
+        "DEMO_SKIP_WEB": "1",
+        "ANVIL_PORT": str(port),
         "API_PORT": str(_free_port()),
         "WEB_PORT": str(_free_port()),
     }
@@ -41,11 +51,8 @@ def test_make_demo_derisks_and_anchors_a_reason() -> None:
         check=False,
     )
     assert out.returncode == 0, out.stderr[-2000:]
-    cfg = load_config(load_env_file=False)
-    profile = cfg.demo.profile
-    result = json.loads(
-        (cfg.path(cfg.paths.state_dir) / f"{profile}.closing_bell.json").read_text()
-    )
+    profile = load_config(load_env_file=False).demo.profile
+    result = json.loads((state_dir / f"{profile}.closing_bell.json").read_text())
     assert result["derisked"], result
     assert result["reasons"], result
     assert all(r["registry_tx"].startswith("0x") for r in result["reasons"])
