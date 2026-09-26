@@ -1,8 +1,13 @@
 # Afterhours
 
-A lending vault for Robinhood Stock Tokens. It lends USDG at full speed while the stock market
-is open and calm, moves lender money to safer Morpho markets before the market closes into risk,
-and writes the reason for every move onchain.
+A lending vault for Robinhood Stock Tokens. It lends USDG to each stock in the riskiest Morpho
+market that stock's history allows, pulls back the money borrowers are not using before nights
+that could gap past every market's cushion, and writes the reason for every move onchain.
+
+In the held-out backtest (2022-01-03 to 2026-09-24, settings chosen on earlier years only) it
+earned 9.12% against 9.09% for the fixed weekday/weekend mix with the nearest yield, with 5,849
+USDG of bad debt against 11,132: the same yield as the best fixed mix, with about half the loss.
+Historical stock prices, simulated vault.
 
 Built for the Colosseum Crypto World's Fair, Robinhood Chain track (the same code runs on
 Arbitrum). Status and evidence for every step: [PROGRESS.md](PROGRESS.md).
@@ -27,34 +32,86 @@ earnings nights opened 10% or more below the previous close; over all 2,032,976 
 it was 0.08% (`artifacts/gaps/summary.json`). A loan at a high loan-to-value limit can reopen
 worth less than its debt, and the lenders take the loss.
 
-Lenders face a choice today. Lend in a market with a high limit (more borrowers, higher rates,
-exposed to gaps) or a low one (safe, but lower rates all week). Afterhours does both, at the
-right times.
+Lenders face a trade-off. Lend in a market with a high limit and earn more while taking the
+gaps, or a low one and earn less. Every fixed mix of the two sits on one line; Afterhours sits
+above it.
 
 ## How it works
 
-1. **Two tiers per stock.** Each stock has two Morpho Blue markets: a weekday tier at 91.5%
-   LLTV and a weekend tier at 77.0% LLTV. A tier's cushion is how far the price can fall before
-   a loan at the limit leaves bad debt: 1 minus LLTV minus Morpho's liquidation incentive
-   allowance. That is 6.1% for the weekday tier and 17.3% for the weekend tier.
-2. **Forecast the bad case.** Before each close, the engine forecasts every stock's bad-case
-   drop for the coming closed periods: the 1% worst gap, from EWMA volatility scaled by the
-   hours closed and calibrated per kind of closed period (ordinary night, weekend, holiday,
-   earnings night).
-3. **Apply one rule.** A tier stays open for a stock only if the bad-case drop plus a 5% safety
-   margin fits inside its cushion. A linear program then allocates the vault across the open
-   markets for the best yield, within per-stock caps and an idle reserve for withdrawals.
-4. **Move before the bell.** The bot, as the allocator of a Morpho Vault V2, moves the money
-   that borrowers are not using. Money already lent stays until it is repaid.
-5. **Explain every move.** Each reallocation produces a reason card: the forecast, what drove
-   it, the rule that fired. Its RFC 8785 canonical hash is written to the
-   `AfterhoursReasonRegistry` contract in the same cycle. The web app recomputes the hash in the
-   browser and checks it against the onchain event ("Verify on chain").
+1. **Three tiers per stock.** Each stock has three Morpho Blue markets, at 91.5%, 86% and 77%
+   LLTV (all three enabled on Robinhood Chain's Morpho). A tier's cushion is how far the price can
+   fall before a loan at the limit leaves bad debt: 1 minus LLTV minus Morpho's liquidation
+   incentive allowance. That is 6.1%, 10.2% and 17.3%.
+2. **A yearly tier map.** Each January every stock is rated on the previous 365 days only: its
+   worst 1% closed-period gap. It may lend in the highest tier whose cushion, less 40% of it,
+   covers that rating (limits 3.7%, 6.1% and 10.4%), and never below the 77% tier.
+3. **A pullback before risky nights.** Before each close, the engine forecasts every stock's
+   bad-case drop for the next 5 closed periods: the 1% worst gap, from EWMA volatility scaled by
+   the hours closed and calibrated per kind of closed period. If that exceeds every tier's
+   cushion less 40% (10.4%), the stock's money that borrowers are not using goes idle. There are
+   no nightly moves between tiers.
+4. **Move and explain.** The bot, as the allocator of a Morpho Vault V2, places money with a
+   linear program within per-stock caps and an idle reserve, and moves only what borrowers are not
+   using. Each move produces a reason card (the rating, tonight's forecast, the rule that fired)
+   whose RFC 8785 canonical hash goes to the `AfterhoursReasonRegistry` contract. The web app
+   recomputes the hash in the browser and checks it onchain ("Verify on chain").
 
 The interface follows the real exchange clock: a daylit art deco exchange while the market is
 open, night after the closing bell, drawn entirely in code.
 
 ## Results
+
+All results are historical stock prices, simulated vault: a fresh 2,000,000 USDG vault, settings
+chosen on 2017 to 2021 only, evaluated on 2022-01-03 to 2026-09-24 (1,186 closed periods).
+
+**How the policy was chosen.** Before running, we wrote down a rule for the design we expected to
+ship, which moved each stock between tiers night by night (the dynamic strategy):
+
+> The dynamic strategy wins only if, on 2022 to 2026, it has less bad debt than the no-hindsight fixed map at equal or higher interest.
+
+The result, as recorded:
+
+> The dynamic strategy has less bad debt but less interest in both universes, so under the rule it does not win. Option B applies.
+
+Option B is what Afterhours runs now (above). B was defined after those held-out results were
+seen; its settings were then tuned on 2017 to 2021 and evaluated once on the same held-out years,
+the second evaluation on that window. Details and every run: `artifacts/backtest/option_a.json`,
+`artifacts/backtest/option_b.json`, and [PROGRESS.md](PROGRESS.md).
+
+**The 5 vault stocks** (NVDA, SPY, META, SGOV, USO):
+
+| Strategy | Lender yield | Bad debt (USDG) | Worst single night |
+| --- | --- | --- | --- |
+| Afterhours (B): yearly tier map plus pullback | 9.12% | 5,849 | 0.107% of the vault |
+| Static blend nearest B's yield (90% weekday) | 9.09% | 11,132 | 0.220% |
+| No-hindsight fixed map (tiers from the prior year, no pullback) | 9.13% | 8,482 | 0.199% |
+| Dynamic strategy (documented alternative) | 8.67% | 748 | 0.020% |
+| Always 91.5% | 9.34% | 12,521 | 0.247% |
+| Always 77% | 6.88% | 595 | 0.026% |
+
+**All 35 Stock Token underlyings:** B 9.37%, 4,444 USDG, 0.083%; nearest blend (100% weekday)
+9.34%, 12,646, 0.244%; fixed map 9.28%, 13,380, 0.244%; dynamic 9.04%, 1,339, 0.025%.
+
+Facts that go with these numbers:
+- B against the nearest static blend: yield 9.12% vs 9.09%, bad debt 5,849 vs 11,132 USDG,
+  worst single night 0.107% vs 0.220% of the vault.
+- B against the fixed map: yield 9.12% vs 9.13%, bad debt 5,849 vs 8,482 USDG, worst single
+  night 0.107% vs 0.199%.
+- The fixed map broke the 0.10% worst-night cap in tuning (its smallest worst night across all
+  settings was 0.543%) and out of sample (0.199%).
+- B broke it in tuning too: 0 of 144 settings met it, and the rule's fallback chose the smallest
+  worst night (0.541%). Out of sample B's worst night was 0.107% on the 5 vault stocks (above the
+  cap) and 0.083% on all 35 (within it).
+- The dynamic strategy had the least bad debt (748 USDG) and the smallest worst night (0.020%),
+  but earned 963,015 USDG of interest against 1,030,359 for the fixed map, so under the rule it
+  did not ship. It remains a documented alternative.
+- Tier yields are assumptions, not observed rates: supply APY 9.5%, 8.5% and 7.0% for the 91.5%,
+  86% and 77% tiers. How much any strategy gains from the higher tiers depends on that spread.
+
+**One night.** META opened 24.5% below its close after earnings on 2022-10-26. Replayed on a
+2,000,000 USDG vault, always lending at 91.5% loses 24,300 USDG; Afterhours (B), which had
+pulled META's unborrowed money five nights before, loses 9,953 on the money that was still lent
+(`artifacts/backtest/replay/META-2022-10-26-earnings.json`).
 
 **Forecasts.** The LightGBM gap model we built did not beat the simplest baseline on held-out
 years, so Afterhours ships the baseline (the report card says so in its first sentence). On
@@ -62,26 +119,9 @@ years, so Afterhours ships the baseline (the report card says so in its first se
 forecast bad case 1.30% of the time against a 1% target; on earnings nights 1.08%
 (`artifacts/model/report_card.json`).
 
-**Backtest** (historical stock prices, simulated vault): a 2,000,000 USDG vault across NVDA,
-SPY, META, SGOV and USO, 2017-01-03 to 2026-09-25, 2,445 closed periods
-(`artifacts/backtest/results.json`).
-
-| Strategy | Lender yield | Bad debt (USDG) | Worst single event |
-| --- | --- | --- | --- |
-| Always weekday tier | 8.84% | 108,748 | 0.74% of the vault |
-| Always weekend tier | 6.85% | 7,491 | 0.12% of the vault |
-| Afterhours | 7.47% | 5,122 | 0.07% of the vault |
-| Perfect foresight (not achievable) | 8.96% | 65,615 | 0.47% of the vault |
-
-Afterhours had about 21 times less bad debt than always lending at the weekday tier, and less
-than always staying in the weekend tier while earning more. Its settings were chosen by one
-rule: the highest yield among settings whose worst single event loses at most 0.10% of the
-vault. Rates, utilisation and borrower behaviour are assumptions; the report card shows how the
-results move when they change.
-
-**One night.** META opened 24.5% below its close after earnings on 2022-10-26. Replayed on a
-2,000,000 USDG vault, always lending at the weekday tier loses 24,300 USDG; Afterhours loses
-2,228 (`artifacts/backtest/replay/META-2022-10-26-earnings.json`).
+**The market today.** At Robinhood Chain block 73,382,409 (2026-09-26), 149 Morpho markets used a
+Stock Token as collateral; together they held 804,926 USDG supplied and 6,115 USDG borrowed
+(`artifacts/discovery/market_size.json`). The market is early.
 
 ## Architecture
 
@@ -133,9 +173,9 @@ make demo      # local chain, contracts, seeded borrowers, API, bot, web app, th
 ```
 
 `make demo` fetches daily prices and earnings for the five vault stocks on its first run, deploys
-Morpho, the vault and simulated Stock Tokens on Anvil, and runs the closing-bell scenario: the bot
-forecasts the coming closed periods, moves money out of the markets whose cushion is too thin,
-and anchors a reason for each move in the onchain registry. It took 1 minute 12 seconds on the
+Morpho, the vault and simulated Stock Tokens on Anvil, and replays the week of 2025-04-22: before
+META's 2025-04-30 earnings, the bot's forecast bad case for META exceeds every tier's limit, so
+it pulls META's unborrowed money and anchors the reason in the onchain registry. It took 1 minute 12 seconds on the
 clean-clone check (2026-09-26). Open the web app at `http://localhost:$WEB_PORT` (3000 unless
 you change it). Ports come from `.env.example`; set `ANVIL_PORT`, `API_PORT` or `WEB_PORT` in
 the environment to use others.
@@ -167,15 +207,23 @@ the real Morpho, USDG, Stock Token and Chainlink addresses found in M1 discovery
 
 ## Limitations
 
-- **Simulation.** The demo runs on a local chain with simulated tokens and prices. Fork runs at
-  a pinned mainnet block need an archive RPC we do not have yet; tests at the chain head pass.
+- **Simulation.** The demo runs on a local chain with simulated tokens and prices, replaying the
+  week of 2025-04-22. Fork runs at a pinned mainnet block need an archive RPC we do not have yet;
+  tests at the chain head pass.
+- **Two looks at the held-out years.** Option B was defined after option A's held-out results
+  were known, so B's held-out figures are a second evaluation on the same window.
+- **The worst-night cap.** No setting of B or the fixed map met the 0.10% cap in tuning, which
+  includes March 2020. Out of sample B's worst night on the 5 vault stocks was 0.107%.
+- **Assumed rates.** Supply rates, utilisation, loan turnover and borrower loan-to-value are
+  assumptions set in config, not observed markets. With one assumed rate per tier, the optimiser
+  is indifferent between stocks in the same tier, so which stock gets the money within a tier
+  comes down to tie-breaks.
 - **The model.** The LightGBM model lost to the EWMA baseline, which ships. The baseline misses
-  more often than targeted on holidays (2.74% against 1%).
-- **Backtest assumptions.** Supply rates, utilisation, loan turnover and borrower loan-to-value
-  are assumptions set in config, not observed markets; sensitivity tables are in the report card.
-  The stock universe is today's S&P 500 plus Stock Tokens, so it has survivorship bias.
-- **Money already lent cannot move.** Afterhours can only withdraw what borrowers are not using;
-  the replay shows the part that stays exposed.
+  more often than targeted on holidays (2.74% against 1%); most of those misses fall on a few
+  market-wide shock dates (PROGRESS.md, item 4).
+- **Money already lent cannot move.** Afterhours can only pull what borrowers are not using.
+- **Universe.** The stock universe for the gap study is today's S&P 500 plus Stock Tokens, so it
+  has survivorship bias.
 - **Not audited.** The contracts we wrote are small (the registry and simulated tokens), and the
   vault and markets are Morpho's, but nothing here has had a security review.
 

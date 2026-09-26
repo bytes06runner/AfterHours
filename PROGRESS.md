@@ -569,3 +569,36 @@ the same settings in both families and universes, so A's verdict is unchanged.
 
 Ships: B, per the rule. Next: three tiers in the deploy, the bot on B's policy, then the report
 card, landing chart, README, pitch.md and demo.md.
+
+### 2026-09-27 Option B ships: bot, UI and documents
+
+Done
+- Deploy: three markets per stock (91.5%, 86%, 77% LLTV); the Solidity script takes an ordered
+  tier list. `forge test` green; the mainnet fork deploy test passes at the chain head with three
+  tiers on Robinhood's real Morpho, Chainlink and USDG.
+- Bot and API: `policy/option_b.py` is the one implementation of B, used by the backtest and the
+  bot (the refactored backtest reproduces option_b.json exactly: 5,849 USDG bad debt, 1,026,091
+  interest). Config `policy`: map fraction 0.4, pullback fraction 0.4, lookahead 5 (B's choice
+  for the vault stocks). `/v1/risk` reports each stock's rating, mapped tier and pullback state.
+- A bug caught by that reproduction check before it shipped: the tier-map floor used the
+  smallest cushion instead of the lowest-LLTV tier's (the widest).
+- Demo week moved to 2025-04-22 (config `demo`): META, in the 91.5% tier by its 2025 rating, is
+  pulled before its 2025-04-30 earnings. A 2026 week would show no move: scanning 2026, no stock
+  that holds vault money is ever pulled under B at these settings.
+- Replays rerun under B. META 2022-10-26: B had pulled META's unborrowed money five nights
+  before; it lost 9,953 USDG against 24,300 for always-weekday (the old dynamic design lost 2,228).
+- UI: allocation board with three tiers and each stock's map and pullback state; Almanac bars
+  against the pullback limit with each stock's mapped tier; RiskGauge and Replay on B; report
+  card decision section (verdict verbatim, frontier chart, tables for both universes, the facts
+  below as statements); landing story led by B against the nearest fixed mix.
+- Documents: README, pitch.md and demo.md rewritten for B; every number passes `make lint-numbers`.
+  Stated as facts, as asked: the verdict verbatim; the fixed map broke the 0.10% cap in tuning
+  (0.543%) and out of sample (0.199%); B against the nearest blend and against the fixed map;
+  the dynamic strategy's results as a documented alternative; tier yields are assumed.
+- Pitch market line uses the measured mainnet figures (149 markets, 804,926 USDG supplied,
+  6,115 borrowed at block 73,382,409) and calls the market early.
+- Item 5 (LightGBM multiplier) dropped, as decided.
+
+Evidence
+- `make e2e`: 32 passed. `make test-integration`: 2 passed. `make test`: Python, vitest and
+  forge green. `make lint` clean, including lint-numbers.

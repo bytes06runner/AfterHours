@@ -767,6 +767,11 @@
       "text": "10.2%",
       "source": "config (enabled onchain, M1)"
     },
+    "tiers.weekday.lltv_short": {
+      "value": 0.915,
+      "text": "91.5%",
+      "source": "config morpho.lltv_tiers"
+    },
     "policy.map_limit.weekday": {
       "value": 0.03663417136993334,
       "text": "3.7%",
@@ -777,6 +782,11 @@
       "text": "9.5%",
       "source": "config backtest.supply_apy_by_lltv"
     },
+    "tiers.middle.lltv_short": {
+      "value": 0.86,
+      "text": "86%",
+      "source": "config morpho.lltv_tiers"
+    },
     "policy.map_limit.middle": {
       "value": 0.061377870563674275,
       "text": "6.1%",
@@ -786,6 +796,11 @@
       "value": 0.085,
       "text": "8.5%",
       "source": "config backtest.supply_apy_by_lltv"
+    },
+    "tiers.weekend.lltv_short": {
+      "value": 0.77,
+      "text": "77%",
+      "source": "config morpho.lltv_tiers"
     },
     "policy.map_limit.weekend": {
       "value": 0.10375939849624058,

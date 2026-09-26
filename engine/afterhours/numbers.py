@@ -272,6 +272,9 @@ def build(cfg: AfterhoursConfig) -> dict[str, Any]:
         pol = cfg.policy
         for name, lltv in cfg.morpho.lltv_tiers.ordered():
             spec = tier_spec(name, lltv)
+            n[f"tiers.{name}.lltv_short"] = _entry(
+                lltv, f"{lltv * 100:g}%", "config morpho.lltv_tiers"
+            )
             lim = spec.cushion * (1 - pol.map_fraction)
             n[f"policy.map_limit.{name}"] = _entry(lim, pct(lim), "config policy (option B)")
             apy = cfg.backtest.apy(lltv)
