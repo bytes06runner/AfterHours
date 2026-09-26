@@ -21,7 +21,7 @@ AH := uv run --quiet afterhours
 WEB := pnpm --filter @afterhours/web
 
 .PHONY: help setup gen-schema discover verify-discovered local-chain fork deploy seed engine api web up demo report \
-        test test-py test-web test-sol test-config lint lint-py lint-web lint-sol lint-hardcode
+        test test-py test-web test-sol test-config test-integration lint lint-py lint-web lint-sol lint-hardcode
 
 help: ## List commands
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -65,11 +65,12 @@ deploy: ## Deploy markets, vault, registry; write deployments/<profile>.json
 seed: ## Create simulated lenders and borrowers on the fork or local chain
 	$(AH) sim seed
 
-engine: ## Run the data pipeline, model and scheduler
-	@echo "make engine arrives with M2 and M6." >&2; exit 2
+engine: ## Refresh market data (cached) and run the bot scheduler
+	$(AH) data build >/dev/null
+	$(AH) bot run
 
 api: ## Start the FastAPI service
-	@echo "make api arrives with M6." >&2; exit 2
+	$(AH) api
 
 web: ## Start the Next.js app
 	@NEXT_PUBLIC_API_BASE_URL="$${NEXT_PUBLIC_API_BASE_URL:-http://$${API_HOST}:$${API_PORT}}" $(WEB) exec next dev --port "$${WEB_PORT}"  # hardcode-ok: local scheme
@@ -85,7 +86,7 @@ report: ## Regenerate gap stats, model report card and backtest artifacts
 
 # ---------------------------------------------------------------- quality
 
-test: test-py test-web test-sol test-config ## All tests
+test: test-py test-web test-sol test-config test-integration ## All tests
 
 test-py:
 	uv run pytest
@@ -99,6 +100,9 @@ test-sol:
 
 test-config:
 	./scripts/config-roundtrip.sh
+
+test-integration: ## Deploy, seed and run the API on a throwaway Anvil chain (M6 acceptance)
+	uv run pytest -m integration engine/tests/integration -q
 
 lint: lint-py lint-web lint-sol lint-hardcode ## All linters
 

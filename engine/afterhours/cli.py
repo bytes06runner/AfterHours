@@ -227,6 +227,15 @@ def bot_once(
     typer.echo(dump(Allocator(load_config()).run_cycle(trigger, execute=not dry_run)))
 
 
+@bot_app.command("run")
+def bot_run() -> None:
+    """Run the scheduler: hourly, pre-close, post-open, pre-earnings and trigger cycles."""
+    from afterhours.bot.scheduler import BotScheduler
+
+    _logging()
+    BotScheduler(load_config()).run()
+
+
 @sim_app.command("seed")
 def sim_seed() -> None:
     """Seed lenders, let the bot allocate, then seed borrowers."""
@@ -247,6 +256,14 @@ def sim_seed() -> None:
     typer.echo(
         f"borrowers: {len(borrowers)}, {sum(x['usdg'] for x in borrowers):,.0f} USDG borrowed"
     )
+
+
+@app.command("api")
+def api_cmd() -> None:
+    """Start the FastAPI service (host and port from the env vars named in config)."""
+    from afterhours.api.app import serve
+
+    serve()
 
 
 if __name__ == "__main__":

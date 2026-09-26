@@ -252,6 +252,7 @@ class TriggersConfig(_Strict):
 
 
 class ScheduleConfig(_Strict):
+    tick_seconds: PositiveInt
     hourly: bool
     pre_close_minutes: PositiveInt
     post_open_minutes: PositiveInt
@@ -264,6 +265,14 @@ class ApiConfig(_Strict):
     port_env: EnvName
     cors_origins_env: EnvName
     admin_token_env: EnvName
+    local_web_origin_templates: list[
+        Annotated[str, StringConstraints(pattern=r"^https?://.*\{port\}")]
+    ]
+    web_port_env: EnvName
+    sse_poll_seconds: Annotated[float, Field(gt=0)]
+    sse_heartbeat_seconds: Annotated[float, Field(gt=0)]
+    almanac_max_days: PositiveInt
+    reasons_page_size: PositiveInt
 
 
 class WebConfig(_Strict):

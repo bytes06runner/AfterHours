@@ -20,7 +20,7 @@
 - [x] M3 Model (2026-09-26; fallback applied: ships the EWMA baseline)
 - [x] M4 Policy and backtest (2026-09-26)
 - [x] M5 Contracts (2026-09-26; pinned-block fork runs wait on BLOCKED 1)
-- [ ] M6 Bot and API
+- [x] M6 Bot and API (2026-09-26; accepted on the local profile, fork run waits on BLOCKED 1)
 - [ ] M7 Simulation harness
 - [ ] M8 Frontend foundation
 - [ ] M9 Frontend pages
@@ -193,3 +193,25 @@ Acceptance
 - `make deploy PROFILE=fork` writes `deployments/fork.json`: pending BLOCKED 1 (`make fork` needs the archive RPC). Verified the same script against the real contracts in the fork test above; `deployments/fork.plan.json` is written.
 
 Next: M6 bot and API (developed on the local profile, then the fork once unblocked).
+
+### 2026-09-26 M6 Bot and API: done on the local profile (fork run pending BLOCKED 1)
+
+What was done
+- Live risk (`engine/afterhours/risk/live.py`): the shipped calibrated baseline over the next closed periods from the exchange calendar, scheduled earnings and EWMA volatility up to "now"; drivers are an exact additive split (stock volatility, closed hours, segment calibration). On fork and local profiles "now" is the chain's clock, so the demo can move time.
+- Allocator (`engine/afterhours/bot/allocator.py`): reads vault state onchain (allocation, lent-out amount from market liquidity, live supply APY via the IRM, caps, idle), solves the LP, executes deallocations then allocations with the allocator key (only unborrowed money moves), then builds one reason card per stock that moved, hashes it (RFC 8785 + keccak256, excluding `tx` and the stored hash), logs it with `logReason`, and stores it. A file lock keeps one cycle at a time across processes.
+- Reason cards follow SPEC 7.7 with two stated differences: drivers are `{feature, contribution, detail}` plus `drivers_method` (the shipped forecaster is a baseline, so this is an exact split, not SHAP), and numbers are fixed-point strings so canonical JSON is stable across languages.
+- Server-side verifier (`explain/verify.py`): recompute the hash, read `ReasonLogged` from the registry receipt, compare hash and subject.
+- Scheduler (`bot/scheduler.py`): APScheduler tick; hourly, pre-close, post-open and pre-earnings marks on the profile's clock; shock, stale-oracle and pool-divergence triggers, each debounced.
+- API (`engine/afterhours/api/app.py`, `make api`): every SPEC 8 endpoint plus `?replay=true` on the stream; simulation endpoints require the admin token and a fork or local chain. The bot and API share an append-only event log, so either can restart.
+- Seeding (`afterhours sim seed`, `make seed`): lenders deposit, the bot allocates, borrowers borrow in every supplied market at LTVs drawn over 60% to 95% of the tier LLTV, via Anvil impersonation (Simulation).
+- CLI: `afterhours bot once|run`, `afterhours sim seed`, `afterhours api`; `make engine` refreshes cached data then runs the scheduler.
+
+Evidence
+- `make test-integration` (engine/tests/integration/test_local_stack.py, 51 s): throwaway Anvil chain, `afterhours deploy`, `afterhours sim seed`, API server, then `POST /v1/sim/close-out`: every market's vault supply equals the plan target (within 0.01 USDG), every reason card verifies as "matched" against its registry event, and the stream delivered status, plan_changed, tx_sent, tx_confirmed, reason_logged and vault_updated.
+- Manual run on the local chain: 5 lenders, 1,622,954 USDG (sim); 6 borrowers, 1,298,363 USDG (sim) borrowed; 3 reason cards, all matched onchain (seq 1 to 3).
+- Unit tests: 47 Python tests pass (scheduler marks and triggers included); mypy strict clean.
+
+Acceptance
+- On the fork, a forced close-out moves funds exactly as planned, the registry event matches the recomputed hash, and SSE emits every event type: passed on the local profile (self-deployed Morpho, simulated oracle and collateral). The same code path runs on the fork once `make fork` has an archive RPC (BLOCKED 1); the fork deploy test already exercises the real contracts.
+
+Next: M7 scripted scenarios and `make demo`.

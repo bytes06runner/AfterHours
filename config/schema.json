@@ -46,6 +46,11 @@
           "title": "Admin Token Env",
           "type": "string"
         },
+        "almanac_max_days": {
+          "exclusiveMinimum": 0,
+          "title": "Almanac Max Days",
+          "type": "integer"
+        },
         "cors_origins_env": {
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Cors Origins Env",
@@ -56,9 +61,37 @@
           "title": "Host Env",
           "type": "string"
         },
+        "local_web_origin_templates": {
+          "items": {
+            "pattern": "^https?://.*\\{port\\}",
+            "type": "string"
+          },
+          "title": "Local Web Origin Templates",
+          "type": "array"
+        },
         "port_env": {
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Port Env",
+          "type": "string"
+        },
+        "reasons_page_size": {
+          "exclusiveMinimum": 0,
+          "title": "Reasons Page Size",
+          "type": "integer"
+        },
+        "sse_heartbeat_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Sse Heartbeat Seconds",
+          "type": "number"
+        },
+        "sse_poll_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Sse Poll Seconds",
+          "type": "number"
+        },
+        "web_port_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Web Port Env",
           "type": "string"
         }
       },
@@ -66,7 +99,13 @@
         "host_env",
         "port_env",
         "cors_origins_env",
-        "admin_token_env"
+        "admin_token_env",
+        "local_web_origin_templates",
+        "web_port_env",
+        "sse_poll_seconds",
+        "sse_heartbeat_seconds",
+        "almanac_max_days",
+        "reasons_page_size"
       ],
       "title": "ApiConfig",
       "type": "object"
@@ -1117,11 +1156,17 @@
           "title": "Pre Earnings Hours",
           "type": "integer"
         },
+        "tick_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Tick Seconds",
+          "type": "integer"
+        },
         "triggers": {
           "$ref": "#/$defs/TriggersConfig"
         }
       },
       "required": [
+        "tick_seconds",
         "hourly",
         "pre_close_minutes",
         "post_open_minutes",

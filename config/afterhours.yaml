@@ -230,6 +230,7 @@ sim:
   eth_per_actor: 10
 
 schedule:
+  tick_seconds: 30                      # how often the bot checks marks and triggers
   hourly: true
   pre_close_minutes: 120
   post_open_minutes: 30
@@ -238,6 +239,16 @@ schedule:
   # feed can be hours old while the market is open. Stale means past the heartbeat plus 30 minutes.
   triggers: { shock_move_pct: 0.03, shock_window_min: 15, divergence_pct: 0.02, stale_minutes: 1470 }
 
-api: { host_env: API_HOST, port_env: API_PORT, cors_origins_env: CORS_ORIGINS, admin_token_env: ADMIN_TOKEN }
+api:
+  host_env: API_HOST
+  port_env: API_PORT
+  cors_origins_env: CORS_ORIGINS          # comma separated; empty means the local web origins below
+  admin_token_env: ADMIN_TOKEN
+  local_web_origin_templates: ["http://127.0.0.1:{port}", "http://localhost:{port}"]
+  web_port_env: WEB_PORT
+  sse_poll_seconds: 0.5
+  sse_heartbeat_seconds: 15
+  almanac_max_days: 60
+  reasons_page_size: 20
 web: { api_base_url_env: NEXT_PUBLIC_API_BASE_URL, walletconnect_project_id_env: NEXT_PUBLIC_WC_PROJECT_ID }
 alerts: { webhook_env: ALERT_WEBHOOK_URL }
