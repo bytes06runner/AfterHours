@@ -301,6 +301,7 @@ class AfterhoursConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="AFTERHOURS_",
         env_nested_delimiter="__",
+        env_ignore_empty=True,
         extra="forbid",
         frozen=True,
     )
