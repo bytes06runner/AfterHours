@@ -1,0 +1,13 @@
+.env
+.env.local
+secrets/
+data/cache/
+node_modules/
+.next/
+__pycache__/
+.venv/
+out/
+cache/
+broadcast/*/31337/
+*.log
+.DS_Store
