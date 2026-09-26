@@ -3,7 +3,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-import { api } from "@/lib/api";
+import { api, RETRY_TEXT } from "@/lib/api";
 import { usePhase } from "@/lib/phase";
 import { useConfig } from "@/lib/queries";
 
@@ -66,7 +66,7 @@ export function LedgerView() {
       </header>
       {query.isError && (
         <p role="alert" className="mt-10 text-[18px]">
-          Can&apos;t reach the Afterhours API. Retrying shortly.
+          Can&apos;t reach the Afterhours API. {RETRY_TEXT}
         </p>
       )}
       {query.isSuccess && cards.length === 0 && (

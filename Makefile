@@ -120,8 +120,8 @@ lint-web:
 lint-sol:
 	cd contracts && forge fmt --check
 
-e2e: ## Playwright E2E against the running stack (make up)
-	cd web && WEB_BASE_URL="http://localhost:$$WEB_PORT" ANVIL_RPC_URL="http://127.0.0.1:$$ANVIL_PORT" pnpm exec playwright test  # hardcode-ok: local stack
+e2e: ## Playwright E2E against the running stack (make up); E2E_ARGS passes playwright options
+	./scripts/e2e.sh $(E2E_ARGS)
 
 lighthouse: ## Lighthouse on the production build for every page (needs make up running)
 	./scripts/lighthouse.sh

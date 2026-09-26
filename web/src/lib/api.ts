@@ -16,6 +16,10 @@ export class ApiError extends Error {
   }
 }
 
+/** How often a failed query is retried; the error messages quote it. */
+export const ERROR_RETRY_MS = 10_000;
+export const RETRY_TEXT = `Retrying in ${ERROR_RETRY_MS / 1000} seconds.`;
+
 export function apiBase(): string {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL;
   if (!base) throw new ApiError(0, "NEXT_PUBLIC_API_BASE_URL is not set.");
@@ -30,7 +34,7 @@ async function get<T>(path: string, schema: z.ZodType<T>, init?: RequestInit): P
       headers: { accept: "application/json", ...(init?.headers ?? {}) },
     });
   } catch {
-    throw new ApiError(0, "Can't reach the Afterhours API. Retrying shortly.");
+    throw new ApiError(0, "Can't reach the Afterhours API.");
   }
   if (!response.ok) {
     let detail = `${response.status}`;

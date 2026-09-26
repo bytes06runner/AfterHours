@@ -6,6 +6,7 @@
  * bar against each tier's allowed limit (cushion minus the safety margin). Clicking a stock opens
  * its RiskGauge and drivers. Data: /v1/almanac, /v1/risk, /v1/vault.
  */
+import { RETRY_TEXT } from "@/lib/api";
 import "@/art/art.css";
 
 import { useState } from "react";
@@ -463,7 +464,7 @@ export function AlmanacView() {
       </div>
       <div className="mt-6 min-h-[380px]">
         {almanac.isError || vault.isError ? (
-          <p role="alert">Can&apos;t load the almanac. Retrying shortly.</p>
+          <p role="alert">Can&apos;t load the almanac. {RETRY_TEXT}</p>
         ) : almanac.data && limits ? (
           <>
             <div className="hidden md:block">

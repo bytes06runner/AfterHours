@@ -5,6 +5,7 @@
  * brass bars sized by the vault's USDG, the lent-out part hatched, idle as its own reservoir.
  * Bars move only because money moved: widths come from /v1/vault and glide when it changes.
  */
+import { RETRY_TEXT } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 import type { Market, Risk, Vault } from "@/lib/api";
@@ -95,7 +96,7 @@ export function AllocationBoard() {
   const vault = useVault();
   const risk = useRisk();
   const flash = useFlash();
-  if (vault.isError) return <p role="alert">Can&apos;t reach the vault. Retrying shortly.</p>;
+  if (vault.isError) return <p role="alert">Can&apos;t reach the vault. {RETRY_TEXT}</p>;
   if (!vault.data) return <p aria-busy="true">Reading the vault onchain.</p>;
   const v: Vault = vault.data;
   const limit = v.max_share_per_stock * v.tvl_usdg;

@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { ERROR_RETRY_MS } from "@/lib/api";
 import { PhaseProvider, type Phase } from "@/lib/phase";
 import { LiveStreamProvider } from "@/lib/queries";
 
@@ -18,7 +19,14 @@ export function Providers({
   const [client] = useState(
     () =>
       new QueryClient({
-        defaultOptions: { queries: { staleTime: 15_000, refetchOnWindowFocus: false } },
+        defaultOptions: {
+          queries: {
+            staleTime: 15_000,
+            refetchOnWindowFocus: false,
+            // Error messages promise a retry; queries in error refetch on this interval.
+            refetchInterval: (q) => (q.state.status === "error" ? ERROR_RETRY_MS : false),
+          },
+        },
       }),
   );
   return (

@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { GapHistogram } from "@/charts/GapHistogram";
-import { api, type ReportCard, type Scenario, type Vault } from "@/lib/api";
+import { api, type ReportCard, type Scenario, type Vault, RETRY_TEXT } from "@/lib/api";
 import { useReplay, useReportCard, useScenarios, useVault } from "@/lib/queries";
 import { STRATEGY_NAMES } from "@/lib/names";
 import { formatPct, formatUsd } from "@/lib/time";
@@ -327,7 +327,7 @@ export function LandingStory() {
   const sq = useScenarios();
   if (!rcq.data || !vq.data) {
     return rcq.isError || vq.isError ? (
-      <p role="alert">Can&apos;t load the story&apos;s data. Retrying shortly.</p>
+      <p role="alert">Can&apos;t load the story&apos;s data. {RETRY_TEXT}</p>
     ) : (
       <p aria-busy="true">Loading the numbers.</p>
     );

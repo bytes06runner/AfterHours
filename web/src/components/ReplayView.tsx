@@ -7,6 +7,7 @@
  * comes from /v1/replay, which serves artifacts/backtest/replay. Historical stock prices,
  * simulated vault.
  */
+import { RETRY_TEXT } from "@/lib/api";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -362,21 +363,30 @@ export function ReplayView() {
         The largest real gaps in the backtest, replayed on a simulated vault: one that always lends
         at the weekday tier, and Afterhours. Historical stock prices, simulated vault.
       </p>
-      {scenarios.isError && <p role="alert">Can&apos;t load the scenarios. Retrying shortly.</p>}
+      {scenarios.isError && <p role="alert">Can&apos;t load the scenarios. {RETRY_TEXT}</p>}
       <div className="mt-10 grid gap-10 lg:grid-cols-[260px_1fr]">
-        {list.length > 0 ? (
-          <Picker scenarios={list} selected={id} onSelect={setPicked} />
-        ) : (
-          <p aria-busy="true" className="min-h-[112px]">
-            Loading scenarios.
+        {scenarios.isSuccess && list.length === 0 ? (
+          <p className="lg:col-span-2">
+            No replays yet. They are generated with the backtest (make report), from the largest
+            gaps it finds.
           </p>
-        )}
-        {replay.data ? (
-          <Theatre key={replay.data.id} replay={replay.data} />
-        ) : replay.isError ? (
-          <p role="alert">Can&apos;t load this replay. Retrying shortly.</p>
         ) : (
-          <p aria-busy="true">Loading the replay.</p>
+          <>
+            {list.length > 0 ? (
+              <Picker scenarios={list} selected={id} onSelect={setPicked} />
+            ) : (
+              <p aria-busy="true" className="min-h-[112px]">
+                Loading scenarios.
+              </p>
+            )}
+            {replay.data ? (
+              <Theatre key={replay.data.id} replay={replay.data} />
+            ) : replay.isError ? (
+              <p role="alert">Can&apos;t load this replay. {RETRY_TEXT}</p>
+            ) : (
+              <p aria-busy="true">Loading the replay.</p>
+            )}
+          </>
         )}
       </div>
     </div>

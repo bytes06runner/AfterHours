@@ -7,7 +7,7 @@
  */
 import { CalibrationPlot } from "@/charts/CalibrationPlot";
 import { TailChart } from "@/charts/TailChart";
-import { SEGMENT_KEYS, STRATEGIES, type ReportCard, type StrategyKey } from "@/lib/api";
+import { SEGMENT_KEYS, STRATEGIES, type ReportCard, type StrategyKey, RETRY_TEXT } from "@/lib/api";
 import { FORECASTERS, STRATEGY_NAMES } from "@/lib/names";
 import { useReportCard } from "@/lib/queries";
 import { formatPct, formatUsd } from "@/lib/time";
@@ -237,7 +237,7 @@ export function ReportCardView() {
   if (q.isError)
     return (
       <Shell>
-        <p role="alert">Can&apos;t load the report card. Retrying shortly.</p>
+        <p role="alert">Can&apos;t load the report card. {RETRY_TEXT}</p>
       </Shell>
     );
   if (!q.data)
