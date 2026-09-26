@@ -387,7 +387,16 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
             },
             "gaps": {
                 k: gaps[k]
-                for k in ("label", "period", "tickers", "universe", "selected", "worst_selected")
+                for k in (
+                    "label",
+                    "period",
+                    "tickers",
+                    "universe",
+                    "selected",
+                    "worst_selected",
+                    "histograms",
+                    "tail",
+                )
             },
         }
 

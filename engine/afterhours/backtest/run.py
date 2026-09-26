@@ -31,6 +31,7 @@ from afterhours.config import AfterhoursConfig
 from afterhours.deployments import load_discovered
 from afterhours.features.dataset import SEGMENTS
 from afterhours.features.gaps import code_version
+from afterhours.policy.lp import allowed_tier
 
 log = logging.getLogger(__name__)
 LABEL = "historical stock prices, simulated vault"
@@ -144,12 +145,14 @@ def replay_series(
     vaults = {}
     for strategy in ("always_weekday", "afterhours"):
         single = SimParams(**{**p.__dict__, "max_share_per_stock": 1.0})
-        ledger = run_strategy(strategy, single, local, fc)
+        series: list[dict[str, Any]] = []
+        ledger = run_strategy(strategy, single, local, fc, record=series)
         vaults[strategy] = {
             "bad_debt_usdg": ledger.bad_debt,
             "interest_usdg": ledger.interest,
             "final_assets_usdg": ledger.assets,
             "events": ledger.events,
+            "series": series,
         }
     px = prices.loc[
         (prices.index >= local["session_prev"].min())
@@ -325,6 +328,74 @@ def run(
         json.dumps({"label": LABEL, "scenarios": scenarios}, indent=2) + "\n"
     )
     return results
+
+
+def write_replays(
+    cfg: AfterhoursConfig,
+    data: pd.DataFrame,
+    heldout: pd.DataFrame,
+    card: dict[str, Any],
+    prices: dict[str, pd.DataFrame],
+    selected: list[str],
+) -> list[str]:
+    """Regenerate scenarios and replays with the settings already chosen in results.json."""
+    b = cfg.backtest
+    out_dir = cfg.path(cfg.paths.artifacts_dir) / "backtest"
+    results = json.loads((out_dir / "results.json").read_text())
+    chosen = results["chosen"]
+    _, fseries = forecasts(card, heldout, cfg.model.target_alpha)
+    fmap = fseries.to_dict()
+    periods = data[data["ticker"].isin(selected)]
+    periods = periods[
+        [(t, sp) in fmap for t, sp in zip(periods["ticker"], periods["session_prev"], strict=True)]
+    ]
+    periods = periods.sort_values(["session_prev", "ticker"]).reset_index(drop=True)
+    periods = periods.assign(
+        forecast_drop=[
+            max(0.0, -float(fmap[(t, sp)]))
+            for t, sp in zip(periods["ticker"], periods["session_prev"], strict=True)
+        ],
+        realised_drop=np.maximum(0.0, -periods["g"].to_numpy(dtype=float)),
+    )
+    p = params_from(
+        b,
+        cfg.policy,
+        cfg.vault,
+        float(chosen["weekday_lltv"]),
+        float(chosen["weekend_lltv"]),
+        float(chosen["safety_margin"]),
+        depth_by_symbol(cfg),
+    )
+    table = lookahead_risk(
+        periods, "forecast_drop", int(chosen["lookahead_closed_periods"]), ex_ante=True
+    )
+
+    def fc(row: Any) -> float:
+        return table[(row.ticker, row.session_prev)]
+
+    scenarios = select_scenarios(periods, b.replay.per_segment)
+    (out_dir / "replay").mkdir(parents=True, exist_ok=True)
+    written = []
+    for sc in scenarios:
+        doc = replay_series(sc, periods, prices[sc["ticker"]], p, fc, b.replay.window_sessions)
+        doc["settings"] = {
+            k: chosen[k]
+            for k in ("weekday_lltv", "weekend_lltv", "safety_margin", "lookahead_closed_periods")
+        }
+        tiers = {"weekday": p.weekday, "weekend": p.weekend}
+        doc["tiers"] = {n: {"lltv": t.lltv, "cushion": t.cushion} for n, t in tiers.items()}
+        for step in doc["periods"]:
+            step["allowed"] = {
+                n: allowed_tier(step["bad_case_drop"], p.safety_margin, t)[0]
+                for n, t in tiers.items()
+            }
+        path = out_dir / "replay" / f"{sc['id']}.json"
+        path.write_text(json.dumps(doc, indent=2, default=str) + "\n")
+        written.append(str(path))
+    (out_dir / "scenarios.json").write_text(
+        json.dumps({"label": LABEL, "scenarios": scenarios}, indent=2) + "\n"
+    )
+    return written
 
 
 def load_inputs(cfg: AfterhoursConfig) -> tuple[pd.DataFrame, dict[str, Any]]:

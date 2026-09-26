@@ -75,77 +75,121 @@
       "session_next": "2020-08-31",
       "g": 0.005859385065074996,
       "segment": "weekend",
-      "bad_case_drop": 0.027281734267757093
+      "bad_case_drop": 0.027281734267757093,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-08-31",
       "session_next": "2020-09-01",
       "g": 0.0019620492508853893,
       "segment": "overnight",
-      "bad_case_drop": 0.016428861089124103
+      "bad_case_drop": 0.016428861089124103,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-09-01",
       "session_next": "2020-09-02",
       "g": -0.000980094284459554,
       "segment": "overnight",
-      "bad_case_drop": 0.01593067199873484
+      "bad_case_drop": 0.01593067199873484,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-09-02",
       "session_next": "2020-09-03",
       "g": -0.023777661664720617,
       "segment": "overnight",
-      "bad_case_drop": 0.018919407538066937
+      "bad_case_drop": 0.018919407538066937,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-09-03",
       "session_next": "2020-09-04",
       "g": -0.007422379145909375,
       "segment": "overnight",
-      "bad_case_drop": 0.018484954706033157
+      "bad_case_drop": 0.018484954706033157,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-09-04",
       "session_next": "2020-09-08",
       "g": -0.057172958787421346,
       "segment": "holiday",
-      "bad_case_drop": 0.02157731318155144
+      "bad_case_drop": 0.02157731318155144,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-09-08",
       "session_next": "2020-09-09",
       "g": 0.003364491685528659,
       "segment": "overnight",
-      "bad_case_drop": 0.02528228722350886
+      "bad_case_drop": 0.02528228722350886,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-09-09",
       "session_next": "2020-09-10",
       "g": -0.006566957540234175,
       "segment": "overnight",
-      "bad_case_drop": 0.04044231414044616
+      "bad_case_drop": 0.04044231414044616,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-09-10",
       "session_next": "2020-09-11",
       "g": 0.004852525432026189,
       "segment": "overnight",
-      "bad_case_drop": 0.040443544078344024
+      "bad_case_drop": 0.040443544078344024,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-09-11",
       "session_next": "2020-09-14",
       "g": -0.01109471650338989,
       "segment": "weekend",
-      "bad_case_drop": 0.03941739035466516
+      "bad_case_drop": 0.03941739035466516,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2020-09-14",
       "session_next": "2020-09-15",
       "g": 0.00445430324817786,
       "segment": "overnight",
-      "bad_case_drop": 0.024064487785726982
+      "bad_case_drop": 0.024064487785726982,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     }
   ],
   "vaults": {
@@ -153,14 +197,298 @@
       "bad_debt_usdg": 0.0,
       "interest_usdg": 2519.6561876712326,
       "final_assets_usdg": 2002519.6561876717,
-      "events": []
+      "events": [],
+      "series": [
+        {
+          "session_prev": "2020-08-28",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1462598.5926979454,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 419.94269794520545,
+          "assets": 2000419.9426979453
+        },
+        {
+          "session_prev": "2020-08-31",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1462738.5735972603,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 559.9235972602739,
+          "assets": 2000559.9235972604
+        },
+        {
+          "session_prev": "2020-09-01",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1462878.5544965756,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 699.9044965753424,
+          "assets": 2000699.9044965755
+        },
+        {
+          "session_prev": "2020-09-02",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1463018.5353958905,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 839.8853958904108,
+          "assets": 2000839.8853958906
+        },
+        {
+          "session_prev": "2020-09-03",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1463158.5162952058,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 979.8662952054792,
+          "assets": 2000979.8662952057
+        },
+        {
+          "session_prev": "2020-09-04",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1463718.4398924662,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1539.7898924657532,
+          "assets": 2001539.789892466
+        },
+        {
+          "session_prev": "2020-09-08",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1463858.420791781,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1679.7707917808216,
+          "assets": 2001679.7707917811
+        },
+        {
+          "session_prev": "2020-09-09",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1463998.4016910964,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1819.75169109589,
+          "assets": 2001819.7516910962
+        },
+        {
+          "session_prev": "2020-09-10",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1464138.3825904112,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1959.7325904109584,
+          "assets": 2001959.7325904113
+        },
+        {
+          "session_prev": "2020-09-11",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1464558.3252883567,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 2379.675288356164,
+          "assets": 2002379.6752883566
+        },
+        {
+          "session_prev": "2020-09-14",
+          "weekday_supply": 537821.35,
+          "weekday_lent": 457148.14749999996,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 1464698.3061876716,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 2519.6561876712326,
+          "assets": 2002519.6561876717
+        }
+      ]
     },
     "afterhours": {
       "bad_debt_usdg": 0.0,
       "interest_usdg": 1856.588769863014,
       "final_assets_usdg": 2001856.5887698634,
-      "events": []
+      "events": [],
+      "series": [
+        {
+          "session_prev": "2020-08-28",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1462488.0814616438,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 309.43146164383563,
+          "assets": 2000309.431461644
+        },
+        {
+          "session_prev": "2020-08-31",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1462591.2252821918,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 412.57528219178084,
+          "assets": 2000412.5752821919
+        },
+        {
+          "session_prev": "2020-09-01",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1462694.3691027397,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 515.719102739726,
+          "assets": 2000515.7191027398
+        },
+        {
+          "session_prev": "2020-09-02",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1462797.5129232877,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 618.8629232876713,
+          "assets": 2000618.8629232878
+        },
+        {
+          "session_prev": "2020-09-03",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1462900.6567438357,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 722.0067438356165,
+          "assets": 2000722.0067438358
+        },
+        {
+          "session_prev": "2020-09-04",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1463313.2320260275,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1134.5820260273972,
+          "assets": 2001134.5820260276
+        },
+        {
+          "session_prev": "2020-09-08",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1463416.3758465755,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1237.7258465753425,
+          "assets": 2001237.7258465756
+        },
+        {
+          "session_prev": "2020-09-09",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1463519.5196671234,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1340.8696671232879,
+          "assets": 2001340.8696671235
+        },
+        {
+          "session_prev": "2020-09-10",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1463622.6634876714,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1444.0134876712332,
+          "assets": 2001444.0134876715
+        },
+        {
+          "session_prev": "2020-09-11",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1463932.0949493153,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1753.4449493150687,
+          "assets": 2001753.4449493154
+        },
+        {
+          "session_prev": "2020-09-14",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 537821.35,
+          "weekend_lent": 457148.14749999996,
+          "idle": 1464035.2387698633,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1856.588769863014,
+          "assets": 2001856.5887698634
+        }
+      ]
     }
   },
-  "vault_usdg": 2000000.0
+  "vault_usdg": 2000000.0,
+  "settings": {
+    "weekday_lltv": 0.915,
+    "weekend_lltv": 0.77,
+    "safety_margin": 0.05,
+    "lookahead_closed_periods": 3
+  },
+  "tiers": {
+    "weekday": {
+      "lltv": 0.915,
+      "cushion": 0.061056952283222235
+    },
+    "weekend": {
+      "lltv": 0.77,
+      "cushion": 0.17293233082706763
+    }
+  }
 }

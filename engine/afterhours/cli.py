@@ -290,5 +290,27 @@ def sim_scenario(
     typer.echo(json.dumps(out, indent=2, default=str))
 
 
+@app.command("replay")
+def replay_cmd() -> None:
+    """Regenerate replay scenarios with the settings chosen by the last backtest."""
+    from afterhours.backtest.run import load_inputs, write_replays
+    from afterhours.data.pipeline import DATASET_KEY, make_cache
+    from afterhours.data.universe import stock_token_tickers
+
+    _logging()
+    cfg = load_config()
+    cache = make_cache(cfg)
+    data = cache.get(DATASET_KEY, allow_stale=True)
+    if data is None:
+        raise typer.BadParameter("no dataset; run `afterhours data build` first")
+    heldout, card = load_inputs(cfg)
+    _, selected = stock_token_tickers(cfg)
+    prices = {t: cache.get(f"prices/{t}", allow_stale=True) for t in selected}
+    for path in write_replays(
+        cfg, data, heldout, card, {t: f for t, f in prices.items() if f is not None}, selected
+    ):
+        typer.echo(f"wrote {path}")
+
+
 if __name__ == "__main__":
     app()

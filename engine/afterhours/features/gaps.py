@@ -62,6 +62,29 @@ def by_segment(
     return out
 
 
+def histograms(
+    frame: pd.DataFrame, lo: float = -0.2, hi: float = 0.2, bins: int = 80
+) -> dict[str, Any]:
+    """Share of closed periods per gap bin, by segment (gaps clipped to [lo, hi])."""
+    edges = np.linspace(lo, hi, bins + 1)
+    out: dict[str, Any] = {"edges": [round(float(e), 6) for e in edges], "segments": {}}
+    for seg in SEGMENTS:
+        g = frame.loc[frame["segment"] == seg, "g"].clip(lo, hi).to_numpy()
+        if g.size:
+            counts, _ = np.histogram(g, bins=edges)
+            out["segments"][seg] = {"n": int(g.size), "share": [float(c) / g.size for c in counts]}
+    return out
+
+
+def tail_curve(frame: pd.DataFrame, drops: Sequence[float]) -> dict[str, list[float]]:
+    """Share of closed periods opening down at least each drop, by segment."""
+    return {
+        seg: [float((frame.loc[frame["segment"] == seg, "g"] <= -d).mean()) for d in drops]
+        for seg in SEGMENTS
+        if (frame["segment"] == seg).any()
+    }
+
+
 def worst(frame: pd.DataFrame, n: int) -> list[dict[str, Any]]:
     """The n most negative gaps."""
     rows = frame.nsmallest(n, "g")
@@ -112,6 +135,14 @@ def study(
         "selected": by_segment(sel, quantiles, drops) if not sel.empty else None,
         "selected_per_ticker": per_ticker,
         "worst_selected": worst(sel, worst_n) if not sel.empty else [],
+        "histograms": {
+            "universe": histograms(data),
+            "selected": histograms(sel) if not sel.empty else None,
+        },
+        "tail": {
+            "drops": [round(d, 3) for d in np.linspace(0.01, 0.3, 30)],
+            "universe": tail_curve(data, list(np.linspace(0.01, 0.3, 30))),
+        },
         "worst_stock_tokens": worst(tok, worst_n) if not tok.empty else [],
     }
 

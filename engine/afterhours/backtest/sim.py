@@ -145,6 +145,7 @@ def run_strategy(
     p: SimParams,
     periods: pd.DataFrame,
     risk: Callable[[Any], float],
+    record: list[dict[str, Any]] | None = None,
 ) -> Ledger:
     """Simulate one strategy over `periods` (one row per ticker and closed period).
 
@@ -168,6 +169,13 @@ def run_strategy(
         ledger.supply = {k: v for k, v in target.items() if v > 0}
         for k, v in ledger.supply.items():
             ledger.borrowed.setdefault(k, p.utilization * v)
+        exposure = {
+            t: (
+                sum(v for (_s, tt), v in ledger.supply.items() if tt == t),
+                sum(v for (_s, tt), v in ledger.borrowed.items() if tt == t),
+            )
+            for t in ("weekday", "weekend")
+        }
         hours = float(rows["hours_closed"].iloc[0])
         period_bad = 0.0
         for (s, t), b in list(ledger.borrowed.items()):
@@ -202,6 +210,21 @@ def run_strategy(
             ledger.tier_usd_hours[t] += v * hours
             placed += v
         ledger.tier_usd_hours["idle"] += max(ledger.assets - placed, 0.0) * hours
+        if record is not None:
+            record.append(
+                {
+                    "session_prev": str(session_prev),
+                    "weekday_supply": exposure["weekday"][0],
+                    "weekday_lent": exposure["weekday"][1],
+                    "weekend_supply": exposure["weekend"][0],
+                    "weekend_lent": exposure["weekend"][1],
+                    "idle": max(ledger.assets - placed, 0.0),
+                    "bad_debt_period": period_bad,
+                    "bad_debt_cum": ledger.bad_debt,
+                    "interest_cum": ledger.interest,
+                    "assets": ledger.assets,
+                }
+            )
         for k, v in ledger.supply.items():
             b = ledger.borrowed.get(k, 0.0)
             if v <= b * (1 + 1e-9):

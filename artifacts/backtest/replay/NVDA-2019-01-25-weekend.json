@@ -75,77 +75,121 @@
       "session_next": "2019-01-18",
       "g": 0.013247981280016363,
       "segment": "overnight",
-      "bad_case_drop": 0.06140101028475542
+      "bad_case_drop": 0.06140101028475542,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-01-18",
       "session_next": "2019-01-22",
       "g": -0.007773951751044561,
       "segment": "holiday",
-      "bad_case_drop": 0.06112700036438015
+      "bad_case_drop": 0.06112700036438015,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-01-22",
       "session_next": "2019-01-23",
       "g": 0.014989674826855426,
       "segment": "overnight",
-      "bad_case_drop": 0.04526323270808972
+      "bad_case_drop": 0.04526323270808972,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-01-23",
       "session_next": "2019-01-24",
       "g": 0.022841150304398594,
       "segment": "overnight",
-      "bad_case_drop": 0.043896354581113586
+      "bad_case_drop": 0.043896354581113586,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-01-24",
       "session_next": "2019-01-25",
       "g": -0.015205133920746294,
       "segment": "overnight",
-      "bad_case_drop": 0.045506671557528855
+      "bad_case_drop": 0.045506671557528855,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-01-25",
       "session_next": "2019-01-28",
       "g": -0.14736176898955244,
       "segment": "weekend",
-      "bad_case_drop": 0.04343497776370844
+      "bad_case_drop": 0.04343497776370844,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-01-28",
       "session_next": "2019-01-29",
       "g": -0.013477507100559616,
       "segment": "overnight",
-      "bad_case_drop": 0.060104514674781284
+      "bad_case_drop": 0.060104514674781284,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-01-29",
       "session_next": "2019-01-30",
       "g": 0.023328492100700204,
       "segment": "overnight",
-      "bad_case_drop": 0.059890083282138705
+      "bad_case_drop": 0.059890083282138705,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-01-30",
       "session_next": "2019-01-31",
       "g": -0.0009463496704689156,
       "segment": "overnight",
-      "bad_case_drop": 0.05937655897581561
+      "bad_case_drop": 0.05937655897581561,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-01-31",
       "session_next": "2019-02-01",
       "g": 0.005217570232332047,
       "segment": "overnight",
-      "bad_case_drop": 0.05924931042780614
+      "bad_case_drop": 0.05924931042780614,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     },
     {
       "session_prev": "2019-02-01",
       "session_next": "2019-02-04",
       "g": 0.004421871862982263,
       "segment": "weekend",
-      "bad_case_drop": 0.05760773928284964
+      "bad_case_drop": 0.05760773928284964,
+      "allowed": {
+        "weekday": false,
+        "weekend": true
+      }
     }
   ],
   "vaults": {
@@ -158,14 +202,298 @@
           "session_prev": "2019-01-25",
           "bad_debt_usdg": 6804.1410626178285
         }
+      ],
+      "series": [
+        {
+          "session_prev": "2019-01-17",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 935982.6255,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 899130.5722543835,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 286.6022543835616,
+          "assets": 2000286.6022543835
+        },
+        {
+          "session_prev": "2019-01-18",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 935982.6255000001,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 900276.9812719177,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1433.011271917808,
+          "assets": 2001433.0112719177
+        },
+        {
+          "session_prev": "2019-01-22",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 935982.6255000001,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 900563.5835263012,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1719.6135263013696,
+          "assets": 2001719.6135263012
+        },
+        {
+          "session_prev": "2019-01-23",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 935982.6255000001,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 900850.1857806847,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 2006.2157806849311,
+          "assets": 2002006.2157806847
+        },
+        {
+          "session_prev": "2019-01-24",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 935982.6255000001,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 901136.7880350682,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 2292.818035068493,
+          "assets": 2002292.8180350682
+        },
+        {
+          "session_prev": "2019-01-25",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 935982.6255000001,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 895192.4537356012,
+          "bad_debt_period": 6804.1410626178285,
+          "bad_debt_cum": 6804.1410626178285,
+          "interest_cum": 3152.624798219178,
+          "assets": 1996348.4837356012
+        },
+        {
+          "session_prev": "2019-01-28",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 930539.3126499059,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 895479.0559899847,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 6804.1410626178285,
+          "interest_cum": 3439.2270526027396,
+          "assets": 1996635.0859899847
+        },
+        {
+          "session_prev": "2019-01-29",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 931627.9752199247,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 895765.6582443682,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 6804.1410626178285,
+          "interest_cum": 3725.829306986301,
+          "assets": 1996921.6882443682
+        },
+        {
+          "session_prev": "2019-01-30",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 932498.9052759397,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 896052.2604987517,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 6804.1410626178285,
+          "interest_cum": 4012.4315613698627,
+          "assets": 1997208.2904987517
+        },
+        {
+          "session_prev": "2019-01-31",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 933195.6493207519,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 896338.8627531352,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 6804.1410626178285,
+          "interest_cum": 4299.033815753424,
+          "assets": 1997494.8927531352
+        },
+        {
+          "session_prev": "2019-02-01",
+          "weekday_supply": 1101156.03,
+          "weekday_lent": 933753.0445566017,
+          "weekend_supply": 0,
+          "weekend_lent": 0,
+          "idle": 897198.6695162859,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 6804.1410626178285,
+          "interest_cum": 5158.840578904109,
+          "assets": 1998354.699516286
+        }
       ]
     },
     "afterhours": {
       "bad_debt_usdg": 0.0,
       "interest_usdg": 3801.250952876713,
       "final_assets_usdg": 2003801.2509528757,
-      "events": []
+      "events": [],
+      "series": [
+        {
+          "session_prev": "2019-01-17",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255,
+          "idle": 899055.150608493,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 211.18060849315071,
+          "assets": 2000211.180608493
+        },
+        {
+          "session_prev": "2019-01-18",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 899899.8730424657,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1055.9030424657535,
+          "assets": 2001055.9030424657
+        },
+        {
+          "session_prev": "2019-01-22",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 900111.0536509587,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1267.0836509589042,
+          "assets": 2001267.0836509587
+        },
+        {
+          "session_prev": "2019-01-23",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 900322.2342594517,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1478.2642594520548,
+          "assets": 2001478.2642594518
+        },
+        {
+          "session_prev": "2019-01-24",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 900533.4148679448,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 1689.4448679452055,
+          "assets": 2001689.4448679448
+        },
+        {
+          "session_prev": "2019-01-25",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 901166.9566934241,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 2322.9866934246575,
+          "assets": 2002322.9866934242
+        },
+        {
+          "session_prev": "2019-01-28",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 901378.1373019172,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 2534.1673019178083,
+          "assets": 2002534.1673019172
+        },
+        {
+          "session_prev": "2019-01-29",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 901589.3179104102,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 2745.3479104109592,
+          "assets": 2002745.3479104103
+        },
+        {
+          "session_prev": "2019-01-30",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 901800.4985189033,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 2956.52851890411,
+          "assets": 2002956.5285189033
+        },
+        {
+          "session_prev": "2019-01-31",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 902011.6791273963,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 3167.709127397261,
+          "assets": 2003167.7091273963
+        },
+        {
+          "session_prev": "2019-02-01",
+          "weekday_supply": 0,
+          "weekday_lent": 0,
+          "weekend_supply": 1101156.03,
+          "weekend_lent": 935982.6255000001,
+          "idle": 902645.2209528757,
+          "bad_debt_period": 0.0,
+          "bad_debt_cum": 0.0,
+          "interest_cum": 3801.250952876713,
+          "assets": 2003801.2509528757
+        }
+      ]
     }
   },
-  "vault_usdg": 2000000.0
+  "vault_usdg": 2000000.0,
+  "settings": {
+    "weekday_lltv": 0.915,
+    "weekend_lltv": 0.77,
+    "safety_margin": 0.05,
+    "lookahead_closed_periods": 3
+  },
+  "tiers": {
+    "weekday": {
+      "lltv": 0.915,
+      "cushion": 0.061056952283222235
+    },
+    "weekend": {
+      "lltv": 0.77,
+      "cushion": 0.17293233082706763
+    }
+  }
 }
