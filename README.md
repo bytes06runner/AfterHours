@@ -175,8 +175,8 @@ make demo      # local chain, contracts, seeded borrowers, API, bot, web app, th
 `make demo` fetches daily prices and earnings for the five vault stocks on its first run, deploys
 Morpho, the vault and simulated Stock Tokens on Anvil, and replays the week of 2025-04-22: before
 META's 2025-04-30 earnings, the bot's forecast bad case for META exceeds every tier's limit, so
-it pulls META's unborrowed money and anchors the reason in the onchain registry. It took 1 minute 12 seconds on the
-clean-clone check (2026-09-26). Open the web app at `http://localhost:$WEB_PORT` (3000 unless
+it pulls META's unborrowed money and anchors the reason in the onchain registry. It took 1 minute 22 seconds on the
+clean-clone check (2026-09-27). Open the web app at `http://localhost:$WEB_PORT` (3000 unless
 you change it). Ports come from `.env.example`; set `ANVIL_PORT`, `API_PORT` or `WEB_PORT` in
 the environment to use others.
 
