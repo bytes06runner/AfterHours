@@ -1,0 +1,5 @@
+forge-std/=lib/forge-std/src/
+morpho-blue/=lib/morpho-blue/
+vault-v2/=lib/vault-v2/
+morpho-blue-oracles/=lib/morpho-blue-oracles/
+public-allocator/=lib/public-allocator/

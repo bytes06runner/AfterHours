@@ -4,5 +4,29 @@
       "name": "v1.16.2",
       "rev": "bf647bd6046f2f7da30d0c2bf435e5c76a780c1b"
     }
+  },
+  "lib/morpho-blue": {
+    "tag": {
+      "name": "v1.0.0",
+      "rev": "55d2d99304fb3fb930c688462ae2ccabb1d533ad"
+    }
+  },
+  "lib/morpho-blue-oracles": {
+    "tag": {
+      "name": "v2.0.0",
+      "rev": "07a9a6988b0e1b316ac2fa97ec62ad485fbd0041"
+    }
+  },
+  "lib/public-allocator": {
+    "tag": {
+      "name": "v1.0.0",
+      "rev": "7271fbd60881ff32a466a588f99344c6bf72629a"
+    }
+  },
+  "lib/vault-v2": {
+    "tag": {
+      "name": "2026-08-13",
+      "rev": "2b139002feaf4631f1c63d880380ca2278df7aec"
+    }
   }
 }

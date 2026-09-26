@@ -6,6 +6,8 @@ test = "test"
 script = "script"
 optimizer = true
 optimizer_runs = 999999
+evm_version = "cancun"
+fs_permissions = [{ access = "read", path = "../deployments" }]
 # Fork tests read their RPC and block from the environment, which `make` fills from
 # config/afterhours.yaml (fork_block) and .env (the RPC named by rpc_env).
 
