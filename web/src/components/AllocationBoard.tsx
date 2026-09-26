@@ -1,8 +1,9 @@
 "use client";
 
 /**
- * AllocationBoard (docs/DESIGN.md section 6): one row per stock, weekday and weekend slots,
- * brass bars sized by the vault's USDG, the lent-out part hatched, idle as its own reservoir.
+ * AllocationBoard (docs/DESIGN.md section 6): one row per stock, one slot per tier (weekday
+ * 91.5%, middle 86%, weekend 77% LLTV), brass bars sized by the vault's USDG, the lent-out part
+ * hatched, idle as its own reservoir.
  * Bars move only because money moved: widths come from /v1/vault and glide when it changes.
  */
 import { RETRY_TEXT } from "@/lib/api";
@@ -58,18 +59,27 @@ function Slot({
   );
 }
 
+const TIER_LABEL: Record<string, string> = {
+  weekday: "Weekday tier",
+  middle: "Middle tier",
+  weekend: "Weekend tier",
+};
+
+/** Option B: the tier the yearly map allows, and whether tonight's pullback is on. */
 function RiskNote({ risk }: { risk: Risk["stocks"][number] | undefined }) {
   if (!risk) return null;
-  const weekday = risk.tiers.weekday;
+  const p = risk.policy;
   return (
     <p className="text-[14px]">
-      Bad case {formatPct(risk.worst_in_lookahead.bad_case_drop)} (
-      {risk.worst_in_lookahead.period.segment}){" "}
-      <span
-        className="font-semibold"
-        style={{ color: weekday?.allowed ? "var(--c-safe)" : "var(--c-risk)" }}
-      >
-        {weekday?.allowed ? "Weekday tier open" : "Weekday tier closed"}
+      {TIER_LABEL[p.mapped_tier]} by its {p.rating_year} rating. Bad case{" "}
+      {formatPct(risk.worst_in_lookahead.bad_case_drop)}:{" "}
+      <span className="font-semibold">
+        <span
+          aria-hidden="true"
+          className="mr-1 inline-block h-2.5 w-2.5 rounded-full"
+          style={{ background: p.pulled ? "var(--c-risk)" : "var(--c-safe)" }}
+        />
+        {p.pulled ? "pulled back tonight" : "lending"}
       </span>
     </p>
   );
@@ -101,7 +111,11 @@ export function AllocationBoard() {
   const v: Vault = vault.data;
   const limit = v.max_share_per_stock * v.tvl_usdg;
   const symbols = Array.from(new Set(v.markets.map((m) => m.symbol)));
-  const find = (s: string, t: "weekday" | "weekend") =>
+  const tiers = (Object.entries(v.tiers) as [Market["tier"], Vault["tiers"][Market["tier"]]][])
+    .filter(([, t]) => t)
+    .sort((a, b) => b[1].lltv - a[1].lltv);
+  const cols = `10rem ${tiers.map(() => "1fr").join(" ")}`;
+  const find = (s: string, t: Market["tier"]) =>
     v.markets.find((m) => m.symbol === s && m.tier === t);
   const riskOf = (s: string) => risk.data?.stocks.find((r) => r.symbol === s);
   const reserve = v.idle_reserve_share * v.tvl_usdg;
@@ -113,23 +127,24 @@ export function AllocationBoard() {
         </h2>
         <p className="text-[14px]">Hatched: lent to borrowers, cannot move until repaid.</p>
       </div>
-      <div className="mt-4 hidden grid-cols-[10rem_1fr_1fr] gap-6 border-b-[1.25px] border-rule pb-2 text-[14px] font-semibold md:grid">
+      <div
+        className="mt-4 hidden gap-6 border-b-[1.25px] border-rule pb-2 text-[14px] font-semibold md:grid"
+        style={{ gridTemplateColumns: cols }}
+      >
         <span>Stock</span>
-        <span>
-          Weekday tier: {formatPct(v.tiers.weekday.lltv)} LTV, {formatPct(v.tiers.weekday.cushion)}{" "}
-          cushion
-        </span>
-        <span>
-          Weekend tier: {formatPct(v.tiers.weekend.lltv)} LTV, {formatPct(v.tiers.weekend.cushion)}{" "}
-          cushion
-        </span>
+        {tiers.map(([name, t]) => (
+          <span key={name}>
+            {TIER_LABEL[name]}: {formatPct(t.lltv)} LLTV, {formatPct(t.cushion)} cushion
+          </span>
+        ))}
       </div>
       <ul>
         {symbols.map((s, i) => (
           <li
             key={s}
-            className="grid gap-3 border-b-[1.25px] border-rule py-4 md:grid-cols-[10rem_1fr_1fr] md:gap-6"
+            className="grid gap-3 border-b-[1.25px] border-rule py-4 md:gap-6 md:[grid-template-columns:var(--cols)]"
             style={{
+              ["--cols" as string]: cols,
               outline: flash === s ? "2px solid var(--c-brass)" : "2px solid transparent",
               outlineOffset: "4px",
               transition: "outline-color 400ms var(--ease-ui)",
@@ -139,24 +154,17 @@ export function AllocationBoard() {
               <p className="font-display text-[24px] leading-none">{s}</p>
               <RiskNote risk={riskOf(s)} />
             </div>
-            <div>
-              <p className="mb-1 text-[14px] font-semibold md:hidden">Weekday tier</p>
-              <Slot
-                market={find(s, "weekday")}
-                limit={limit}
-                delay={i * 120}
-                routed={v.liquidity_market === `${s}:weekday`}
-              />
-            </div>
-            <div>
-              <p className="mb-1 text-[14px] font-semibold md:hidden">Weekend tier</p>
-              <Slot
-                market={find(s, "weekend")}
-                limit={limit}
-                delay={i * 120 + 60}
-                routed={v.liquidity_market === `${s}:weekend`}
-              />
-            </div>
+            {tiers.map(([name], j) => (
+              <div key={name}>
+                <p className="mb-1 text-[14px] font-semibold md:hidden">{TIER_LABEL[name]}</p>
+                <Slot
+                  market={find(s, name)}
+                  limit={limit}
+                  delay={i * 120 + j * 60}
+                  routed={v.liquidity_market === `${s}:${name}`}
+                />
+              </div>
+            ))}
           </li>
         ))}
       </ul>

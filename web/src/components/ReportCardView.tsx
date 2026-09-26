@@ -7,8 +7,9 @@
  */
 import { CalibrationPlot } from "@/charts/CalibrationPlot";
 import { TailChart } from "@/charts/TailChart";
-import { SEGMENT_KEYS, STRATEGIES, type ReportCard, type StrategyKey, RETRY_TEXT } from "@/lib/api";
-import { FORECASTERS, STRATEGY_NAMES } from "@/lib/names";
+import { FrontierChart } from "@/charts/FrontierChart";
+import { SEGMENT_KEYS, type DecisionUniverse, type ReportCard, RETRY_TEXT } from "@/lib/api";
+import { FORECASTERS } from "@/lib/names";
 import { useReportCard } from "@/lib/queries";
 import { formatPct, formatUsd } from "@/lib/time";
 
@@ -128,58 +129,48 @@ function Coverage({ rc }: { rc: ReportCard }) {
   );
 }
 
-function Strategies({ rc }: { rc: ReportCard }) {
-  const s = rc.backtest.strategies;
-  const rows: { label: string; value: (k: StrategyKey) => string }[] = [
-    {
-      label: "Net lender yield, annualised",
-      value: (k) => formatPct(s[k].net_lender_yield_annualised, 2),
-    },
-    { label: "Bad debt", value: (k) => `${formatUsd(s[k].bad_debt_usdg)} USDG` },
-    { label: "Closed periods with bad debt", value: (k) => String(s[k].bad_debt_events) },
-    {
-      label: "Worst single event",
-      value: (k) => {
-        const w = s[k].worst_event;
-        return w?.bad_debt_usdg !== undefined && w.share_of_vault !== undefined
-          ? `${formatUsd(w.bad_debt_usdg)} USDG (${formatPct(w.share_of_vault, 2)} of the vault), ${w.ticker} ${w.session_prev}`
-          : "None";
-      },
-    },
-    {
-      label: "Time in weekday / weekend / idle",
-      value: (k) =>
-        `${formatPct(s[k].share_of_time.weekday, 0)} / ${formatPct(s[k].share_of_time.weekend, 0)} / ${formatPct(s[k].share_of_time.idle, 0)}`,
-    },
-    { label: "Reallocations", value: (k) => s[k].reallocations.toLocaleString("en-US") },
+type DecisionData = ReportCard["decision"];
+
+const ROWS: { key: "b" | "nearest_blend" | "fixed_map" | "dynamic"; label: string }[] = [
+  { key: "b", label: "Afterhours (B): yearly tier map plus pullback" },
+  { key: "nearest_blend", label: "Static blend nearest B's yield" },
+  { key: "fixed_map", label: "No-hindsight fixed map" },
+  { key: "dynamic", label: "Dynamic strategy (documented alternative)" },
+];
+
+function DecisionTable({ u, name }: { u: DecisionUniverse; name: string }) {
+  const blends = [...u.blends].sort((a, b) => a.w - b.w);
+  const rows = [
+    ...ROWS.map((r) => ({
+      label:
+        r.key === "nearest_blend"
+          ? `${r.label} (${formatPct(u.nearest_blend.w, 0)} weekday)`
+          : r.label,
+      p: u[r.key],
+      strong: r.key === "b",
+    })),
+    { label: "Always weekday tier", p: blends[blends.length - 1], strong: false },
+    { label: "Always weekend tier", p: blends[0], strong: false },
   ];
   return (
-    <Table caption="Backtest results for the four strategies">
+    <Table caption={`Held-out results, ${name}`}>
       <thead>
         <tr>
-          <th className={th}>
-            <span className="sr-only">Measure</span>
-          </th>
-          {STRATEGIES.map((k) => (
-            <th key={k} className={th}>
-              {STRATEGY_NAMES[k]}
-            </th>
-          ))}
+          <th className={th}>Strategy</th>
+          <th className={th}>Lender yield</th>
+          <th className={th}>Bad debt (USDG)</th>
+          <th className={th}>Worst single night</th>
+          <th className={th}>Interest (USDG)</th>
         </tr>
       </thead>
       <tbody>
         {rows.map((r) => (
-          <tr key={r.label}>
-            <td className={`${td} font-semibold`}>{r.label}</td>
-            {STRATEGIES.map((k) => (
-              <td
-                key={k}
-                className={td}
-                style={k === "afterhours" ? { fontWeight: 700 } : undefined}
-              >
-                {r.value(k)}
-              </td>
-            ))}
+          <tr key={r.label} style={r.strong ? { fontWeight: 700 } : undefined}>
+            <td className={td}>{r.label}</td>
+            <td className={td}>{formatPct(r.p.yield, 2)}</td>
+            <td className={td}>{formatUsd(r.p.bad_debt)}</td>
+            <td className={td}>{formatPct(r.p.worst, 3)} of the vault</td>
+            <td className={td}>{formatUsd(r.p.interest)}</td>
           </tr>
         ))}
       </tbody>
@@ -187,48 +178,94 @@ function Strategies({ rc }: { rc: ReportCard }) {
   );
 }
 
-function Sensitivity({ rc }: { rc: ReportCard }) {
-  const label = (kind: string, v: number) =>
-    kind === "rate_spread"
-      ? `Weekday rate premium x${v}`
-      : kind === "loan_turnover"
-        ? `Loan turnover ${formatPct(v, 0)} per session`
-        : `${kind} ${v}`;
+/** Plain statements of fact about B, computed from the numbers (no adjectives chosen here). */
+function Facts({ d, u }: { d: DecisionData; u: DecisionUniverse }) {
+  const cmp = (a: number, b: number, more: string, less: string) =>
+    a > b ? more : a < b ? less : "the same";
+  const b = u.b;
+  const bl = u.nearest_blend;
+  const fm = u.fixed_map;
   return (
-    <Table caption="Sensitivity of yield and bad debt to the rate and borrower assumptions">
-      <thead>
-        <tr>
-          <th className={th}>Assumption</th>
-          {STRATEGIES.map((k) => (
-            <th key={k} className={th}>
-              {STRATEGY_NAMES[k]}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rc.backtest.sensitivity.map((row) => (
-          <tr key={`${row.kind}-${row.value}`}>
-            <td className={td}>{label(row.kind, row.value)}</td>
-            {STRATEGIES.map((k) => {
-              const r = row.results[k];
-              return (
-                <td
-                  key={k}
-                  className={td}
-                  style={k === "afterhours" ? { fontWeight: 700 } : undefined}
-                >
-                  {r ? formatPct(r.net_lender_yield_annualised, 2) : "n/a"}
-                  <span className="block text-[14px] font-normal">
-                    {r ? `${formatUsd(r.bad_debt_usdg)} bad debt` : ""}
-                  </span>
-                </td>
-              );
-            })}
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+    <ul className="mt-4 flex max-w-[72ch] list-disc flex-col gap-2 pl-5 text-[16px]">
+      <li>
+        B against the static blend nearest its yield ({formatPct(bl.w, 0)} weekday): yield{" "}
+        {formatPct(b.yield, 2)} vs {formatPct(bl.yield, 2)}, bad debt {formatUsd(b.bad_debt)} vs{" "}
+        {formatUsd(bl.bad_debt)} USDG, worst single night {formatPct(b.worst, 3)} vs{" "}
+        {formatPct(bl.worst, 3)} of the vault.
+      </li>
+      <li>
+        B against the no-hindsight fixed map: yield {formatPct(b.yield, 2)} vs{" "}
+        {formatPct(fm.yield, 2)} ({cmp(b.yield, fm.yield, "higher", "lower")}), bad debt{" "}
+        {formatUsd(b.bad_debt)} vs {formatUsd(fm.bad_debt)} USDG, worst single night{" "}
+        {formatPct(b.worst, 3)} vs {formatPct(fm.worst, 3)}.
+      </li>
+      <li>
+        The fixed map broke the {formatPct(d.cap, 2)} worst-night cap in tuning (its smallest worst
+        night across all settings was {formatPct(u.fixed_map_tuning_smallest_worst, 3)}) and out of
+        sample ({formatPct(fm.worst, 3)}).
+      </li>
+      <li>
+        B broke the same cap in tuning too: {u.b_settings_meeting_cap} of {u.b_settings} settings
+        met it; the rule&apos;s fallback chose the smallest worst night (
+        {formatPct(u.b_tuning_worst, 3)}). Out of sample B&apos;s worst night was{" "}
+        {formatPct(b.worst, 3)} ({b.worst > d.cap ? "above" : "within"} the cap).
+      </li>
+      <li>
+        The dynamic strategy, measured and kept as an alternative: yield{" "}
+        {formatPct(u.dynamic.yield, 2)}, bad debt {formatUsd(u.dynamic.bad_debt)} USDG, worst single
+        night {formatPct(u.dynamic.worst, 3)}, interest {formatUsd(u.dynamic.interest)} USDG against
+        the fixed map&apos;s {formatUsd(fm.interest)}.
+      </li>
+    </ul>
+  );
+}
+
+function Decision({ d }: { d: DecisionData }) {
+  const [u5, u35] = [d.universes.vault, d.universes.stock_tokens];
+  const apy = Object.entries(d.assumed_apy).map(([k, v]) => `${k} ${formatPct(v, 1)}`);
+  return (
+    <section aria-labelledby="decision" className="mt-12">
+      <h2 id="decision" className="text-[36px]">
+        Which policy ships, and why
+      </h2>
+      <p className="mt-2">
+        Before running, we wrote down this rule: tune on {d.tuning_years}, evaluate once on{" "}
+        {d.evaluation_years}.
+      </p>
+      <blockquote className="mt-3 border-l-[3px] border-brass pl-4 text-[18px]">
+        {d.rule}
+      </blockquote>
+      <p className="mt-3">The result, as recorded:</p>
+      <blockquote className="mt-3 border-l-[3px] border-brass pl-4 text-[18px] font-semibold">
+        {d.result}
+      </blockquote>
+      <p className="mt-3 text-[16px]">
+        Afterhours therefore runs option B: each January every stock is rated from the previous year
+        only and may lend in the highest tier its rating allows (91.5%, 86% or 77% LLTV); on a night
+        when its forecast bad case exceeds every tier&apos;s limit, the money borrowers are not
+        using goes idle. B was defined after option A&apos;s held-out results were seen and its
+        settings were then tuned on {d.tuning_years}, so its held-out figures below come from the{" "}
+        {d.second_evaluation_note}.
+      </p>
+      <h3 className="mt-8 text-[24px]">
+        Yield against the worst single night, {u5.stocks} vault stocks, {u5.evaluation.first} to{" "}
+        {u5.evaluation.last}
+      </h3>
+      <div className="mt-4">
+        <FrontierChart u={u5} cap={d.cap} />
+      </div>
+      <h3 className="mt-8 text-[24px]">The {u5.stocks} vault stocks</h3>
+      <DecisionTable u={u5} name={`${u5.stocks} vault stocks`} />
+      <Facts d={d} u={u5} />
+      <h3 className="mt-8 text-[24px]">All {u35.stocks} Stock Token underlyings</h3>
+      <DecisionTable u={u35} name={`${u35.stocks} Stock Token underlyings`} />
+      <Facts d={d} u={u35} />
+      <p className="mt-6 text-[16px]">
+        Tier yields are assumptions, not observed rates: supply APY {apy.join(", ")} by tier. The
+        gap between tiers drives how much any strategy gains by lending at higher loan-to-value;
+        with a smaller spread the higher tiers are worth less. Backtests: {d.label}.
+      </p>
+    </section>
   );
 }
 
@@ -251,13 +288,14 @@ export function ReportCardView() {
   const shipped = m.acceptance.shipped;
   const curves = m.calibration_curves[shipped] ?? {};
   const wf = m.config.walk_forward;
-  const bt = rc.backtest;
   return (
     <Shell>
       <p className="mt-4 text-[21px] font-semibold">{m.first_sentence}</p>
       <p className="mt-2 text-[16px]">
-        Forecasts are judged on {m.label}. The backtest uses {bt.label}.
+        Forecasts are judged on {m.label}. Backtests use {rc.decision.label}.
       </p>
+
+      <Decision d={rc.decision} />
 
       <section aria-labelledby="accept" className="mt-12">
         <h2 id="accept" className="text-[36px]">
@@ -310,32 +348,6 @@ export function ReportCardView() {
         <Coverage rc={rc} />
       </section>
 
-      <section aria-labelledby="bt" className="mt-12">
-        <h2 id="bt" className="text-[36px]">
-          Backtest: four ways to run the vault
-        </h2>
-        <p className="mt-2">
-          {formatUsd(bt.assumptions.vault_usdg)} USDG across {bt.selected.join(", ")}, from{" "}
-          {bt.period.first} to {bt.period.last}: {bt.period.closed_periods.toLocaleString("en-US")}{" "}
-          closed periods. Historical stock prices, simulated vault. Perfect foresight knows every
-          gap in advance and is not achievable; it marks the ceiling.
-        </p>
-        <Strategies rc={rc} />
-        <p className="mt-4 text-[16px]">
-          Afterhours settings: weekday tier LLTV {formatPct(bt.chosen.weekday_lltv)}, weekend tier
-          LLTV {formatPct(bt.chosen.weekend_lltv)}, safety margin{" "}
-          {formatPct(bt.chosen.safety_margin, 0)}, looking {bt.chosen.lookahead_closed_periods}{" "}
-          closed periods ahead. Chosen by this rule: {bt.chosen.rule} ({bt.chosen.eligible_settings}{" "}
-          settings qualified).
-        </p>
-        <h3 className="mt-8 text-[24px]">Sensitivity</h3>
-        <p className="mt-2">
-          Supply rates, utilisation and borrower behaviour are assumptions set in config. These rows
-          rerun the backtest with them changed.
-        </p>
-        <Sensitivity rc={rc} />
-      </section>
-
       <section aria-labelledby="tail" className="mt-12">
         <h2 id="tail" className="text-[36px]">
           How often prices gap down
@@ -376,8 +388,17 @@ export function ReportCardView() {
             calibration year.
           </li>
           <li>
-            A tier is open for a stock only if its bad-case drop plus the safety margin fits inside
-            the tier&apos;s cushion: 1 minus LLTV minus the liquidation incentive allowance.
+            A tier&apos;s cushion is 1 minus LLTV minus the liquidation incentive allowance: how far
+            the price can fall before a loan at the limit leaves bad debt.
+          </li>
+          <li>
+            The shipped policy (B) rates each stock every January by its worst 1% closed-period gap
+            over the previous 365 days and lets it use the highest tier whose cushion, less{" "}
+            {formatPct(rc.decision.universes.vault.b_chosen.map_fraction, 0)} of it, covers that
+            rating. Before each close it pulls the stock&apos;s unborrowed money when the worst
+            forecast bad case over the next {rc.decision.universes.vault.b_chosen.lookahead} closed
+            periods exceeds every tier&apos;s cushion less{" "}
+            {formatPct(rc.decision.universes.vault.b_chosen.pullback_fraction, 0)}.
           </li>
           <li>
             Model version {m.model_version}, code version {m.code_version}.

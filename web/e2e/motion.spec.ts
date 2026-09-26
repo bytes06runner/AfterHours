@@ -7,7 +7,9 @@ test.use({ reducedMotion: "reduce" });
 test("reduced motion: no pinned story, static ticker, instant replay", async ({ page }) => {
   test.skip(!API, "needs API_BASE_URL");
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Checked against history." })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "We set the rule before we looked." }),
+  ).toBeVisible();
   // Without motion every step carries its own visual; nothing is pinned.
   await expect(page.locator(".sticky")).toHaveCount(0);
   await expect(page.getByRole("img", { name: /Earnings-night gaps/ })).toBeVisible();

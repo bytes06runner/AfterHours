@@ -8,10 +8,12 @@ import { TornEdge } from "@/art/TornEdge";
 import { DriverBars } from "./DriverBars";
 import { VerifyBadge } from "./VerifyBadge";
 
-const TIER = { weekday: "weekday tier", weekend: "weekend tier", idle: "idle" } as Record<
-  string,
-  string
->;
+const TIER = {
+  weekday: "weekday tier",
+  middle: "middle tier",
+  weekend: "weekend tier",
+  idle: "idle",
+} as Record<string, string>;
 
 function when(iso: string): string {
   return new Intl.DateTimeFormat("en-US", {

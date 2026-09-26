@@ -3,8 +3,9 @@
 /**
  * Almanac (docs/DESIGN.md section 7): a paper spread with one column per upcoming day, closed
  * periods as night bands, earnings as small bells, and per stock the predicted bad-case drop as a
- * bar against each tier's allowed limit (cushion minus the safety margin). Clicking a stock opens
- * its RiskGauge and drivers. Data: /v1/almanac, /v1/risk, /v1/vault.
+ * bar against option B's pullback limit (above it, the stock's unborrowed money goes idle). Each
+ * stock's tier comes from its yearly rating. Clicking a stock opens its RiskGauge, drivers and
+ * tier map. Data: /v1/almanac, /v1/risk.
  */
 import { RETRY_TEXT } from "@/lib/api";
 import "@/art/art.css";
@@ -13,7 +14,7 @@ import { useState } from "react";
 
 import { useWidth } from "@/charts/useWidth";
 import type { Almanac, Forecast, Risk } from "@/lib/api";
-import { useAlmanac, useRisk, useVault } from "@/lib/queries";
+import { useAlmanac, useRisk } from "@/lib/queries";
 import { formatPct } from "@/lib/time";
 
 import { RiskGauge } from "./RiskGauge";
@@ -28,21 +29,24 @@ const SEGMENT: Record<string, string> = {
   overnight: "Overnight",
 };
 
-type Limits = { weekday: number; weekend: number };
-type Verdict = "weekday" | "weekend" | "none";
+type Limits = { pull: number };
+type Verdict = "lend" | "pull";
 
 function verdict(drop: number, limits: Limits): Verdict {
-  return drop <= limits.weekday ? "weekday" : drop <= limits.weekend ? "weekend" : "none";
+  return drop > limits.pull ? "pull" : "lend";
 }
 const COLOR: Record<Verdict, string> = {
-  weekday: "var(--c-safe)",
-  weekend: "var(--c-brass)",
-  none: "var(--c-risk)",
+  lend: "var(--c-safe)",
+  pull: "var(--c-risk)",
 };
 const VERDICT_TEXT: Record<Verdict, string> = {
-  weekday: "both tiers open",
-  weekend: "weekend tier only",
-  none: "neither tier",
+  lend: "lends in its mapped tier",
+  pull: "pulled back, unborrowed money idle",
+};
+const TIER_LABEL: Record<string, string> = {
+  weekday: "weekday tier",
+  middle: "middle tier",
+  weekend: "weekend tier",
 };
 
 function nyParts(t: number) {
@@ -88,11 +92,13 @@ function BellIcon({ x, y }: { x: number; y: number }) {
 function Spread({
   almanac,
   limits,
+  mapped,
   selected,
   onSelect,
 }: {
   almanac: Almanac;
   limits: Limits;
+  mapped: Record<string, string>;
   selected: string | null;
   onSelect: (s: string) => void;
 }) {
@@ -109,7 +115,7 @@ function Spread({
   const top = headH + bandH + 8;
   const H = top + almanac.stocks.length * rowH + 8;
   const full = Math.max(
-    limits.weekend * 1.25,
+    limits.pull * 1.25,
     ...almanac.stocks.flatMap((s) => s.forecasts.map((f) => f.bad_case_drop)),
   );
   const days = Array.from({ length: DAYS }, (_, i) => nyMidnight(now, i));
@@ -201,21 +207,17 @@ function Spread({
               <line
                 x1={label}
                 x2={W}
-                y1={yv(limits.weekday)}
-                y2={yv(limits.weekday)}
-                stroke="var(--c-safe)"
+                y1={yv(limits.pull)}
+                y2={yv(limits.pull)}
+                stroke="var(--c-risk)"
                 strokeWidth={1.25}
                 strokeDasharray="4 3"
               />
-              <line
-                x1={label}
-                x2={W}
-                y1={yv(limits.weekend)}
-                y2={yv(limits.weekend)}
-                stroke="var(--c-brass)"
-                strokeWidth={1.25}
-                strokeDasharray="4 3"
-              />
+              {mapped[s.symbol] && (
+                <text x={6} y={y0 + inner + 10} fontSize={11} fill="var(--c-text)">
+                  {TIER_LABEL[mapped[s.symbol]]}
+                </text>
+              )}
               {s.forecasts.map((f) => {
                 const a = Math.max(x(Date.parse(f.period.starts)), label) + 2;
                 const b = Math.min(x(Date.parse(f.period.ends)), W) - 2;
@@ -326,16 +328,10 @@ function List({
   );
 }
 
-function Detail({
-  stock,
-  risk,
-  cushions,
-}: {
-  stock: Risk["stocks"][number];
-  risk: Risk;
-  cushions: Limits;
-}) {
+function Detail({ stock, risk }: { stock: Risk["stocks"][number]; risk: Risk }) {
   const w: Forecast = stock.worst_in_lookahead;
+  const p = stock.policy;
+  const tiers = Object.entries(risk.tier_limits).sort((a, b) => b[1].lltv - a[1].lltv);
   return (
     <section aria-labelledby="detail-title" className="stepped bg-surface p-6">
       <h2 id="detail-title" className="text-[36px]">
@@ -348,8 +344,34 @@ function Detail({
         New York, {w.period.hours} hours closed.
       </p>
       <div className="mt-5 grid gap-8 md:grid-cols-[300px_1fr]">
-        <RiskGauge drop={w.bad_case_drop} margin={risk.safety_margin} cushions={cushions} />
+        <RiskGauge drop={w.bad_case_drop} pullLimit={p.pull_limit} pulled={p.pulled} />
         <div className="flex flex-col gap-4">
+          <p className="text-[18px]">{p.reason}</p>
+          <div>
+            <h3 className="text-[21px]">Tier map for {p.rating_year}</h3>
+            <p className="mt-1 text-[16px]">
+              {p.rating === null
+                ? "Too little history to rate this stock: weekend tier only."
+                : `Worst 1% closed-period gap over the previous year: ${formatPct(p.rating)}. A stock may use a tier when that fits inside ${formatPct(1 - risk.map_fraction, 0)} of the tier's cushion.`}
+            </p>
+            <ul className="mt-2 flex flex-col gap-1 text-[16px]">
+              {tiers.map(([name, t]) => (
+                <li key={name}>
+                  <span
+                    aria-hidden="true"
+                    className="mr-2 inline-block h-3 w-3 rounded-full align-baseline"
+                    style={{
+                      background: stock.tiers[name]?.allowed ? "var(--c-safe)" : "var(--c-rule)",
+                    }}
+                  />
+                  <span className="font-semibold">{TIER_LABEL[name]}</span> (LLTV{" "}
+                  {formatPct(t.lltv)}): limit {formatPct(t.map_limit)}
+                  {name === p.mapped_tier ? ", mapped" : ""}
+                  {stock.tiers[name]?.allowed ? "" : ", not tonight"}
+                </li>
+              ))}
+            </ul>
+          </div>
           <div>
             <h3 className="text-[21px]">What made up the bad case</h3>
             <div className="mt-2">
@@ -367,25 +389,6 @@ function Detail({
               ))}
             </ul>
           </div>
-          <div>
-            <h3 className="text-[21px]">Tiers</h3>
-            <ul className="mt-2 flex flex-col gap-2 text-[16px]">
-              {Object.entries(stock.tiers).map(([t, v]) => (
-                <li key={t}>
-                  <span className="font-semibold">
-                    <span
-                      aria-hidden="true"
-                      className="mr-2 inline-block h-3 w-3 rounded-full align-baseline"
-                      style={{ background: v.allowed ? "var(--c-safe)" : "var(--c-risk)" }}
-                    />
-                    {t === "weekday" ? "Weekday tier" : "Weekend tier"}{" "}
-                    {v.allowed ? "open" : "closed"}:
-                  </span>{" "}
-                  {v.reason}
-                </li>
-              ))}
-            </ul>
-          </div>
           <p className="text-[14px]">
             Forecast by {w.method}, model version {w.model_version.slice(0, 8)}, at a{" "}
             {formatPct(w.alpha, 0)} miss rate.
@@ -399,17 +402,10 @@ function Detail({
 export function AlmanacView() {
   const almanac = useAlmanac(DAYS);
   const risk = useRisk();
-  const vault = useVault();
   const [selected, setSelected] = useState<string | null>(null);
-  const tiers = vault.data?.tiers;
-  const margin = risk.data?.safety_margin;
-  const cushions = tiers
-    ? { weekday: tiers.weekday.cushion, weekend: tiers.weekend.cushion }
-    : null;
-  const limits =
-    cushions && margin !== undefined
-      ? { weekday: cushions.weekday - margin, weekend: cushions.weekend - margin }
-      : null;
+  const r = risk.data;
+  const limits = r?.stocks[0] ? { pull: r.stocks[0].policy.pull_limit } : null;
+  const mapped = Object.fromEntries((r?.stocks ?? []).map((s) => [s.symbol, s.policy.mapped_tier]));
   const symbol = selected ?? risk.data?.stocks[0]?.symbol ?? null;
   const stock = risk.data?.stocks.find((s) => s.symbol === symbol);
   const pick = (s: string) => {
@@ -423,8 +419,9 @@ export function AlmanacView() {
       <h1 className="mt-8 text-[48px] lg:text-[64px]">Almanac</h1>
       <p className="mt-3 text-[18px]">
         The next {DAYS} days of closed markets. Each bar is a stock&apos;s forecast bad-case drop
-        for one closed period, set against how far each tier can fall before lenders lose money,
-        less the {margin !== undefined ? formatPct(margin, 0) : ""} safety margin.
+        for one closed period. Each stock lends in the tier its yearly rating allows; when a bad
+        case in the next {r?.lookahead_closed_periods ?? ""} closed periods rises above the pullback
+        limit, the money borrowers are not using goes idle.
       </p>
       <div className="min-h-[56px] md:min-h-[28px]">
         {limits && (
@@ -433,25 +430,17 @@ export function AlmanacView() {
               <span
                 aria-hidden="true"
                 className="inline-block h-3 w-3"
-                style={{ background: COLOR.weekday }}
+                style={{ background: COLOR.lend }}
               />
-              Under {formatPct(limits.weekday)}: both tiers open
+              Up to {formatPct(limits.pull)}: lends in its mapped tier
             </li>
             <li className="flex items-center gap-2">
               <span
                 aria-hidden="true"
                 className="inline-block h-3 w-3"
-                style={{ background: COLOR.weekend }}
+                style={{ background: COLOR.pull }}
               />
-              Under {formatPct(limits.weekend)}: weekend tier only
-            </li>
-            <li className="flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className="inline-block h-3 w-3"
-                style={{ background: COLOR.none }}
-              />
-              Above: neither tier
+              Above: pulled back
             </li>
             <li className="flex items-center gap-2">
               <svg width="14" height="16" aria-hidden="true">
@@ -463,12 +452,18 @@ export function AlmanacView() {
         )}
       </div>
       <div className="mt-6 min-h-[380px]">
-        {almanac.isError || vault.isError ? (
+        {almanac.isError || risk.isError ? (
           <p role="alert">Can&apos;t load the almanac. {RETRY_TEXT}</p>
         ) : almanac.data && limits ? (
           <>
             <div className="hidden md:block">
-              <Spread almanac={almanac.data} limits={limits} selected={symbol} onSelect={pick} />
+              <Spread
+                almanac={almanac.data}
+                limits={limits}
+                mapped={mapped}
+                selected={symbol}
+                onSelect={pick}
+              />
             </div>
             <div className="md:hidden">
               <List almanac={almanac.data} limits={limits} onSelect={pick} />
@@ -478,11 +473,7 @@ export function AlmanacView() {
           <p aria-busy="true">Reading the calendar and forecasts.</p>
         )}
       </div>
-      <div className="mt-10">
-        {stock && risk.data && cushions && (
-          <Detail stock={stock} risk={risk.data} cushions={cushions} />
-        )}
-      </div>
+      <div className="mt-10">{stock && risk.data && <Detail stock={stock} risk={risk.data} />}</div>
     </div>
   );
 }

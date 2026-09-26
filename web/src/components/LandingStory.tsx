@@ -13,9 +13,16 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { GapHistogram } from "@/charts/GapHistogram";
-import { api, type ReportCard, type Scenario, type Vault, RETRY_TEXT } from "@/lib/api";
+import { FrontierChart } from "@/charts/FrontierChart";
+import {
+  api,
+  type DecisionUniverse,
+  type ReportCard,
+  type Scenario,
+  type Vault,
+  RETRY_TEXT,
+} from "@/lib/api";
 import { useReplay, useReportCard, useScenarios, useVault } from "@/lib/queries";
-import { STRATEGY_NAMES } from "@/lib/names";
 import { formatPct, formatUsd } from "@/lib/time";
 
 // The telegram carries the verifier (hashing, chain reads); load it only when it is shown.
@@ -57,52 +64,36 @@ function GapVisual({ rc, vault }: { rc: ReportCard; vault: Vault }) {
   );
 }
 
-function SettingsVisual({ rc }: { rc: ReportCard }) {
-  const s = rc.backtest.strategies;
-  const keys = ["always_weekday", "always_weekend", "afterhours"] as const;
-  const maxDebt = Math.max(...keys.map((k) => s[k].bad_debt_usdg));
-  const maxYield = Math.max(...keys.map((k) => s[k].net_lender_yield_annualised));
-  return (
-    <figure className="flex flex-col gap-5">
-      {keys.map((k) => (
-        <div key={k}>
-          <p className="text-[18px] font-bold">{STRATEGY_NAMES[k]}</p>
-          <div className="mt-1 grid grid-cols-[7rem_1fr] items-center gap-x-3 gap-y-1 text-[14px]">
-            <span>Yield {formatPct(s[k].net_lender_yield_annualised, 2)}</span>
-            <span
-              className="h-3 rounded-full bg-brass"
-              style={{ width: `${(s[k].net_lender_yield_annualised / maxYield) * 100}%` }}
-            />
-            <span>Bad debt {formatUsd(s[k].bad_debt_usdg)}</span>
-            <span
-              className="h-3 rounded-full bg-risk"
-              style={{ width: `${Math.max(1, (s[k].bad_debt_usdg / maxDebt) * 100)}%` }}
-            />
-          </div>
-        </div>
-      ))}
-      <figcaption className="text-[14px]">
-        {formatUsd(rc.backtest.assumptions.vault_usdg)} USDG vault, {rc.backtest.period.first} to{" "}
-        {rc.backtest.period.last}. Historical stock prices, simulated vault.
-      </figcaption>
-    </figure>
-  );
-}
+const TIER_LABEL: Record<string, string> = {
+  weekday: "Weekday tier",
+  middle: "Middle tier",
+  weekend: "Weekend tier",
+};
 
 function BoardVisual({ vault }: { vault: Vault }) {
   const symbols = Array.from(new Set(vault.markets.map((m) => m.symbol)));
   const limit = Math.max(1, vault.max_share_per_stock * vault.tvl_usdg);
+  const tiers = Object.entries(vault.tiers)
+    .filter(([, t]) => t)
+    .sort((a, b) => b[1].lltv - a[1].lltv)
+    .map(([n]) => n);
   const find = (s: string, t: string) => vault.markets.find((m) => m.symbol === s && m.tier === t);
   return (
     <figure>
-      <div className="grid grid-cols-[4rem_1fr_1fr] gap-x-3 gap-y-2 text-[14px]">
+      <div
+        className="grid gap-x-3 gap-y-2 text-[14px]"
+        style={{ gridTemplateColumns: `4rem ${tiers.map(() => "1fr").join(" ")}` }}
+      >
         <span />
-        <span className="font-semibold">Weekday tier</span>
-        <span className="font-semibold">Weekend tier</span>
+        {tiers.map((t) => (
+          <span key={t} className="font-semibold">
+            {TIER_LABEL[t]}
+          </span>
+        ))}
         {symbols.map((s) => (
           <div key={s} className="contents">
             <span className="font-display text-[18px]">{s}</span>
-            {(["weekday", "weekend"] as const).map((t) => {
+            {tiers.map((t) => {
               const v = find(s, t)?.vault_supply ?? 0;
               return (
                 <span
@@ -173,44 +164,38 @@ function ReplayVisual({ scenario }: { scenario: Scenario }) {
   );
 }
 
-function ReportVisual({ rc }: { rc: ReportCard }) {
-  const shipped = rc.model.acceptance.shipped;
-  const perf = rc.model.shipped_performance.overall;
-  const ah = rc.backtest.strategies.afterhours;
-  const wd = rc.backtest.strategies.always_weekday;
+function CompareVisual({ u }: { u: DecisionUniverse }) {
+  const cells = [
+    { label: "Lender yield", b: formatPct(u.b.yield, 2), o: formatPct(u.nearest_blend.yield, 2) },
+    {
+      label: "Bad debt (USDG)",
+      b: formatUsd(u.b.bad_debt),
+      o: formatUsd(u.nearest_blend.bad_debt),
+    },
+    {
+      label: "Worst single night",
+      b: formatPct(u.b.worst, 3),
+      o: formatPct(u.nearest_blend.worst, 3),
+    },
+  ];
   return (
-    <dl className="grid grid-cols-2 gap-6">
-      <div>
-        <dt className="text-[14px] font-semibold">
-          Forecast misses, target {formatPct(rc.model.acceptance.alpha, 0)}
-        </dt>
-        <dd className="font-display text-[48px] leading-none">{formatPct(perf.miss_rate, 2)}</dd>
-        <dd className="text-[14px]">
-          {perf.n.toLocaleString("en-US")} held-out closed periods ({shipped})
-        </dd>
-      </div>
-      <div>
-        <dt className="text-[14px] font-semibold">Afterhours lender yield</dt>
-        <dd className="font-display text-[48px] leading-none">
-          {formatPct(ah.net_lender_yield_annualised, 2)}
-        </dd>
-        <dd className="text-[14px]">
-          vs {formatPct(wd.net_lender_yield_annualised, 2)} always weekday
-        </dd>
-      </div>
-      <div>
-        <dt className="text-[14px] font-semibold">Bad debt, Afterhours</dt>
-        <dd className="font-display text-[48px] leading-none">{formatUsd(ah.bad_debt_usdg)}</dd>
-        <dd className="text-[14px]">vs {formatUsd(wd.bad_debt_usdg)} USDG always weekday</dd>
-      </div>
-      <div>
-        <dt className="text-[14px] font-semibold">Backtest</dt>
-        <dd className="font-display text-[48px] leading-none">
-          {rc.backtest.period.closed_periods.toLocaleString("en-US")}
-        </dd>
-        <dd className="text-[14px]">closed periods, historical stock prices, simulated vault</dd>
-      </div>
-    </dl>
+    <figure>
+      <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        {cells.map((c) => (
+          <div key={c.label}>
+            <dt className="text-[14px] font-semibold">{c.label}</dt>
+            <dd className="font-display text-[40px] leading-none">{c.b}</dd>
+            <dd className="text-[14px]">
+              vs {c.o} for the {formatPct(u.nearest_blend.w, 0)} weekday mix
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <figcaption className="mt-4 text-[14px]">
+        {u.stocks} vault stocks, {u.evaluation.first} to {u.evaluation.last}, settings chosen on
+        earlier years only. Historical stock prices, simulated vault.
+      </figcaption>
+    </figure>
   );
 }
 
@@ -338,9 +323,18 @@ export function LandingStory() {
   const h = rc.gaps.histograms.universe.segments;
   const edges = rc.gaps.histograms.universe.edges;
   const cushion = vault.tiers.weekday.cushion;
+  const d = rc.decision;
+  const u = d.universes.vault;
+  const blends = [...u.blends].sort((a, b) => a.w - b.w);
+  const [weekend, weekday] = [blends[0], blends[blends.length - 1]];
+  const lossRatio = u.b.bad_debt / u.nearest_blend.bad_debt;
+  const loss =
+    lossRatio > 0.4 && lossRatio < 0.6
+      ? "about half the loss"
+      : `${formatPct(1 - lossRatio, 0)} less bad debt`;
+  const sameYield = Math.abs(u.b.yield - u.nearest_blend.yield) < 0.001;
   const earn = shareBelow(edges, h.earnings.share, cushion);
   const night = shareBelow(edges, h.overnight.share, cushion);
-  const s = rc.backtest.strategies;
   const worst = (sq.data?.scenarios ?? []).reduce<Scenario | null>(
     (a, b) => (a === null || b.g < a.g ? b : a),
     null,
@@ -366,31 +360,49 @@ export function LandingStory() {
       visual: <GapVisual rc={rc} vault={vault} />,
     },
     {
-      id: "settings",
-      title: "Both fixed settings lose.",
+      id: "tradeoff",
+      title: "Every fixed mix trades yield for loss.",
       body: (
         <>
           <p>
-            Lend at {formatPct(rc.backtest.chosen.weekday_lltv)} LLTV all the time and the gaps cost{" "}
-            {formatUsd(s.always_weekday.bad_debt_usdg)} USDG of bad debt in the backtest.
+            Lend at {formatPct(vault.tiers.weekday.lltv)} LLTV all the time and lenders earned{" "}
+            {formatPct(weekday.yield, 2)} from {u.evaluation.first} to {u.evaluation.last}, but one
+            night cost {formatPct(weekday.worst, 3)} of the vault. At{" "}
+            {formatPct(vault.tiers.weekend.lltv)} it is safer, and lenders earned{" "}
+            {formatPct(weekend.yield, 2)}.
+          </p>
+          <p>Every split between the two sits on the grey line.</p>
+        </>
+      ),
+      visual: <FrontierChart u={u} cap={d.cap} height={300} />,
+    },
+    {
+      id: "claim",
+      title: `${sameYield ? "The same yield" : "Close to the yield"} as the best fixed mix, ${loss}.`,
+      body: (
+        <>
+          <p>
+            Afterhours earned {formatPct(u.b.yield, 2)} against{" "}
+            {formatPct(u.nearest_blend.yield, 2)} for the fixed mix with the nearest yield (
+            {formatPct(u.nearest_blend.w, 0)} weekday), with {formatUsd(u.b.bad_debt)} USDG of bad
+            debt against {formatUsd(u.nearest_blend.bad_debt)}.
           </p>
           <p>
-            Lend at {formatPct(rc.backtest.chosen.weekend_lltv)} all the time and it is safer, but
-            lenders earn {formatPct(s.always_weekend.net_lender_yield_annualised, 2)} instead of{" "}
-            {formatPct(s.always_weekday.net_lender_yield_annualised, 2)}.
+            Its settings were chosen on {d.tuning_years} and tested once on {d.evaluation_years}.
           </p>
         </>
       ),
-      visual: <SettingsVisual rc={rc} />,
+      visual: <CompareVisual u={u} />,
     },
     {
       id: "board",
-      title: "So the vault moves before the bell.",
+      title: "The right tier per stock, pulled back before risky nights.",
       body: (
         <p>
-          Before each close, Afterhours forecasts the bad-case drop for every stock and moves money
-          that is not lent out to the tier whose cushion covers it. When the forecast allows it
-          again, the money goes back.
+          Each January every stock is rated on the previous year only and may lend in the highest
+          tier its rating allows: 91.5%, 86% or 77% loan-to-value. Before each close, if a
+          stock&apos;s forecast bad case is too large for any tier, the money borrowers are not
+          using goes idle until the risk passes.
         </p>
       ),
       visual: <BoardVisual vault={vault} />,
@@ -400,9 +412,9 @@ export function LandingStory() {
       title: "Every move prints a reason.",
       body: (
         <p>
-          Each reallocation comes with a reason card: the forecast, what drove it, and the rule that
-          fired. Its hash is written onchain, so anyone can check the reason was not changed
-          afterwards. <Link href="/ledger">See the ledger</Link>.
+          Each move comes with a reason card: the stock&apos;s rating, tonight&apos;s forecast, and
+          the rule that fired. Its hash is written onchain, so anyone can check the reason was not
+          changed afterwards. <Link href="/ledger">See the ledger</Link>.
         </p>
       ),
       visual: <TelegramVisual />,
@@ -415,8 +427,8 @@ export function LandingStory() {
             body: (
               <p>
                 {worst.ticker} opened {formatPct(Math.abs(worst.g))} below its close on{" "}
-                {worst.session_next}. Here is what an ordinary vault and Afterhours would have lost.{" "}
-                <Link href="/replay">Replay this night</Link>.
+                {worst.session_next}. Here is what a vault always in the weekday tier and Afterhours
+                would have lost. <Link href="/replay">Replay this night</Link>.
               </p>
             ),
             visual: <ReplayVisual scenario={worst} />,
@@ -425,13 +437,17 @@ export function LandingStory() {
       : []),
     {
       id: "report",
-      title: "Checked against history.",
+      title: "We set the rule before we looked.",
       body: (
-        <p>
-          {rc.model.first_sentence} <Link href="/report-card">Read the report card</Link>.
-        </p>
+        <>
+          <p>{d.rule}</p>
+          <p className="font-semibold">{d.result}</p>
+          <p>
+            {rc.model.first_sentence} <Link href="/report-card">Read the report card</Link>.
+          </p>
+        </>
       ),
-      visual: <ReportVisual rc={rc} />,
+      visual: <FrontierChart u={u} cap={d.cap} height={300} />,
     },
   ];
   return <Story steps={steps} />;

@@ -16,9 +16,9 @@ for (const { path, heading } of PAGES) {
     await expect(page.getByRole("note").filter({ hasText: "Simulation" })).toBeVisible();
     // Wait for the data-driven part of each page, then check nothing is still loading.
     const ready = {
-      "/": page.getByRole("heading", { name: "Checked against history." }),
+      "/": page.getByRole("heading", { name: "We set the rule before we looked." }),
       "/vault": page.getByRole("heading", { name: "Allocation board" }),
-      "/almanac": page.getByText("weekend tier only").first(),
+      "/almanac": page.getByText("Above: pulled back").first(),
       "/ledger": page.getByText(/reasons|No moves yet/).first(),
       "/replay": page.getByRole("heading", { name: /earnings night of/ }),
       "/report-card": page.getByRole("heading", { name: "Calibration of the shipped forecaster" }),

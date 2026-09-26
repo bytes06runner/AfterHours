@@ -63,7 +63,7 @@ export type Status = z.infer<typeof StatusSchema>;
 
 const MarketSchema = z.object({
   symbol: z.string(),
-  tier: z.enum(["weekday", "weekend"]),
+  tier: z.enum(["weekday", "middle", "weekend"]),
   market_id: z.string(),
   vault_supply: z.number(),
   lent_out: z.number(),
@@ -97,7 +97,7 @@ export const VaultSchema = z.object({
   max_share_per_stock: z.number(),
   apy: z.number(),
   share_price: z.number(),
-  tiers: z.object({ weekday: TierSchema, weekend: TierSchema }),
+  tiers: z.record(z.enum(["weekday", "middle", "weekend"]), TierSchema),
   markets: z.array(MarketSchema),
 });
 export type Vault = z.infer<typeof VaultSchema>;
@@ -126,14 +126,28 @@ export type Forecast = z.infer<typeof ForecastSchema>;
 
 export const RiskSchema = z.object({
   now: z.string(),
+  policy: z.literal("option_b"),
   lookahead_closed_periods: z.number(),
-  safety_margin: z.number(),
+  map_fraction: z.number(),
+  pullback_fraction: z.number(),
+  tier_limits: z.record(
+    z.string(),
+    z.object({ lltv: z.number(), cushion: z.number(), map_limit: z.number() }),
+  ),
   stocks: z.array(
     z.object({
       symbol: z.string(),
       next: ForecastSchema,
       worst_in_lookahead: ForecastSchema,
       tiers: z.record(z.string(), z.object({ allowed: z.boolean(), reason: z.string() })),
+      policy: z.object({
+        rating: z.number().nullable(),
+        rating_year: z.number(),
+        mapped_tier: z.string(),
+        pull_limit: z.number(),
+        pulled: z.boolean(),
+        reason: z.string(),
+      }),
     }),
   ),
 });
@@ -265,7 +279,46 @@ const Hist = z.object({
   segments: z.record(z.string(), z.object({ n: z.number(), share: z.array(z.number()) })),
 });
 
+const FrontierPoint = z.object({
+  yield: z.number(),
+  worst: z.number(),
+  bad_debt: z.number(),
+  interest: z.number(),
+});
+export type FrontierPoint = z.infer<typeof FrontierPoint>;
+const DecisionUniverse = z.object({
+  stocks: z.number(),
+  evaluation: z.object({ first: z.string(), last: z.string(), closed_periods: z.number() }),
+  b: FrontierPoint.extend({ share_of_time: z.record(z.string(), z.number()) }),
+  b_chosen: z.object({
+    map_fraction: z.number(),
+    pullback_fraction: z.number(),
+    lookahead: z.number(),
+  }),
+  b_met_cap_on_tuning: z.boolean(),
+  b_tuning_worst: z.number(),
+  b_settings_meeting_cap: z.number(),
+  b_settings: z.number(),
+  fixed_map_tuning_smallest_worst: z.number(),
+  fixed_map: FrontierPoint,
+  dynamic: FrontierPoint,
+  nearest_blend: FrontierPoint.extend({ w: z.number() }),
+  blends: z.array(FrontierPoint.extend({ w: z.number() })),
+});
+export type DecisionUniverse = z.infer<typeof DecisionUniverse>;
+
 export const ReportCardSchema = z.object({
+  decision: z.object({
+    rule: z.string(),
+    result: z.string(),
+    tuning_years: z.string(),
+    evaluation_years: z.string(),
+    cap: z.number(),
+    label: z.string(),
+    second_evaluation_note: z.string(),
+    universes: z.object({ vault: DecisionUniverse, stock_tokens: DecisionUniverse }),
+    assumed_apy: z.record(z.string(), z.number()),
+  }),
   oracle: z.object({
     weekends: z.number(),
     feeds: z.number(),
@@ -396,6 +449,8 @@ const ReplayPoint = z.object({
   session_prev: z.string(),
   weekday_supply: z.number(),
   weekday_lent: z.number(),
+  middle_supply: z.number().default(0),
+  middle_lent: z.number().default(0),
   weekend_supply: z.number(),
   weekend_lent: z.number(),
   idle: z.number(),
@@ -421,21 +476,21 @@ export const ReplaySchema = ScenarioSchema.extend({
       g: z.number(),
       segment: z.string(),
       bad_case_drop: z.number(),
-      allowed: z.object({ weekday: z.boolean(), weekend: z.boolean() }),
+      rating: z.number().nullable(),
+      mapped_tier: z.string(),
+      pulled: z.boolean(),
+      pull_limit: z.number(),
     }),
   ),
   vaults: z.object({ always_weekday: ReplayVault, afterhours: ReplayVault }),
   vault_usdg: z.number(),
   settings: z.object({
-    weekday_lltv: z.number(),
-    weekend_lltv: z.number(),
-    safety_margin: z.number(),
+    policy: z.literal("option_b"),
+    map_fraction: z.number(),
+    pullback_fraction: z.number(),
     lookahead_closed_periods: z.number(),
   }),
-  tiers: z.object({
-    weekday: z.object({ lltv: z.number(), cushion: z.number() }),
-    weekend: z.object({ lltv: z.number(), cushion: z.number() }),
-  }),
+  tiers: z.record(z.string(), z.object({ lltv: z.number(), cushion: z.number() })),
 });
 export type Replay = z.infer<typeof ReplaySchema>;
 

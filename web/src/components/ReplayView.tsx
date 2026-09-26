@@ -118,6 +118,12 @@ function Stage({
         scale={scale}
       />
       <Bar
+        label={`${ticker}, middle tier`}
+        supply={point.middle_supply}
+        lent={point.middle_lent}
+        scale={scale}
+      />
+      <Bar
         label={`${ticker}, weekend tier`}
         supply={point.weekend_supply}
         lent={point.weekend_lent}
@@ -139,30 +145,35 @@ function Stage({
   );
 }
 
-/** The reason Afterhours would have written before this close, from the replay's own numbers. */
+const TIER_NAME: Record<string, string> = {
+  weekday: "weekday tier",
+  middle: "middle tier",
+  weekend: "weekend tier",
+};
+const TIER_KEYS = ["weekday", "middle", "weekend"] as const;
+
+/** The reason Afterhours (option B) would have written before this close, from the replay. */
 function Reason({ replay, index }: { replay: Replay; index: number }) {
   const p = replay.periods[index];
   const s = replay.vaults.afterhours.series;
   const now = s[index];
   const prev = index > 0 ? s[index - 1] : null;
-  const margin = replay.settings.safety_margin;
-  const need = p.bad_case_drop + margin;
-  const wd = replay.tiers.weekday;
-  const we = replay.tiers.weekend;
-  const verdict = p.allowed.weekday
-    ? `That fits inside the weekday tier's ${formatPct(wd.cushion)} cushion, so lending can stay at full speed.`
-    : p.allowed.weekend
-      ? `That is more than the weekday tier's ${formatPct(wd.cushion)} cushion but fits the weekend tier's ${formatPct(we.cushion)}, so ${replay.ticker} lends only in the weekend tier.`
-      : `That is more than both cushions (weekday ${formatPct(wd.cushion)}, weekend ${formatPct(we.cushion)}), so Afterhours withdraws everything borrowers are not using.`;
+  const year = p.session_prev.slice(0, 4);
+  const tier = replay.tiers[p.mapped_tier];
+  const map =
+    p.rating === null
+      ? `${replay.ticker} had too little history to rate for ${year}, so it may lend only in the weekend tier.`
+      : `By its ${year} rating (worst 1% gap over the previous year: ${formatPct(p.rating)}), ${replay.ticker} may lend in the ${TIER_NAME[p.mapped_tier]} (LLTV ${formatPct(tier?.lltv ?? 0)}).`;
+  const pull = p.pulled
+    ? `The forecast bad case over the next ${replay.settings.lookahead_closed_periods} closed periods is ${formatPct(p.bad_case_drop)}, above every tier's limit (the largest is ${formatPct(p.pull_limit)}), so the money borrowers are not using goes idle.`
+    : `The forecast bad case over the next ${replay.settings.lookahead_closed_periods} closed periods is ${formatPct(p.bad_case_drop)}, within the pullback limit of ${formatPct(p.pull_limit)}, so it keeps lending.`;
   const moved = prev
-    ? (["weekday", "weekend"] as const)
-        .map((t) => {
-          const d = now[`${t}_supply`] - prev[`${t}_supply`];
-          return Math.abs(d) >= 1
-            ? `${d > 0 ? "added" : "pulled"} ${formatUsd(Math.abs(d))} USDG ${d > 0 ? "to" : "from"} the ${t} tier`
-            : null;
-        })
-        .filter(Boolean)
+    ? TIER_KEYS.map((t) => {
+        const d = now[`${t}_supply`] - prev[`${t}_supply`];
+        return Math.abs(d) >= 1
+          ? `${d > 0 ? "added" : "pulled"} ${formatUsd(Math.abs(d))} USDG ${d > 0 ? "to" : "from"} the ${TIER_NAME[t]}`
+          : null;
+      }).filter(Boolean)
     : [];
   return (
     <article aria-label="Afterhours reason for this close" className="max-w-[640px]">
@@ -174,9 +185,7 @@ function Reason({ replay, index }: { replay: Replay; index: number }) {
           <p className="text-[14px]">What Afterhours would have written (simulated vault)</p>
         </header>
         <p className="mt-4 text-[18px] leading-[1.5]">
-          The bad case for {replay.ticker} over the next {replay.settings.lookahead_closed_periods}{" "}
-          closed periods is a {formatPct(p.bad_case_drop)} drop; with the {formatPct(margin, 0)}{" "}
-          safety margin that is {formatPct(need)}. {verdict}
+          {map} {pull}
         </p>
         <p className="mt-3 text-[16px]">
           {moved.length ? `It ${moved.join(" and ")}.` : "No money moved at this close."} What
@@ -270,7 +279,7 @@ function Theatre({ replay }: { replay: Replay }) {
       Math.max(
         1,
         ...Object.values(replay.vaults).flatMap((v) =>
-          v.series.map((p) => Math.max(p.weekday_supply, p.weekend_supply)),
+          v.series.map((p) => Math.max(p.weekday_supply, p.middle_supply, p.weekend_supply)),
         ),
       ),
     [replay],
@@ -324,7 +333,7 @@ function Theatre({ replay }: { replay: Replay }) {
       <div className="grid gap-6 md:grid-cols-2">
         <Stage
           title="Ordinary vault"
-          note={`Always in the weekday tier (LLTV ${formatPct(replay.tiers.weekday.lltv)})`}
+          note={`Always in the weekday tier (LLTV ${formatPct(replay.tiers.weekday?.lltv ?? 0)})`}
           ticker={replay.ticker}
           point={ordinary}
           scale={scale}
@@ -332,7 +341,7 @@ function Theatre({ replay }: { replay: Replay }) {
         />
         <Stage
           title="Afterhours"
-          note={`Moves between weekday (LLTV ${formatPct(replay.tiers.weekday.lltv)}) and weekend (LLTV ${formatPct(replay.tiers.weekend.lltv)}) before each close`}
+          note="Lends in the tier its yearly rating allows; pulls unborrowed money before risky nights"
           ticker={replay.ticker}
           point={ah}
           scale={scale}

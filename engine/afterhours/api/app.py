@@ -406,6 +406,14 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                 "b": point(bu["evaluation"]) | {"share_of_time": bu["evaluation"]["share_of_time"]},
                 "b_chosen": bu["chosen"],
                 "b_met_cap_on_tuning": bu["met_cap_on_tuning"],
+                "b_tuning_worst": float(
+                    (bu["tuning_result"].get("worst_event") or {}).get("share_of_vault", 0.0)
+                ),
+                "b_settings_meeting_cap": bu["settings_meeting_cap_on_tuning"],
+                "b_settings": bu["settings"],
+                "fixed_map_tuning_smallest_worst": min(
+                    x["worst_event_share"] for x in au["grid"]["tuning"] if x["kind"] == "fixed_map"
+                ),
                 "fixed_map": point(au["evaluation"]["fixed_map"]),
                 "dynamic": point(au["evaluation"]["afterhours"]),
                 "nearest_blend": point(bu["compare_on_evaluation"]["nearest_blend"])
