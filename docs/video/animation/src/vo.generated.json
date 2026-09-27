@@ -1,0 +1,119 @@
+{
+  "voice": "af_heart",
+  "cues": [
+    {
+      "file": "vo/00.mp3",
+      "at": 0.9,
+      "seconds": 1.8,
+      "text": "This is Afterhours."
+    },
+    {
+      "file": "vo/01.mp3",
+      "at": 3.0,
+      "seconds": 4.0,
+      "text": "Stock Tokens trade all weekend. Their price feeds don't."
+    },
+    {
+      "file": "vo/02.mp3",
+      "at": 7.9,
+      "seconds": 6.125,
+      "text": "Over 8 weekends, 32 of 35 feeds posted nothing, Friday night to Sunday night."
+    },
+    {
+      "file": "vo/03.mp3",
+      "at": 14.3,
+      "seconds": 5.75,
+      "text": "No prices, no liquidations. When Monday opens with a gap, lenders take the loss."
+    },
+    {
+      "file": "vo/04.mp3",
+      "at": 20.4,
+      "seconds": 3.5,
+      "text": "Afterhours is a Morpho vault for Stock Tokens."
+    },
+    {
+      "file": "vo/05.mp3",
+      "at": 25.2,
+      "seconds": 5.55,
+      "text": "Each stock gets three markets. It lends in the riskiest one its own last year allows."
+    },
+    {
+      "file": "vo/06.mp3",
+      "at": 34.4,
+      "seconds": 7.15,
+      "text": "Before every close, it forecasts each stock's bad night. Too risky? It pulls the money borrowers aren't using."
+    },
+    {
+      "file": "vo/07.mp3",
+      "at": 42.6,
+      "seconds": 5.8,
+      "text": "And every move gets a reason card, with its fingerprint written onchain for anyone to check."
+    },
+    {
+      "file": "vo/08.mp3",
+      "at": 50.1,
+      "seconds": 9.025,
+      "text": "Fixed mixes sit on this line. Afterhours sits above it: same yield, 47% less bad debt, 51% smaller worst night."
+    },
+    {
+      "file": "vo/09.mp3",
+      "at": 59.4,
+      "seconds": 6.25,
+      "text": "Against a yearly plan: 31% less bad debt, 46% smaller worst night."
+    },
+    {
+      "file": "vo/10.mp3",
+      "at": 66.0,
+      "seconds": 6.025,
+      "text": "We wrote the test down before running it. Our first design didn't pass, so the simpler one ships."
+    },
+    {
+      "file": "vo/11.mp3",
+      "at": 73.8,
+      "seconds": 6.325,
+      "text": "Honest note: the rates are modelled. Real markets pay lenders 0.0016% today."
+    },
+    {
+      "file": "vo/12.mp3",
+      "at": 80.5,
+      "seconds": 3.725,
+      "text": "October 2022. META reports earnings."
+    },
+    {
+      "file": "vo/13.mp3",
+      "at": 85.0,
+      "seconds": 3.8,
+      "text": "The next morning, it opens 24.5% down."
+    },
+    {
+      "file": "vo/14.mp3",
+      "at": 89.1,
+      "seconds": 11.125,
+      "text": "At the top limit, a vault lost 24,300 USDG. Afterhours had already pulled back, and lost 9,953: 59% less."
+    },
+    {
+      "file": "vo/15.mp3",
+      "at": 100.6,
+      "seconds": 14.15,
+      "text": "The market is early. When we measured, 150 Morpho markets took Stock Tokens as collateral: 804,926 USDG supplied, 6,182 borrowed."
+    },
+    {
+      "file": "vo/16.mp3",
+      "at": 115.3,
+      "seconds": 3.725,
+      "text": "We're building the vault lenders can trust with it, as it grows."
+    },
+    {
+      "file": "vo/17.mp3",
+      "at": 126.2,
+      "seconds": 2.525,
+      "text": "Afterhours. Lend through the night."
+    },
+    {
+      "file": "vo/18.mp3",
+      "at": 130.0,
+      "seconds": 6.275,
+      "text": "Built on Robinhood Chain and Morpho. Try it live, and read every line of the code on GitHub."
+    }
+  ]
+}

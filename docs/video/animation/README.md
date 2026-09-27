@@ -16,7 +16,29 @@ that show real data say so; illustrations and backtests carry their labels ("Ill
 | 1:40 to 2:05 | Market | Morpho markets with Stock Token collateral today |
 | 2:05 to 2:25 | Close | The name, the live links, your team's words |
 
-## Make your final video
+## The AI voiceover (already in)
+
+The video ships with a voiceover by **Kokoro-82M** (hexgrad, Apache 2.0): an open-source voice
+model that runs on your machine, with no account and no cost. The words are in
+[`voiceover.json`](voiceover.json); each line starts at its scene's cue, numbers are filled in from
+`numbers.json`, and a line that would run into the next is spoken slightly faster (never above
+`max_speed`). The generated clips are committed in `public/vo/`, so `npm run render` gives the
+voiced video straight away.
+
+To change the words or the voice (for example `am_michael`, `am_fenrir` or `bf_emma` in
+`voiceover.json`'s `voice`):
+
+```bash
+npm run setup:voice
+```
+
+```bash
+npm run voice
+```
+
+Then `npm run render`. The subtitled version (`npm run render:script`) shows exactly what is said.
+
+## Or use your own voice
 
 From this folder (needs Node 20 and Python 3):
 
@@ -33,8 +55,8 @@ npm install
    npm run render:script
    ```
 
-3. **Put the recording in** `public/voiceover.mp3` (or `.wav` or `.m4a`), starting at 0:00. The
-   night pad automatically gets quieter under your voice.
+3. **Put the recording in** `public/voiceover.mp3` (or `.wav` or `.m4a`), starting at 0:00. It
+   replaces the AI voice, and the night pad and effects get quieter under it.
 4. **Render the final video:**
 
    ```bash

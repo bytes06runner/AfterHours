@@ -982,3 +982,12 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   ducked. `PitchWithScript` renders the pitch.md lines as timed subtitles for recording.
 - Checked by rendering stills of every scene and fixing overlaps (moon over headlines, chart
   labels, the gap counter off screen, the vault box, the closing links over the skyline).
+- AI voiceover (by request): Kokoro-82M (hexgrad, Apache 2.0, local, no account). 19 cues in
+  `voiceover.json`, each placed at its scene; numbers filled from numbers.json; a line that would
+  overrun its slot is regenerated slightly faster (at most 1.16x in the final cut, cap 1.2x).
+  Clips committed as MP3 in `public/vo` (2.2 MB), so a fresh clone renders the voiced video
+  without the model. Effects and pad duck under the voice; subtitles show the spoken words. The
+  scene 6 team lines are replaced by factual ones ("Built on Robinhood Chain and Morpho. Try it
+  live, and read every line of the code on GitHub."); the team can edit them.
+- Loudness: renders are normalised to -16 LUFS, true peak -1.5 dB (measured -16.6 LUFS, -1.47
+  dB); checked that speech windows are louder than the old render and quiet windows ducked.

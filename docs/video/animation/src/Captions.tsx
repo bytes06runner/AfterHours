@@ -21,9 +21,15 @@ const cues: Cue[] = (Object.keys(SCENES) as (keyof typeof SCENES)[]).flatMap((k)
   });
 });
 
-export const Captions: React.FC = () => {
+/** With a voiceover, the subtitles are its exact words at the moment each is spoken. */
+export const Captions: React.FC<{ spoken?: { at: number; seconds: number; text: string }[] }> = ({
+  spoken = [],
+}) => {
   const f = useCurrentFrame();
-  const cue = cues.find((c) => f >= c.from && f < c.to);
+  const timed: Cue[] = spoken.length
+    ? spoken.map((c) => ({ from: sec(c.at), to: sec(c.at + c.seconds + 0.35), text: c.text }))
+    : cues;
+  const cue = timed.find((c) => f >= c.from && f < c.to);
   if (!cue) return null;
   const o = interpolate(f, [cue.from, cue.from + 6, cue.to - 6, cue.to], [0, 1, 1, 0]);
   return (

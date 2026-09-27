@@ -1,7 +1,8 @@
 /** 1:40 to 2:05. The market today: early, and growing. */
 import React from "react";
-import { AbsoluteFill, Audio, Sequence, interpolate, random, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Sequence, interpolate, random, useCurrentFrame } from "remotion";
 
+import { Sfx } from "../components/Sfx";
 import { Grain, Skyline, Sky, Stars, Vignette } from "../components/Atmosphere";
 import { Chip, Counter, Kinetic } from "../components/Pieces";
 import { n, v } from "../data";
@@ -89,11 +90,11 @@ export const Market: React.FC = () => (
   <AbsoluteFill style={{ background: C.bgDeep }}>
     <Sequence durationInFrames={420}>
       <Markets />
-      <Audio src={staticFile("whoosh.wav")} volume={0.5} />
+      <Sfx name="whoosh" volume={0.5} />
     </Sequence>
     <Sequence from={420} durationInFrames={330}>
       <Grow />
-      <Audio src={staticFile("whoosh.wav")} volume={0.4} />
+      <Sfx name="whoosh" volume={0.4} />
     </Sequence>
     <Grain />
     <Vignette />

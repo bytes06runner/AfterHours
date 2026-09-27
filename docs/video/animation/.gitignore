@@ -4,3 +4,4 @@ node_modules/
 public/*.wav
 # Your own recording stays on your machine.
 public/voiceover.*
+.tts/

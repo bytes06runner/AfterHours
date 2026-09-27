@@ -1,7 +1,8 @@
 /** 0:50 to 1:20. The claim: above the line of fixed mixes, tested the honest way. */
 import React from "react";
-import { AbsoluteFill, Audio, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Sequence, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
+import { Sfx } from "../components/Sfx";
 import { Grain, Vignette } from "../components/Atmosphere";
 import { Chip, Counter, Kinetic } from "../components/Pieces";
 import { FRONTIER, n } from "../data";
@@ -170,15 +171,15 @@ export const Claim: React.FC = () => (
   <AbsoluteFill style={{ background: C.bgDeep }}>
     <Sequence durationInFrames={420}>
       <Frontier />
-      <Audio src={staticFile("whoosh.wav")} volume={0.5} />
+      <Sfx name="whoosh" volume={0.5} />
       <Sequence from={90}>
-        <Audio src={staticFile("stamp.wav")} volume={0.6} />
+        <Sfx name="stamp" volume={0.6} />
       </Sequence>
     </Sequence>
     <Sequence from={420} durationInFrames={300}>
       <TestFirst />
       <Sequence from={160}>
-        <Audio src={staticFile("stamp.wav")} volume={1} />
+        <Sfx name="stamp" volume={1} />
       </Sequence>
     </Sequence>
     <Sequence from={720} durationInFrames={180}>

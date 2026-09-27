@@ -1,7 +1,8 @@
 /** 0:00 to 0:20. The hook: Stock Tokens trade all weekend; their feeds freeze; lenders take the gap. */
 import React from "react";
-import { AbsoluteFill, Audio, Sequence, interpolate, random, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Sequence, interpolate, random, useCurrentFrame } from "remotion";
 
+import { Sfx } from "../components/Sfx";
 import { Grain, Moon, Skyline, Sky, Stars, Vignette } from "../components/Atmosphere";
 import { Bell, Chip, Counter, Exchange, Kinetic, Sunburst } from "../components/Pieces";
 import { n, STOCK_TOKENS, UPDATED_FEEDS } from "../data";
@@ -162,19 +163,19 @@ export const Hook: React.FC = () => (
   <AbsoluteFill style={{ background: C.bgDeep }}>
     <Sequence durationInFrames={75}>
       <ColdOpen />
-      <Audio src={staticFile("bell.wav")} startFrom={0} volume={0.9} />
+      <Sfx name="bell" volume={0.9} />
     </Sequence>
     <Sequence from={75} durationInFrames={165}>
       <City />
     </Sequence>
     <Sequence from={240} durationInFrames={180}>
       <Feeds />
-      <Audio src={staticFile("whoosh.wav")} volume={0.5} />
+      <Sfx name="whoosh" volume={0.5} />
     </Sequence>
     <Sequence from={420} durationInFrames={180}>
       <Gap />
       <Sequence from={70}>
-        <Audio src={staticFile("boom.wav")} volume={0.9} />
+        <Sfx name="boom" volume={0.9} />
       </Sequence>
     </Sequence>
     <Grain />

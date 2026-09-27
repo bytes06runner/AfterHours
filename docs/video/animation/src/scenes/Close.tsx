@@ -1,7 +1,8 @@
 /** 2:05 to 2:25. The close: the bell, the name, where to find it, and the team's own words. */
 import React from "react";
-import { AbsoluteFill, Audio, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Sequence, interpolate, useCurrentFrame } from "remotion";
 
+import { Sfx } from "../components/Sfx";
 import { Grain, Moon, Skyline, Sky, Stars, Vignette } from "../components/Atmosphere";
 import { Exchange, Kinetic, Sunburst } from "../components/Pieces";
 import team from "../team.json";
@@ -51,10 +52,10 @@ export const Close: React.FC = () => {
         </div>
       </AbsoluteFill>
       <Sequence from={20}>
-        <Audio src={staticFile("bell.wav")} volume={0.9} />
+        <Sfx name="bell" volume={0.9} />
       </Sequence>
       <Sequence from={430}>
-        <Audio src={staticFile("bell.wav")} volume={0.7} />
+        <Sfx name="bell" volume={0.7} />
       </Sequence>
       <Grain />
       <Vignette />

@@ -1,7 +1,8 @@
 /** 0:20 to 0:50. The product: three tiers, a forecast before every close, a pullback, a reason onchain. */
 import React from "react";
-import { AbsoluteFill, Audio, Sequence, interpolate, random, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Sequence, interpolate, random, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
+import { Sfx } from "../components/Sfx";
 import { Grain, Sky, Stars, Vignette } from "../components/Atmosphere";
 import { Bell, Chip, Kinetic } from "../components/Pieces";
 import { n, TIERS, VAULT_STOCKS } from "../data";
@@ -258,23 +259,23 @@ export const Product: React.FC = () => (
   <AbsoluteFill style={{ background: C.bgDeep }}>
     <Sequence durationInFrames={150}>
       <Vault />
-      <Audio src={staticFile("whoosh.wav")} volume={0.5} />
+      <Sfx name="whoosh" volume={0.5} />
     </Sequence>
     <Sequence from={150} durationInFrames={270}>
       <Shelves />
-      <Audio src={staticFile("whoosh.wav")} volume={0.4} />
+      <Sfx name="whoosh" volume={0.4} />
     </Sequence>
     <Sequence from={420} durationInFrames={250}>
       <Forecast />
-      <Audio src={staticFile("bell.wav")} volume={0.45} />
+      <Sfx name="bell" volume={0.45} />
       <Sequence from={150}>
-        <Audio src={staticFile("whoosh.wav")} volume={0.6} />
+        <Sfx name="whoosh" volume={0.6} />
       </Sequence>
     </Sequence>
     <Sequence from={670} durationInFrames={230}>
       <Reason />
       <Sequence from={110}>
-        <Audio src={staticFile("stamp.wav")} volume={0.9} />
+        <Sfx name="stamp" volume={0.9} />
       </Sequence>
     </Sequence>
     <Grain />

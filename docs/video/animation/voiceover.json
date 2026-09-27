@@ -1,0 +1,83 @@
+{
+  "_comment": "The AI voiceover. Each cue starts at `at` seconds, lined up with the scene it describes. {key} is replaced by that number from artifacts/report/numbers.json. Edit the words freely; run `npm run voice` to regenerate. A line that runs into the next cue is spoken slightly faster (up to max_speed); if it still does not fit, the script stops and names it.",
+  "voice": "af_heart",
+  "max_speed": 1.2,
+  "cues": [
+    {
+      "at": 0.9,
+      "text": "This is Afterhours."
+    },
+    {
+      "at": 3.0,
+      "text": "Stock Tokens trade all weekend. Their price feeds don't."
+    },
+    {
+      "at": 7.9,
+      "text": "Over {oracle.weekends} weekends, {oracle.feeds_without_update} of {oracle.feeds} feeds posted nothing, Friday night to Sunday night."
+    },
+    {
+      "at": 14.3,
+      "text": "No prices, no liquidations. When Monday opens with a gap, lenders take the loss."
+    },
+    {
+      "at": 20.4,
+      "text": "Afterhours is a Morpho vault for Stock Tokens."
+    },
+    {
+      "at": 25.2,
+      "text": "Each stock gets three markets. It lends in the riskiest one its own last year allows."
+    },
+    {
+      "at": 34.4,
+      "text": "Before every close, it forecasts each stock's bad night. Too risky? It pulls the money borrowers aren't using."
+    },
+    {
+      "at": 42.6,
+      "text": "And every move gets a reason card, with its fingerprint written onchain for anyone to check."
+    },
+    {
+      "at": 50.1,
+      "text": "Fixed mixes sit on this line. Afterhours sits above it: same yield, {rel.b_vs_blend.bad_debt_less} less bad debt, {rel.b_vs_blend.worst_less} smaller worst night."
+    },
+    {
+      "at": 59.4,
+      "text": "Against a yearly plan: {rel.b_vs_fixed_map.bad_debt_less} less bad debt, {rel.b_vs_fixed_map.worst_less} smaller worst night."
+    },
+    {
+      "at": 66.0,
+      "text": "We wrote the test down before running it. Our first design didn't pass, so the simpler one ships."
+    },
+    {
+      "at": 73.8,
+      "text": "Honest note: the rates are modelled. Real markets pay lenders {market.supply_apy} today."
+    },
+    {
+      "at": 80.5,
+      "text": "October 2022. {replay.ticker} reports earnings."
+    },
+    {
+      "at": 85.0,
+      "text": "The next morning, it opens {replay.gap} down."
+    },
+    {
+      "at": 89.1,
+      "text": "At the top limit, a vault lost {replay.always_weekday.bad_debt} USDG. Afterhours had already pulled back, and lost {replay.afterhours.bad_debt}: {rel.replay.b_less} less."
+    },
+    {
+      "at": 100.6,
+      "text": "The market is early. When we measured, {market.stock_token_markets} Morpho markets took Stock Tokens as collateral: {market.usdg_supplied} USDG supplied, {market.usdg_borrowed} borrowed."
+    },
+    {
+      "at": 115.3,
+      "text": "We're building the vault lenders can trust with it, as it grows."
+    },
+    {
+      "at": 126.2,
+      "text": "Afterhours. Lend through the night."
+    },
+    {
+      "at": 130.0,
+      "text": "Built on Robinhood Chain and Morpho. Try it live, and read every line of the code on GitHub."
+    }
+  ]
+}

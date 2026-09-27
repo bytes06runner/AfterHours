@@ -1,7 +1,8 @@
 /** 1:20 to 1:40. One night: META's October 2022 earnings gap, replayed. */
 import React from "react";
-import { AbsoluteFill, Audio, Sequence, interpolate, random, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Sequence, interpolate, random, useCurrentFrame } from "remotion";
 
+import { Sfx } from "../components/Sfx";
 import { Grain, Moon, Sky, Stars, Vignette } from "../components/Atmosphere";
 import { Bell, Chip, Counter, Kinetic } from "../components/Pieces";
 import { n } from "../data";
@@ -118,15 +119,15 @@ export const Night: React.FC = () => (
   <AbsoluteFill style={{ background: C.bgDeep }}>
     <Sequence durationInFrames={130}>
       <Calendar />
-      <Audio src={staticFile("whoosh.wav")} volume={0.5} />
+      <Sfx name="whoosh" volume={0.5} />
       <Sequence from={50}>
-        <Audio src={staticFile("bell.wav")} volume={0.6} />
+        <Sfx name="bell" volume={0.6} />
       </Sequence>
     </Sequence>
     <Sequence from={130} durationInFrames={150}>
       <Drop />
       <Sequence from={50}>
-        <Audio src={staticFile("boom.wav")} volume={1} />
+        <Sfx name="boom" volume={1} />
       </Sequence>
     </Sequence>
     <Sequence from={280} durationInFrames={320}>
