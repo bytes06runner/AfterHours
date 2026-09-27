@@ -214,6 +214,9 @@ def deploy_cmd(
     keys = dep.role_keys(cfg, profile)
     if cfg.profile.local_rpc_port_env:
         dep.fund_local(rpc, list(dep.addresses(keys).values()), 1000 * 10**18)
+    else:
+        sent = dep.top_up_curator(cfg, rpc, keys)
+        typer.echo(f"curator topped up by {sent / 1e18:.6f} ETH" if sent else "curator has gas")
     raw_path = deployment_path(cfg, profile).with_suffix(".raw.json")
     dep.run_script(cfg, profile, plan_path, raw_path, rpc, keys)
     doc = dep.finalise(cfg, profile, raw_path, plan_doc)

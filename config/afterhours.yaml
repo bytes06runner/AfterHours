@@ -276,7 +276,7 @@ sim:
   borrow_share_of_market_supply: 0.8      # borrowers take up to this share of each market's supply
   borrower_ltv_share_of_lltv: { low: 0.60, high: 0.95 }
   eth_per_actor: 10                        # Anvil only (anvil_setBalance)
-  testnet_eth_per_actor: 0.0005           # sent by the deployer to each testnet actor for gas
+  testnet_eth_per_actor: 0.00005          # sent by the deployer to each testnet actor for gas (17x measured)
   # Browser faucet for the local demo only (simulated USDG, local chain): per request, and
   # at most once per address per cooldown.
   faucet: { usdg: 50000, eth: 1, cooldown_seconds: 60 }
@@ -333,12 +333,14 @@ live:
   warm_prices: true                    # the API refreshes every Stock Token's prices at start
 
 # Telegram alerts (core.telegram.org/bots/api: https://api.telegram.org/bot<token>/METHOD_NAME).
-# Testnet gas for the allocator (`make fund-allocator PROFILE=...`): the deployer sends it, so only
-# the deployer needs faucet ETH. The M11 rehearsal measured 0.0013 ETH per chain for the first
-# allocation (PROGRESS.md BLOCKED 2b); 0.02 covers many rebalances.
+# Testnet gas, all sent by the deployer, so only the deployer needs faucet ETH. Measured on an
+# rh-testnet fork on 2026-09-27 and priced at live rates (0.01 gwei L2 gas plus L1 data from
+# ArbGasInfo.getPricesInWei): deploy and seed 0.00036 ETH (deployer), curation 0.00008 (curator,
+# 114 transactions), first bot cycle 0.000014 (allocator), at most 0.0000029 per seed actor.
 funding:
-  allocator_eth: 0.02
-  keep_deployer_eth: 0.005             # refuse if the deployer would be left with less than this
+  allocator_eth: 0.002                 # about 150 first-cycle-sized bot cycles
+  curator_eth: 0.0005                  # topped up before `make deploy`; about 6x its deploy gas
+  keep_deployer_eth: 0.001             # refuse if the deployer would be left with less than this
   faucet_profile: rh-testnet           # `make testnet-keys` points to this testnet's faucet
 
 alerts:

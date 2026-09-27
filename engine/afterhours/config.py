@@ -417,6 +417,7 @@ class LiveConfig(_Strict):
 
 class FundingConfig(_Strict):
     allocator_eth: PositiveFloat
+    curator_eth: PositiveFloat
     keep_deployer_eth: PositiveFloat
     faucet_profile: str
 

@@ -182,6 +182,37 @@ def fund_local(rpc: str, accounts: list[str], wei: int) -> None:
         )
 
 
+def top_up(
+    balance_of: Callable[[str], int],
+    send: Callable[[str, int], object],
+    address: str,
+    target_wei: int,
+) -> int:
+    """Send `address` what it lacks to reach `target_wei`; returns the wei sent (0 if enough)."""
+    lacking = target_wei - balance_of(address)
+    if lacking <= 0:
+        return 0
+    send(address, lacking)
+    return lacking
+
+
+def top_up_curator(cfg: AfterhoursConfig, rpc: str, keys: dict[str, str]) -> int:
+    """Before a real-chain deploy: the curator signs the curation transactions, so the deployer
+    tops it up to `funding.curator_eth` (only what it lacks)."""
+    from afterhours.chain.rpc import connect
+    from afterhours.chain.tx import Signer
+
+    w3 = connect(rpc)
+    deployer = Signer(w3, keys["DEPLOYER_PK"])
+    curator = addresses({"CURATOR_PK": keys["CURATOR_PK"]})["CURATOR_PK"]
+    return top_up(
+        lambda a: int(w3.eth.get_balance(to_checksum_address(a))),
+        deployer.transfer,
+        curator,
+        int(cfg.funding.curator_eth * 10**18),
+    )
+
+
 def run_script(
     cfg: AfterhoursConfig,
     profile: str,

@@ -1,0 +1,212 @@
+{
+  "profile": "rh-testnet",
+  "chain_id": 46630,
+  "deployed_at_block": 11792948,
+  "simulation": {
+    "oracle": true,
+    "collateral": true,
+    "morpho_self_deployed": true
+  },
+  "morpho": {
+    "address": "0xFeE49d53CF7a073b75917F0d9343e7C660C4A06e"
+  },
+  "irm": {
+    "address": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+  },
+  "vault_v2_factory": {
+    "address": "0x67522A3108AE6423086eE526616E206cdA58bFF4"
+  },
+  "adapter_factory": {
+    "address": "0x20C200D0c33db355DC1a96C50c76FdEB90F327eE"
+  },
+  "loan_token": {
+    "address": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c"
+  },
+  "vault": {
+    "address": "0xD4791630C02FF7462536bAEae7BcE13c5917E6d3"
+  },
+  "adapter": {
+    "address": "0x3A59C9B5134C9A1Cd6EA75ac8088aa06a6D321E2"
+  },
+  "registry": {
+    "address": "0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0"
+  },
+  "roles": {
+    "owner": "0x5006323b641AFBEE80a88BB885af2caa1c0e0E01",
+    "curator": "0x575Eb7f4257f58E9dcB68aB84d592DfFAe926dc4",
+    "allocator": "0x4f9ad36c2cab98A51255d054eB57dbaF48a91c11",
+    "guardian": "0x61d30FC7CF81e36cDfcF4607E3D912BD2B4A74ed"
+  },
+  "tiers": {
+    "weekday": {
+      "lltv": 0.915,
+      "liquidation_allowance_b": 0.023943047716777733,
+      "cushion": 0.061056952283222235,
+      "formula": "b = LLTV * (min(1.15, 1/(1 - 0.3*(1 - LLTV))) - 1), verified in M1"
+    },
+    "middle": {
+      "lltv": 0.86,
+      "liquidation_allowance_b": 0.03770354906054288,
+      "cushion": 0.10229645093945713,
+      "formula": "b = LLTV * (min(1.15, 1/(1 - 0.3*(1 - LLTV))) - 1), verified in M1"
+    },
+    "weekend": {
+      "lltv": 0.77,
+      "liquidation_allowance_b": 0.05706766917293236,
+      "cushion": 0.17293233082706763,
+      "formula": "b = LLTV * (min(1.15, 1/(1 - 0.3*(1 - LLTV))) - 1), verified in M1"
+    }
+  },
+  "markets": [
+    {
+      "symbol": "NVDA",
+      "tier": "weekday",
+      "market_id": "0xd4b302f8a350ff2d9de50d47ca967ed7b807cf2a1e6edc8b586a84ec20c71ee9",
+      "collateral": "0xC932b9Bd10e7B0A4e5B6Fb8Ed79d45ccA7637954",
+      "oracle": "0xE9a8a0fC43c7Fed6Ea09f9Fc93332C2ef14C271F",
+      "lltv_wad": "915000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "NVDA",
+      "tier": "middle",
+      "market_id": "0x8552bb10b2c59b36399439c63b0d1f264f4cd1b3aaf034a5a49cc2e23edf4d89",
+      "collateral": "0xC932b9Bd10e7B0A4e5B6Fb8Ed79d45ccA7637954",
+      "oracle": "0xE9a8a0fC43c7Fed6Ea09f9Fc93332C2ef14C271F",
+      "lltv_wad": "860000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "NVDA",
+      "tier": "weekend",
+      "market_id": "0xdc9c9a8cbfec561e3f371de8af2f784b48d3c66c8e5f6102aee162fd03be2320",
+      "collateral": "0xC932b9Bd10e7B0A4e5B6Fb8Ed79d45ccA7637954",
+      "oracle": "0xE9a8a0fC43c7Fed6Ea09f9Fc93332C2ef14C271F",
+      "lltv_wad": "770000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "SPY",
+      "tier": "weekday",
+      "market_id": "0x1995c8986d23a3f3d46b1ef304190ac80276275240defcf9fdd725231b44b548",
+      "collateral": "0x29610DC44E46ed1412f424BF2719F24b70cb657d",
+      "oracle": "0xF094b0124545231d923380803f21bE453121BB92",
+      "lltv_wad": "915000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "SPY",
+      "tier": "middle",
+      "market_id": "0x8d09fcff132d1a3dfe5d04b3fc473a7b4fcefb6fdfc5b7e9e1ada2f515d80ad5",
+      "collateral": "0x29610DC44E46ed1412f424BF2719F24b70cb657d",
+      "oracle": "0xF094b0124545231d923380803f21bE453121BB92",
+      "lltv_wad": "860000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "SPY",
+      "tier": "weekend",
+      "market_id": "0xc05cabef225708e459783626c966694040a220fa02705c0668a1fd090bef36b3",
+      "collateral": "0x29610DC44E46ed1412f424BF2719F24b70cb657d",
+      "oracle": "0xF094b0124545231d923380803f21bE453121BB92",
+      "lltv_wad": "770000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "META",
+      "tier": "weekday",
+      "market_id": "0x2ec5d2bbbf982586cdefece7715d36d551847bf1e7cbc6e8c3c16c8c897c8062",
+      "collateral": "0xc7bA7539cB6755add50E218e0e090274dE72472b",
+      "oracle": "0x0d0dA945265DEc89573470F35A1Df079ADE6cB7D",
+      "lltv_wad": "915000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "META",
+      "tier": "middle",
+      "market_id": "0x58bbcf97b418c6c9474fc0604e45db49b48585143dabb2dbf1086a26931e9b8c",
+      "collateral": "0xc7bA7539cB6755add50E218e0e090274dE72472b",
+      "oracle": "0x0d0dA945265DEc89573470F35A1Df079ADE6cB7D",
+      "lltv_wad": "860000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "META",
+      "tier": "weekend",
+      "market_id": "0x8c601160371ef48ae4b00f7fd7b2b53a3da41d030aa2c130bbbfa3e1c9ed53da",
+      "collateral": "0xc7bA7539cB6755add50E218e0e090274dE72472b",
+      "oracle": "0x0d0dA945265DEc89573470F35A1Df079ADE6cB7D",
+      "lltv_wad": "770000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "SGOV",
+      "tier": "weekday",
+      "market_id": "0x7db1651e6c74bac48a26a5dc032f131b9a3ffdb3be5472af3a46f222ec37bdf4",
+      "collateral": "0xAEBfc9655B7EA5D136ac52F3F47236127CE1213E",
+      "oracle": "0x191ef0f7599d4A6f25B70d4B520A324ef0586f51",
+      "lltv_wad": "915000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "SGOV",
+      "tier": "middle",
+      "market_id": "0xf0f4c0d01ed97507f91551dad75ee9a9f178206b9afe58b695c3ea70848ec9ff",
+      "collateral": "0xAEBfc9655B7EA5D136ac52F3F47236127CE1213E",
+      "oracle": "0x191ef0f7599d4A6f25B70d4B520A324ef0586f51",
+      "lltv_wad": "860000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "SGOV",
+      "tier": "weekend",
+      "market_id": "0xc83075b6da554a634835f16925a1741e7d4d63808f55dc2473e3093f4569817e",
+      "collateral": "0xAEBfc9655B7EA5D136ac52F3F47236127CE1213E",
+      "oracle": "0x191ef0f7599d4A6f25B70d4B520A324ef0586f51",
+      "lltv_wad": "770000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "USO",
+      "tier": "weekday",
+      "market_id": "0x576b8e9fffddb1f5ca286516da16d981934597306ff0c27dcfd81d4635143b3a",
+      "collateral": "0x896FCc68C2014Ad86b7D7eE8Bb7B46CB3D13B24d",
+      "oracle": "0x2937978c2D94253AA8C4150Ab2445aDcFDBF43Da",
+      "lltv_wad": "915000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "USO",
+      "tier": "middle",
+      "market_id": "0xdfb9d5dc4ec33e6c5310c9949fb3365e927ec8b10bf57eb0586480af6c0ef741",
+      "collateral": "0x896FCc68C2014Ad86b7D7eE8Bb7B46CB3D13B24d",
+      "oracle": "0x2937978c2D94253AA8C4150Ab2445aDcFDBF43Da",
+      "lltv_wad": "860000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    },
+    {
+      "symbol": "USO",
+      "tier": "weekend",
+      "market_id": "0x9f7ad831fe48edf8d6d424b50bbd1d14fe5d7e084f4a262ac20db8a0347a274a",
+      "collateral": "0x896FCc68C2014Ad86b7D7eE8Bb7B46CB3D13B24d",
+      "oracle": "0x2937978c2D94253AA8C4150Ab2445aDcFDBF43Da",
+      "lltv_wad": "770000000000000000",
+      "loan_token": "0xd7E9A7FA8eF842fc785309fcF6a2e0F463b8cb6c",
+      "irm": "0x3BC1B8a32ca40320Baf2b1591a393EB6a2C0b6Bc"
+    }
+  ]
+}

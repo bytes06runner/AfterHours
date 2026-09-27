@@ -250,6 +250,10 @@ Hosting (engine on Render, web app on Vercel), every environment variable, testn
 - **Not audited.** The contracts we wrote are small (the registry and simulated tokens), and the
   vault and markets are Morpho's, but nothing here has had a security review.
 
+## Future work
+
+- Use the real testnet Stock Tokens the Robinhood Chain faucet hands out (TSLA, AMZN, PLTR, NFLX, AMD) as testnet collateral instead of simulated ones.
+
 ## Prior work
 
 This repository was started on 2026-09-26, during the hackathon (it opened on 2026-09-14). No

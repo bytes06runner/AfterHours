@@ -58,3 +58,21 @@ def test_live_views_find_stock_tokens_on_a_testnet_profile(
     cfg = load_config(load_env_file=False)
     assert stock_token_tickers(cfg)[0] == []
     assert len(stock_token_tickers(cfg, cfg.live.discovery_profile)[0]) > 0
+
+
+def test_curator_top_up_sends_only_what_is_missing() -> None:
+    from afterhours.deploy import top_up
+
+    balances = {"curator": 0}
+    sent: list[int] = []
+
+    def send(address: str, wei: int) -> None:
+        sent.append(wei)
+        balances[address] += wei
+
+    target = int(load_config(load_env_file=False).funding.curator_eth * 10**18)
+    assert top_up(balances.__getitem__, send, "curator", target) == target
+    assert top_up(balances.__getitem__, send, "curator", target) == 0  # enough: no transfer
+    balances["curator"] = target - 7
+    assert top_up(balances.__getitem__, send, "curator", target) == 7
+    assert sent == [target, 7]

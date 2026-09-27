@@ -910,6 +910,11 @@
           "title": "Allocator Eth",
           "type": "number"
         },
+        "curator_eth": {
+          "exclusiveMinimum": 0,
+          "title": "Curator Eth",
+          "type": "number"
+        },
         "faucet_profile": {
           "title": "Faucet Profile",
           "type": "string"
@@ -922,6 +927,7 @@
       },
       "required": [
         "allocator_eth",
+        "curator_eth",
         "keep_deployer_eth",
         "faucet_profile"
       ],

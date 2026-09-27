@@ -28,9 +28,17 @@ for role in DEPLOYER_PK CURATOR_PK ALLOCATOR_PK GUARDIAN_PK; do
   key=$(jq -r "$w | .private_key" <<<"$json"); addr=$(jq -r "$w | .address" <<<"$json")
   export "$role=$key"
   eval "addr_$role=$addr"  # bash 3.2 (macOS) has no associative arrays
-  cast rpc anvil_setBalance "$addr" 0x56BC75E2D63100000 --rpc-url "$node" >/dev/null  # 100 fork ETH
+  # 100 fork ETH, except the curator: it starts at 0, as on a fresh testnet, so the deploy
+  # must top it up (funding.curator_eth) or the curation transactions fail.
+  wei=0x56BC75E2D63100000; [ "$role" = CURATOR_PK ] && wei=0x0
+  cast rpc anvil_setBalance "$addr" "$wei" --rpc-url "$node" >/dev/null
 done
 export "$rpc_env=$node"
+# The testnets suggest a 0 priority fee (eth_maxPriorityFeePerGas); Anvil suggests 1 gwei even
+# with --no-priority-fee, 100x the testnet base fee, so on the fork each seed actor gets more gas
+# money than sim.testnet_eth_per_actor. The curator top-up (funding.curator_eth) is tested as is:
+# forge prices its transactions from eth_gasPrice, which the fork keeps near the testnet's.
+export AFTERHOURS_SIM__TESTNET_ETH_PER_ACTOR=0.001
 export AFTERHOURS_PATHS__DEPLOYMENTS_DIR="$work/deployments"
 export AFTERHOURS_PATHS__STATE_DIR="$PWD/$work/state"
 $AH deploy
@@ -38,7 +46,7 @@ $AH sim seed
 $AH bot once
 for role in DEPLOYER_PK CURATOR_PK ALLOCATOR_PK GUARDIAN_PK; do
   addr_var="addr_$role"; left=$(cast balance "${!addr_var}" --rpc-url "$node" --ether)
-  echo "rehearsal: ${role%_PK} spent $(uv run --quiet python -c "print(f'{100 - float(\"$left\"):.6f}')") ETH"
+  echo "rehearsal: ${role%_PK} balance now $left ETH"
 done
 echo "rehearsal: deployment written to $work/deployments/$profile.json"
 jq '{profile, chain_id, vault: .vault.address, registry: .registry.address, markets: (.markets | length)}' "$work/deployments/$profile.json"

@@ -851,3 +851,33 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
 - Not run on the real `.env`. Checked with real `cast` against a temp file (deleted after): no
   key-shaped string in the output, 4 roles filled, mode 600. `tests/test_testnet_keys.py`: in-place
   fill, new file, never overwrite (plain, `export`, quoted and spaced forms), CLI output has no key.
+
+### 2026-09-27 Robinhood Chain Testnet vault deployed
+
+- Budget re-estimated at live gas before deploying: an rh-testnet fork run, priced with
+  `ArbGasInfo.getPricesInWei` (0.01 gwei L2 gas plus L1 data per byte). The faucet's 0.01 ETH
+  covers it. Config only: `funding.allocator_eth` 0.02 to 0.002, `funding.keep_deployer_eth`
+  0.005 to 0.001, `sim.testnet_eth_per_actor` 0.0005 to 0.00005, new `funding.curator_eth`
+  0.0005.
+- Bug found and fixed first: the curator signs 114 curation transactions during `make deploy`,
+  but nothing gave it gas (the M11 rehearsal gave every role 100 fork ETH, so it never showed).
+  `deploy` now has the deployer top the curator up to `funding.curator_eth`, only what it
+  lacks, before the deploy script runs on a real chain. `rehearse-testnet.sh` starts the curator
+  at 0 ETH, and gives fork actors more gas money because Anvil suggests a 1 gwei priority fee
+  where the testnet suggests 0. Unit test for the top-up.
+- Deployed at block `deployed_at_block` in `deployments/rh-testnet.json`: vault
+  0xD4791630C02FF7462536bAEae7BcE13c5917E6d3, registry 0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0,
+  15 markets, simulated USDG, collateral and oracles. Checked onchain: vault curator, owner,
+  guardian as sentinel and the registry's allocator are the four addresses from `.env`.
+- Real spend: deployer about 0.00034 ETH for the deploy (estimate 0.00036), curator 0.000078
+  (estimate 0.00008), allocator 0.0000134 for its first cycle (estimate 0.000014).
+- Seed: 5 lenders deposited; the seed's allocation cycle then stopped because the allocator had
+  no gas yet (the seed calls the bot before borrowers). After the allocator was funded (0.002
+  ETH, approved by the team in chat), the rest of the seed ran (allocation cycle: 3 transactions,
+  4 reason cards; 6 borrowers, 1,233,445 simulated USDG borrowed), without depositing the
+  lenders twice.
+- One bot cycle afterwards (`bot once`): nothing to change, no transaction, no new reason.
+- Reason cards verified onchain: 4 `ReasonLogged` events (seq 1 to 4); for each, the hash
+  recomputed from the stored card equals the event's `reasonHash` (`explain/verify.py`).
+- Balances after: deployer 0.0066 ETH, allocator 0.00199, curator 0.00042, guardian 0.
+- README: one future-work line on using the faucet's real testnet Stock Tokens as collateral.
