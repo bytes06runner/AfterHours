@@ -216,7 +216,7 @@ Other commands: `make report` regenerates the gap study, model and backtest; `ma
 | Where | Status |
 | --- | --- |
 | Local chain (Anvil) | `make demo`; addresses in `deployments/local.json` |
-| Robinhood Chain testnet | Rehearsed on a fork of the testnet (`scripts/rehearse-testnet.sh rh-testnet`); live deployment waits on funded testnet keys |
+| Robinhood Chain testnet | Deployed 2026-09-27 (`deployments/rh-testnet.json`), simulated USDG, collateral and oracles: vault [`0xD4791630C02FF7462536bAEae7BcE13c5917E6d3`](https://explorer.testnet.chain.robinhood.com/address/0xD4791630C02FF7462536bAEae7BcE13c5917E6d3), reason registry [`0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0`](https://explorer.testnet.chain.robinhood.com/address/0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0) |
 | Arbitrum Sepolia | Rehearsed the same way; live deployment waits on funded testnet keys |
 | Robinhood Chain mainnet | Not deployed. Needs an explicit go from the team and an archive RPC for the pinned fork tests |
 

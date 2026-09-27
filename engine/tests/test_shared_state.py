@@ -218,3 +218,30 @@ def test_free_render_blueprint(cfg: AfterhoursConfig) -> None:
     assert {cfg.alerts.webhook_secret_env, cfg.state.kv_url_env, cfg.state.kv_token_env} <= keys
     # The free API never signs: no private key at all.
     assert not keys & (NEVER_HOSTED | {"ALLOCATOR_PK"})
+
+
+def test_copy_local_history_to_shared(tmp_path: Any, cfg: AfterhoursConfig) -> None:
+    from afterhours.state import Store, copy_to_shared
+
+    src = Store(tmp_path)
+    for i in range(3):
+        src.emit("plan_changed", {"n": i})
+    for card in ({"id": "first"}, {"id": "second"}):
+        src.add_reason(card)
+    src.write("plan", {"allocation": [1]})
+    (tmp_path / "cycle.lock").write_text("")  # locks are not copied
+
+    up = FakeUpstash()
+    dst = KVStore(up.kv(), "rh-testnet", cfg)
+    assert copy_to_shared(src, dst, dry_run=True) == {"events": 3, "reasons": 2, "documents": 1}
+    assert up.data == {}  # a dry run writes nothing
+    assert copy_to_shared(src, dst) == {"events": 3, "reasons": 2, "documents": 1}
+
+    fresh = KVStore(up.kv(), "rh-testnet", cfg)  # what the hosted API sees
+    assert fresh.events_since(0)[0] == src.events_since(0)[0]  # same events, same timestamps
+    assert [c["id"] for c in fresh.reasons()] == ["second", "first"]  # newest first, as locally
+    assert fresh.read("plan") == {"allocation": [1]}
+    assert not [k for k in up.data if "lock" in k]
+    with pytest.raises(ValueError, match="already has history"):
+        copy_to_shared(src, dst)  # a second run cannot duplicate
+    assert fresh.events_end() == 3

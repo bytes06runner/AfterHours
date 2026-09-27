@@ -27,7 +27,7 @@ WEB := pnpm --filter @afterhours/web
 
 NAME ?= closing_bell
 
-.PHONY: help setup scenario gen-schema discover verify-discovered local-chain screens lighthouse e2e fork deploy seed testnet-keys fund-allocator engine api alerts telegram-webhook web up demo report \
+.PHONY: help setup scenario gen-schema discover verify-discovered local-chain screens lighthouse e2e fork deploy seed testnet-keys fund-allocator engine api alerts telegram-webhook state-to-upstash web up demo report \
         test test-py test-web test-sol test-config test-integration lint lint-py lint-web lint-sol lint-hardcode lint-numbers
 
 help: ## List commands
@@ -88,6 +88,11 @@ testnet-keys: ## Make the four testnet keys with cast and write them into .env (
 fund-allocator: ## Testnet ETH from the deployer to the allocator: make fund-allocator PROFILE=rh-testnet
 	@test -n "$(PROFILE)" || { echo "set PROFILE=rh-testnet or PROFILE=arb-sepolia"; exit 2; }
 	$(AH) fund-allocator --profile "$(PROFILE)"
+
+state-to-upstash: ## One-time copy of local bot history into Upstash: make state-to-upstash PROFILE=rh-testnet
+	@test -n "$(PROFILE)" || { echo "set PROFILE=rh-testnet"; exit 2; }
+	$(AH) state copy-to-shared --profile "$(PROFILE)" --dry-run
+	$(AH) state copy-to-shared --profile "$(PROFILE)"
 
 telegram-webhook: ## Point Telegram at the hosted API: make telegram-webhook URL=<API URL> (token and secret from .env)
 	@test -n "$(URL)" || { echo "set URL to the API's public URL"; exit 2; }

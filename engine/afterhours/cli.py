@@ -364,6 +364,41 @@ def fund_allocator_cmd(
     typer.echo(f"allocator now has {balance('ALLOCATOR_PK') / 1e18:.6f} {unit}")
 
 
+state_app = typer.Typer(no_args_is_help=True, help="Bot history storage.")
+app.add_typer(state_app, name="state")
+
+
+@state_app.command("copy-to-shared")
+def state_copy_to_shared(
+    profile: Annotated[str, typer.Option(help="Whose history to copy, e.g. rh-testnet.")],
+    dry_run: Annotated[
+        bool, typer.Option(help="Count what would be copied; write nothing.")
+    ] = False,
+) -> None:
+    """One-time: copy a profile's local bot history (events, reason cards, plan) into Upstash."""
+    from afterhours.kv import kv_from_config
+    from afterhours.state import KVStore, Store, copy_to_shared
+
+    cfg = load_config()
+    kv = kv_from_config(cfg)
+    if kv is None:
+        raise typer.BadParameter(
+            f"set {cfg.state.kv_url_env} and {cfg.state.kv_token_env} in .env first"
+        )
+    root = cfg.path(cfg.paths.state_dir) / profile
+    if not root.is_dir():
+        raise typer.BadParameter(f"no local history for {profile} at {root}")
+    try:
+        n = copy_to_shared(Store(root), KVStore(kv, profile, cfg), dry_run=dry_run)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from None
+    verb = "would copy" if dry_run else "copied"
+    typer.echo(
+        f"{verb} {n['events']} events, {n['reasons']} reason cards and "
+        f"{n['documents']} documents for {profile}"
+    )
+
+
 alerts_app = typer.Typer(no_args_is_help=True, help="Telegram alerts (read-only, mainnet).")
 app.add_typer(alerts_app, name="alerts")
 

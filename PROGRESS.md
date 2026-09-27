@@ -881,3 +881,14 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   recomputed from the stored card equals the event's `reasonHash` (`explain/verify.py`).
 - Balances after: deployer 0.0066 ETH, allocator 0.00199, curator 0.00042, guardian 0.
 - README: one future-work line on using the faucet's real testnet Stock Tokens as collateral.
+
+### 2026-09-27 README testnet row; one-time history copy to Upstash (not run)
+
+- README Deployments: Robinhood Chain testnet row now links the vault and reason registry on the
+  testnet explorer (both pages checked, HTTP 200).
+- `afterhours state copy-to-shared --profile P [--dry-run]` and `make state-to-upstash
+  PROFILE=P` (dry run, then copy): copies local events, reason cards and documents into Upstash
+  unchanged; refuses if Upstash already has events or reasons for the profile. Test with the fake
+  Upstash: order, timestamps and newest-first reasons kept, locks skipped, second run refused.
+- Local `rh-testnet` history to copy: 20 events, 4 reason cards (registry seq 1 to 4), plan and
+  forecasts. Waits for the team to say Upstash is ready.

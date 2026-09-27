@@ -282,6 +282,17 @@ make fund-allocator PROFILE=rh-testnet
 4. Commit and push `deployments/rh-testnet.json` (public addresses only).
 5. Add `ALLOCATOR_PK` as a GitHub Actions secret (step 8). The next pre-close run cycles the
    bot, and the Ledger page on the site shows its history from Upstash.
+6. If the bot already ran on your machine before Upstash was set up (for `rh-testnet` it did:
+   the seed logged the first 4 reason cards), copy that history into Upstash once, with the
+   Upstash URL and token in `.env`:
+
+```bash
+make state-to-upstash PROFILE=rh-testnet
+```
+
+   It first prints what it would copy (a dry run), then copies events, reason cards and the plan
+   unchanged, with their original timestamps. It refuses if Upstash already has history for that
+   profile, so running it twice cannot duplicate anything.
 
 The M11 rehearsal measured nothing spent by the curator and guardian; they only need gas for
 emergency actions.

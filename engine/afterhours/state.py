@@ -254,3 +254,39 @@ class KVStore(BaseStore):
             yield
         finally:
             self.kv.cmd("EVAL", UNLOCK, 1, key, token)
+
+
+def copy_to_shared(src: Store, dst: KVStore, *, dry_run: bool = False) -> dict[str, int]:
+    """One-time copy of a profile's file history into the shared store, unchanged.
+
+    Events and reason cards keep their order and timestamps; documents (plan, forecasts, ...)
+    are copied as they are. Refuses if the shared store already has events or reasons for the
+    profile, so running it twice cannot duplicate history. Returns what was (or would be) copied.
+    """
+    events = (
+        [line for line in src.events_path.read_text().splitlines() if line.strip()]
+        if (src.events_path.exists())
+        else []
+    )
+    reasons = (
+        [line for line in src.reasons_path.read_text().splitlines() if line.strip()]
+        if (src.reasons_path.exists())
+        else []
+    )
+    docs = {p.stem: json.loads(p.read_text()) for p in sorted(src.root.glob("*.json"))}
+    counts = {"events": len(events), "reasons": len(reasons), "documents": len(docs)}
+    have = dst.kv.pipeline([["LLEN", dst._key("events")], ["LLEN", dst._key("reasons")]])
+    if any(int(n) for n in have):
+        raise ValueError(
+            f"the shared store already has history for {dst.profile} "
+            f"({have[0]} events, {have[1]} reasons); nothing copied"
+        )
+    if dry_run:
+        return counts
+    batch = 100  # keeps each request far below Upstash's 10 MB request limit
+    for key, rows in (("events", events), ("reasons", reasons)):
+        for i in range(0, len(rows), batch):
+            dst.kv.cmd("RPUSH", dst._key(key), *rows[i : i + batch])
+    for name, doc in docs.items():
+        dst.write(name, doc)
+    return counts
