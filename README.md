@@ -1,5 +1,10 @@
 # Afterhours
 
+**Live:** [after-hours-web-eta.vercel.app](https://after-hours-web-eta.vercel.app) (web app) ·
+[afterhours-api.onrender.com/v1/health](https://afterhours-api.onrender.com/v1/health) (API).
+The vault runs on Robinhood Chain Testnet with simulated tokens; the risk board and position
+checker read Robinhood Chain mainnet, read-only.
+
 A lending vault for Robinhood Stock Tokens. It lends USDG to each stock in the riskiest Morpho
 market that stock's history allows, pulls back the money borrowers are not using before nights
 that could gap past every market's cushion, and writes the reason for every move onchain.

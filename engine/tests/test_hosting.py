@@ -76,3 +76,25 @@ def test_curator_top_up_sends_only_what_is_missing() -> None:
     balances["curator"] = target - 7
     assert top_up(balances.__getitem__, send, "curator", target) == 7
     assert sent == [target, 7]
+
+
+def test_health_answers_head() -> None:
+    from fastapi.testclient import TestClient
+
+    from afterhours.api.app import create_app
+
+    client = TestClient(create_app(load_config(load_env_file=False)))
+    assert client.head("/v1/health").status_code == 200
+
+
+def test_cors_allows_the_configured_origin(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastapi.testclient import TestClient
+
+    from afterhours.api.app import create_app
+
+    cfg = load_config(load_env_file=False)
+    site = "https://site.example"
+    monkeypatch.setenv(cfg.api.cors_origins_env, f" {site} ,https://other.example")
+    client = TestClient(create_app(cfg))
+    res = client.get("/v1/config/public", headers={"Origin": site})
+    assert res.headers.get("access-control-allow-origin") == site

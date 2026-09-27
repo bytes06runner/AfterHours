@@ -898,3 +898,26 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   the same order; each card verified against its `ReasonLogged` event (seq 1 to 4, matched).
   Recommended to the team: reset the Upstash token (it was posted in chat) before putting it on
   Render and GitHub.
+
+### 2026-09-27 Production smoke test: CORS blocks the site; prices load fine
+
+- API (https://afterhours-api.onrender.com), read-only: `/v1/health` 200 (rh-testnet, chain
+  reachable), `/v1/config/public` 200, `/v1/status` 200, `/v1/prices` 200 (5 vault prices),
+  `/v1/reasons` 200 with the 4 cards from Upstash, `/v1/live/examples` 3 borrowers,
+  `/v1/live/board` 35 stocks with a price and a forecast each, positions for a live borrower
+  with tonight's forecast.
+- Yahoo's 429s in the Render logs did not leave the cache empty: all 35 forecasts load. No
+  provider change needed now.
+- Cause of "Waiting for prices from the API": CORS. Headless Chromium on the Vercel site: every
+  API call on /, /live and /positions blocked ("No 'Access-Control-Allow-Origin' header").
+  The API answers `Access-Control-Allow-Origin` for http://localhost:3000 and not for the Vercel
+  origin, which only happens when `CORS_ORIGINS` is empty in the running process: set on Render
+  after the only deploy, or not saved. Team action: set it and redeploy.
+- The API now logs a warning at start when `CORS_ORIGINS` is unset, and `/v1/health` answers
+  HEAD (uptime monitors). Tests for both.
+- Test isolation bug: `make test-py` exports .env, so after Upstash went into .env one alert test
+  wrote a fake subscription (chat 9, NVDA) and a pre-close key into the real Upstash. Bot
+  history untouched (20 events, 4 reasons). `tests/conftest.py` now clears the Upstash and
+  Telegram variables and stops .env reloading in every test. Removing the two fake records waits
+  for the team's OK.
+- README: live links at the top.

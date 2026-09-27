@@ -149,6 +149,14 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     if not origins:
         ports = [p for p in (cfg.env(e) for e in cfg.api.web_port_envs) if p]
         origins = [t.format(port=p) for p in ports for t in cfg.api.local_web_origin_templates]
+        # On a host this means every browser call from the web app will be refused.
+        log.warning(
+            "%s is not set: only local web origins may call this API (%s)",
+            cfg.api.cors_origins_env,
+            ", ".join(origins),
+        )
+    else:
+        log.info("CORS origins: %s", ", ".join(origins))
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -165,7 +173,8 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
         if not ctx.chain_clock:
             raise HTTPException(403, "Simulation endpoints run only on fork and local chains.")
 
-    @app.get("/v1/health")
+    # HEAD too: uptime monitors often probe with HEAD.
+    @app.api_route("/v1/health", methods=["GET", "HEAD"])
     def health() -> dict[str, Any]:
         chain: dict[str, Any] = {
             "profile": cfg.active_profile,
