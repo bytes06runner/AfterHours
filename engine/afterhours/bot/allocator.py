@@ -74,7 +74,7 @@ class Allocator:
         self.w3 = connect(cfg.node_url(self.profile))
         self.store = Store.for_profile(cfg)
         self.risk = LiveRisk(cfg, make_cache(cfg))
-        keys = role_keys(cfg, self.profile)
+        keys = role_keys(cfg, self.profile, ("ALLOCATOR_PK",))
         self.allocator = Signer(self.w3, keys["ALLOCATOR_PK"])
         self.tiers = deployed_tiers(self.deployment)
         self.tier_names = [t.name for t in self.tiers]

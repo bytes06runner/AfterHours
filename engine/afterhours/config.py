@@ -35,6 +35,7 @@ HttpUrlStr = Annotated[str, StringConstraints(pattern=r"^https?://")]
 EnvName = Annotated[str, StringConstraints(pattern=r"^[A-Z][A-Z0-9_]*$")]
 Fraction = Annotated[float, Field(ge=0, le=1)]
 PositiveInt = Annotated[int, Field(gt=0)]
+PositiveFloat = Annotated[float, Field(gt=0)]
 
 
 class _Strict(BaseModel):
@@ -412,6 +413,11 @@ class LiveConfig(_Strict):
     examples: PositiveInt
 
 
+class FundingConfig(_Strict):
+    allocator_eth: PositiveFloat
+    keep_deployer_eth: PositiveFloat
+
+
 class AlertsConfig(_Strict):
     webhook_env: EnvName
     telegram_api_base: HttpUrlStr
@@ -465,6 +471,7 @@ class AfterhoursConfig(BaseSettings):
     web: WebConfig
     alerts: AlertsConfig
     live: LiveConfig
+    funding: FundingConfig
 
     @classmethod
     def settings_customise_sources(

@@ -107,15 +107,21 @@ def _throwaway_keys(cfg: AfterhoursConfig) -> dict[str, str]:
     return keys
 
 
-def role_keys(cfg: AfterhoursConfig, profile: str) -> dict[str, str]:
-    """Private keys per role from the environment, or throwaway keys on local chains."""
-    env = {r: os.environ.get(r, "") for r in ROLES}
+def role_keys(
+    cfg: AfterhoursConfig, profile: str, roles: tuple[str, ...] = ROLES
+) -> dict[str, str]:
+    """Private keys for `roles` from the environment, or throwaway keys on local chains.
+
+    Ask only for the roles you sign with: the hosted bot needs ALLOCATOR_PK alone, so the
+    deployer, curator and guardian keys never have to be on the server.
+    """
+    env = {r: os.environ.get(r, "") for r in roles}
     if all(env.values()):
         return env
     if profile not in LOCAL_PROFILES_FOR_THROWAWAY_KEYS:
         missing = ", ".join(r for r, v in env.items() if not v)
         raise KeyError(f"set {missing} in .env (throwaway keys from `cast wallet new`)")
-    return _throwaway_keys(cfg)
+    return {r: k for r, k in _throwaway_keys(cfg).items() if r in roles}
 
 
 def addresses(keys: dict[str, str]) -> dict[str, str]:

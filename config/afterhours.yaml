@@ -331,6 +331,13 @@ live:
   examples: 3                          # live borrower addresses offered as examples in the checker
 
 # Telegram alerts (core.telegram.org/bots/api: https://api.telegram.org/bot<token>/METHOD_NAME).
+# Testnet gas for the allocator (`make fund-allocator PROFILE=...`): the deployer sends it, so only
+# the deployer needs faucet ETH. The M11 rehearsal measured 0.0013 ETH per chain for the first
+# allocation (PROGRESS.md BLOCKED 2b); 0.02 covers many rebalances.
+funding:
+  allocator_eth: 0.02
+  keep_deployer_eth: 0.005             # refuse if the deployer would be left with less than this
+
 alerts:
   webhook_env: ALERT_WEBHOOK_URL
   telegram_api_base: https://api.telegram.org

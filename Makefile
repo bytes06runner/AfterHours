@@ -27,7 +27,7 @@ WEB := pnpm --filter @afterhours/web
 
 NAME ?= closing_bell
 
-.PHONY: help setup scenario gen-schema discover verify-discovered local-chain screens lighthouse e2e fork deploy seed engine api alerts web up demo report \
+.PHONY: help setup scenario gen-schema discover verify-discovered local-chain screens lighthouse e2e fork deploy seed fund-allocator engine api alerts web up demo report \
         test test-py test-web test-sol test-config test-integration lint lint-py lint-web lint-sol lint-hardcode lint-numbers
 
 help: ## List commands
@@ -81,6 +81,10 @@ engine: ## Refresh market data (cached) and run the bot scheduler
 
 api: ## Start the FastAPI service
 	$(AH) api
+
+fund-allocator: ## Testnet ETH from the deployer to the allocator: make fund-allocator PROFILE=rh-testnet
+	@test -n "$(PROFILE)" || { echo "set PROFILE=rh-testnet or PROFILE=arb-sepolia"; exit 2; }
+	$(AH) fund-allocator --profile "$(PROFILE)"
 
 alerts: ## Telegram alert bot (read-only, mainnet); needs TELEGRAM_BOT_TOKEN in .env
 	$(AH) data fetch --stock-tokens >/dev/null

@@ -881,6 +881,27 @@
       "title": "FrozenWindow",
       "type": "object"
     },
+    "FundingConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "allocator_eth": {
+          "exclusiveMinimum": 0,
+          "title": "Allocator Eth",
+          "type": "number"
+        },
+        "keep_deployer_eth": {
+          "exclusiveMinimum": 0,
+          "title": "Keep Deployer Eth",
+          "type": "number"
+        }
+      },
+      "required": [
+        "allocator_eth",
+        "keep_deployer_eth"
+      ],
+      "title": "FundingConfig",
+      "type": "object"
+    },
     "GapsConfig": {
       "additionalProperties": false,
       "properties": {
@@ -2011,6 +2032,9 @@
     "discovery": {
       "$ref": "#/$defs/DiscoveryConfig"
     },
+    "funding": {
+      "$ref": "#/$defs/FundingConfig"
+    },
     "gaps": {
       "$ref": "#/$defs/GapsConfig"
     },
@@ -2076,7 +2100,8 @@
     "api",
     "web",
     "alerts",
-    "live"
+    "live",
+    "funding"
   ],
   "title": "Afterhours configuration",
   "type": "object"

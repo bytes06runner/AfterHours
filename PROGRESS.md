@@ -26,10 +26,9 @@
       Arbitrum Sepolia. Curator and guardian: 0.001 each for emergency actions.
    c. RPC URLs are optional: without `RH_TESTNET_RPC_URL` / `ARB_SEPOLIA_RPC_URL` the engine uses
       the public RPCs recorded in `config/afterhours.yaml`.
-   d. Hosting (M11 asks for a hosted API and web app): choose where the API plus bot runs (an
-      always-on Python service with a small persistent disk for `data/`) and where the web app
-      runs (any Next.js host), then either log in to their CLIs here or tell me you will deploy
-      and I will prepare the config for that host.
+   d. Hosting: prepared for Render (engine) and Vercel (web); follow `docs/HOSTING.md`. The
+      accounts, the paid Render plan (a disk needs one) and pasting secrets into the dashboards
+      are yours.
    Then tell me in chat that it is ready and I run `PROFILE=rh-testnet make deploy seed` and the same for
    `arb-sepolia`, write the addresses to the README and point the hosted app at them.
 
@@ -764,3 +763,29 @@ Both are correct, at different blocks. Checked onchain with `cast`:
   `loan_symbol` (the token's own `symbol()`, read onchain); a WETH loan would have read "units of
   the loan token" and a liquidation price with no unit. `e2e/live.spec.ts` checks the card shows
   the onchain symbol. `make e2e` 48 passed, `make test-py` 60 passed, lints clean.
+
+### 2026-09-27 Hosting config and guide (feature freeze: hosting and docs only)
+
+- `docs/HOSTING.md`: Render for the engine (API, bot, alerts in one service with one disk) and
+  Vercel for `web/`, every environment variable per service, testnet faucets and RPCs, and the
+  order to do it in. Platform facts checked in Render's and Vercel's docs on 2026-09-27.
+- `render.yaml` (Blueprint): Python runtime, build `uv sync --frozen --no-dev`, start
+  `./scripts/serve.sh`, health `/v1/health`, plan `1c-2g` (measured: API about 240 MB, bot about
+  150 MB), disk at `/var/data`. State and cache paths move onto the disk through
+  `AFTERHOURS_PATHS__STATE_DIR` and `AFTERHOURS_DATA__CACHE_DIR` (config overrides).
+- `scripts/serve.sh`: binds `0.0.0.0:$PORT`, refreshes prices, starts the bot and alerts only
+  when their key and deployment exist, restarts them if they exit. Tested locally with
+  `PORT=8123`: listened on `*:8123`, `/v1/health` 200, state written to the override path.
+- Least privilege: the bot now asks only for `ALLOCATOR_PK` (`role_keys(..., roles)`), so the
+  deployer, curator and guardian keys never go to the server.
+- `make fund-allocator PROFILE=...`: the deployer sends `funding.allocator_eth` (0.02) to the
+  allocator; testnet profiles only, chain id checked, keeps `funding.keep_deployer_eth`, asks
+  first, keys never on a command line. Tested on an Anvil fork of Robinhood Chain Testnet with
+  throwaway keys: refused at 0.01 ETH, sent 0.02 at 1 ETH, refused `rh-mainnet` and `local`.
+- On `rh-testnet` and `arb-sepolia` without a deployment, `/v1/health` is 200, the live board
+  works and `/v1/vault` answers 404 "No deployment for this profile yet".
+- Web: a production build with no API URL prerenders static pages; with
+  `NEXT_PUBLIC_API_BASE_URL` set, every page renders per request. The guide says to set it
+  before the first Vercel build.
+- `engine/tests/test_hosting.py`: disk paths, required secrets, no deployer key on Render, bot
+  key scope. `make test-py` 63 passed, `make lint` clean.

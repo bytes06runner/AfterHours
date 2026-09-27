@@ -225,6 +225,9 @@ Vault V2 themselves, with simulated USDG, Stock Tokens and oracles. On mainnet t
 the real Morpho, USDG, Stock Token and Chainlink addresses found in M1 discovery
 (`deployments/fork.discovered.json`), each verified onchain.
 
+Hosting (engine on Render, web app on Vercel), every environment variable, testnet faucets and
+`make fund-allocator`: [docs/HOSTING.md](docs/HOSTING.md).
+
 ## Limitations
 
 - **Simulation.** The demo runs on a local chain with simulated tokens and prices, replaying the

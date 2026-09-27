@@ -1,0 +1,51 @@
+# Render Blueprint for the Afterhours engine: API, allocator bot and Telegram alerts in one web
+# service with one persistent disk. Step by step: docs/HOSTING.md. Field names from
+# render.com/docs/blueprint-spec (checked 2026-09-27).
+services:
+  - type: web
+    name: afterhours-engine
+    runtime: python
+    # Measured locally: the API uses about 240 MB and the bot about 150 MB of memory, so the
+    # 512 MB instance is too small for the API, bot and alerts together.
+    plan: 1c-2g
+    # No rootDir: uv.lock, config/, artifacts/ and deployments/ are at the repository root.
+    buildCommand: uv sync --frozen --no-dev
+    startCommand: ./scripts/serve.sh
+    healthCheckPath: /v1/health
+    # Only files under the mount path survive restarts and deploys (render.com/docs/disks).
+    disk:
+      name: afterhours-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      # Persistent paths on the disk (override paths.state_dir and data.cache_dir in config).
+      - key: AFTERHOURS_PATHS__STATE_DIR
+        value: /var/data/state
+      - key: AFTERHOURS_DATA__CACHE_DIR
+        value: /var/data/cache
+      # Which vault the site shows: rh-testnet or arb-sepolia, after `make deploy` for it.
+      - key: AFTERHOURS_ACTIVE_PROFILE
+        sync: false
+      # The web app's origin(s), comma separated (docs/HOSTING.md section 4).
+      - key: CORS_ORIGINS
+        sync: false
+      # Guards the demo-only /v1/sim endpoints, which refuse to run off the local chain anyway.
+      - key: ADMIN_TOKEN
+        generateValue: true
+      # Secrets and optional values: Render asks for each one when you create the Blueprint.
+      - key: ALLOCATOR_PK
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: RH_MAINNET_RPC_URL
+        sync: false
+      - key: RH_TESTNET_RPC_URL
+        sync: false
+      - key: ARB_SEPOLIA_RPC_URL
+        sync: false
+      - key: ALERT_WEBHOOK_URL
+        sync: false
+      - key: FINNHUB_API_KEY
+        sync: false
+      - key: ALPHAVANTAGE_API_KEY
+        sync: false

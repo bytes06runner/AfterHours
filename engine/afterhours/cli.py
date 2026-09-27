@@ -252,6 +252,55 @@ def bot_run() -> None:
     BotScheduler(load_config()).run()
 
 
+@app.command("fund-allocator")
+def fund_allocator_cmd(
+    profile: Annotated[str, typer.Option(help="A testnet profile: rh-testnet or arb-sepolia.")],
+    yes: Annotated[bool, typer.Option("--yes", help="Send without asking.")] = False,
+) -> None:
+    """Send testnet ETH from the deployer to the allocator (keys from .env, never printed)."""
+    from eth_utils.address import to_checksum_address
+
+    from afterhours.chain.rpc import connect
+    from afterhours.chain.tx import Signer
+    from afterhours.deploy import addresses, role_keys
+
+    cfg = load_config()
+    prof = cfg.profiles.get(profile)
+    chain = cfg.chains[prof.chain] if prof else None
+    # Testnets only: a chain with a faucet, no local node, no mainnet go required.
+    testnet = bool(chain and chain.faucet_url) and not (
+        prof is None or prof.requires_human_go or prof.local_rpc_port_env
+    )
+    if not prof or not chain or not testnet:
+        raise typer.BadParameter(f"{profile} is not a testnet profile with a faucet")
+    keys = role_keys(cfg, profile, ("DEPLOYER_PK", "ALLOCATOR_PK"))
+    who = addresses(keys)
+    w3 = connect(cfg.rpc_url(profile))
+
+    def balance(role: str) -> int:
+        return int(w3.eth.get_balance(to_checksum_address(who[role])))
+
+    if chain.chain_id and int(w3.eth.chain_id) != chain.chain_id:
+        raise typer.BadParameter(f"RPC answers chain {w3.eth.chain_id}, expected {chain.chain_id}")
+    unit = chain.native_currency.symbol
+    amount = int(cfg.funding.allocator_eth * 10**18)
+    keep = int(cfg.funding.keep_deployer_eth * 10**18)
+    have = balance("DEPLOYER_PK")
+    typer.echo(f"{chain.name}: deployer {who['DEPLOYER_PK']} has {have / 1e18:.6f} {unit}")
+    typer.echo(f"allocator {who['ALLOCATOR_PK']} has {balance('ALLOCATOR_PK') / 1e18:.6f} {unit}")
+    if have < amount + keep:
+        raise typer.BadParameter(
+            f"the deployer needs at least {(amount + keep) / 1e18} {unit}: "
+            f"fund it at {chain.faucet_url}"
+        )
+    if not yes and not typer.confirm(f"Send {amount / 1e18} {unit} to the allocator?"):
+        raise typer.Exit(1)
+    sent = Signer(w3, keys["DEPLOYER_PK"]).transfer(who["ALLOCATOR_PK"], amount)
+    link = f"{chain.explorer_url}/tx/{sent.tx_hash}" if chain.explorer_url else sent.tx_hash
+    typer.echo(f"sent: {link}")
+    typer.echo(f"allocator now has {balance('ALLOCATOR_PK') / 1e18:.6f} {unit}")
+
+
 alerts_app = typer.Typer(no_args_is_help=True, help="Telegram alerts (read-only, mainnet).")
 app.add_typer(alerts_app, name="alerts")
 
