@@ -104,6 +104,10 @@ All of these are live at [after-hours-web-eta.vercel.app](https://after-hours-we
 | Risk board | Every Stock Token: when its feed last moved, whether it is frozen now, and tonight's bad case against each lending market's cushion | Robinhood Chain mainnet, read-only |
 | Check a position | Any address's Morpho loans against Stock Tokens: loan-to-value, liquidation price, and whether tonight's bad case reaches it | Robinhood Chain mainnet, read-only |
 
+![The live risk board: every Stock Token feed on Robinhood Chain mainnet, frozen for the weekend, with tonight's bad case](artifacts/screens/live/risk-board.png)
+
+![The position checker: a real borrower's loans with loan-to-value, liquidation price and tonight's bad case](artifacts/screens/live/position-checker.png)
+
 Session and forecast times show in New York time and in the visitor's own time zone. Wallets
 connect through RainbowKit (browser wallets and WalletConnect); nothing on mainnet is ever
 signed.
@@ -135,6 +139,8 @@ Option B is what Afterhours runs now (above). B was defined after those held-out
 seen; its settings were then tuned on 2017 to 2021 and evaluated once on the same held-out years,
 the second evaluation on that window. Details and every run: `artifacts/backtest/option_a.json`,
 `artifacts/backtest/option_b.json`, and [PROGRESS.md](PROGRESS.md).
+
+![The report card: the rule written before running, the recorded result, and the policy that ships](artifacts/screens/live/report-card.png)
 
 **The 5 vault stocks** (NVDA, SPY, META, SGOV, USO):
 

@@ -954,3 +954,11 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   profiles, button shown only on local), so the deposit is recorded locally.
 - Checks: `make test-py` 91 passed, web 25, `make e2e` 48 passed (all 12 live tests pass), lint
   clean.
+- After deploy (`956aa59` on Render): the board answered "still reading" within seconds, then a
+  full board (35 stocks, 35 forecasts) about 97 s later. Production smoke test: health, config,
+  status, prices, vault, reasons (4 cards), board, examples, positions (22.8 s, inside the
+  budget) and report card all 200 with the Vercel origin allowed; HEAD /v1/health 200.
+  Screenshots retaken from production (report card, risk board, position checker), each with the
+  badge showing the real session ("Afterhours, opens in ...").
+- Two text fixes seen in the screenshots: "(1 markets)" now "(1 market)"; no space before the
+  comma in the live label.

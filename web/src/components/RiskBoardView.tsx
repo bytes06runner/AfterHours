@@ -79,7 +79,8 @@ function Markets({ r }: { r: Row }) {
   if (r.breached.length === 0)
     return (
       <span className="text-[14px]">
-        Within every market&apos;s cushion ({r.markets.length} markets)
+        Within every market&apos;s cushion ({r.markets.length}{" "}
+        {r.markets.length === 1 ? "market" : "markets"})
       </span>
     );
   const worst = r.markets.filter((m) => r.breached.includes(m.lltv));

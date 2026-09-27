@@ -9,10 +9,13 @@ export function LiveLabel({ block }: { block?: number }) {
   return (
     <p className="badge !border-safe">
       <span aria-hidden="true" className="live-dot" />
-      Live{network ? `: ${network} mainnet` : ""}, read-only
-      {block !== undefined && (
-        <span className="font-normal">, block {block.toLocaleString("en-US")}</span>
-      )}
+      {/* One span: the badge's flex gap would otherwise put a space before the comma. */}
+      <span>
+        Live{network ? `: ${network} mainnet` : ""}, read-only
+        {block !== undefined && (
+          <span className="font-normal">, block {block.toLocaleString("en-US")}</span>
+        )}
+      </span>
     </p>
   );
 }
