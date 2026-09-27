@@ -33,7 +33,7 @@
    Then tell me in chat that it is ready and I run `PROFILE=rh-testnet make deploy seed` and the same for
    `arb-sepolia`, write the addresses to the README and point the hosted app at them.
 
-3. **WalletConnect project ID (phone wallets and QR codes).** Browser-extension wallets work
+3. **Resolved 2026-09-27: WalletConnect project ID set in `.env` (git-ignored).** Was: Browser-extension wallets work
    without it (Brave Wallet, Rabby, Phantom, Coinbase Wallet, MetaMask and any wallet that
    announces itself through EIP-6963). Phone wallets and the WalletConnect QR code need a free
    project ID from Reown (the WalletConnect cloud dashboard). Please create one and set
@@ -676,4 +676,19 @@ Reported: in Brave, choosing "Browser Wallet" left the modal spinning with no wa
 - Testnet and mainnet: "Switch to <chain name>" and a link to the chain's faucet from config.
 - Evidence: `e2e/wallet-stuck.spec.ts` (a wallet that never answers gets the hint) passes; the
   full suite passes.
+
+### 2026-09-27 WalletConnect enabled; QR crash fixed
+
+- The team supplied a WalletConnect (Reown) project ID; it is in `.env` as
+  `NEXT_PUBLIC_WC_PROJECT_ID` (git-ignored, never committed). The modal now also lists MetaMask,
+  Rainbow, OKX Wallet and WalletConnect.
+- With QR wallets on, the page crashed ("RangeError: invalid border=0"). Cause: RainbowKit 2.2.11
+  (the latest) draws QR codes with `cuer@0.0.3`, which accepts any `qr` 0.x and passes border 0;
+  `qr@0.7.0` (and 0.6.0) reject a zero border, `qr@0.5.5` accepts it. Fixed with a pnpm override
+  (`cuer>qr: 0.5.5`) in the root `package.json`.
+- Verified: the Rainbow option shows a WalletConnect pairing QR with no page errors (which also
+  confirms the relay accepts the project ID). New test in `e2e/wallet-stuck.spec.ts`; `make e2e`
+  38 passed.
+- Hosting note: the web host needs the same `NEXT_PUBLIC_WC_PROJECT_ID`, and if the Reown project
+  has a domain allowlist, the hosted domain must be on it.
 

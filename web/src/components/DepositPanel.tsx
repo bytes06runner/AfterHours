@@ -113,8 +113,8 @@ export default function DepositPanel({ vault }: { vault: Vault | undefined }) {
         <ConnectButton label="Connect" chainStatus="none" showBalance={false} />
         {pub.profile === "local" ? (
           <p className="text-[14px]">
-            Local simulation: your wallet will be asked to add {pub.chain.name} (chain id{" "}
-            {pub.chain.chain_id}), then use the test USDG faucet here.
+            Local simulation: your wallet will be asked to add the local chain, chain id{" "}
+            {pub.chain.chain_id}. Then use the test USDG faucet here.
           </p>
         ) : (
           <p className="text-[14px]">
