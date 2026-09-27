@@ -288,6 +288,30 @@ def bot_run() -> None:
     BotScheduler(load_config()).run()
 
 
+@app.command("testnet-keys")
+def testnet_keys_cmd() -> None:
+    """Make the four testnet keys with `cast wallet new` and write them into .env.
+
+    Prints roles and addresses only, never a key. Refuses if any role already has a key.
+    """
+    from afterhours.deploy import write_testnet_keys
+
+    cfg = load_config(load_env_file=False)
+    env_path = cfg.path(cfg.paths.env_file)
+    try:
+        who = write_testnet_keys(env_path)
+    except KeyError as exc:
+        raise typer.BadParameter(str(exc.args[0])) from None
+    typer.echo(f"Wrote 4 new testnet keys to {env_path.name} (not shown). Addresses:")
+    for role, address in who.items():
+        typer.echo(f"  {role.removesuffix('_PK').lower():<10} {address}")
+    prof = cfg.profiles[cfg.funding.faucet_profile]
+    chain = cfg.chains[prof.chain]
+    typer.echo(f"\nNext: fund the deployer on {chain.name} (docs/HOSTING.md step 9).")
+    typer.echo(f"Faucet:           {chain.faucet_url}")
+    typer.echo(f"Deployer address: {who['DEPLOYER_PK']}")
+
+
 @app.command("fund-allocator")
 def fund_allocator_cmd(
     profile: Annotated[str, typer.Option(help="A testnet profile: rh-testnet or arb-sepolia.")],

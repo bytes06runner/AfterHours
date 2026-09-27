@@ -18,9 +18,9 @@
    there: the deployer spent 0.0065 ETH (Robinhood testnet) and 0.0066 ETH (Arbitrum Sepolia),
    the allocator 0.0013 ETH per chain for the first allocation; curator and guardian nothing.
    Please:
-   a. Run `cast wallet new` four times and put the private keys in `.env` as `DEPLOYER_PK`,
-      `CURATOR_PK`, `ALLOCATOR_PK`, `GUARDIAN_PK` (testnet only; the same keys can serve both
-      testnets). I never read `.env`.
+   a. Run `make testnet-keys` in your own terminal: it writes `DEPLOYER_PK`, `CURATOR_PK`,
+      `ALLOCATOR_PK`, `GUARDIAN_PK` into `.env` and prints only their addresses and the faucet
+      link (testnet only; the same keys can serve both testnets). I never read `.env`.
    b. Fund from each chain's official faucet: deployer at least 0.02 testnet ETH and allocator
       at least 0.02 (the bot pays gas for every rebalance), on Robinhood Chain testnet and on
       Arbitrum Sepolia. Curator and guardian: 0.001 each for emergency actions.
@@ -840,3 +840,14 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   `alerts check` skips with a message when the Telegram token is not set yet, so scheduled runs
   stay green until the secrets are added. Checked locally with no secrets: `pre-close`, `bot due`
   and `alerts check` all exit 0.
+
+
+### 2026-09-27 `make testnet-keys`
+
+- `afterhours testnet-keys` (`make testnet-keys`): four keys from `cast wallet new` written into
+  `.env` (empty `ROLE=` lines filled in place, others appended, atomic replace, mode 600). Prints
+  roles and addresses only, then the faucet URL of `funding.faucet_profile` (rh-testnet) and the
+  deployer address. Refuses, naming roles but no values, if any role already has a key.
+- Not run on the real `.env`. Checked with real `cast` against a temp file (deleted after): no
+  key-shaped string in the output, 4 roles filled, mode 600. `tests/test_testnet_keys.py`: in-place
+  fill, new file, never overwrite (plain, `export`, quoted and spaced forms), CLI output has no key.

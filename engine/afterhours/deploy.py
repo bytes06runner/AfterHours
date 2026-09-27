@@ -10,7 +10,10 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
+import tempfile
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -92,6 +95,44 @@ def cast_wallet_new() -> str:
     wallet = (doc.get("data") or doc) if isinstance(doc, dict) else doc
     key: str = (wallet[0] if isinstance(wallet, list) else wallet)["private_key"]
     return key
+
+
+def _env_value(line: str, name: str) -> str | None:
+    """The value of `name` on this .env line (quotes stripped), or None if it is another line."""
+    m = re.match(rf"^\s*(?:export\s+)?{re.escape(name)}\s*=(.*)$", line)
+    return m.group(1).strip().strip("'\"") if m else None
+
+
+def write_testnet_keys(env_path: Path, new_key: Callable[[], str] | None = None) -> dict[str, str]:
+    """Make one key per role and write them into `env_path`; return {role: address} only.
+
+    Refuses (KeyError naming the roles, never the values) if any role already has a value, so
+    no key is ever overwritten. Empty `ROLE=` lines (from .env.example) are filled in place;
+    missing ones are appended. The file is replaced atomically and left readable by you only.
+    """
+    lines = env_path.read_text().splitlines() if env_path.exists() else []
+    taken = [r for r in ROLES if any(_env_value(line, r) for line in lines)]
+    if taken:
+        raise KeyError(
+            f"{', '.join(taken)} already set in {env_path.name}; not overwriting any key"
+        )
+    make = new_key or cast_wallet_new
+    keys = {role: make() for role in ROLES}
+    for role, key in keys.items():
+        at = next((i for i, line in enumerate(lines) if _env_value(line, role) == ""), None)
+        if at is None:
+            lines.append(f"{role}={key}")
+        else:
+            lines[at] = f"{role}={key}"
+    fd, tmp = tempfile.mkstemp(dir=env_path.parent, prefix=".env.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:  # mkstemp creates the file readable by you only
+            f.write("\n".join(lines) + "\n")
+        os.replace(tmp, env_path)
+    except BaseException:
+        Path(tmp).unlink(missing_ok=True)
+        raise
+    return addresses(keys)
 
 
 def _throwaway_keys(cfg: AfterhoursConfig) -> dict[str, str]:

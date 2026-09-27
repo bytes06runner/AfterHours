@@ -339,6 +339,7 @@ live:
 funding:
   allocator_eth: 0.02
   keep_deployer_eth: 0.005             # refuse if the deployer would be left with less than this
+  faucet_profile: rh-testnet           # `make testnet-keys` points to this testnet's faucet
 
 alerts:
   webhook_env: ALERT_WEBHOOK_URL

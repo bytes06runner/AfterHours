@@ -245,8 +245,18 @@ RPCs are rate limited:
 
 Then:
 
-1. Make four throwaway keys with `cast wallet new` and put them in `.env` as `DEPLOYER_PK`,
-   `CURATOR_PK`, `ALLOCATOR_PK`, `GUARDIAN_PK`. Testnet only.
+1. Make the four testnet keys in your own terminal:
+
+```bash
+make testnet-keys
+```
+
+   It runs `cast wallet new` four times and writes `DEPLOYER_PK`, `CURATOR_PK`,
+   `ALLOCATOR_PK` and `GUARDIAN_PK` into `.env`, readable by you only.
+   - It prints only the four addresses with their roles, never a key.
+   - It refuses if any of the four is already set, so it can never overwrite a key.
+   - It ends with the faucet link (`funding.faucet_profile` in config) and the deployer
+     address to paste there. Testnet only.
 2. Send faucet ETH to the **deployer** only. You need about 0.0315 ETH on each testnet you use:
    - 0.0065 for deploy, seed and a first cycle (measured in the M11 rehearsal);
    - 0.02 the deployer passes to the allocator (`funding.allocator_eth`);

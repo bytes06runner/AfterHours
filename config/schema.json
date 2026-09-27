@@ -910,6 +910,10 @@
           "title": "Allocator Eth",
           "type": "number"
         },
+        "faucet_profile": {
+          "title": "Faucet Profile",
+          "type": "string"
+        },
         "keep_deployer_eth": {
           "exclusiveMinimum": 0,
           "title": "Keep Deployer Eth",
@@ -918,7 +922,8 @@
       },
       "required": [
         "allocator_eth",
-        "keep_deployer_eth"
+        "keep_deployer_eth",
+        "faucet_profile"
       ],
       "title": "FundingConfig",
       "type": "object"
