@@ -82,5 +82,11 @@ test.describe("position checker", () => {
       /Tonight's bad case(,| is) a \d+(\.\d+)?% fall/,
     );
     await expect(page.getByTestId("tonight").first()).toContainText("New York");
+    // Debt is shown in the loan token's own onchain symbol, never assumed.
+    const first = new URL(page.url()).searchParams.get("address") ?? "";
+    const pos = await (await request.get(new URL(`/v1/live/positions/${first}`, API).href)).json();
+    const loan = pos.positions.find((p: { ltv?: number }) => p.ltv !== undefined);
+    await expect(card).toContainText(`You borrowed`);
+    await expect(card).toContainText(loan.loan_symbol);
   });
 });

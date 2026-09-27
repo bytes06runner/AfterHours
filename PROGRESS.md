@@ -54,6 +54,11 @@
    `NEXT_PUBLIC_PLAUSIBLE_SRC` in the web host's environment. The script loads only in production
    builds and only from `web.analytics.script_host`; nothing about it is shown to visitors.
 
+## FEATURE FREEZE (2026-09-27)
+
+From now on only bug fixes, hosting configuration and documentation changes. No new features,
+pages, endpoints, strategies, settings or backtests. Analysis stays frozen as before.
+
 ## Milestones
 
 - [x] M0 Bootstrap (2026-09-26, `d185414`)
@@ -738,3 +743,24 @@ Simulation; the new pages say "Live: Robinhood Chain mainnet, read-only, block N
   nights, restart); `e2e/live.spec.ts` (board rows match the API, filters, unreachable chain,
   invalid address, empty wallet, live borrower card with tonight's line). `make test-py` 60
   passed, `make e2e` 48 passed, lint, hardcode and numbers checks clean.
+
+### 2026-09-27 Reconciled: checker shows 99,000.81 USDG debt, numbers.json says 6,182 borrowed
+
+Both are correct, at different blocks. Checked onchain with `cast`:
+- Market 0x8b16...9c3e: `idToMarketParams` gives loan token 0x5fc5...d168 (`symbol()` "USDG",
+  "Global Dollar", 6 decimals), collateral NVDA, LLTV 62.5%. Total borrow 99,912.81 USDG; the
+  address holds 98.8e15 of 99.7e15 borrow shares, so 99,000.8 USDG. The label was right.
+- `numbers.json` (`market.usdg_borrowed`) is read at block 73,650,323 (04:22 UTC). Borrow events
+  show 0x4987...C7CB borrowing exactly 99,000 / 100,000 / 101,000 USDG in the NVDA, SPCX and AAPL
+  62.5% markets at block 73,670,925 (04:57 UTC), 35 minutes later. The same address borrowed and
+  repaid about 300,000 on 2026-09-10 and about 186,000 on 2026-09-14.
+- At block 73,832,105: 148 USDG markets, 804,927.22 supplied, 306,892.81 borrowed. The only
+  other loan token is WETH (2 markets, 2.24 WETH supplied, 0 borrowed; `by_loan_token` in
+  `artifacts/discovery/market_size.json` already lists it). No other stablecoin markets, so
+  numbers.json is unchanged.
+- The README and report card give the block with the figure. The pitch script (line 42 of
+  `docs/video/pitch.md`) says "6,182 borrowed" with no date: flagged to the team, not changed.
+- Bug fixed: the checker assumed USDG for the unit. Positions now carry `loan_token` and
+  `loan_symbol` (the token's own `symbol()`, read onchain); a WETH loan would have read "units of
+  the loan token" and a liquidation price with no unit. `e2e/live.spec.ts` checks the card shows
+  the onchain symbol. `make e2e` 48 passed, `make test-py` 60 passed, lints clean.

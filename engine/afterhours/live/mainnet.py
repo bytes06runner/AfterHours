@@ -125,6 +125,7 @@ class Mainnet:
         self._lock = threading.Lock()
         self._board: tuple[float, dict[str, Any]] | None = None
         self._decimals: dict[str, int] = {}
+        self._symbols: dict[str, str | None] = {}
         self.store = cfg.path(cfg.paths.state_dir) / "live-markets.json"
         self.borrowers = cfg.path(cfg.paths.state_dir) / "live-borrowers.json"
 
@@ -139,6 +140,15 @@ class Mainnet:
             for t, v in zip(missing, vals, strict=True):
                 self._decimals[t] = int(v) if v is not None else 18
         return {t: self._decimals[t] for t in tokens}
+
+    def symbols(self, tokens: list[str], block: int) -> dict[str, str | None]:
+        """Each token's own `symbol()`, read onchain (None if the token has none)."""
+        missing = [t for t in tokens if t not in self._symbols]
+        if missing:
+            vals = call_many(self.w3, [Call(t, "symbol()(string)") for t in missing], block=block)
+            for t, v in zip(missing, vals, strict=True):
+                self._symbols[t] = str(v) if v else None
+        return {t: self._symbols[t] for t in tokens}
 
     # ------------------------------------------------------------------ market registry
     def markets(self) -> list[Market]:
@@ -264,6 +274,7 @@ class Mainnet:
         )
         tokens = sorted({m.loan_token for m, _ in held} | {m.collateral for m, _ in held})
         dec = self.decimals(tokens, block)
+        names = self.symbols(sorted({m.loan_token for m, _ in held}), block)
         out = []
         for (m, p), st, price in zip(held, states, prices, strict=True):
             supply_shares, borrow_shares, collateral = (int(x) for x in p)
@@ -277,6 +288,8 @@ class Mainnet:
                 "symbol": m.symbol,
                 "lltv": m.lltv,
                 "loan_is_usdg": m.loan_token == self.usdg,
+                "loan_token": m.loan_token,
+                "loan_symbol": names[m.loan_token],
                 "collateral_tokens": coll,
                 "borrowed": borrowed,
                 "supplied": supplied,

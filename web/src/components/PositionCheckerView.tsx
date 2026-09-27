@@ -27,7 +27,8 @@ const num = (x: number, d = 2) => x.toLocaleString("en-US", { maximumFractionDig
 type Pos = LivePositions["positions"][number];
 
 function PositionCard({ p }: { p: Pos }) {
-  const unit = p.loan_is_usdg ? "USDG" : "units of the loan token";
+  // The loan token's own symbol, read onchain; its address if it has none.
+  const unit = p.loan_symbol ?? `of token ${short(p.loan_token)}`;
   const value = p.price !== null ? p.collateral_tokens * p.price : null;
   const seg: Record<string, string> = {
     earnings: "earnings night",
@@ -61,7 +62,7 @@ function PositionCard({ p }: { p: Pos }) {
               {num(p.collateral_tokens, 4)} {p.symbol}
             </strong>{" "}
             tokens
-            {value !== null ? `, worth ${num(value)} ${p.loan_is_usdg ? "USDG" : ""} now` : ""}.
+            {value !== null ? `, worth ${num(value)} ${unit} now` : ""}.
           </li>
         )}
         {p.borrowed === 0 && p.collateral_tokens > 0 && (
@@ -94,7 +95,7 @@ function PositionCard({ p }: { p: Pos }) {
               <li>
                 You would be liquidated if {p.symbol} fell to{" "}
                 <strong>
-                  {num(p.liquidation_price)} {p.loan_is_usdg ? "USDG" : ""}
+                  {num(p.liquidation_price)} {unit}
                 </strong>{" "}
                 per token, a <strong>{formatPct(p.drop_to_liquidation)}</strong> fall from{" "}
                 {p.price !== null ? num(p.price) : "now"}.

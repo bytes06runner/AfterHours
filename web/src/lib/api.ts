@@ -558,6 +558,8 @@ export const LivePositionsSchema = z.object({
       symbol: z.string(),
       lltv: z.number(),
       loan_is_usdg: z.boolean(),
+      loan_token: z.string(),
+      loan_symbol: z.string().nullable(),
       collateral_tokens: z.number(),
       borrowed: z.number(),
       supplied: z.number(),
