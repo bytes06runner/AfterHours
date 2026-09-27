@@ -26,9 +26,9 @@
       Arbitrum Sepolia. Curator and guardian: 0.001 each for emergency actions.
    c. RPC URLs are optional: without `RH_TESTNET_RPC_URL` / `ARB_SEPOLIA_RPC_URL` the engine uses
       the public RPCs recorded in `config/afterhours.yaml`.
-   d. Hosting: prepared for Render (engine) and Vercel (web); follow `docs/HOSTING.md`. The
-      accounts, the paid Render plan (a disk needs one) and pasting secrets into the dashboards
-      are yours.
+   d. Hosting: zero-budget setup prepared (Vercel Hobby, Render free, GitHub Actions, Upstash,
+      UptimeRobot, GoatCounter); follow `docs/HOSTING.md`. Creating the accounts and pasting
+      secrets into the dashboards are yours.
    Then tell me in chat that it is ready and I run `PROFILE=rh-testnet make deploy seed` and the same for
    `arb-sepolia`, write the addresses to the README and point the hosted app at them.
 
@@ -44,14 +44,16 @@
    a. In Telegram, message @BotFather, send `/newbot`, pick a name and a username ending in `bot`.
    b. Put the token it gives you in `.env` as `TELEGRAM_BOT_TOKEN=...` (git-ignored; I never
       read `.env`). Optionally send BotFather `/setcommands` with: watch, unwatch, list, stop, help.
-   c. Run `make alerts` (refreshes all Stock Token prices, then long-polls). It must stay running
-      to send pre-close alerts, so when hosted it runs next to the API (BLOCKED 2d).
+   c. Hosted (free setup): set `TELEGRAM_WEBHOOK_SECRET` too, and after the API is on Render run
+      `make telegram-webhook URL=<Render URL>` (docs/HOSTING.md steps 2 and 7). Pre-close alerts
+      are sent by the GitHub Actions workflow. Locally, `make alerts` still long-polls.
    Then message your bot `/watch NVDA` and tell me in chat; I will check a real round trip.
 
-5. **Plausible analytics needs your site's script URL.** Add the hosted domain as a site at
-   plausible.io, copy the script URL it shows (`https://plausible.io/js/pa-....js`) and set
-   `NEXT_PUBLIC_PLAUSIBLE_SRC` in the web host's environment. The script loads only in production
-   builds and only from `web.analytics.script_host`; nothing about it is shown to visitors.
+5. **GoatCounter analytics needs your site's count endpoint** (replaced Plausible, which is
+   paid). Sign up at goatcounter.com, pick a code, and set `NEXT_PUBLIC_GOATCOUNTER_URL` to
+   `https://<code>.goatcounter.com/count` in Vercel (docs/HOSTING.md step 10). The script loads
+   only in production builds and only from `web.analytics.script_src`; nothing is shown to
+   visitors.
 
 ## FEATURE FREEZE (2026-09-27)
 
@@ -789,3 +791,46 @@ Both are correct, at different blocks. Checked onchain with `cast`:
   before the first Vercel build.
 - `engine/tests/test_hosting.py`: disk paths, required secrets, no deployer key on Render, bot
   key scope. `make test-py` 63 passed, `make lint` clean.
+
+### 2026-09-27 Zero-budget hosting (feature freeze: hosting, bug fixes and docs only)
+
+Checked every free tier in the provider's docs (sources in `docs/HOSTING.md`). One assumption
+was wrong: Hugging Face Docker Spaces now need a paid plan (PRO) to create, so the API uses the
+named fallback, Render free. Vercel Hobby is free for non-commercial personal use only.
+
+- Web: Vercel Hobby, unchanged apart from analytics.
+- API: Render free (`render.free.yaml`, 512 MB, sleeps after 15 minutes idle). Measured from an
+  empty cache on the `rh-testnet` profile: prices for all 35 Stock Tokens, the board and the
+  borrower scan ready in 21 s, peak 366 MB (macOS `time -l`) plus about 17 MB for `uv`.
+  UptimeRobot pings `/v1/health` every 5 minutes to keep it awake.
+- Telegram: webhook mode. `POST /v1/telegram/webhook` checks `X-Telegram-Bot-Api-Secret-Token`
+  (constant-time) against `TELEGRAM_WEBHOOK_SECRET`; 404 when not configured, 403 on a bad
+  secret, 200 otherwise so Telegram does not retry. `make telegram-webhook URL=...` registers it.
+- Scheduled work: `.github/workflows/pre-close.yml`, hourly at minute 23 on weekdays; the engine
+  decides (`afterhours pre-close`). Then `bot due` (one pre-close cycle per close, if deployed)
+  and `alerts check` (once per subscription per close). `ALLOCATOR_PK` reaches only the bot step,
+  the Telegram token only the alerts step; no deployer, curator or guardian key anywhere.
+- Shared state: Upstash Redis over REST (`afterhours/kv.py`, no new dependency), used when
+  `UPSTASH_REDIS_REST_URL` and `_TOKEN` are set. Bot history (`state.py` `KVStore`: events and
+  reasons as lists, documents as keys, a lock with expiry) and Telegram subscriptions (one hash
+  field per chat, pre-close bookkeeping in its own key, so the API and the job never overwrite
+  each other). Reads cached 30 s and event checks every 30 s to stay inside 500K commands/month.
+  Chose Upstash over Neon: HTTPS with a token (no driver on a 512 MB host, no connections from
+  short jobs), key-value data, and Neon's free compute sleeps after 5 minutes.
+- Analytics: GoatCounter replaces Plausible. Script from `web.analytics.script_src`, endpoint
+  from `NEXT_PUBLIC_GOATCOUNTER_URL` on `endpoint_domain`, production only, SPA route changes
+  counted. Verified in a production build with GoatCounter blocked: one script tag,
+  `no_onload` set first, nothing sent.
+- Bugs found and fixed while measuring:
+  - On a testnet profile the live price fetch found no Stock Tokens (it read the testnet's
+    discovered file, which does not exist): 0 symbols before, 35 after (`live.discovery_profile`).
+    Test in `test_hosting.py`.
+  - Concurrent requests to `/v1/live/examples` each started a full borrower scan (the public RPC
+    answered 429 and memory reached 495 MB). Now one scan at a time; others get the cache at
+    once. The board is computed once for concurrent callers too.
+  - Prices are warmed inside the API process instead of a second Python process.
+- Tests: `tests/test_shared_state.py` (fake Upstash: history round trip, cached reads, the lock,
+  bad token, API and job not overwriting each other, webhook secret and replies, workflow and
+  Blueprint secret audits). `make test-py` 75 passed, web 25, contracts 22, `make e2e` 48,
+  `make lint` clean.
+- Paid path kept: `render.yaml` with a disk.

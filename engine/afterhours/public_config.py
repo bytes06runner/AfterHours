@@ -36,7 +36,10 @@ def public_config(cfg: AfterhoursConfig) -> dict[str, Any]:
             "network": cfg.chains[cfg.profiles[cfg.live.profile].chain].name,
             "explorer_url": cfg.chains[cfg.profiles[cfg.live.profile].chain].explorer_url,
         },
-        "analytics": {"script_host": cfg.web.analytics.script_host},
+        "analytics": {
+            "script_src": cfg.web.analytics.script_src,
+            "endpoint_domain": cfg.web.analytics.endpoint_domain,
+        },
         "exchange_calendar": cfg.data.exchange_calendar,
         "schedule": {
             "hourly": cfg.schedule.hourly,

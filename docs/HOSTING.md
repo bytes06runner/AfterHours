@@ -1,214 +1,229 @@
-# Hosting Afterhours
+# Hosting Afterhours for free
 
-This guide puts Afterhours on the internet in two parts:
+This guide puts Afterhours on the internet at no cost, step by step. You create every account
+yourself; nothing here shares a key with anyone, and no key ever goes into git.
 
-- **The engine** (API, allocator bot and Telegram alerts) runs on **Render** as one web service
-  with one persistent disk.
-- **The web app** (`web/`) runs on **Vercel**.
+Free-tier facts below were checked in each provider's own documentation on 2026-09-27. Free
+tiers change, so each section names its source page; check it again if something differs.
 
-You need accounts on both, created by you. Nothing in this guide asks you to share a key with
-anyone, and no key ever goes into git.
+## What runs where
 
-Platform facts below were checked in Render's and Vercel's documentation on 2026-09-27; each
-section names its source page.
-
-## The order, at a glance
-
-1. Optional but recommended first: deploy the testnet vault from your machine (section 6). The
-   site works without it, but the vault pages say "No deployment for this profile yet" until
-   then. The risk board, position checker and Telegram alerts work either way.
-2. Render: create the engine from `render.yaml` (section 1). Copy its URL.
-3. Vercel: create the web app with that URL (section 3). Copy the site's URL.
-4. Render: set `CORS_ORIGINS` to the site's URL (section 4). The engine restarts.
-5. Reown and Plausible: add the site's domain (section 4).
-6. Check it (section 7).
-
-## 1. Render: the engine
-
-Source: render.com/docs/blueprint-spec, render.com/docs/web-services,
-render.com/docs/python-version, render.com/docs/uv-version, render.com/docs/infrastructure-as-code.
-
-`render.yaml` at the repository root describes the service, so Render fills in most settings
-for you.
-
-| Setting | Value | Why |
+| Part | Where | Why there |
 | --- | --- | --- |
-| Root directory | none (the repository root) | Render adds uv only when `uv.lock` is in the service's root directory, and the engine reads `config/`, `artifacts/` and `deployments/` from the root. |
-| Runtime | Python | Version 3.12, from `.python-version` at the root. |
-| Build command | `uv sync --frozen --no-dev` | Installs exactly what `uv.lock` pins, without test tools. |
-| Start command | `./scripts/serve.sh` | Starts the API, then the bot and the alerts in the background. |
-| Health check path | `/v1/health` | Answers 200 when the API is up. |
-| Plan | `1c-2g` | Measured locally: the API uses about 240 MB of memory and the bot about 150 MB, so the 512 MB plan is too small for all three. Check Render's pricing page for the cost. |
-| Disk | `afterhours-data`, mounted at `/var/data`, 1 GB | See section 2. Disks need a paid plan. |
+| Web app (`web/`) | Vercel Hobby | Free Next.js hosting. |
+| API: risk board, position checker, Telegram webhook | Render free web service (`render.free.yaml`) | Free Python web service. |
+| Pre-close bot cycle (testnet vault) and pre-close Telegram alerts | GitHub Actions (`.github/workflows/pre-close.yml`) | Free for public repositories; runs hourly on weekdays. |
+| Bot history and Telegram subscriptions | Upstash Redis | Free, reached over HTTPS, so the API and the Actions job share it. |
+| Keeping the API awake | UptimeRobot | Free; calls `/v1/health` every 5 minutes. |
+| Page counts | GoatCounter | Free, no cookies, keeps aggregate counts only. |
 
-**The port.** Render requires every web service to listen on host `0.0.0.0` and gives it a
-`PORT` environment variable (10000 unless you change it). `scripts/serve.sh` sets
-`API_HOST=0.0.0.0` and `API_PORT=$PORT` before starting the API, so you do not set either on
-Render. Tested locally: with `PORT=8123`, the API listened on `*:8123` and `/v1/health`
-answered 200.
+Everything else (price cache, borrower scan, market registry) is rebuilt when the API starts,
+in the background, in about 20 seconds (measured locally from an empty cache).
 
-**What `serve.sh` starts.**
+**Keys.** The hosted pieces get only what they use:
+- Render gets the Telegram bot token, the webhook secret and the Upstash URL and token. It
+  signs nothing, so it has no private key.
+- GitHub Actions gets `ALLOCATOR_PK` for the bot step only, the Telegram bot token for the alerts
+  step only, and the Upstash URL and token.
+- `DEPLOYER_PK`, `CURATOR_PK` and `GUARDIAN_PK` never leave your `.env`.
+  `engine/tests/test_shared_state.py` fails if the workflow or `render.free.yaml` ever asks for
+  them.
 
-- The API, in the foreground. If it stops, Render restarts the service.
-- In the background: first a refresh of every Stock Token's prices (into the disk cache), then:
-  - the allocator bot, only when `ALLOCATOR_PK` is set and `deployments/<profile>.json` exists;
-  - the Telegram alerts, only when `TELEGRAM_BOT_TOKEN` is set.
+## What we checked, and what changed from the first plan
 
-  Each one restarts 30 seconds after it exits. When one is skipped, the log says why.
+| Assumption | Verdict (source) |
+| --- | --- |
+| Hugging Face Spaces free CPU with Docker | **Wrong.** Docker and Gradio Spaces now need a paid plan (PRO) to create; free accounts get Static Spaces and ZeroGPU Gradio only (huggingface.co/docs/hub/spaces-overview, huggingface.co/pricing). The API uses Render free instead, the named fallback. |
+| Render free web service | Right. 512 MB RAM and 0.1 CPU; 750 free instance hours per workspace per month, then free services are suspended until the next month; sleeps after 15 minutes without inbound traffic and wakes on the next HTTP request in about a minute; no disk, files lost on restart (render.com/docs/free; RAM from render.com/blog/free-tier). |
+| The API fits in free RAM | Right, measured. From an empty cache, the API fetched all 35 Stock Tokens' prices, built the board and scanned borrowers with a peak of 366 MB (macOS, `time -l`), plus about 17 MB for the `uv` wrapper. Linux differs a little. |
+| Telegram webhook with a secret | Right. `setWebhook` takes `secret_token` (1 to 256 characters, `A-Z a-z 0-9 _ -`), sent back in the `X-Telegram-Bot-Api-Secret-Token` header; webhooks use ports 443, 80, 88 or 8443; `getUpdates` stops working while a webhook is set (core.telegram.org/bots/api#setwebhook). |
+| GitHub Actions hourly on weekdays | Right, with limits. Free for public repositories (this one is public); private repositories on GitHub Free get 2,000 minutes a month. Scheduled runs can be delayed or dropped under load, "especially the start of every hour", so the job runs at minute 23; they run only on the default branch and are disabled after 60 days without repository activity (docs.github.com, events that trigger workflows; billing for GitHub Actions). |
+| A free database | Upstash Redis free: 256 MB data, 500,000 commands a month, 10 GB bandwidth, REST API included (upstash.com/docs/redis/overall/pricing). Free databases are archived after at least 30 days of inactivity, with warning emails and a backup you can restore (upstash.com/docs/redis/help/faq). |
+| Vercel Hobby | Right, with one condition: free, but "non-commercial, personal use only" (vercel.com/docs/plans/hobby). A hackathon demo fits; a business would need Pro. |
+| Free analytics | GoatCounter: free "for reasonable public usage", including a personal site or a small-to-medium business; stores aggregate data and no IP addresses (goatcounter.com, goatcounter.com/help/gdpr). |
+| Uptime pinger | UptimeRobot free: 50 monitors, checks every 5 minutes (uptimerobot.com/pricing). Render's free docs do not forbid keeping a service awake. |
 
-**Steps.**
+**Why Upstash Redis and not Neon Postgres.** Both have free tiers that fit. Upstash wins here
+because it is reached over plain HTTPS with a token, so:
+- the engine needs no database driver (it already uses `httpx`), which matters on a 512 MB
+  instance;
+- short GitHub Actions jobs do not open and close database connections;
+- the data is keys, lists and small JSON documents, which is what Redis stores.
 
-1. Open dashboard.render.com and click **New > Blueprint**.
-2. Click **Connect** next to the `AfterHours` repository. Pick the `main` branch. Render finds
-   `render.yaml` at the root.
-3. Render asks for every variable marked `sync: false`. Fill them in from section 5. Leave
-   optional ones empty if you do not have them.
+Neon's free compute also sleeps after 5 minutes idle and cannot be kept on (neon.com/docs,
+plans), which would add a cold start to every Telegram command.
+
+**Upstash command budget** (estimate from config, not measured):
+- The pinger reads the bot's plan once per health check: 12 an hour, about 9,000 a month.
+- A browser tab left open on the site checks for new bot events once every 30 seconds
+  (`state.event_poll_seconds`): at most about 89,000 a month, even if a tab stayed open all
+  month.
+- API reads are cached for 30 seconds (`state.read_cache_seconds`).
+- Telegram commands and the pre-close job use a few hundred a month.
+
+That is well under 500,000.
+
+**Render hours.** One service awake all month uses up to 744 hours of the 750. Do not run a
+second free Render service in the same workspace, or both will be suspended near the end of
+the month.
+
+## Before you start
+
+You need a GitHub account with this repository, and accounts on:
+- Render
+- Vercel
+- Upstash
+- UptimeRobot
+- GoatCounter
+- Telegram (for the bot)
+- Reown (for WalletConnect; you already have a project ID)
+
+All are free. Sign in with GitHub where offered. None of these steps needs a payment card.
+
+On your own machine you need the repository and `make setup` done, and a `.env` file (copy
+`.env.example`). You will add a few values to `.env` as you go.
+
+## Step 1. Upstash: the shared database
+
+1. Open console.upstash.com and create a **Redis** database. Pick the region closest to your
+   Render region.
+2. Open the database and find the **REST API** section. Copy two values:
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
+
+   The token is a secret.
+
+## Step 2. Telegram: the bot and its webhook secret
+
+1. In Telegram, message **@BotFather**, send `/newbot`, and pick a name and a username ending in
+   `bot`. BotFather replies with the token (`TELEGRAM_BOT_TOKEN`, a secret).
+2. Make a webhook secret on your machine:
+
+```bash
+openssl rand -hex 32
+```
+
+3. Put both in your local `.env` as `TELEGRAM_BOT_TOKEN=...` and `TELEGRAM_WEBHOOK_SECRET=...`.
+   You need them again in steps 3 and 7.
+
+## Step 3. Render: the API
+
+Source: render.com/docs/free, render.com/docs/blueprint-spec, render.com/docs/web-services.
+
+1. Open dashboard.render.com, click **New > Blueprint**, and click **Connect** next to the
+   `AfterHours` repository. Pick the `main` branch.
+2. In **Blueprint Path**, type `render.free.yaml`. (The default `render.yaml` is the paid setup
+   with a disk; see the end of this guide.)
+3. Render asks for each value marked `sync: false`. Fill them in from the table in section
+   "Environment variables". Leave the optional RPC URLs empty if you have none.
 4. Click **Deploy Blueprint**. The first build takes a few minutes.
-5. When it is live, copy the service URL (it ends in `onrender.com`). Check it: open
-   `<that URL>/v1/health` in a browser. You should see `"service":"ok"`.
+5. Copy the service URL (it ends in `onrender.com`) and open `<that URL>/v1/health`. You should
+   see `"service":"ok"`.
 
-Later pushes to `main` that change `render.yaml` update the service automatically. Pushes
-that change code redeploy it if auto-deploy is on in the service settings.
-
-**One thing to know.** A service with a disk stops the old instance before starting the new
-one on every deploy, so the API is down for a short moment each time (Render's disk docs).
-
-## 2. What must survive a restart
-
-Source: render.com/docs/disks and render.com/docs/free.
-
-Everything on a Render service is wiped when it restarts or redeploys, except files under the
-disk's mount path. Free services cannot have a disk, and they stop after 15 minutes without
-traffic, which would also stop the Telegram bot. So the engine needs a paid plan and a disk.
-
-Every file the engine writes while hosted:
-
-| What | File | Config key | On Render |
-| --- | --- | --- | --- |
-| Telegram subscriptions and the last update read | `<state_dir>/alerts.json` | `paths.state_dir`, `alerts.store` | `/var/data/state/alerts.json` |
-| Borrower scan for "Try a live borrower" | `<state_dir>/live-borrowers.json` | `paths.state_dir` | `/var/data/state/live-borrowers.json` |
-| Morpho market registry (mainnet) | `<state_dir>/live-markets.json` | `paths.state_dir` | `/var/data/state/live-markets.json` |
-| Bot state: plan, forecasts, reasons, event log (the Ledger page) | `<state_dir>/<profile>/` | `paths.state_dir` | `/var/data/state/rh-testnet/` |
-| Prices and earnings cache | `<cache_dir>/prices/`, `earnings/`, `manifest.json` | `data.cache_dir` | `/var/data/cache/` |
-
-Both folders are set by environment variables, which override `config/afterhours.yaml`:
-
-- `AFTERHOURS_PATHS__STATE_DIR=/var/data/state`
-- `AFTERHOURS_DATA__CACHE_DIR=/var/data/cache`
-
-`render.yaml` sets both, so you do not type them. `engine/tests/test_hosting.py` checks that
-they land under the disk's mount path. **Use mount path `/var/data`.** Render does not allow
-`/`, `/opt`, `/opt/render`, `/home`, `/home/render`, `/etc` or `/etc/secrets` themselves.
-
-What the engine only reads, from the repository:
-
-- `deployments/`: written on your machine by `make deploy`, then committed. The hosted
-  engine never deploys, so it needs no disk for these. (`AFTERHOURS_PATHS__DEPLOYMENTS_DIR`
-  moves it if you ever need to.)
-- `artifacts/` and `config/`.
-
-If the disk is lost, nothing breaks for good:
-
-- Prices are fetched again at start.
-- The market registry and borrower scan are rebuilt (the first borrower scan takes about
-  90 seconds).
-- What would be lost: Telegram subscriptions and the bot's history.
-
-## 3. Vercel: the web app
-
-Source: vercel.com/docs/monorepos, vercel.com/docs/monorepos/monorepo-faq,
-vercel.com/docs/builds/configure-a-build, vercel.com/docs/package-managers.
+What `render.free.yaml` sets:
 
 | Setting | Value |
 | --- | --- |
-| Framework preset | Next.js (detected) |
-| Root directory | `web` |
-| Include source files outside of the Root Directory | On (the default for new projects) |
-| Install command | leave the default (`pnpm install`) |
-| Build command | leave the default (`next build`, from `web/package.json`) |
-| Output directory | leave the default |
-| Node.js version | the default is fine (the app needs 20.9 or newer) |
+| Plan | `free` |
+| Root directory | none (the repository root: Render adds uv when `uv.lock` is there, and the engine reads `config/`, `artifacts/`, `deployments/`) |
+| Build command | `uv sync --frozen --no-dev` |
+| Start command | `./scripts/serve.sh` |
+| Health check path | `/v1/health` |
+| Disk | none (free services cannot have one) |
 
-**Files outside `web/` that the build needs**, all at the repository root:
+**The port.** Render requires every web service to listen on host `0.0.0.0` and passes a `PORT`
+variable (10000 by default). `scripts/serve.sh` sets `API_HOST=0.0.0.0` and `API_PORT=$PORT`,
+so do not set either yourself. With no `ALLOCATOR_PK` and a webhook secret set, it starts the
+API only.
 
-- `pnpm-lock.yaml`: Vercel picks the package manager from the lockfile at the repository root.
-  Ours is `lockfileVersion: '9.0'`, which Vercel installs with pnpm 9 or 10.
-- `pnpm-workspace.yaml`: declares `web` as a workspace package.
-- `package.json`: holds the `pnpm.overrides` entry that pins `qr` to 0.5.5. Without it the
-  wallet QR code crashes the page ("invalid border=0").
+## Step 4. Vercel: the web app
 
-That is why the setting above must stay on. The web app reads nothing else from outside
-`web/` at build or run time; it gets the configuration from the engine's
-`/v1/config/public`.
-
-**Steps.**
+Source: vercel.com/docs/monorepos, vercel.com/docs/builds/configure-a-build,
+vercel.com/docs/package-managers, vercel.com/docs/plans/hobby.
 
 1. Open vercel.com, click **Add New… > Project**, and **Import** the `AfterHours` repository.
-2. Next to **Root Directory**, click **Edit** and choose `web`.
-3. Open **Environment Variables** and add the three from section 5 (Vercel column). Set
-   `NEXT_PUBLIC_API_BASE_URL` **before** the first build. Variables starting with
-   `NEXT_PUBLIC_` are baked in when the site builds, so after changing one you must redeploy.
-   Checked locally: with the API URL set, every page renders per request; without it, the
-   pages build as static pages with no live data.
-4. Click **Deploy**. Copy the site's URL (it ends in `vercel.app` unless you add a domain).
+2. Next to **Root Directory**, click **Edit** and choose `web`. Leave **Include source files
+   outside of the Root Directory** on (the default). The build needs three files at the
+   repository root:
+   - `pnpm-lock.yaml`: Vercel picks pnpm from it.
+   - `pnpm-workspace.yaml`
+   - `package.json`: its `pnpm.overrides` keeps the wallet QR code from crashing.
+3. Leave the framework (Next.js), install command and build command at their defaults.
+4. Under **Environment Variables**, add the three Vercel values from the table below. Set
+   `NEXT_PUBLIC_API_BASE_URL` **before** the first build: `NEXT_PUBLIC_` values are baked in
+   at build time, so after changing one you must redeploy. Checked locally: with it set, every
+   page renders per request; without it, pages build as static pages with no live data.
+5. Click **Deploy** and copy the site's URL (it ends in `vercel.app`).
 
-## 4. Connect the two
+## Step 5. Connect the web app and the API
 
-1. **CORS.** In Render, set `CORS_ORIGINS` to the site's URL, for example
-   `https://your-project.vercel.app`. If you add your own domain, list both, separated by a
-   comma. Without this, the browser blocks the site's calls to the engine.
-2. **Reown (WalletConnect).** If your Reown project has a domain allowlist, add the site's
-   domain. Otherwise phone wallets and the QR code will not connect.
-3. **Plausible.** Add the site's domain at plausible.io, copy the script URL it gives you, set
-   `NEXT_PUBLIC_PLAUSIBLE_SRC` in Vercel, and redeploy. It only loads in production and only
-   from `https://plausible.io` (`web.analytics.script_host` in config). Visitors see nothing
-   about it.
+1. **CORS.** In Render, open the service's **Environment** and set `CORS_ORIGINS` to the site's
+   URL, for example `https://your-project.vercel.app` (no trailing slash). Render restarts the
+   service.
+2. **Reown.** If your Reown project has a domain allowlist, add the site's domain.
 
-## 5. Environment variables
+## Step 6. UptimeRobot: keep the API awake
 
-Never paste real values into a file in git, an issue or a chat. Put them in the host's
-dashboard, or in `.env` on your own machine.
+A free Render service sleeps after 15 minutes without traffic, and the first request after that
+waits about a minute.
 
-### Render (engine)
+1. In UptimeRobot, add a new **HTTP(s)** monitor.
+2. Set the URL to `<Render URL>/v1/health` and the interval to 5 minutes.
 
-| Name | Secret? | Where the value comes from | Example format |
-| --- | --- | --- | --- |
-| `AFTERHOURS_PATHS__STATE_DIR` | no | set by `render.yaml` | `/var/data/state` |
-| `AFTERHOURS_DATA__CACHE_DIR` | no | set by `render.yaml` | `/var/data/cache` |
-| `AFTERHOURS_ACTIVE_PROFILE` | no | your choice: the testnet whose vault the site shows | `rh-testnet` or `arb-sepolia` |
-| `CORS_ORIGINS` | no | your Vercel site's URL (section 4) | `https://your-project.vercel.app` |
-| `ADMIN_TOKEN` | yes | Render generates it (`generateValue`) | 64 hex characters |
-| `ALLOCATOR_PK` | yes | the allocator key you made with `cast wallet new` (section 6) | `0x` then 64 hex characters |
-| `TELEGRAM_BOT_TOKEN` | yes | @BotFather in Telegram, `/newbot` | `<digits>:<letters and digits>` |
-| `RH_MAINNET_RPC_URL` | yes (the URL holds your provider key) | optional; an RPC provider dashboard. Empty uses the public RPC. | `https://<provider host>/<your key>` |
-| `RH_TESTNET_RPC_URL` | yes | optional, same as above | `https://<provider host>/<your key>` |
-| `ARB_SEPOLIA_RPC_URL` | yes | optional, same as above | `https://<provider host>/<your key>` |
-| `ALERT_WEBHOOK_URL` | yes | optional; a Discord channel's webhook | `https://discord.com/api/webhooks/<id>/<token>` |
-| `FINNHUB_API_KEY` | yes | optional backup data provider (free tier) | letters and digits |
-| `ALPHAVANTAGE_API_KEY` | yes | optional backup data provider (free tier) | letters and digits |
-| `PORT` | no | Render sets it; do not add it | `10000` |
+The health check reads only cached data, so this costs almost nothing in Upstash commands.
 
-The hosted bot signs only as the allocator. It needs `ALLOCATOR_PK` and no other key.
-`DEPLOYER_PK`, `CURATOR_PK` and `GUARDIAN_PK` stay in `.env` on your machine, and
-`engine/tests/test_hosting.py` fails if `render.yaml` ever asks for them.
+If you skip this step, the site still works; the first visitor after a quiet spell waits about
+a minute. A Telegram message that arrives while the API sleeps wakes it, and Telegram retries
+the message if the first delivery fails.
 
-### Vercel (web)
+## Step 7. Telegram: point the bot at the API
 
-| Name | Secret? | Where the value comes from | Example format |
-| --- | --- | --- | --- |
-| `NEXT_PUBLIC_API_BASE_URL` | no | your Render service URL (section 1) | `https://afterhours-engine.onrender.com` |
-| `NEXT_PUBLIC_WC_PROJECT_ID` | no (browsers see it), but keep it out of git | the Project ID in your Reown dashboard | the ID string Reown shows |
-| `NEXT_PUBLIC_PLAUSIBLE_SRC` | no | your site's settings at plausible.io | `https://plausible.io/js/pa-XXXXXXXX.js` |
+On your machine, with `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` in `.env`:
 
-### Only on your machine (`.env`)
+```bash
+make telegram-webhook URL=https://your-service.onrender.com
+```
 
-| Name | Secret? | Used for |
-| --- | --- | --- |
-| `DEPLOYER_PK`, `CURATOR_PK`, `ALLOCATOR_PK`, `GUARDIAN_PK` | yes | `make deploy`, `make seed`, `make fund-allocator` |
-| `RH_TESTNET_RPC_URL`, `ARB_SEPOLIA_RPC_URL` | yes | optional, for deploys |
-| `ETHERSCAN_API_KEY` | yes | optional, contract verification |
+It calls Telegram's `setWebhook` with the secret and prints the URL Telegram now uses. Then
+message your bot `/watch NVDA`; it should answer "Following NVDA".
 
-## 6. Testnets: faucets, RPCs and funding
+- To go back to long polling on your machine (`make alerts`), run
+  `uv run afterhours alerts delete-webhook` first.
+- The two modes cannot run at once: Telegram disables `getUpdates` while a webhook is set.
+
+## Step 8. GitHub Actions: the pre-close jobs
+
+The workflow `.github/workflows/pre-close.yml` runs at minute 23 of every hour, Monday to
+Friday (UTC). Each run:
+
+1. installs the engine and asks it whether now is inside a pre-close window (the two hours
+   before an exchange close, holidays and early closes included). If not, it stops;
+2. refreshes every Stock Token's prices;
+3. runs the bot's pre-close cycle for the testnet vault, once per close, if the vault is
+   deployed;
+4. sends the Telegram pre-close alerts, once per subscription per close.
+
+Set it up:
+
+1. In GitHub, open the repository's **Settings > Secrets and variables > Actions**.
+2. Under **Secrets**, add:
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
+   - `TELEGRAM_BOT_TOKEN`
+   - optional: `RH_MAINNET_RPC_URL`, `RH_TESTNET_RPC_URL`, `ARB_SEPOLIA_RPC_URL`
+   - `ALLOCATOR_PK`, but only after step 9.
+3. Under **Variables**, add `AFTERHOURS_ACTIVE_PROFILE` = `rh-testnet` (or `arb-sepolia`).
+4. Check it: open the **Actions** tab, pick **Pre-close jobs**, and click **Run workflow**.
+   Outside a pre-close window it installs, prints `false` for the window check, and stops. That
+   is a pass.
+
+Keep the repository public, or Actions minutes count against GitHub Free's 2,000 a month. Push
+at least once every 60 days, or GitHub disables the schedule.
+
+## Step 9 (optional, for the vault). Deploy the testnet vault
+
+The site works without this; the vault pages say "No deployment for this profile yet" until
+you do it. The risk board, position checker and alerts work either way.
 
 From `config/afterhours.yaml` (`chains`):
 
@@ -220,26 +235,24 @@ From `config/afterhours.yaml` (`chains`):
 | Explorer | https://explorer.testnet.chain.robinhood.com | https://sepolia.arbiscan.io |
 | Faucet | https://faucet.testnet.chain.robinhood.com | https://arbitrum.faucet.dev |
 
-**Which RPC variables you still need.** None is required: when a profile's variable is empty,
-the engine uses the public RPC above (`rpc_url` in `engine/afterhours/config.py`). Public RPCs
-are rate limited, so:
+**RPC variables.** None is required: an empty `*_RPC_URL` means the public RPC above. Public
+RPCs are rate limited:
+- `RH_MAINNET_RPC_URL` is recommended, because the risk board, checker and alerts read mainnet.
+  The public mainnet RPC answered "429 Too Many Requests" during our local tests. It is also
+  the archive endpoint the fork runs still need (PROGRESS.md BLOCKED 1).
+- `RH_TESTNET_RPC_URL` and `ARB_SEPOLIA_RPC_URL` are optional.
+- `ARB_ONE_RPC_URL` is not used by anything hosted.
 
-- `RH_MAINNET_RPC_URL`: recommended on Render. The risk board, position checker and alerts
-  all read Robinhood Chain mainnet. It is also still needed as an archive endpoint for the
-  fork runs (PROGRESS.md BLOCKED 1).
-- `RH_TESTNET_RPC_URL`, `ARB_SEPOLIA_RPC_URL`: optional, for smoother deploys and bot runs.
-- `ARB_ONE_RPC_URL`: not needed. Nothing hosted uses Arbitrum One.
-
-**Fund one address, not four.** The deployer pays for the deploy and then sends the allocator
-its gas.
+Then:
 
 1. Make four throwaway keys with `cast wallet new` and put them in `.env` as `DEPLOYER_PK`,
    `CURATOR_PK`, `ALLOCATOR_PK`, `GUARDIAN_PK`. Testnet only.
-2. Send faucet ETH to the **deployer's** address on each testnet you use. How much, per chain:
-   - The M11 rehearsal measured 0.0065 ETH for deploy, seed and a first bot cycle.
-   - `funding.allocator_eth` sends the allocator 0.02 ETH.
-   - `funding.keep_deployer_eth` keeps 0.005 ETH back on the deployer.
-   - Total: about 0.0315 ETH, so ask the faucet for at least 0.035.
+2. Send faucet ETH to the **deployer** only. You need about 0.0315 ETH on each testnet you use:
+   - 0.0065 for deploy, seed and a first cycle (measured in the M11 rehearsal);
+   - 0.02 the deployer passes to the allocator (`funding.allocator_eth`);
+   - 0.005 kept back (`funding.keep_deployer_eth`).
+
+   Ask the faucet for at least 0.035.
 3. Deploy, seed and fund the allocator:
 
 ```bash
@@ -250,44 +263,122 @@ PROFILE=rh-testnet make deploy seed
 make fund-allocator PROFILE=rh-testnet
 ```
 
-`make fund-allocator` shows both balances and asks before sending. What it checks:
+   `make fund-allocator`:
+   - shows both balances and asks before sending;
+   - sends only on a testnet profile, and checks the RPC's chain id;
+   - keeps `funding.keep_deployer_eth` on the deployer;
+   - signs with the engine's signer, so no key appears on a command line.
 
-- It sends only on a testnet profile: the chain must have a faucet, need no mainnet go and use
-  no local node. It refuses `rh-mainnet`, `arb-one`, `local` and `fork`.
-- It checks the RPC answers with the expected chain id.
-- It refuses if the deployer would be left below `funding.keep_deployer_eth`.
+4. Commit and push `deployments/rh-testnet.json` (public addresses only).
+5. Add `ALLOCATOR_PK` as a GitHub Actions secret (step 8). The next pre-close run cycles the
+   bot, and the Ledger page on the site shows its history from Upstash.
 
-It signs with the engine's own signer, so keys stay in the environment and never appear on a
-command line. Tested on a local fork of Robinhood Chain Testnet with throwaway keys and fork
-ETH: it refused with too little ETH, then sent 0.02 ETH and the allocator's balance became
-0.02.
+The M11 rehearsal measured nothing spent by the curator and guardian; they only need gas for
+emergency actions.
 
-The curator and guardian spent nothing in the rehearsal. They only need gas for emergency
-actions, so send them a little later if you ever need them.
+## Step 10. GoatCounter: page counts
 
-4. Commit and push the new `deployments/rh-testnet.json` (it holds public addresses only). Set
-   `AFTERHOURS_ACTIVE_PROFILE=rh-testnet` and `ALLOCATOR_PK` on Render. The bot starts on the
-   next deploy.
+1. Sign up at goatcounter.com and pick a code for the site.
+2. Your count endpoint is `https://<your code>.goatcounter.com/count`.
+3. In Vercel, set `NEXT_PUBLIC_GOATCOUNTER_URL` to it and redeploy.
 
-Repeat with `PROFILE=arb-sepolia` for Arbitrum Sepolia.
+How it loads:
+- The script comes only from `web.analytics.script_src` in config (`gc.zgo.at`, from
+  GoatCounter's docs).
+- The endpoint must be on `web.analytics.endpoint_domain`.
+- It loads in production builds only and shows nothing to visitors.
+- Page changes inside the app are counted as GoatCounter's single-page-app guide describes.
 
-## 7. Check it
+## Environment variables
 
-- `<Render URL>/v1/health` shows `"service":"ok"` and your profile.
+Never paste real values into a file in git, an issue or a chat.
+
+### Render (API)
+
+| Name | Secret? | Where the value comes from | Example format |
+| --- | --- | --- | --- |
+| `AFTERHOURS_ACTIVE_PROFILE` | no | your choice: which vault the site shows | `rh-testnet` |
+| `CORS_ORIGINS` | no | your Vercel URL (step 5) | `https://your-project.vercel.app` |
+| `ADMIN_TOKEN` | yes | Render generates it | 64 hex characters |
+| `UPSTASH_REDIS_REST_URL` | yes | Upstash console, REST API | `https://<name>.upstash.io` |
+| `UPSTASH_REDIS_REST_TOKEN` | yes | Upstash console, REST API | a long token string |
+| `TELEGRAM_BOT_TOKEN` | yes | @BotFather | `<digits>:<letters and digits>` |
+| `TELEGRAM_WEBHOOK_SECRET` | yes | `openssl rand -hex 32` (step 2) | 64 hex characters |
+| `RH_MAINNET_RPC_URL` | yes (holds a provider key) | optional; an RPC provider | `https://<provider host>/<your key>` |
+| `RH_TESTNET_RPC_URL` | yes | optional | same |
+| `ARB_SEPOLIA_RPC_URL` | yes | optional | same |
+| `PORT` | no | Render sets it; do not add it | `10000` |
+
+### GitHub Actions (repository secrets and one variable)
+
+| Name | Kind | Used by | Example format |
+| --- | --- | --- | --- |
+| `AFTERHOURS_ACTIVE_PROFILE` | variable | the whole job | `rh-testnet` |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | secret | the whole job | as above |
+| `ALLOCATOR_PK` | secret | the bot step only | `0x` then 64 hex characters |
+| `TELEGRAM_BOT_TOKEN` | secret | the alerts step only | as above |
+| `RH_MAINNET_RPC_URL`, `RH_TESTNET_RPC_URL`, `ARB_SEPOLIA_RPC_URL` | secret, optional | the whole job | as above |
+
+### Vercel (web)
+
+| Name | Secret? | Where the value comes from | Example format |
+| --- | --- | --- | --- |
+| `NEXT_PUBLIC_API_BASE_URL` | no | your Render URL (step 3) | `https://your-service.onrender.com` |
+| `NEXT_PUBLIC_WC_PROJECT_ID` | no (browsers see it), keep it out of git | Reown dashboard | the ID string Reown shows |
+| `NEXT_PUBLIC_GOATCOUNTER_URL` | no | GoatCounter (step 10) | `https://<code>.goatcounter.com/count` |
+
+### Only on your machine (`.env`)
+
+| Name | Used for |
+| --- | --- |
+| `DEPLOYER_PK`, `CURATOR_PK`, `ALLOCATOR_PK`, `GUARDIAN_PK` | `make deploy`, `make seed`, `make fund-allocator` |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET` | `make telegram-webhook` |
+| `ETHERSCAN_API_KEY` | optional, contract verification |
+
+## What is stored where
+
+| Data | Free setup | Rebuilt on restart? |
+| --- | --- | --- |
+| Telegram subscriptions | Upstash hash `afterhours:alerts:chats` | kept |
+| Which subscriptions were checked for a close | Upstash key `afterhours:alerts:checked` (expires after `state.checked_ttl_days`) | kept |
+| Bot history: plan, forecasts, reasons, event log | Upstash keys under `afterhours:<profile>:` | kept |
+| Which close the bot already ran for | Upstash key `afterhours:<profile>:doc:pre_close_run` | kept |
+| Prices and earnings | API's local cache; Actions cache in the workflow | yes, at start (about 20 s) |
+| Borrower scan, market registry | API's local state folder | yes, at start |
+
+The shared store is used whenever `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are
+set (`state` in config); without them everything stays in files under `data/state`, as on your
+machine.
+
+## Check it
+
+- `<Render URL>/v1/health` shows `"service":"ok"`.
 - The site's `/live` page lists every Stock Token with "Live: Robinhood Chain mainnet,
   read-only".
-- `/positions`: "Try a live borrower" shows a position card. Right after the first start it
-  can take about 90 seconds to appear.
-- Telegram: send your bot `/watch NVDA`; it answers "Following NVDA".
-- Render's **Logs** tab shows `serve:` lines saying which background parts started or why not.
+- `/positions`: "Try a live borrower" appears within a minute of a cold start.
+- Telegram: `/watch NVDA` answers "Following NVDA"; `/list` shows it.
+- GitHub **Actions** tab: hourly runs on weekdays; inside a pre-close window they show the bot
+  and alerts steps.
+- Render **Logs**: `serve:` lines say what started and why the rest did not.
 
 ## Troubleshooting
 
 | Symptom | Likely cause |
 | --- | --- |
-| Render deploy fails the health check | The service is not listening on the port Render expects. Leave the start command as `./scripts/serve.sh` and do not set `PORT`. |
-| The site loads but every panel says it can't reach the engine | `CORS_ORIGINS` on Render does not match the site's URL exactly (`https://`, no trailing slash), or `NEXT_PUBLIC_API_BASE_URL` was set after the build. Redeploy on Vercel. |
-| Vault pages say "No deployment for this profile yet" | Section 6 is not done for the profile in `AFTERHOURS_ACTIVE_PROFILE`, or `deployments/<profile>.json` is not pushed. |
-| Wallet QR code does not connect | Add the site's domain to the Reown project's allowlist. |
-| Telegram bot does not answer | `TELEGRAM_BOT_TOKEN` is empty or wrong. The Logs tab says "alerts not started" when it is empty. |
-| Subscriptions vanish after a deploy | The disk is not attached, or the state path does not start with `/var/data`. |
+| Every panel says it can't reach the engine | `CORS_ORIGINS` does not match the site's URL exactly, or `NEXT_PUBLIC_API_BASE_URL` was set after the build (redeploy on Vercel). |
+| The site is slow to answer the first time | Render woke the API (about a minute). Set up step 6. |
+| The bot does not answer in Telegram | The webhook is not set (step 7), or the secret on Render differs from the one in `.env`, or `TELEGRAM_BOT_TOKEN` is missing on Render. Run `uv run afterhours alerts set-webhook <URL>` again; it prints what Telegram has. |
+| No pre-close alerts arrive | The Actions secrets are missing, the schedule was disabled (60 days without activity), or a run was delayed past the window. Check the **Actions** tab. |
+| Vault pages say "No deployment for this profile yet" | Step 9 is not done for the profile in `AFTERHOURS_ACTIVE_PROFILE`, or `deployments/<profile>.json` is not pushed. |
+| Upstash says the database is archived | No activity for 30 days or more; restore it from the backup in the Upstash console. |
+
+## Optional paid path: `render.yaml`
+
+`render.yaml` (Render's default Blueprint file) runs the API, the bot and Telegram long polling
+in one paid web service with a 1 GB disk at `/var/data`. There, state lives in files on the disk
+(`AFTERHOURS_PATHS__STATE_DIR`, `AFTERHOURS_DATA__CACHE_DIR`), and GitHub Actions and Upstash are
+not needed. Render keeps only files under the disk's mount path across restarts
+(render.com/docs/disks), disks need a paid plan, and the plan is `1c-2g` because the API and the
+bot together measured about 390 MB (240 plus 149). `serve.sh` starts:
+- the bot when `ALLOCATOR_PK` is set and the profile is deployed;
+- long polling when `TELEGRAM_BOT_TOKEN` is set and `TELEGRAM_WEBHOOK_SECRET` is not.

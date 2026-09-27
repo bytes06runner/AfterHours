@@ -58,6 +58,19 @@
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Webhook Env",
           "type": "string"
+        },
+        "webhook_path": {
+          "title": "Webhook Path",
+          "type": "string"
+        },
+        "webhook_secret_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Webhook Secret Env",
+          "type": "string"
+        },
+        "webhook_secret_header": {
+          "title": "Webhook Secret Header",
+          "type": "string"
         }
       },
       "required": [
@@ -67,7 +80,10 @@
         "poll_timeout_seconds",
         "store",
         "max_watches_per_chat",
-        "refresh_prices"
+        "refresh_prices",
+        "webhook_secret_env",
+        "webhook_secret_header",
+        "webhook_path"
       ],
       "title": "AlertsConfig",
       "type": "object"
@@ -75,20 +91,25 @@
     "AnalyticsConfig": {
       "additionalProperties": false,
       "properties": {
-        "script_host": {
-          "pattern": "^https?://",
-          "title": "Script Host",
+        "endpoint_domain": {
+          "title": "Endpoint Domain",
           "type": "string"
         },
-        "script_src_env": {
+        "endpoint_env": {
           "pattern": "^[A-Z][A-Z0-9_]*$",
-          "title": "Script Src Env",
+          "title": "Endpoint Env",
+          "type": "string"
+        },
+        "script_src": {
+          "pattern": "^https?://",
+          "title": "Script Src",
           "type": "string"
         }
       },
       "required": [
-        "script_host",
-        "script_src_env"
+        "script_src",
+        "endpoint_domain",
+        "endpoint_env"
       ],
       "title": "AnalyticsConfig",
       "type": "object"
@@ -992,6 +1013,10 @@
           "title": "Board Cache Seconds",
           "type": "integer"
         },
+        "discovery_profile": {
+          "title": "Discovery Profile",
+          "type": "string"
+        },
         "examples": {
           "exclusiveMinimum": 0,
           "title": "Examples",
@@ -1018,16 +1043,22 @@
           "exclusiveMinimum": 0,
           "title": "Quiet After Minutes",
           "type": "integer"
+        },
+        "warm_prices": {
+          "title": "Warm Prices",
+          "type": "boolean"
         }
       },
       "required": [
         "profile",
+        "discovery_profile",
         "board_cache_seconds",
         "quiet_after_minutes",
         "frozen_window",
         "market_refresh_minutes",
         "lag_blocks",
-        "examples"
+        "examples",
+        "warm_prices"
       ],
       "title": "LiveConfig",
       "type": "object"
@@ -1798,6 +1829,62 @@
       "title": "SimConfig",
       "type": "object"
     },
+    "StateConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "checked_ttl_days": {
+          "exclusiveMinimum": 0,
+          "title": "Checked Ttl Days",
+          "type": "integer"
+        },
+        "cycle_lock_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Cycle Lock Seconds",
+          "type": "integer"
+        },
+        "event_poll_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Event Poll Seconds",
+          "type": "integer"
+        },
+        "key_prefix": {
+          "title": "Key Prefix",
+          "type": "string"
+        },
+        "kv_token_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Kv Token Env",
+          "type": "string"
+        },
+        "kv_url_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Kv Url Env",
+          "type": "string"
+        },
+        "read_cache_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Read Cache Seconds",
+          "type": "integer"
+        },
+        "request_timeout_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Request Timeout Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kv_url_env",
+        "kv_token_env",
+        "key_prefix",
+        "request_timeout_seconds",
+        "read_cache_seconds",
+        "event_poll_seconds",
+        "cycle_lock_seconds",
+        "checked_ttl_days"
+      ],
+      "title": "StateConfig",
+      "type": "object"
+    },
     "TriggersConfig": {
       "additionalProperties": false,
       "properties": {
@@ -2069,6 +2156,9 @@
     "sim": {
       "$ref": "#/$defs/SimConfig"
     },
+    "state": {
+      "$ref": "#/$defs/StateConfig"
+    },
     "universe": {
       "$ref": "#/$defs/UniverseConfig"
     },
@@ -2101,7 +2191,8 @@
     "web",
     "alerts",
     "live",
-    "funding"
+    "funding",
+    "state"
   ],
   "title": "Afterhours configuration",
   "type": "object"

@@ -405,12 +405,14 @@ class FrozenWindow(_Strict):
 
 class LiveConfig(_Strict):
     profile: str
+    discovery_profile: str
     board_cache_seconds: PositiveInt
     quiet_after_minutes: PositiveInt
     frozen_window: FrozenWindow
     market_refresh_minutes: PositiveInt
     lag_blocks: PositiveInt
     examples: PositiveInt
+    warm_prices: bool
 
 
 class FundingConfig(_Strict):
@@ -426,11 +428,26 @@ class AlertsConfig(_Strict):
     store: str
     max_watches_per_chat: PositiveInt
     refresh_prices: bool
+    webhook_secret_env: EnvName
+    webhook_secret_header: str
+    webhook_path: str
+
+
+class StateConfig(_Strict):
+    kv_url_env: EnvName
+    kv_token_env: EnvName
+    key_prefix: str
+    request_timeout_seconds: PositiveInt
+    read_cache_seconds: PositiveInt
+    event_poll_seconds: PositiveInt
+    cycle_lock_seconds: PositiveInt
+    checked_ttl_days: PositiveInt
 
 
 class AnalyticsConfig(_Strict):
-    script_host: HttpUrlStr
-    script_src_env: EnvName
+    script_src: HttpUrlStr
+    endpoint_domain: str
+    endpoint_env: EnvName
 
 
 class WebConfig(_Strict):
@@ -472,6 +489,7 @@ class AfterhoursConfig(BaseSettings):
     alerts: AlertsConfig
     live: LiveConfig
     funding: FundingConfig
+    state: StateConfig
 
     @classmethod
     def settings_customise_sources(

@@ -1,0 +1,65 @@
+# Pre-close jobs for the free hosting setup (docs/HOSTING.md): the allocator bot's pre-close
+# cycle and the Telegram pre-close alerts. Runs hourly on weekdays; the engine decides whether
+# now is inside a pre-close window (schedule.pre_close_minutes before an exchange close, holidays
+# and early closes included) and does nothing otherwise.
+#
+# GitHub delays scheduled runs at busy times, especially the start of every hour, so this runs at
+# minute 23; a two-hour window gives it two chances per close. Scheduled workflows run only on
+# the default branch, and GitHub disables them after 60 days without repository activity.
+name: Pre-close jobs
+
+on:
+  schedule:
+    - cron: "23 * * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pre-close
+  cancel-in-progress: false
+
+jobs:
+  pre-close:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Which testnet vault the bot runs (a repository variable, not a secret).
+      AFTERHOURS_ACTIVE_PROFILE: ${{ vars.AFTERHOURS_ACTIVE_PROFILE }}
+      # Shared state with the API: bot history and Telegram subscriptions.
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      # Optional: empty means the public RPC from config.
+      RH_MAINNET_RPC_URL: ${{ secrets.RH_MAINNET_RPC_URL }}
+      RH_TESTNET_RPC_URL: ${{ secrets.RH_TESTNET_RPC_URL }}
+      ARB_SEPOLIA_RPC_URL: ${{ secrets.ARB_SEPOLIA_RPC_URL }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - name: Install the engine
+        run: uv sync --frozen --no-dev
+      - name: Inside a pre-close window?
+        id: window
+        run: echo "due=$(uv run --frozen --no-dev afterhours pre-close)" >> "$GITHUB_OUTPUT"
+      - name: Restore the price cache
+        if: steps.window.outputs.due == 'true'
+        uses: actions/cache@v6
+        with:
+          path: data/cache
+          key: prices-${{ github.run_id }}
+          restore-keys: prices-
+      - name: Refresh every Stock Token's prices
+        if: steps.window.outputs.due == 'true'
+        continue-on-error: true
+        run: uv run --frozen --no-dev afterhours data fetch --stock-tokens > /dev/null
+      - name: Bot pre-close cycle
+        if: steps.window.outputs.due == 'true'
+        env:
+          ALLOCATOR_PK: ${{ secrets.ALLOCATOR_PK }}
+        run: uv run --frozen --no-dev afterhours bot due
+      - name: Telegram pre-close alerts
+        if: always() && steps.window.outputs.due == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: uv run --frozen --no-dev afterhours alerts check

@@ -45,3 +45,16 @@ def test_bot_needs_only_the_allocator_key(monkeypatch: pytest.MonkeyPatch) -> No
     assert set(role_keys(cfg, "rh-testnet", ("ALLOCATOR_PK",))) == {"ALLOCATOR_PK"}
     with pytest.raises(KeyError, match="DEPLOYER_PK"):
         role_keys(cfg, "rh-testnet")
+
+
+def test_live_views_find_stock_tokens_on_a_testnet_profile(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A hosted API runs on rh-testnet, which has no discovered file; the live views must still
+    fetch prices for every mainnet Stock Token (this was empty before the fix)."""
+    from afterhours.data.universe import stock_token_tickers
+
+    monkeypatch.setenv("AFTERHOURS_ACTIVE_PROFILE", "rh-testnet")
+    cfg = load_config(load_env_file=False)
+    assert stock_token_tickers(cfg)[0] == []
+    assert len(stock_token_tickers(cfg, cfg.live.discovery_profile)[0]) > 0

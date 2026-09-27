@@ -11,7 +11,6 @@ event stream.
 
 from __future__ import annotations
 
-import fcntl
 import json
 import logging
 from collections.abc import Iterator
@@ -33,7 +32,7 @@ from afterhours.explain.reason import VAULT_SUBJECT, build_card, reason_hash
 from afterhours.policy.lp import Plan, StockState, TierSpec, solve, tier_spec
 from afterhours.policy.option_b import Decision, decide, live_ratings, reason
 from afterhours.risk.live import Forecast, LiveRisk, session_state
-from afterhours.state import Store
+from afterhours.state import BaseStore, Store
 
 log = logging.getLogger(__name__)
 DUST_UNITS = 2  # stay a hair inside caps and withdrawable amounts
@@ -52,14 +51,10 @@ class CycleResult:
 
 
 @contextmanager
-def cycle_lock(store: Store) -> Iterator[None]:
-    """One cycle at a time across processes (bot scheduler and API sim endpoints)."""
-    with (store.root / "cycle.lock").open("w") as f:
-        fcntl.flock(f, fcntl.LOCK_EX)
-        try:
-            yield
-        finally:
-            fcntl.flock(f, fcntl.LOCK_UN)
+def cycle_lock(store: BaseStore) -> Iterator[None]:
+    """One cycle at a time across processes (bot scheduler, scheduled jobs, API sim endpoints)."""
+    with store.lock("cycle"):
+        yield
 
 
 class Allocator:

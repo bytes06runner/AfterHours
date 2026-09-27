@@ -321,6 +321,7 @@ api:
 # Telegram alerts. Nothing here signs a transaction or holds funds.
 live:
   profile: rh-mainnet                  # RPC from RH_MAINNET_RPC_URL, else the chain's public RPC
+  discovery_profile: fork              # mainnet addresses: deployments/<this>.discovered.json (M1)
   board_cache_seconds: 60
   quiet_after_minutes: 60              # outside the weekend window, no update this long = "quiet"
   # M1 oracle study (artifacts/discovery/oracle_study.json): Stock Token feeds post nothing from
@@ -329,6 +330,7 @@ live:
   market_refresh_minutes: 30           # rescan CreateMarket events from the last scanned block
   lag_blocks: 30                       # read a little behind the head (public nodes lag)
   examples: 3                          # live borrower addresses offered as examples in the checker
+  warm_prices: true                    # the API refreshes every Stock Token's prices at start
 
 # Telegram alerts (core.telegram.org/bots/api: https://api.telegram.org/bot<token>/METHOD_NAME).
 # Testnet gas for the allocator (`make fund-allocator PROFILE=...`): the deployer sends it, so only
@@ -343,15 +345,36 @@ alerts:
   telegram_api_base: https://api.telegram.org
   token_env: TELEGRAM_BOT_TOKEN
   poll_timeout_seconds: 25
-  store: alerts.json                   # subscriptions, in paths.state_dir
+  store: alerts.json                   # subscriptions, in paths.state_dir (file mode)
   max_watches_per_chat: 20             # stocks plus addresses one chat may follow
   refresh_prices: true                 # refresh every Stock Token's prices before each check
+  # Webhook mode (core.telegram.org/bots/api#setwebhook): Telegram sends secret_token in this
+  # header on every update; allowed characters A-Z a-z 0-9 _ -, 1 to 256 long.
+  webhook_secret_env: TELEGRAM_WEBHOOK_SECRET
+  webhook_secret_header: X-Telegram-Bot-Api-Secret-Token
+  webhook_path: /v1/telegram/webhook
 
-# Web analytics: Plausible (cookieless). The site's own script URL comes from Plausible when the
-# site is added (plausible.io/docs/nextjs-integration); it is loaded only from script_host.
+# Shared state for hosted runs (docs/HOSTING.md): bot history and Telegram subscriptions live in
+# Upstash Redis, reached over its REST API (upstash.com/docs/redis/features/restapi), when both
+# env vars are set; otherwise in files under paths.state_dir. Upstash free: 500K commands/month,
+# so the API caches reads and checks for new bot events slowly.
+state:
+  kv_url_env: UPSTASH_REDIS_REST_URL
+  kv_token_env: UPSTASH_REDIS_REST_TOKEN
+  key_prefix: afterhours
+  request_timeout_seconds: 10
+  read_cache_seconds: 30               # API reads of plan, forecasts and reasons
+  event_poll_seconds: 30               # how often the API looks for new bot events (SSE)
+  cycle_lock_seconds: 900              # a bot cycle holds the lock at most this long
+  checked_ttl_days: 7                  # pre-close bookkeeping expires after this
+
+# Web analytics: GoatCounter (goatcounter.com/help/start; aggregate counts, no IP addresses kept,
+# goatcounter.com/help/gdpr). The script comes only from script_src; each site's count endpoint
+# comes from the env var and must be on endpoint_domain. Counted per route change (help/spa).
 web:
   api_base_url_env: NEXT_PUBLIC_API_BASE_URL
   walletconnect_project_id_env: NEXT_PUBLIC_WC_PROJECT_ID
   analytics:
-    script_host: https://plausible.io
-    script_src_env: NEXT_PUBLIC_PLAUSIBLE_SRC
+    script_src: https://gc.zgo.at/count.js
+    endpoint_domain: goatcounter.com
+    endpoint_env: NEXT_PUBLIC_GOATCOUNTER_URL

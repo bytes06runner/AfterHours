@@ -110,7 +110,7 @@ class Mainnet:
     def __init__(self, cfg: AfterhoursConfig) -> None:
         self.cfg = cfg
         self.w3: Web3 = connect(cfg.rpc_url(cfg.live.profile))
-        disc = load_discovered(cfg, "fork")
+        disc = load_discovered(cfg, cfg.live.discovery_profile)
         self.blue = to_checksum_address(disc["core"]["morpho_blue"]["address"])
         self.usdg = to_checksum_address(disc["core"]["usdg"]["address"])
         self.tokens = {
@@ -123,6 +123,7 @@ class Mainnet:
         }
         self.risk = LiveRisk(cfg, make_cache(cfg))
         self._lock = threading.Lock()
+        self._board_lock = threading.Lock()
         self._board: tuple[float, dict[str, Any]] | None = None
         self._decimals: dict[str, int] = {}
         self._symbols: dict[str, str | None] = {}
@@ -202,10 +203,14 @@ class Mainnet:
 
     # ------------------------------------------------------------------ risk board
     def board(self, now: datetime | None = None) -> dict[str, Any]:
-        cached = self._board
-        if cached and time.time() - cached[0] < self.cfg.live.board_cache_seconds:
-            return cached[1]
-        now = now or datetime.now(UTC)
+        # One computation at a time; callers that arrive meanwhile get its result from the cache.
+        with self._board_lock:
+            cached = self._board
+            if cached and time.time() - cached[0] < self.cfg.live.board_cache_seconds:
+                return cached[1]
+            return self._board_now(now or datetime.now(UTC))
+
+    def _board_now(self, now: datetime) -> dict[str, Any]:
         block = self.block()
         syms = sorted(self.feeds)
         rounds = call_many(self.w3, [Call(self.feeds[s], LATEST_ROUND) for s in syms], block=block)

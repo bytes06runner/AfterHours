@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import UTC, datetime
 from typing import Annotated
 
 import typer
@@ -91,7 +92,8 @@ def data_fetch(
     from afterhours.data.universe import stock_token_tickers
 
     cfg = load_config()
-    wanted = symbols or (stock_token_tickers(cfg)[0] if stock_tokens else vault_symbols(cfg))
+    live = cfg.live.discovery_profile
+    wanted = symbols or (stock_token_tickers(cfg, live)[0] if stock_tokens else vault_symbols(cfg))
     typer.echo(json.dumps(fetch_symbols(cfg, wanted)))
 
 
@@ -243,6 +245,40 @@ def bot_once(
     typer.echo(dump(Allocator(load_config()).run_cycle(trigger, execute=not dry_run)))
 
 
+@bot_app.command("due")
+def bot_due() -> None:
+    """One pre-close cycle per close, only inside the pre-close window (for scheduled jobs)."""
+    from afterhours.bot.allocator import Allocator, dump
+    from afterhours.bot.scheduler import pre_close_window
+    from afterhours.deployments import deployment_path
+    from afterhours.state import Store
+
+    _logging()
+    cfg = load_config()
+    close = pre_close_window(cfg, datetime.now(UTC))
+    if close is None:
+        typer.echo("not in a pre-close window; nothing to do")
+        return
+    if not deployment_path(cfg).exists():
+        typer.echo(f"no deployment for {cfg.active_profile} yet; nothing to do")
+        return
+    store = Store.for_profile(cfg)
+    done = store.read("pre_close_run")
+    if done and done.get("close") == close.isoformat():
+        typer.echo(f"already ran for the {close.isoformat()} close")
+        return
+    typer.echo(dump(Allocator(cfg).run_cycle("pre_close")))
+    store.write("pre_close_run", {"close": close.isoformat(), "at": datetime.now(UTC).isoformat()})
+
+
+@app.command("pre-close")
+def pre_close_cmd() -> None:
+    """Print `true` inside a pre-close window, else `false` (scheduled jobs gate on it)."""
+    from afterhours.bot.scheduler import pre_close_window
+
+    typer.echo("true" if pre_close_window(load_config(), datetime.now(UTC)) else "false")
+
+
 @bot_app.command("run")
 def bot_run() -> None:
     """Run the scheduler: hourly, pre-close, post-open, pre-earnings and trigger cycles."""
@@ -305,6 +341,54 @@ alerts_app = typer.Typer(no_args_is_help=True, help="Telegram alerts (read-only,
 app.add_typer(alerts_app, name="alerts")
 
 
+@alerts_app.command("check")
+def alerts_check() -> None:
+    """Send what is due before this close, once (for scheduled jobs); else do nothing."""
+    from afterhours.live.alerts import AlertBot, telegram_from_config
+    from afterhours.live.mainnet import Mainnet
+
+    _logging()
+    cfg = load_config()
+    try:
+        chat = telegram_from_config(cfg)
+    except RuntimeError as exc:
+        raise typer.BadParameter(str(exc)) from None
+    sent = AlertBot(cfg, Mainnet(cfg), chat).check()
+    typer.echo(f"sent {sent} alerts")
+
+
+@alerts_app.command("set-webhook")
+def alerts_set_webhook(
+    api_url: Annotated[str, typer.Argument(help="The API's public URL, e.g. your Render URL.")],
+) -> None:
+    """Point Telegram at the API's webhook (uses the token and webhook secret from .env)."""
+    from urllib.parse import urlparse
+
+    from afterhours.live.alerts import telegram_from_config
+
+    cfg = load_config()
+    secret = cfg.env(cfg.alerts.webhook_secret_env)
+    if not secret:
+        raise typer.BadParameter(f"set {cfg.alerts.webhook_secret_env} in .env first")
+    if urlparse(api_url).scheme != "https":
+        raise typer.BadParameter("Telegram only sends webhooks to https URLs")
+    tg = telegram_from_config(cfg)
+    tg.set_webhook(api_url.rstrip("/") + cfg.alerts.webhook_path, secret)
+    info = tg.webhook_info()
+    typer.echo(
+        f"webhook set: {info.get('url')} (pending updates: {info.get('pending_update_count')})"
+    )
+
+
+@alerts_app.command("delete-webhook")
+def alerts_delete_webhook() -> None:
+    """Stop the webhook so `alerts run` (long polling) can receive updates again."""
+    from afterhours.live.alerts import telegram_from_config
+
+    telegram_from_config(load_config()).delete_webhook()
+    typer.echo("webhook removed")
+
+
 @alerts_app.command("run")
 def alerts_run() -> None:
     """Answer Telegram commands and send pre-close alerts. Needs the bot token in .env."""
@@ -322,7 +406,7 @@ def alerts_run() -> None:
 
     def refresh() -> None:
         if cfg.alerts.refresh_prices:
-            fetch_symbols(cfg, stock_token_tickers(cfg)[0])
+            fetch_symbols(cfg, stock_token_tickers(cfg, cfg.live.discovery_profile)[0])
 
     AlertBot(cfg, Mainnet(cfg), chat, refresh=refresh).run()
 

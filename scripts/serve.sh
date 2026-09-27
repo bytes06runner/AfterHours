@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Hosted engine entry point (Render; docs/HOSTING.md). One process tree on one disk:
-#   - the API in the foreground, bound to 0.0.0.0 and the PORT the host provides;
-#   - in the background: refresh every Stock Token's prices, then the allocator bot (when the
-#     active profile has a deployment and ALLOCATOR_PK is set) and the Telegram alerts (when
-#     TELEGRAM_BOT_TOKEN is set). Each is restarted if it exits.
-# Persistent paths come from AFTERHOURS_PATHS__STATE_DIR and AFTERHOURS_DATA__CACHE_DIR.
+# Hosted engine entry point (Render; docs/HOSTING.md).
+#   - The API runs in the foreground, bound to 0.0.0.0 and the PORT the host provides. It warms
+#     prices, the risk board and the borrower examples itself, in the same process.
+#   - Free setup: that is all. The bot and the pre-close alerts run in GitHub Actions, and
+#     Telegram commands arrive at the API's webhook.
+#   - Paid setup (render.yaml, one disk): also the allocator bot, when ALLOCATOR_PK is set and the
+#     profile has a deployment, and Telegram long polling, when TELEGRAM_BOT_TOKEN is set and no
+#     webhook secret is. Each is restarted if it exits.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -26,19 +28,22 @@ keep() { # keep NAME CMD...: run CMD, restart it after it exits
 }
 
 background() {
-  "${AH[@]}" data fetch --stock-tokens >/dev/null || log "price refresh failed; using cached prices"
   local profile deployment
-  profile=$("${AH[@]}" config get active_profile | tr -d '"')
-  deployment="deployments/${profile}.json"
-  if [ -n "${ALLOCATOR_PK:-}" ] && [ -f "$deployment" ]; then
-    keep bot "${AH[@]}" bot run &
+  if [ -n "${ALLOCATOR_PK:-}" ]; then
+    profile=$("${AH[@]}" config get active_profile | tr -d '"')
+    deployment="deployments/${profile}.json"
+    if [ -f "$deployment" ]; then
+      keep bot "${AH[@]}" bot run &
+    else
+      log "bot not started: no $deployment yet (docs/HOSTING.md)"
+    fi
   else
-    log "bot not started: needs ALLOCATOR_PK and $deployment (docs/HOSTING.md)"
+    log "bot not started here: no ALLOCATOR_PK (free setup runs it in GitHub Actions)"
   fi
-  if [ -n "${TELEGRAM_BOT_TOKEN:-}" ]; then
+  if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -z "${TELEGRAM_WEBHOOK_SECRET:-}" ]; then
     keep alerts "${AH[@]}" alerts run &
   else
-    log "alerts not started: TELEGRAM_BOT_TOKEN is not set"
+    log "alert polling not started: webhook mode, or TELEGRAM_BOT_TOKEN is not set"
   fi
   wait
 }

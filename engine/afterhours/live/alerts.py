@@ -1,8 +1,10 @@
 """Telegram alerts: before each close, warn subscribers whose stock or position looks risky tonight.
 
-Read-only. The bot long-polls the Telegram Bot API (core.telegram.org/bots/api, `getUpdates`) for
-commands, keeps subscriptions in `paths.state_dir/<alerts.store>`, and once per session, inside the
-pre-close window (`schedule.pre_close_minutes` before the close), checks every subscription:
+Read-only. Commands arrive either by long polling (`getUpdates`, `afterhours alerts run`) or by
+webhook (`setWebhook`, handled by the API; core.telegram.org/bots/api). Subscriptions live in
+`paths.state_dir/<alerts.store>`, or in the shared store when one is configured (`state`). Once
+per session, inside the pre-close window (`schedule.pre_close_minutes` before the close), every
+subscription is checked (`afterhours alerts check`, or the polling loop):
 
 - a stock alerts when tonight's forecast bad case reaches the cushion of one of its mainnet
   Morpho markets (the risk board's `breached` list);
@@ -19,14 +21,16 @@ import logging
 import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Protocol
 
 import httpx
 from eth_utils.address import is_address, to_checksum_address
 
+from afterhours.bot.scheduler import pre_close_window as check_window
 from afterhours.config import AfterhoursConfig
+from afterhours.kv import KV, kv_from_config
 
 log = logging.getLogger(__name__)
 
@@ -77,13 +81,32 @@ class Telegram:
     def send(self, chat_id: int, text: str) -> None:
         self._call("sendMessage", {"chat_id": chat_id, "text": text})
 
+    def set_webhook(self, url: str, secret: str) -> None:
+        self._call(
+            "setWebhook", {"url": url, "secret_token": secret, "allowed_updates": ["message"]}
+        )
+
+    def delete_webhook(self) -> None:
+        self._call("deleteWebhook", {})
+
+    def webhook_info(self) -> dict[str, Any]:
+        info: dict[str, Any] = self._call("getWebhookInfo", {})
+        return info
+
 
 # ---------------------------------------------------------------------- subscriptions
 @dataclass
 class Store:
-    """Subscriptions and delivery bookkeeping, saved as JSON."""
+    """Subscriptions and delivery bookkeeping: a JSON file, or the shared store (Redis).
 
-    path: Path
+    In the shared store, chats are one hash field each and the pre-close bookkeeping is its own
+    key, so the API (answering commands) and a scheduled job (sending alerts) never overwrite
+    each other's writes.
+    """
+
+    path: Path | None = None
+    kv: KV | None = None
+    checked_ttl_seconds: int = 0
     offset: int | None = None
     chats: dict[str, dict[str, list[str]]] = field(default_factory=dict)
     checked: dict[str, list[str]] = field(default_factory=dict)  # close iso -> "chat|target"
@@ -93,14 +116,62 @@ class Store:
         if not path.exists():
             return cls(path)
         doc = json.loads(path.read_text())
-        return cls(path, doc.get("offset"), doc.get("chats", {}), doc.get("checked", {}))
+        return cls(
+            path,
+            offset=doc.get("offset"),
+            chats=doc.get("chats", {}),
+            checked=doc.get("checked", {}),
+        )
 
-    def save(self) -> None:
+    @classmethod
+    def load_kv(cls, kv: KV, checked_ttl_seconds: int) -> Store:
+        flat = kv.cmd("HGETALL", kv.key("alerts", "chats")) or []
+        chats = {flat[i]: json.loads(flat[i + 1]) for i in range(0, len(flat), 2)}
+        raw = kv.cmd("GET", kv.key("alerts", "checked"))
+        return cls(
+            kv=kv,
+            checked_ttl_seconds=checked_ttl_seconds,
+            chats=chats,
+            checked=json.loads(raw) if raw else {},
+        )
+
+    @classmethod
+    def from_config(cls, cfg: AfterhoursConfig) -> Store:
+        kv = kv_from_config(cfg)
+        if kv is not None:
+            return cls.load_kv(kv, cfg.state.checked_ttl_days * 86400)
+        return cls.load(cfg.path(cfg.paths.state_dir) / cfg.alerts.store)
+
+    def _write_file(self) -> None:
+        if self.path is None:
+            return
         self.path.parent.mkdir(parents=True, exist_ok=True)
         tmp = self.path.with_suffix(".tmp")
         doc = {"offset": self.offset, "chats": self.chats, "checked": self.checked}
         tmp.write_text(json.dumps(doc, indent=2, sort_keys=True))
         tmp.replace(self.path)
+
+    def save_chat(self, chat: int) -> None:
+        """Persist one chat's subscriptions (or their removal)."""
+        if self.kv is None:
+            self._write_file()
+            return
+        key, name = self.kv.key("alerts", "chats"), str(chat)
+        if name in self.chats:
+            self.kv.cmd("HSET", key, name, json.dumps(self.chats[name]))
+        else:
+            self.kv.cmd("HDEL", key, name)
+
+    def save_checked(self) -> None:
+        if self.kv is None:
+            self._write_file()
+            return
+        key = self.kv.key("alerts", "checked")
+        self.kv.cmd("SET", key, json.dumps(self.checked), "EX", self.checked_ttl_seconds)
+
+    def save_offset(self) -> None:
+        """Only polling uses an offset; webhooks need none."""
+        self._write_file()
 
     def watches(self, chat: int) -> dict[str, list[str]]:
         return self.chats.setdefault(str(chat), {"symbols": [], "addresses": []})
@@ -150,6 +221,21 @@ def handle(  # noqa: PLR0911 (one reply per command and error)
     return f"Following {value}. I will message you before a close only if tonight looks risky."
 
 
+def handle_update(
+    store: Store, update: dict[str, Any], symbols: set[str], network: str, limit: int
+) -> tuple[int, str] | None:
+    """One Telegram update: apply its command, save that chat, return (chat, reply)."""
+    msg = update.get("message") or {}
+    text, chat = msg.get("text"), (msg.get("chat") or {}).get("id")
+    if not text or chat is None:
+        return None
+    reply = handle(store, int(chat), text, symbols, network, limit)
+    if str(chat) in store.chats and not any(store.chats[str(chat)].values()):
+        store.chats.pop(str(chat))  # nothing followed: keep no record of the chat
+    store.save_chat(int(chat))
+    return int(chat), reply
+
+
 # ---------------------------------------------------------------------- the checks
 def pct(x: float) -> str:
     return f"{x * 100:.1f}%"
@@ -193,19 +279,6 @@ class Source(Protocol):
 
     def board(self, now: datetime | None = None) -> dict[str, Any]: ...
     def positions(self, address: str, now: datetime | None = None) -> dict[str, Any]: ...
-
-
-def check_window(cfg: AfterhoursConfig, now: datetime) -> datetime | None:
-    """The close whose pre-close window contains `now`, if any."""
-    from afterhours.features.dataset import sessions
-
-    sess = sessions(cfg.data.exchange_calendar, (now - timedelta(days=1)).date(), now.date())
-    lead = timedelta(minutes=cfg.schedule.pre_close_minutes)
-    for c in sess["close"]:
-        close = c.to_pydatetime()
-        if close - lead <= now < close:
-            return close  # type: ignore[no-any-return]
-    return None
 
 
 def run_checks(
@@ -256,7 +329,7 @@ class AlertBot:
         self.chat = chat
         self.clock = clock
         self.refresh = refresh
-        self.store = Store.load(cfg.path(cfg.paths.state_dir) / cfg.alerts.store)
+        self.store = Store.from_config(cfg)
         profile = cfg.profiles[cfg.live.profile]
         self.network = cfg.chains[profile.chain].name
         self._refreshed: datetime | None = None
@@ -265,20 +338,16 @@ class AlertBot:
         """Answer the commands that arrived since the last poll."""
         for u in self.chat.updates(self.store.offset):
             self.store.offset = int(u["update_id"]) + 1
-            msg = u.get("message") or {}
-            text, chat = msg.get("text"), (msg.get("chat") or {}).get("id")
-            if not text or chat is None:
-                continue
-            reply = handle(
+            answer = handle_update(
                 self.store,
-                int(chat),
-                text,
+                u,
                 set(self.source.feeds),
                 self.network,
                 self.cfg.alerts.max_watches_per_chat,
             )
-            self.chat.send(int(chat), reply)
-        self.store.save()
+            if answer:
+                self.chat.send(*answer)
+        self.store.save_offset()
 
     def check(self) -> int:
         """Inside a pre-close window, send what is due. Returns messages sent."""
@@ -289,6 +358,8 @@ class AlertBot:
         if self.refresh and self._refreshed != close:
             self.refresh()
             self._refreshed = close
+        if self.store.kv is not None:
+            self.store = Store.from_config(self.cfg)  # the API may have added subscriptions
         sent = 0
         for chat, text in run_checks(self.store, self.source, close, now):
             try:
@@ -296,7 +367,7 @@ class AlertBot:
                 sent += 1
             except RuntimeError as exc:
                 log.warning("alert to one chat failed: %s", exc)
-        self.store.save()
+        self.store.save_checked()
         if sent:
             log.info("sent %d alerts before the %s close", sent, close.isoformat())
         return sent

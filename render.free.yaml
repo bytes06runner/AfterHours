@@ -1,0 +1,41 @@
+# Render Blueprint for the free setup (docs/HOSTING.md): the API only, on a free web service.
+# Pick this file in Render's "Blueprint Path" field. The bot and the pre-close alerts run in
+# GitHub Actions (.github/workflows/pre-close.yml); bot history and Telegram subscriptions live in
+# Upstash Redis. Free web services have 512 MB of memory, no disk, and sleep after 15 minutes
+# without requests (render.com/docs/free), so an uptime pinger calls /v1/health.
+# The paid setup with a disk is render.yaml.
+services:
+  - type: web
+    name: afterhours-api
+    runtime: python
+    plan: free
+    buildCommand: uv sync --frozen --no-dev
+    startCommand: ./scripts/serve.sh
+    healthCheckPath: /v1/health
+    envVars:
+      # Which vault the site shows: rh-testnet or arb-sepolia.
+      - key: AFTERHOURS_ACTIVE_PROFILE
+        sync: false
+      # The web app's origin(s), comma separated (docs/HOSTING.md).
+      - key: CORS_ORIGINS
+        sync: false
+      # Guards the demo-only /v1/sim endpoints, which refuse to run off the local chain anyway.
+      - key: ADMIN_TOKEN
+        generateValue: true
+      # Shared state (Upstash Redis REST URL and token).
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+      # Telegram commands arrive by webhook; the secret proves a request came from Telegram.
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        sync: false
+      # Optional: empty means the public RPC from config.
+      - key: RH_MAINNET_RPC_URL
+        sync: false
+      - key: RH_TESTNET_RPC_URL
+        sync: false
+      - key: ARB_SEPOLIA_RPC_URL
+        sync: false

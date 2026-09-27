@@ -48,6 +48,17 @@ def schedule_marks(
     return sorted(m for m in marks if start < m[0] <= end)
 
 
+def pre_close_window(cfg: AfterhoursConfig, now: datetime) -> datetime | None:
+    """The close whose pre-close window (`schedule.pre_close_minutes`) contains `now`, if any."""
+    sess = sessions(cfg.data.exchange_calendar, (now - timedelta(days=1)).date(), now.date())
+    lead = timedelta(minutes=cfg.schedule.pre_close_minutes)
+    for c in sess["close"]:
+        close: datetime = c.to_pydatetime()
+        if close - lead <= now < close:
+            return close
+    return None
+
+
 def earnings_times(calendar: str, events: Iterable[tuple[Any, str]]) -> list[tuple[datetime, str]]:
     """Map (date, timing) to the bell it is tied to: bmo -> that day's open, else its close."""
     rows = list(events)

@@ -19,7 +19,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Any, cast
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from fastapi import Body, Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
@@ -538,25 +538,83 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     def live_positions(address: str) -> dict[str, Any]:
         return cast(dict[str, Any], _live(lambda: ctx.mainnet().positions(address)))
 
-    def refresh_examples() -> list[str]:
+    examples_lock = threading.Lock()
+
+    def refresh_examples(wait: bool = True) -> list[str]:
+        """Borrower examples, rescanned at most every `live.market_refresh_minutes`.
+
+        One scan at a time: while one runs, callers that do not wait get what is cached (or
+        nothing), so a burst of visitors never starts a burst of scans.
+        """
+        ttl = cfg.live.market_refresh_minutes * 60
         cached = ctx._examples
-        if cached is None or time.time() - cached[0] > cfg.live.market_refresh_minutes * 60:
-            cached = (time.time(), cast(list[str], ctx.mainnet().examples()))
-            ctx._examples = cached
-        return cached[1]
+        if cached is not None and time.time() - cached[0] <= ttl:
+            return cached[1]
+        if not examples_lock.acquire(blocking=wait):
+            return cached[1] if cached else []
+        try:
+            cached = ctx._examples
+            if cached is None or time.time() - cached[0] > ttl:
+                cached = (time.time(), cast(list[str], ctx.mainnet().examples()))
+                ctx._examples = cached
+            return cached[1]
+        finally:
+            examples_lock.release()
 
     def warm() -> None:
-        # The first borrower scan reads every Borrow event; do it before a visitor asks.
-        try:
-            refresh_examples()
-        except Exception as exc:
-            log.warning("warming the live examples failed: %s", exc)
+        # In this process, not a second one, so a small host's memory holds: prices for every
+        # Stock Token (the forecasts need them), then the market registry and board, then the
+        # first borrower scan (every Borrow event), all before a visitor asks.
+        if cfg.live.warm_prices:
+            from afterhours.data.pipeline import fetch_symbols
+            from afterhours.data.universe import stock_token_tickers
+
+            try:
+                fetch_symbols(cfg, stock_token_tickers(cfg, cfg.live.discovery_profile)[0])
+            except Exception as exc:
+                log.warning("warming prices failed, using what is cached: %s", exc)
+        for name, fn in (("board", lambda: ctx.mainnet().board()), ("examples", refresh_examples)):
+            try:
+                fn()
+            except Exception as exc:
+                log.warning("warming the live %s failed: %s", name, exc)
 
     warm_on_start.append(warm)
 
     @app.get("/v1/live/examples")
     def live_examples() -> dict[str, Any]:
-        return {"addresses": cast(list[str], _live(refresh_examples))}
+        return {"addresses": cast(list[str], _live(lambda: refresh_examples(wait=False)))}
+
+    # ---------------------------------------------------------------- Telegram webhook
+    @app.post(cfg.alerts.webhook_path, include_in_schema=False)
+    def telegram_webhook(
+        request: Request, update: Annotated[dict[str, Any], Body()]
+    ) -> dict[str, Any]:
+        """Commands from Telegram (setWebhook). Needs the bot token and the webhook secret."""
+        from afterhours.live.alerts import Store as Subscriptions
+        from afterhours.live.alerts import handle_update, telegram_from_config
+
+        secret = cfg.env(cfg.alerts.webhook_secret_env)
+        if not secret or not cfg.env(cfg.alerts.token_env):
+            raise HTTPException(404, "Telegram webhook is not configured.")
+        sent = request.headers.get(cfg.alerts.webhook_secret_header) or ""
+        if not secrets.compare_digest(sent.encode(), secret.encode()):
+            raise HTTPException(403, "Bad secret.")
+        live = cfg.profiles[cfg.live.profile]
+        try:
+            answer = handle_update(
+                Subscriptions.from_config(cfg),
+                update,
+                set(ctx.mainnet().feeds),
+                cfg.chains[live.chain].name,
+                cfg.alerts.max_watches_per_chat,
+            )
+            if answer:
+                telegram_from_config(cfg).send(*answer)
+        except Exception as exc:
+            # Answer 200 anyway: Telegram retries non-2xx replies, and a retry cannot fix this.
+            log.warning("telegram update failed: %s", exc)
+        return {"ok": True}
 
     @app.get("/v1/replay/scenarios")
     def replay_scenarios() -> dict[str, Any]:
@@ -641,16 +699,16 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
         """Server-sent events. `replay=true` starts from the beginning of the log."""
 
         async def events() -> Any:
-            exists = ctx.store.events_path.exists()
-            offset = 0 if replay or not exists else ctx.store.events_path.stat().st_size
+            offset = 0 if replay else ctx.store.events_end()
+            poll = ctx.store.poll_seconds
             quiet = 0.0
             while True:
                 batch, offset = ctx.store.events_since(offset)
                 for e in batch:
                     yield {"event": e["type"], "data": json.dumps(e["data"], default=str)}
                     quiet = 0.0
-                await asyncio.sleep(cfg.api.sse_poll_seconds)
-                quiet += cfg.api.sse_poll_seconds
+                await asyncio.sleep(poll)
+                quiet += poll
                 if quiet >= cfg.api.sse_heartbeat_seconds:
                     quiet = 0.0
                     try:

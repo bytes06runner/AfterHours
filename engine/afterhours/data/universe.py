@@ -43,9 +43,15 @@ def sectors(cache: ParquetCache) -> dict[str, str]:
     return dict(zip(hit["ticker"], hit["sector"], strict=True))
 
 
-def stock_token_tickers(cfg: AfterhoursConfig) -> tuple[list[str], list[str]]:
-    """(all Stock Tokens with a verified feed, the selected ones) from the discovered file."""
-    doc = load_discovered(cfg)
+def stock_token_tickers(
+    cfg: AfterhoursConfig, profile: str | None = None
+) -> tuple[list[str], list[str]]:
+    """(all Stock Tokens with a verified feed, the selected ones) from the discovered file.
+
+    `profile` defaults to the active one; the live views pass `live.discovery_profile`, since a
+    testnet profile has no discovered file of its own.
+    """
+    doc = load_discovered(cfg, profile)
     return list(doc.get("stock_tokens", {})), list(doc.get("selected", []))
 
 
