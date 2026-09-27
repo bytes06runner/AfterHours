@@ -1,0 +1,23 @@
+{
+  "name": "afterhours-pitch-animation",
+  "private": true,
+  "description": "The Afterhours pitch as an animated video (Remotion). Timings from docs/video/pitch.md; every number from artifacts/report/numbers.json.",
+  "scripts": {
+    "studio": "npm run sfx && remotion studio",
+    "sfx": "python3 scripts/make_sfx.py",
+    "render": "npm run sfx && remotion render Pitch out/afterhours-pitch.mp4",
+    "render:script": "npm run sfx && remotion render PitchWithScript out/afterhours-pitch-with-script.mp4",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.529",
+    "@remotion/google-fonts": "4.0.529",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "remotion": "4.0.529"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.12",
+    "typescript": "5.9.2"
+  }
+}

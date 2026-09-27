@@ -7,6 +7,9 @@ Target: under 2 minutes 30 seconds read aloud at a normal pace (the spoken lines
 the report card, not here. Lines marked TEAM are yours: we do not write quotes, traction or
 backgrounds we have not got.
 
+An animated version of this pitch, on these timings and with every number read from
+`artifacts/report/numbers.json`, is in [animation/](animation/README.md); add your voiceover there.
+
 ## Script
 
 **1. The hook (0:00 to 0:20).** Speaker on camera, then the landing page at night.

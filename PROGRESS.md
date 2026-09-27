@@ -962,3 +962,23 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   badge showing the real session ("Afterhours, opens in ...").
 - Two text fixes seen in the screenshots: "(1 markets)" now "(1 market)"; no space before the
   comma in the live label.
+
+### 2026-09-27 Animated pitch video (docs/video/animation)
+
+- Remotion 4.0.529 project (free for individuals, per its LICENSE), outside the pnpm workspace so
+  the web build is untouched. Six scenes on pitch.md's timings (2:25 at 1920 x 1080, 30 fps):
+  bell cold open and the exchange at night; the 35 real feeds freezing except AMD, SGOV and SNDK;
+  a weekend gap; the vault, three tiers and cushions; the pre-close forecast and pullback
+  (labelled Illustration); a reason card hashed onto a block; the held-out frontier with
+  Afterhours above the line of fixed mixes and the 47% / 51% / 31% / 46% counters; the test
+  written first; modelled rates vs 0.0016% today; META 2022-10-26 with the two losses and 59%
+  less; the market at block 73,650,323; the closing card with the live links.
+- Every number is read from `artifacts/report/numbers.json` at build time (`src/data.ts`), the
+  feed names from `deployments/fork.discovered.json`. Labels: "Real data" on the feed grid,
+  "Illustration" where shapes are drawn, "Historical stock prices, simulated vault" on backtest
+  and replay scenes, the block and date on the market numbers.
+- Sounds synthesised by `scripts/make_sfx.py` (bell partials, whoosh, tick, impact, stamp,
+  ambient pad); no samples. A voiceover dropped in `public/voiceover.*` is mixed in with the pad
+  ducked. `PitchWithScript` renders the pitch.md lines as timed subtitles for recording.
+- Checked by rendering stills of every scene and fixing overlaps (moon over headlines, chart
+  labels, the gap counter off screen, the vault box, the closing links over the skyline).
