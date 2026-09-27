@@ -7,12 +7,17 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import os
 import secrets
+import threading
+import time
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, cast
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,6 +39,8 @@ from afterhours.policy.option_b import reason as b_reason
 from afterhours.public_config import public_config
 from afterhours.risk.live import LiveRisk, session_state, upcoming_periods
 from afterhours.state import Store
+
+log = logging.getLogger(__name__)
 
 
 class Shock(BaseModel):
@@ -58,6 +65,16 @@ class Context:
         self.risk = LiveRisk(cfg, make_cache(cfg))
         self._w3: Web3 | None = None
         self._verified: dict[str, dict[str, Any]] = {}
+        self._mainnet: Any = None
+        self._examples: tuple[float, list[str]] | None = None
+
+    def mainnet(self) -> Any:
+        """The read-only mainnet client for the live views (created on first use)."""
+        if self._mainnet is None:
+            from afterhours.live.mainnet import Mainnet
+
+            self._mainnet = Mainnet(self.cfg)
+        return self._mainnet
 
     @property
     def deployment(self) -> dict[str, Any]:
@@ -119,7 +136,15 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     """Build the FastAPI app."""
     cfg = cfg or load_config()
     ctx = Context(cfg)
-    app = FastAPI(title="Afterhours API", version="1")
+    warm_on_start: list[Any] = []
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        for fn in warm_on_start:
+            threading.Thread(target=fn, daemon=True).start()
+        yield
+
+    app = FastAPI(title="Afterhours API", version="1", lifespan=lifespan)
     origins = [o.strip() for o in (cfg.env(cfg.api.cors_origins_env) or "").split(",") if o.strip()]
     if not origins:
         ports = [p for p in (cfg.env(e) for e in cfg.api.web_port_envs) if p]
@@ -494,6 +519,44 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                 )
             },
         }
+
+    # ---------------------------------------------------------------- live mainnet (read-only)
+    def _live(fn: Any) -> Any:
+        try:
+            return fn()
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        except Exception as exc:  # RPC down, rate limited, ...
+            log.warning("live read failed: %s", exc)
+            raise HTTPException(503, "Can't reach Robinhood Chain right now.") from exc
+
+    @app.get("/v1/live/board")
+    def live_board() -> dict[str, Any]:
+        return cast(dict[str, Any], _live(lambda: ctx.mainnet().board()))
+
+    @app.get("/v1/live/positions/{address}")
+    def live_positions(address: str) -> dict[str, Any]:
+        return cast(dict[str, Any], _live(lambda: ctx.mainnet().positions(address)))
+
+    def refresh_examples() -> list[str]:
+        cached = ctx._examples
+        if cached is None or time.time() - cached[0] > cfg.live.market_refresh_minutes * 60:
+            cached = (time.time(), cast(list[str], ctx.mainnet().examples()))
+            ctx._examples = cached
+        return cached[1]
+
+    def warm() -> None:
+        # The first borrower scan reads every Borrow event; do it before a visitor asks.
+        try:
+            refresh_examples()
+        except Exception as exc:
+            log.warning("warming the live examples failed: %s", exc)
+
+    warm_on_start.append(warm)
+
+    @app.get("/v1/live/examples")
+    def live_examples() -> dict[str, Any]:
+        return {"addresses": cast(list[str], _live(refresh_examples))}
 
     @app.get("/v1/replay/scenarios")
     def replay_scenarios() -> dict[str, Any]:

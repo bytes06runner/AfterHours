@@ -35,7 +35,7 @@ else
 fi
 for _ in $(seq 60); do cast chain-id --rpc-url "http://127.0.0.1:$ANVIL_PORT" >/dev/null 2>&1 && break; sleep 1; done  # hardcode-ok: local node
 
-$AH data fetch >/dev/null  # the vault stocks' prices and earnings (cached after the first run)
+$AH data fetch --stock-tokens >/dev/null  # every Stock Token's prices and earnings (vault, risk board, alerts; cached)
 $AH deploy
 $AH sim seed
 $AH api >"$state_dir.api.log" 2>&1 & pids+=($!)

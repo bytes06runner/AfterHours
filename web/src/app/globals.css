@@ -519,3 +519,24 @@ a {
   border-bottom: 2px solid var(--night-brass);
   text-align: center;
 }
+
+/* Live data marker: a verdigris dot that breathes (still with reduced motion). */
+.live-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--c-safe);
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--c-safe) 60%, transparent);
+  animation: live-dot 2s ease-out infinite;
+}
+@keyframes live-dot {
+  to {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+  }
+}

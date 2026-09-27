@@ -509,6 +509,69 @@ export const ReplaySchema = ScenarioSchema.extend({
 });
 export type Replay = z.infer<typeof ReplaySchema>;
 
+const LiveForecast = z.object({
+  symbol: z.string(),
+  period: z.object({
+    starts: z.string(),
+    ends: z.string(),
+    segment: z.string(),
+    hours: z.number(),
+  }),
+  bad_case_drop: z.number(),
+  alpha: z.number(),
+});
+export const LiveBoardSchema = z.object({
+  network: z.string(),
+  block: z.number(),
+  as_of: z.string(),
+  stocks: z.array(
+    z.object({
+      symbol: z.string(),
+      feed: z.string(),
+      price: z.number().nullable(),
+      updated_at: z.string().nullable(),
+      status: z
+        .object({
+          state: z.enum(["frozen", "quiet", "updating"]),
+          age_seconds: z.number(),
+          window_start: z.string(),
+          window_end: z.string(),
+        })
+        .nullable(),
+      tonight: LiveForecast.nullable(),
+      markets: z.array(z.object({ lltv: z.number(), cushion: z.number() })),
+      breached: z.array(z.number()),
+    }),
+  ),
+});
+export type LiveBoard = z.infer<typeof LiveBoardSchema>;
+
+export const LivePositionsSchema = z.object({
+  network: z.string(),
+  address: z.string(),
+  block: z.number(),
+  as_of: z.string(),
+  markets_checked: z.number(),
+  positions: z.array(
+    z.object({
+      market_id: z.string(),
+      symbol: z.string(),
+      lltv: z.number(),
+      loan_is_usdg: z.boolean(),
+      collateral_tokens: z.number(),
+      borrowed: z.number(),
+      supplied: z.number(),
+      price: z.number().nullable(),
+      ltv: z.number().optional(),
+      liquidation_price: z.number().optional(),
+      drop_to_liquidation: z.number().optional(),
+      tonight: LiveForecast.nullable().optional(),
+      breach_tonight: z.boolean().optional(),
+    }),
+  ),
+});
+export type LivePositions = z.infer<typeof LivePositionsSchema>;
+
 export const api = {
   config: (): Promise<PublicConfig> =>
     get("/v1/config/public", z.unknown()).then(parsePublicConfig),
@@ -526,6 +589,10 @@ export const api = {
   reportCard: () => get("/v1/report-card", ReportCardSchema),
   scenarios: () => get("/v1/replay/scenarios", ScenariosSchema),
   replay: (id: string) => get(`/v1/replay/${encodeURIComponent(id)}`, ReplaySchema),
+  liveBoard: () => get("/v1/live/board", LiveBoardSchema),
+  livePositions: (address: string) =>
+    get(`/v1/live/positions/${encodeURIComponent(address)}`, LivePositionsSchema),
+  liveExamples: () => get("/v1/live/examples", z.object({ addresses: z.array(z.string()) })),
 };
 
 export const STREAM_EVENTS = [

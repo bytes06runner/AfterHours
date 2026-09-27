@@ -26,6 +26,34 @@
     "AlertsConfig": {
       "additionalProperties": false,
       "properties": {
+        "max_watches_per_chat": {
+          "exclusiveMinimum": 0,
+          "title": "Max Watches Per Chat",
+          "type": "integer"
+        },
+        "poll_timeout_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Poll Timeout Seconds",
+          "type": "integer"
+        },
+        "refresh_prices": {
+          "title": "Refresh Prices",
+          "type": "boolean"
+        },
+        "store": {
+          "title": "Store",
+          "type": "string"
+        },
+        "telegram_api_base": {
+          "pattern": "^https?://",
+          "title": "Telegram Api Base",
+          "type": "string"
+        },
+        "token_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Token Env",
+          "type": "string"
+        },
         "webhook_env": {
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Webhook Env",
@@ -33,9 +61,36 @@
         }
       },
       "required": [
-        "webhook_env"
+        "webhook_env",
+        "telegram_api_base",
+        "token_env",
+        "poll_timeout_seconds",
+        "store",
+        "max_watches_per_chat",
+        "refresh_prices"
       ],
       "title": "AlertsConfig",
+      "type": "object"
+    },
+    "AnalyticsConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "script_host": {
+          "pattern": "^https?://",
+          "title": "Script Host",
+          "type": "string"
+        },
+        "script_src_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Script Src Env",
+          "type": "string"
+        }
+      },
+      "required": [
+        "script_host",
+        "script_src_env"
+      ],
+      "title": "AnalyticsConfig",
       "type": "object"
     },
     "ApiConfig": {
@@ -794,6 +849,38 @@
       "title": "FixedMapConfig",
       "type": "object"
     },
+    "FrozenWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "hours": {
+          "exclusiveMinimum": 0,
+          "title": "Hours",
+          "type": "number"
+        },
+        "start_time": {
+          "title": "Start Time",
+          "type": "string"
+        },
+        "start_weekday": {
+          "maximum": 6,
+          "minimum": 0,
+          "title": "Start Weekday",
+          "type": "integer"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "timezone",
+        "start_weekday",
+        "start_time",
+        "hours"
+      ],
+      "title": "FrozenWindow",
+      "type": "object"
+    },
     "GapsConfig": {
       "additionalProperties": false,
       "properties": {
@@ -874,6 +961,54 @@
         "verify_from"
       ],
       "title": "LiquidationIncentiveConfig",
+      "type": "object"
+    },
+    "LiveConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "board_cache_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Board Cache Seconds",
+          "type": "integer"
+        },
+        "examples": {
+          "exclusiveMinimum": 0,
+          "title": "Examples",
+          "type": "integer"
+        },
+        "frozen_window": {
+          "$ref": "#/$defs/FrozenWindow"
+        },
+        "lag_blocks": {
+          "exclusiveMinimum": 0,
+          "title": "Lag Blocks",
+          "type": "integer"
+        },
+        "market_refresh_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Market Refresh Minutes",
+          "type": "integer"
+        },
+        "profile": {
+          "title": "Profile",
+          "type": "string"
+        },
+        "quiet_after_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Quiet After Minutes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile",
+        "board_cache_seconds",
+        "quiet_after_minutes",
+        "frozen_window",
+        "market_refresh_minutes",
+        "lag_blocks",
+        "examples"
+      ],
+      "title": "LiveConfig",
       "type": "object"
     },
     "LltvTiers": {
@@ -1820,6 +1955,9 @@
     "WebConfig": {
       "additionalProperties": false,
       "properties": {
+        "analytics": {
+          "$ref": "#/$defs/AnalyticsConfig"
+        },
         "api_base_url_env": {
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Api Base Url Env",
@@ -1833,7 +1971,8 @@
       },
       "required": [
         "api_base_url_env",
-        "walletconnect_project_id_env"
+        "walletconnect_project_id_env",
+        "analytics"
       ],
       "title": "WebConfig",
       "type": "object"
@@ -1874,6 +2013,9 @@
     },
     "gaps": {
       "$ref": "#/$defs/GapsConfig"
+    },
+    "live": {
+      "$ref": "#/$defs/LiveConfig"
     },
     "local_node": {
       "$ref": "#/$defs/LocalNodeConfig"
@@ -1933,7 +2075,8 @@
     "schedule",
     "api",
     "web",
-    "alerts"
+    "alerts",
+    "live"
   ],
   "title": "Afterhours configuration",
   "type": "object"

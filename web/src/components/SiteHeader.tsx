@@ -10,6 +10,8 @@ const NAV = [
   { href: "/ledger", label: "Ledger" },
   { href: "/replay", label: "Replay" },
   { href: "/report-card", label: "Report card" },
+  { href: "/live", label: "Risk board" },
+  { href: "/positions", label: "Check a position" },
 ];
 
 export function SiteHeader() {
@@ -18,7 +20,7 @@ export function SiteHeader() {
       <Link href="/" className="font-display text-[24px] no-underline sm:text-[28px]">
         Afterhours
       </Link>
-      <nav aria-label="Main" className="ml-4 hidden gap-6 text-[16px] font-semibold lg:flex">
+      <nav aria-label="Main" className="ml-4 hidden gap-6 text-[16px] font-semibold xl:flex">
         {NAV.map((n) => (
           <Link key={n.href} href={n.href} className="no-underline hover:underline">
             {n.label}
@@ -33,7 +35,7 @@ export function SiteHeader() {
           <DayNightSwitch />
         </span>
         <WalletButton />
-        <details className="relative lg:hidden">
+        <details className="relative xl:hidden">
           <summary className="btn btn-quiet !min-h-[40px] !text-[16px] list-none" aria-label="Menu">
             Menu
           </summary>

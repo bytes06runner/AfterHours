@@ -316,5 +316,35 @@ api:
   sse_heartbeat_seconds: 15
   almanac_max_days: 60
   reasons_page_size: 20
-web: { api_base_url_env: NEXT_PUBLIC_API_BASE_URL, walletconnect_project_id_env: NEXT_PUBLIC_WC_PROJECT_ID }
-alerts: { webhook_env: ALERT_WEBHOOK_URL }
+
+# Live, read-only views of Robinhood Chain mainnet: the position checker, the risk board and the
+# Telegram alerts. Nothing here signs a transaction or holds funds.
+live:
+  profile: rh-mainnet                  # RPC from RH_MAINNET_RPC_URL, else the chain's public RPC
+  board_cache_seconds: 60
+  quiet_after_minutes: 60              # outside the weekend window, no update this long = "quiet"
+  # M1 oracle study (artifacts/discovery/oracle_study.json): Stock Token feeds post nothing from
+  # Friday 20:00 to Sunday 20:00 New York. start_weekday: Monday = 0.
+  frozen_window: { timezone: America/New_York, start_weekday: 4, start_time: "20:00", hours: 48 }
+  market_refresh_minutes: 30           # rescan CreateMarket events from the last scanned block
+  lag_blocks: 30                       # read a little behind the head (public nodes lag)
+  examples: 3                          # live borrower addresses offered as examples in the checker
+
+# Telegram alerts (core.telegram.org/bots/api: https://api.telegram.org/bot<token>/METHOD_NAME).
+alerts:
+  webhook_env: ALERT_WEBHOOK_URL
+  telegram_api_base: https://api.telegram.org
+  token_env: TELEGRAM_BOT_TOKEN
+  poll_timeout_seconds: 25
+  store: alerts.json                   # subscriptions, in paths.state_dir
+  max_watches_per_chat: 20             # stocks plus addresses one chat may follow
+  refresh_prices: true                 # refresh every Stock Token's prices before each check
+
+# Web analytics: Plausible (cookieless). The site's own script URL comes from Plausible when the
+# site is added (plausible.io/docs/nextjs-integration); it is loaded only from script_host.
+web:
+  api_base_url_env: NEXT_PUBLIC_API_BASE_URL
+  walletconnect_project_id_env: NEXT_PUBLIC_WC_PROJECT_ID
+  analytics:
+    script_host: https://plausible.io
+    script_src_env: NEXT_PUBLIC_PLAUSIBLE_SRC

@@ -48,6 +48,8 @@ const PAGES = [
   { href: "/ledger", label: "Ledger" },
   { href: "/replay", label: "Replay" },
   { href: "/report-card", label: "Report card" },
+  { href: "/live", label: "Live risk board" },
+  { href: "/positions", label: "Check a position" },
 ];
 
 export function SiteFooter() {
@@ -59,8 +61,9 @@ export function SiteFooter() {
           <div>
             <p className="font-display text-[36px] leading-none">Afterhours</p>
             <p className="mt-3 max-w-[60ch] text-[14px]">
-              A lending vault for Robinhood Stock Tokens. The running demo is a simulation on a
-              local chain. Backtests are historical stock prices, simulated vault, with modelled
+              A lending vault for Robinhood Stock Tokens. The vault on this site is a simulation on
+              a local chain. The risk board and position checker read Robinhood Chain mainnet live
+              and read-only. Backtests are historical stock prices, simulated vault, with modelled
               rates. Nothing here is financial advice.
             </p>
           </div>

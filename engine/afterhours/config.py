@@ -357,15 +357,6 @@ class ApiConfig(_Strict):
     reasons_page_size: PositiveInt
 
 
-class WebConfig(_Strict):
-    api_base_url_env: EnvName
-    walletconnect_project_id_env: EnvName
-
-
-class AlertsConfig(_Strict):
-    webhook_env: EnvName
-
-
 class DiscoverySources(_Strict):
     """Where each discovered fact comes from. Every entry is an official or primary source."""
 
@@ -404,6 +395,44 @@ class DiscoveryConfig(_Strict):
     user_agent: str
 
 
+class FrozenWindow(_Strict):
+    timezone: str
+    start_weekday: Annotated[int, Field(ge=0, le=6)]
+    start_time: str
+    hours: Annotated[float, Field(gt=0)]
+
+
+class LiveConfig(_Strict):
+    profile: str
+    board_cache_seconds: PositiveInt
+    quiet_after_minutes: PositiveInt
+    frozen_window: FrozenWindow
+    market_refresh_minutes: PositiveInt
+    lag_blocks: PositiveInt
+    examples: PositiveInt
+
+
+class AlertsConfig(_Strict):
+    webhook_env: EnvName
+    telegram_api_base: HttpUrlStr
+    token_env: EnvName
+    poll_timeout_seconds: PositiveInt
+    store: str
+    max_watches_per_chat: PositiveInt
+    refresh_prices: bool
+
+
+class AnalyticsConfig(_Strict):
+    script_host: HttpUrlStr
+    script_src_env: EnvName
+
+
+class WebConfig(_Strict):
+    api_base_url_env: EnvName
+    walletconnect_project_id_env: EnvName
+    analytics: AnalyticsConfig
+
+
 class AfterhoursConfig(BaseSettings):
     """The whole configuration. Build it with `load_config`, not directly."""
 
@@ -435,6 +464,7 @@ class AfterhoursConfig(BaseSettings):
     api: ApiConfig
     web: WebConfig
     alerts: AlertsConfig
+    live: LiveConfig
 
     @classmethod
     def settings_customise_sources(

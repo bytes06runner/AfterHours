@@ -8,19 +8,11 @@ import { usePhase } from "@/lib/phase";
 import { useConfig } from "@/lib/queries";
 
 import { Telegram } from "./Telegram";
+import { ZonedTime } from "./ZonedTime";
 
-function nextPlan(
-  nextClose: string | undefined,
-  preCloseMinutes: number | undefined,
-): string | null {
+function nextPlan(nextClose: string | undefined, preCloseMinutes: number | undefined): Date | null {
   if (!nextClose || preCloseMinutes === undefined) return null;
-  const at = new Date(new Date(nextClose).getTime() - preCloseMinutes * 60_000);
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    weekday: "long",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(at);
+  return new Date(new Date(nextClose).getTime() - preCloseMinutes * 60_000);
 }
 
 /** Every reason the bot anchored onchain, newest first. */
@@ -72,9 +64,13 @@ export function LedgerView() {
       {query.isSuccess && cards.length === 0 && (
         <p className="mt-10 text-[18px]">
           No moves yet.{" "}
-          {when
-            ? `The next plan runs at the pre-close check, ${when} New York time.`
-            : "The next plan runs at the next pre-close check."}
+          {when ? (
+            <>
+              The next plan runs at the pre-close check, <ZonedTime iso={when} />.
+            </>
+          ) : (
+            "The next plan runs at the next pre-close check."
+          )}
         </p>
       )}
       <p className="mt-8 text-[14px]">{total > 0 && `${total} reasons`}</p>

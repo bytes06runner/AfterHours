@@ -19,6 +19,7 @@ import { formatPct } from "@/lib/time";
 
 import { RiskGauge } from "./RiskGauge";
 import { DriverBars } from "./DriverBars";
+import { ZonedTime } from "./ZonedTime";
 
 const DAYS = 14;
 const TZ = "America/New_York";
@@ -339,9 +340,8 @@ function Detail({ stock, risk }: { stock: Risk["stocks"][number]; risk: Risk }) 
       </h2>
       <p className="mt-1 text-[16px]">
         Worst of the next {risk.lookahead_closed_periods} closed periods:{" "}
-        {SEGMENT[w.period.segment]?.toLowerCase()} from{" "}
-        {fmt(Date.parse(w.period.starts), { weekday: "long", hour: "numeric", minute: "2-digit" })}{" "}
-        New York, {w.period.hours} hours closed.
+        {SEGMENT[w.period.segment]?.toLowerCase()} from <ZonedTime iso={w.period.starts} />,{" "}
+        {w.period.hours} hours closed.
       </p>
       <div className="mt-5 grid gap-8 md:grid-cols-[300px_1fr]">
         <RiskGauge drop={w.bad_case_drop} pullLimit={p.pull_limit} pulled={p.pulled} />

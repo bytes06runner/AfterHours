@@ -184,7 +184,7 @@ make setup     # uv, pnpm and Foundry dependencies; about 5.5 minutes the first 
 make demo      # local chain, contracts, seeded borrowers, API, bot, web app, then the closing bell
 ```
 
-`make demo` fetches daily prices and earnings for the five vault stocks on its first run, deploys
+`make demo` fetches daily prices and earnings for every Stock Token on its first run, deploys
 Morpho, the vault and simulated Stock Tokens on Anvil, and replays the week of 2025-04-22: before
 META's 2025-04-30 earnings, the bot's forecast bad case for META exceeds every tier's limit, so
 it pulls META's unborrowed money and anchors the reason in the onchain registry. It took 1 minute 22 seconds on the
@@ -199,6 +199,14 @@ make e2e          # Playwright: the demo flow, every page on desktop and mobile,
 make lighthouse   # production build, every page
 make screens      # screenshots at 1440, 1024 and 390 px
 ```
+
+Live, read-only on Robinhood Chain mainnet (no keys, no custody; labelled "Live" in the app):
+the risk board at `/live` (every Stock Token's feed, whether it is frozen now, tonight's bad
+case against each lending market's cushion) and the position checker at `/positions` (any
+address's Morpho loans against Stock Tokens: LTV, liquidation price, and whether tonight's bad
+case reaches it). `make alerts` runs the Telegram bot (`/watch NVDA` or `/watch 0x...`), which
+messages before the close only when tonight looks risky; it needs `TELEGRAM_BOT_TOKEN` from
+@BotFather in `.env`.
 
 Other commands: `make report` regenerates the gap study, model and backtest; `make test`,
 `make lint`, `make test-integration`; `make help` lists everything.

@@ -40,6 +40,20 @@
    `NEXT_PUBLIC_WC_PROJECT_ID` in `.env` (and in the web host's environment when it is hosted);
    MetaMask mobile, Rainbow, OKX and the QR option then appear under "More wallets".
 
+4. **Telegram alert bot needs a bot token.** The bot is built and tested with fakes; it has not
+   talked to Telegram yet. Please:
+   a. In Telegram, message @BotFather, send `/newbot`, pick a name and a username ending in `bot`.
+   b. Put the token it gives you in `.env` as `TELEGRAM_BOT_TOKEN=...` (git-ignored; I never
+      read `.env`). Optionally send BotFather `/setcommands` with: watch, unwatch, list, stop, help.
+   c. Run `make alerts` (refreshes all Stock Token prices, then long-polls). It must stay running
+      to send pre-close alerts, so when hosted it runs next to the API (BLOCKED 2d).
+   Then message your bot `/watch NVDA` and tell me in chat; I will check a real round trip.
+
+5. **Plausible analytics needs your site's script URL.** Add the hosted domain as a site at
+   plausible.io, copy the script URL it shows (`https://plausible.io/js/pa-....js`) and set
+   `NEXT_PUBLIC_PLAUSIBLE_SRC` in the web host's environment. The script loads only in production
+   builds and only from `web.analytics.script_host`; nothing about it is shown to visitors.
+
 ## Milestones
 
 - [x] M0 Bootstrap (2026-09-26, `d185414`)
@@ -692,3 +706,35 @@ Reported: in Brave, choosing "Browser Wallet" left the modal spinning with no wa
 - Hosting note: the web host needs the same `NEXT_PUBLIC_WC_PROJECT_ID`, and if the Reown project
   has a domain allowlist, the hosted domain must be on it.
 
+### 2026-09-27 Live, read-only tools for real users (mainnet)
+
+Analysis stays frozen: no strategy, setting or backtest changed. The vault stays labelled
+Simulation; the new pages say "Live: Robinhood Chain mainnet, read-only, block N".
+- Risk board (`/live`, `GET /v1/live/board`): every Stock Token with a verified feed (35 today,
+  from `discovered/`), its price, last update, whether it is frozen now (M1 window, in config
+  under `live.frozen_window`) and tonight's forecast bad case, plus which USDG Morpho markets'
+  cushions it reaches. Cached `live.board_cache_seconds`.
+- Position checker (`/positions`, `GET /v1/live/positions/{address}`): any address or the
+  connected wallet; per Morpho position borrowed, collateral, LTV, liquidation price, the fall to
+  get there, and whether tonight's bad case reaches it. Markets come from CreateMarket events
+  (registry in `data/state/live-markets.json`, rescanned every `live.market_refresh_minutes`).
+  "Try a live borrower" offers addresses from Borrow events with an open loan (kept in
+  `data/state/live-borrowers.json`, scanned incrementally and warmed when the API starts; first
+  scan about 90 s, then milliseconds).
+- Checked by hand against `cast`: 0x4987...C7CB holds 1,300 NVDA against 99,000.81 USDG in the
+  62.5% market, LTV 33.7%, liquidation at 121.85 USDG.
+- Telegram alerts (`afterhours alerts run`, `make alerts`): /watch a stock or an address,
+  /unwatch, /list, /stop. Inside the pre-close window (`schedule.pre_close_minutes`) each
+  subscription is checked once per close; it alerts only when tonight's bad case reaches a
+  market cushion (stock) or a position's fall to liquidation (address). Token from
+  `alerts.token_env`, never logged. Waits on BLOCKED 4 for a real round trip.
+- All 35 Stock Tokens' prices are fetched (`afterhours data fetch --stock-tokens`, called by
+  `demo.sh`, `make alerts` and the bot before each check), so every row has a forecast.
+- Session and forecast times show New York time and the visitor's own time zone.
+- Plausible: `next-plausible` in the root layout, production only, script host from config,
+  site URL from `NEXT_PUBLIC_PLAUSIBLE_SRC` (BLOCKED 5). No UI.
+- "About 1 night in N" now comes from the forecast's alpha instead of a literal.
+- Evidence: `tests/test_alerts.py` (commands, limits, the pre-close window, once per close, quiet
+  nights, restart); `e2e/live.spec.ts` (board rows match the API, filters, unreachable chain,
+  invalid address, empty wallet, live borrower card with tonight's line). `make test-py` 60
+  passed, `make e2e` 48 passed, lint, hardcode and numbers checks clean.

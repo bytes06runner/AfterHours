@@ -35,6 +35,10 @@ export const PublicConfigSchema = z.object({
     oracle: z.boolean(),
     collateral: z.boolean(),
   }),
+  live: z
+    .object({ network: z.string(), explorer_url: z.url({ protocol: /^https?$/ }).nullable() })
+    .optional(),
+  analytics: z.object({ script_host: z.url({ protocol: /^https$/ }) }).optional(),
   vault: z.object({
     name: z.string().min(1),
     symbol: z.string().min(1),

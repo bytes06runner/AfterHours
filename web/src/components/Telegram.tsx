@@ -7,6 +7,7 @@ import { TornEdge } from "@/art/TornEdge";
 
 import { DriverBars } from "./DriverBars";
 import { VerifyBadge } from "./VerifyBadge";
+import { ZonedTime } from "./ZonedTime";
 
 const TIER = {
   weekday: "weekday tier",
@@ -14,17 +15,6 @@ const TIER = {
   weekend: "weekend tier",
   idle: "idle",
 } as Record<string, string>;
-
-function when(iso: string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(iso));
-}
 
 /** A reason card printed as a telegram slip. */
 export function Telegram({ card, compact = false }: { card: Card; compact?: boolean }) {
@@ -41,7 +31,9 @@ export function Telegram({ card, compact = false }: { card: Card; compact?: bool
               ? `Deposits now route to ${card.stock}'s ${(card.to_tier ?? "").split(":")[1] ?? ""} tier`
               : `${card.stock}: ${formatUsd(Number(card.amount_usdg))} USDG from ${from} to ${to}`}
           </h3>
-          <p className="text-[14px]">{when(card.created_at)} New York</p>
+          <p className="text-[14px]">
+            <ZonedTime iso={card.created_at} />
+          </p>
         </header>
         <p className="mt-4 text-[18px] leading-[1.5]">{card.rule_fired}</p>
         {!compact && (

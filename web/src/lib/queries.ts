@@ -31,6 +31,17 @@ export const usePrices = () =>
 export const useRisk = () => useQuery({ queryKey: keys.risk, queryFn: api.risk, retry: 1 });
 export const useAlmanac = (days: number) =>
   useQuery({ queryKey: keys.almanac(days), queryFn: () => api.almanac(days), retry: 1 });
+export const useLiveBoard = () =>
+  useQuery({ queryKey: ["live-board"], queryFn: api.liveBoard, refetchInterval: MINUTE, retry: 1 });
+export const useLiveExamples = () =>
+  useQuery({ queryKey: ["live-examples"], queryFn: api.liveExamples, staleTime: 10 * MINUTE });
+export const useLivePositions = (address: string | null) =>
+  useQuery({
+    queryKey: ["live-positions", address ?? ""],
+    queryFn: () => api.livePositions(address!),
+    enabled: Boolean(address),
+    retry: 0,
+  });
 export const useReportCard = () =>
   useQuery({ queryKey: keys.reportCard, queryFn: api.reportCard, staleTime: 60 * MINUTE });
 export const useScenarios = () =>

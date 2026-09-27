@@ -32,6 +32,11 @@ def public_config(cfg: AfterhoursConfig) -> dict[str, Any]:
             "collateral": profile.collateral_mode == "simulated",
         },
         "vault": {"name": cfg.vault.name, "symbol": cfg.vault.symbol},
+        "live": {
+            "network": cfg.chains[cfg.profiles[cfg.live.profile].chain].name,
+            "explorer_url": cfg.chains[cfg.profiles[cfg.live.profile].chain].explorer_url,
+        },
+        "analytics": {"script_host": cfg.web.analytics.script_host},
         "exchange_calendar": cfg.data.exchange_calendar,
         "schedule": {
             "hourly": cfg.schedule.hourly,

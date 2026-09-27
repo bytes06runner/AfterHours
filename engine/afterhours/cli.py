@@ -80,12 +80,19 @@ def data_build() -> None:
 
 
 @data_app.command("fetch")
-def data_fetch(symbols: Annotated[list[str] | None, typer.Argument()] = None) -> None:
+def data_fetch(
+    symbols: Annotated[list[str] | None, typer.Argument()] = None,
+    stock_tokens: Annotated[
+        bool, typer.Option(help="Every Stock Token with a feed (the risk board and alerts).")
+    ] = False,
+) -> None:
     """Prices and earnings for the vault's stocks only (enough for the bot, API and demo)."""
     from afterhours.data.pipeline import fetch_symbols, vault_symbols
+    from afterhours.data.universe import stock_token_tickers
 
-    rows = fetch_symbols(load_config(), symbols or vault_symbols(load_config()))
-    typer.echo(json.dumps(rows))
+    cfg = load_config()
+    wanted = symbols or (stock_token_tickers(cfg)[0] if stock_tokens else vault_symbols(cfg))
+    typer.echo(json.dumps(fetch_symbols(cfg, wanted)))
 
 
 @app.command("gaps")
@@ -243,6 +250,32 @@ def bot_run() -> None:
 
     _logging()
     BotScheduler(load_config()).run()
+
+
+alerts_app = typer.Typer(no_args_is_help=True, help="Telegram alerts (read-only, mainnet).")
+app.add_typer(alerts_app, name="alerts")
+
+
+@alerts_app.command("run")
+def alerts_run() -> None:
+    """Answer Telegram commands and send pre-close alerts. Needs the bot token in .env."""
+    from afterhours.data.pipeline import fetch_symbols
+    from afterhours.data.universe import stock_token_tickers
+    from afterhours.live.alerts import AlertBot, telegram_from_config
+    from afterhours.live.mainnet import Mainnet
+
+    _logging()
+    cfg = load_config()
+    try:
+        chat = telegram_from_config(cfg)
+    except RuntimeError as exc:
+        raise typer.BadParameter(str(exc)) from None
+
+    def refresh() -> None:
+        if cfg.alerts.refresh_prices:
+            fetch_symbols(cfg, stock_token_tickers(cfg)[0])
+
+    AlertBot(cfg, Mainnet(cfg), chat, refresh=refresh).run()
 
 
 @sim_app.command("seed")
