@@ -834,3 +834,9 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   Blueprint secret audits). `make test-py` 75 passed, web 25, contracts 22, `make e2e` 48,
   `make lint` clean.
 - Paid path kept: `render.yaml` with a disk.
+- After pushing (the workflow is live on GitHub): `afterhours pre-close` crashed when its two-day
+  range held no session (a Sunday, or a Monday holiday such as Labor Day). `sessions()` now
+  returns an empty frame for an empty exchange schedule; tests for Sunday and 2026-09-07. And
+  `alerts check` skips with a message when the Telegram token is not set yet, so scheduled runs
+  stay green until the secrets are added. Checked locally with no secrets: `pre-close`, `bot due`
+  and `alerts check` all exit 0.

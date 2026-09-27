@@ -349,11 +349,11 @@ def alerts_check() -> None:
 
     _logging()
     cfg = load_config()
-    try:
-        chat = telegram_from_config(cfg)
-    except RuntimeError as exc:
-        raise typer.BadParameter(str(exc)) from None
-    sent = AlertBot(cfg, Mainnet(cfg), chat).check()
+    if not cfg.env(cfg.alerts.token_env):
+        # Not set up yet (docs/HOSTING.md step 8): skip without failing the scheduled run.
+        typer.echo(f"{cfg.alerts.token_env} is not set; no alerts to send")
+        return
+    sent = AlertBot(cfg, Mainnet(cfg), telegram_from_config(cfg)).check()
     typer.echo(f"sent {sent} alerts")
 
 

@@ -48,6 +48,9 @@ FEATURES = [
 def sessions(calendar: str, start: date, end: date) -> pd.DataFrame:
     """Exchange sessions with UTC open and close times, indexed by session date."""
     sched = mcal.get_calendar(calendar).schedule(start_date=start, end_date=end)
+    if sched.empty:  # a weekend or holiday range: no sessions, not an error
+        empty = pd.Series([], dtype="datetime64[ns, UTC]")
+        return pd.DataFrame({"open": empty, "close": empty}, index=pd.Index([], name="session"))
     out = pd.DataFrame(
         {
             "open": sched["market_open"].dt.tz_convert("UTC"),

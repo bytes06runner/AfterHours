@@ -108,6 +108,9 @@ def test_window() -> None:
     assert close == datetime(2026, 9, 25, 20, 0, tzinfo=UTC)  # 16:00 New York
     assert check_window(cfg, MIDDAY) is None
     assert check_window(cfg, datetime(2026, 9, 26, 18, 30, tzinfo=UTC)) is None  # Saturday
+    # No session at all in the range it looks at: Sunday, and Labor Day Monday 2026-09-07.
+    assert check_window(cfg, datetime(2026, 9, 27, 18, 30, tzinfo=UTC)) is None
+    assert check_window(cfg, datetime(2026, 9, 7, 18, 30, tzinfo=UTC)) is None
 
 
 def test_alerts_once_per_close(tmp_path: Path) -> None:
