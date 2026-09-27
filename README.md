@@ -1,28 +1,50 @@
 # Afterhours
 
-**Live:** [after-hours-web-eta.vercel.app](https://after-hours-web-eta.vercel.app) (web app) ·
-[afterhours-api.onrender.com/v1/health](https://afterhours-api.onrender.com/v1/health) (API).
-The vault runs on Robinhood Chain Testnet with simulated tokens; the risk board and position
-checker read Robinhood Chain mainnet, read-only.
+A risk-curated lending vault for Robinhood Stock Tokens on Morpho. It lends USDG to each stock in
+the riskiest market that stock's history allows, pulls back the money borrowers are not using
+before nights that could gap past every market's cushion, and writes the reason for every move
+onchain.
 
-A lending vault for Robinhood Stock Tokens. It lends USDG to each stock in the riskiest Morpho
-market that stock's history allows, pulls back the money borrowers are not using before nights
-that could gap past every market's cushion, and writes the reason for every move onchain.
+**[Live app](https://after-hours-web-eta.vercel.app)** ·
+**[API health](https://afterhours-api.onrender.com/v1/health)** ·
+**[Testnet vault](https://explorer.testnet.chain.robinhood.com/address/0xD4791630C02FF7462536bAEae7BcE13c5917E6d3)** ·
+**[Build log](PROGRESS.md)** ·
+**[Hosting guide](docs/HOSTING.md)**
 
-In the held-out backtest (2022-01-03 to 2026-09-24, settings chosen on earlier years only) it
-earned 9.12% against 9.09% for the fixed weekday/weekend mix with the nearest yield, with 5,849
-USDG of bad debt against 11,132: the same yield as the best fixed mix, with about half the loss.
-Historical stock prices, simulated vault, modelled rates: real Stock Token markets on Morpho paid
-lenders 0.0016% at block 73,650,323.
+![The Afterhours landing page at night, with the exchange closed and the price ticker](artifacts/screens/live/landing.png)
 
-Built for the Colosseum Crypto World's Fair, Robinhood Chain track (the same code runs on
-Arbitrum). Status and evidence for every step: [PROGRESS.md](PROGRESS.md).
+Built for the Colosseum Crypto World's Fair, Robinhood Chain track; the same code runs on
+Arbitrum.
 
-Everything in the running demo is labelled Simulation: it runs on a local chain with simulated
-USDG, Stock Tokens and price feeds. Backtests are "historical stock prices, simulated vault".
-Every number below comes from a generated file in `artifacts/`; `artifacts/report/numbers.json`
-lists them with their sources, and `scripts/check-numbers.py` fails if this README quotes one
-that is not there.
+> **What is real and what is simulated.** The vault runs on Robinhood Chain Testnet with
+> simulated USDG, Stock Tokens and price feeds, and the app labels it Simulation. The risk board
+> and position checker read Robinhood Chain mainnet live, read-only. Backtests are "historical
+> stock prices, simulated vault". Every number in this README comes from a generated file in
+> `artifacts/`; `artifacts/report/numbers.json` lists each with its source, and
+> `scripts/check-numbers.py` fails if this file quotes one that is not there.
+
+## Contents
+
+- [Results in brief](#results-in-brief)
+- [The problem](#the-problem)
+- [How it works](#how-it-works)
+- [What you can use today](#what-you-can-use-today)
+- [Results](#results)
+- [Architecture](#architecture)
+- [Run it locally](#run-it-locally)
+- [Deployments](#deployments)
+- [Testing and checks](#testing-and-checks)
+- [Limitations](#limitations)
+- [Future work](#future-work)
+- [Prior work](#prior-work)
+
+## Results in brief
+
+In the held-out backtest (2022-01-03 to 2026-09-24, settings chosen on earlier years only),
+Afterhours earned 9.12% against 9.09% for the fixed weekday/weekend mix with the nearest yield,
+with 5,849 USDG of bad debt against 11,132: the same yield as the best fixed mix, with about half
+the loss. These are historical stock prices, a simulated vault and modelled rates: real Stock
+Token markets on Morpho paid lenders 0.0016% at block 73,650,323.
 
 ## The problem
 
@@ -38,9 +60,9 @@ earnings nights opened 10% or more below the previous close; over all 2,032,976 
 it was 0.08% (`artifacts/gaps/summary.json`). A loan at a high loan-to-value limit can reopen
 worth less than its debt, and the lenders take the loss.
 
-Lenders face a trade-off. Lend in a market with a high limit and earn more while taking the
-gaps, or a low one and earn less. Every fixed mix of the two sits on one line; Afterhours sits
-above it.
+Lenders face a trade-off: lend in a market with a high limit and earn more while taking the
+gaps, or in a low one and earn less. Every fixed mix of the two sits on one line; Afterhours
+sits above it.
 
 ## How it works
 
@@ -64,6 +86,30 @@ above it.
 
 The interface follows the real exchange clock: a daylit art deco exchange while the market is
 open, night after the closing bell, drawn entirely in code.
+
+![The ledger: each vault move with its reason, forecast breakdown and a Verify on chain button](artifacts/screens/live/ledger.png)
+
+## What you can use today
+
+All of these are live at [after-hours-web-eta.vercel.app](https://after-hours-web-eta.vercel.app).
+
+| Page | What it shows | Data |
+| --- | --- | --- |
+| Landing, Vault | The vault's allocation across stocks and tiers, the exchange clock, deposit and withdraw | Robinhood Chain Testnet, simulated tokens |
+| Ledger | Every move the vault made with its reason card; "Verify on chain" recomputes the hash and checks the registry | Testnet registry |
+| Almanac | Each stock's forecast bad case for the closed periods ahead | Historical prices, live model |
+| Replay | Past nights replayed on a simulated vault, such as META's 2022 earnings gap | Historical stock prices, simulated vault |
+| Report card | How the policy and the forecasting model were chosen and judged | Generated artifacts |
+| Risk board | Every Stock Token: when its feed last moved, whether it is frozen now, and tonight's bad case against each lending market's cushion | Robinhood Chain mainnet, read-only |
+| Check a position | Any address's Morpho loans against Stock Tokens: loan-to-value, liquidation price, and whether tonight's bad case reaches it | Robinhood Chain mainnet, read-only |
+
+Session and forecast times show in New York time and in the visitor's own time zone. Wallets
+connect through RainbowKit (browser wallets and WalletConnect); nothing on mainnet is ever
+signed.
+
+**Telegram alerts.** A bot follows a stock (`/watch NVDA`) or an address (`/watch 0x...`) and
+messages before the close only when tonight looks risky for it. Setup is in
+[docs/HOSTING.md](docs/HOSTING.md), steps 2 and 7.
 
 ## Results
 
@@ -103,7 +149,7 @@ the second evaluation on that window. Details and every run: `artifacts/backtest
 **All 35 Stock Token underlyings:** B 9.37%, 4,444 USDG, 0.083%; nearest blend (100% weekday)
 9.34%, 12,646, 0.244%; fixed map 9.28%, 13,380, 0.244%; dynamic 9.04%, 1,339, 0.025%.
 
-Facts that go with these numbers:
+What goes with these numbers:
 - B against the nearest static blend: yield 9.12% vs 9.09%, bad debt 5,849 vs 11,132 USDG,
   worst single night 0.107% vs 0.220% of the vault.
 - B against the fixed map: yield 9.12% vs 9.13%, bad debt 5,849 vs 8,482 USDG, worst single
@@ -144,42 +190,57 @@ read with each market's interest rate model at that block). The market is early.
 
 ```mermaid
 flowchart LR
-  subgraph data[Data and model]
+  subgraph research[Research, offline]
     P[Prices and earnings] --> G[Gap dataset]
     G --> M[Walk-forward model and baselines]
     M --> RC[Report card]
     G --> BT[Backtest and replays]
   end
-  subgraph engine[Engine]
-    R[Live risk: bad-case drop per closed period] --> LP[Policy LP: allowed tiers, allocation]
-    LP --> BOT[Bot: allocator of the vault]
-    BOT --> RS[Reason cards: RFC 8785 + keccak]
-    API[FastAPI and event stream]
+  subgraph api[API: FastAPI on Render]
+    R[Live risk: bad-case drop per closed period]
+    LIVE[Risk board and position checker]
+    TGW[Telegram webhook]
   end
-  subgraph chain[Robinhood Chain or Arbitrum]
-    V[Morpho Vault V2] --> MK[Morpho Blue markets: weekday and weekend tier per stock]
+  subgraph jobs[Scheduled: GitHub Actions]
+    BOT[Pre-close bot cycle: policy LP, allocator]
+    AL[Pre-close Telegram alerts]
+  end
+  subgraph testnet[Robinhood Chain Testnet]
+    V[Morpho Vault V2] --> MK[Morpho Blue markets: three tiers per stock]
     REG[AfterhoursReasonRegistry]
-    O[Chainlink feeds or SimOracle]
   end
+  subgraph mainnet[Robinhood Chain mainnet, read-only]
+    FEEDS[Chainlink Stock Token feeds]
+    MM[Morpho markets with Stock Token collateral]
+  end
+  KV[(Upstash Redis: bot history, subscriptions)]
+  WEB[Next.js app on Vercel]
   M --> R
+  R --> BOT
   BOT --> V
-  RS --> REG
-  O --> MK
-  API --> WEB[Next.js app: vault, almanac, ledger, replay, report card]
+  BOT -- reason hash --> REG
+  BOT --> KV
+  AL --> KV
+  TGW --> KV
+  FEEDS --> LIVE
+  MM --> LIVE
+  KV --> api
+  api --> WEB
   WEB -- verify hash --> REG
 ```
 
 | Folder | What is there |
 | --- | --- |
-| `engine/afterhours/` | Python: discovery, data, features, model, risk, policy, backtest, bot, API, simulation |
+| `engine/afterhours/` | Python: discovery, data, features, model, risk, policy, backtest, bot, API, live mainnet views, Telegram alerts, simulation |
 | `contracts/` | Foundry: reason registry, simulated tokens and oracle, deploy script for Morpho markets and Vault V2 |
 | `web/` | Next.js 16, React 19, Tailwind 4, visx, wagmi and RainbowKit, Playwright |
 | `config/afterhours.yaml` | Every address source, parameter and URL; nothing is hardcoded (`make lint-hardcode`) |
 | `artifacts/` | Generated results: discovery, gap study, model report card, backtest, replays, screenshots, Lighthouse |
 | `deployments/` | Deployed and discovered addresses per profile |
-| `updates/` | Builder update drafts |
+| `docs/` | Hosting guide, findings, pitch script |
+| `.github/workflows/` | The scheduled pre-close jobs |
 
-## Run it
+## Run it locally
 
 From a clean clone, with no `.env` and no keys (everything runs on a local chain, labelled
 Simulation):
@@ -192,37 +253,29 @@ make demo      # local chain, contracts, seeded borrowers, API, bot, web app, th
 `make demo` fetches daily prices and earnings for every Stock Token on its first run, deploys
 Morpho, the vault and simulated Stock Tokens on Anvil, and replays the week of 2025-04-22: before
 META's 2025-04-30 earnings, the bot's forecast bad case for META exceeds every tier's limit, so
-it pulls META's unborrowed money and anchors the reason in the onchain registry. It took 1 minute 22 seconds on the
-clean-clone check (2026-09-27). Open the web app at `http://localhost:$WEB_PORT` (3000 unless
-you change it). Ports come from `.env.example`; set `ANVIL_PORT`, `API_PORT` or `WEB_PORT` in
-the environment to use others.
+it pulls META's unborrowed money and anchors the reason in the onchain registry. It took 1 minute
+22 seconds on the clean-clone check (2026-09-27). Open the web app at `http://localhost:$WEB_PORT`
+(3000 unless you change it). Ports come from `.env.example`; set `ANVIL_PORT`, `API_PORT` or
+`WEB_PORT` in the environment to use others.
 
-`make up` starts the same stack without the scripted scenario. With it running:
+`make up` starts the same stack without the scripted scenario. Other commands:
 
-```bash
-make e2e          # Playwright: the demo flow, every page on desktop and mobile, error states
-make lighthouse   # production build, every page
-make screens      # screenshots at 1440, 1024 and 390 px
-```
-
-Live, read-only on Robinhood Chain mainnet (no keys, no custody; labelled "Live" in the app):
-the risk board at `/live` (every Stock Token's feed, whether it is frozen now, tonight's bad
-case against each lending market's cushion) and the position checker at `/positions` (any
-address's Morpho loans against Stock Tokens: LTV, liquidation price, and whether tonight's bad
-case reaches it). `make alerts` runs the Telegram bot (`/watch NVDA` or `/watch 0x...`), which
-messages before the close only when tonight looks risky; it needs `TELEGRAM_BOT_TOKEN` from
-@BotFather in `.env`.
-
-Other commands: `make report` regenerates the gap study, model and backtest; `make test`,
-`make lint`, `make test-integration`; `make help` lists everything.
+| Command | What it does |
+| --- | --- |
+| `make report` | Regenerates the gap study, model and backtest |
+| `make alerts` | Runs the Telegram bot locally by long polling (needs `TELEGRAM_BOT_TOKEN` in `.env`) |
+| `make testnet-keys` | Writes four throwaway testnet keys into `.env`, printing addresses only |
+| `make fund-allocator PROFILE=rh-testnet` | Sends the allocator its testnet gas from the deployer, after asking |
+| `make help` | Lists everything |
 
 ## Deployments
 
 | Where | Status |
 | --- | --- |
-| Local chain (Anvil) | `make demo`; addresses in `deployments/local.json` |
+| Web app and API | [after-hours-web-eta.vercel.app](https://after-hours-web-eta.vercel.app) (Vercel) and [afterhours-api.onrender.com](https://afterhours-api.onrender.com/v1/health) (Render), free tiers; set up with [docs/HOSTING.md](docs/HOSTING.md) |
 | Robinhood Chain testnet | Deployed 2026-09-27 (`deployments/rh-testnet.json`), simulated USDG, collateral and oracles: vault [`0xD4791630C02FF7462536bAEae7BcE13c5917E6d3`](https://explorer.testnet.chain.robinhood.com/address/0xD4791630C02FF7462536bAEae7BcE13c5917E6d3), reason registry [`0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0`](https://explorer.testnet.chain.robinhood.com/address/0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0) |
-| Arbitrum Sepolia | Rehearsed the same way; live deployment waits on funded testnet keys |
+| Arbitrum Sepolia | Rehearsed on a fork of the testnet (`scripts/rehearse-testnet.sh arb-sepolia`); not deployed yet |
+| Local chain (Anvil) | `make demo`; addresses in `deployments/local.json` |
 | Robinhood Chain mainnet | Not deployed. Needs an explicit go from the team and an archive RPC for the pinned fork tests |
 
 Neither testnet has Morpho, so testnet profiles deploy Morpho Blue, the adaptive curve IRM and
@@ -230,14 +283,27 @@ Vault V2 themselves, with simulated USDG, Stock Tokens and oracles. On mainnet t
 the real Morpho, USDG, Stock Token and Chainlink addresses found in M1 discovery
 (`deployments/fork.discovered.json`), each verified onchain.
 
-Hosting (engine on Render, web app on Vercel), every environment variable, testnet faucets and
-`make fund-allocator`: [docs/HOSTING.md](docs/HOSTING.md).
+## Testing and checks
+
+```bash
+make test         # Python, web and Solidity tests, config round trip, integration
+make lint         # ruff, mypy, eslint, prettier, forge fmt, plus the two checks below
+make e2e          # Playwright against a running stack: every page on desktop and mobile, the demo flow, error states
+make lighthouse   # production build, every page
+```
+
+- `make lint-hardcode` fails on any address, URL or protocol parameter outside `config/` and
+  `deployments/`.
+- `make lint-numbers` fails if this README or the pitch quotes a number that is not in
+  `artifacts/report/numbers.json`.
+- `scripts/rehearse-testnet.sh <profile>` deploys, seeds and runs a bot cycle on a fork of a
+  testnet with throwaway keys before any real testnet deploy.
 
 ## Limitations
 
-- **Simulation.** The demo runs on a local chain with simulated tokens and prices, replaying the
-  week of 2025-04-22. Fork runs at a pinned mainnet block need an archive RPC we do not have yet;
-  tests at the chain head pass.
+- **Simulation.** The vault uses simulated tokens and prices on testnet, and the local demo
+  replays the week of 2025-04-22. Fork runs at a pinned mainnet block need an archive RPC we do
+  not have yet; tests at the chain head pass.
 - **Two looks at the held-out years.** Option B was defined after option A's held-out results
   were known, so B's held-out figures are a second evaluation on the same window.
 - **The worst-night cap.** No setting of B or the fixed map met the 0.10% cap in tuning, which
@@ -252,6 +318,9 @@ Hosting (engine on Render, web app on Vercel), every environment variable, testn
 - **Money already lent cannot move.** Afterhours can only pull what borrowers are not using.
 - **Universe.** The stock universe for the gap study is today's S&P 500 plus Stock Tokens, so it
   has survivorship bias.
+- **Free hosting.** The API runs on a free instance that sleeps without traffic, and the live
+  mainnet views use a public RPC that can rate-limit; both are described in
+  [docs/HOSTING.md](docs/HOSTING.md).
 - **Not audited.** The contracts we wrote are small (the registry and simulated tokens), and the
   vault and markets are Morpho's, but nothing here has had a security review.
 
