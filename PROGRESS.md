@@ -891,4 +891,10 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   unchanged; refuses if Upstash already has events or reasons for the profile. Test with the fake
   Upstash: order, timestamps and newest-first reasons kept, locks skipped, second run refused.
 - Local `rh-testnet` history to copy: 20 events, 4 reason cards (registry seq 1 to 4), plan and
-  forecasts. Waits for the team to say Upstash is ready.
+  forecasts.
+- Done after the team's OK: Upstash URL and token added to `.env` (they had been pasted in chat
+  only), dry run (20 events, 4 cards, 2 documents; Upstash empty for the profile), then the copy.
+  Read back from Upstash: cards, events, plan and forecasts identical to the local files and in
+  the same order; each card verified against its `ReasonLogged` event (seq 1 to 4, matched).
+  Recommended to the team: reset the Upstash token (it was posted in chat) before putting it on
+  Render and GitHub.
