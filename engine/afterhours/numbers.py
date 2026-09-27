@@ -287,6 +287,49 @@ def build(cfg: AfterhoursConfig) -> dict[str, Any]:
             pol.lookahead_closed_periods, str(pol.lookahead_closed_periods), "config policy"
         )
 
+    if "b5.b.bad_debt" in n:
+        src = "derived from option_a.json and option_b.json (5 vault stocks)"
+
+        def less(a: float, b: float) -> float:
+            return 1 - a / b
+
+        b5 = {
+            k: n[f"b5.{k}"]["value"]
+            for k in (
+                "b.bad_debt",
+                "b.worst",
+                "blend.bad_debt",
+                "blend.worst",
+                "fixed_map.bad_debt",
+                "fixed_map.worst",
+            )
+        }
+        for other in ("blend", "fixed_map"):
+            v = less(b5["b.bad_debt"], b5[f"{other}.bad_debt"])
+            n[f"rel.b_vs_{other}.bad_debt_less"] = _entry(v, pct(v, 0), src)
+            v = less(b5["b.worst"], b5[f"{other}.worst"])
+            n[f"rel.b_vs_{other}.worst_less"] = _entry(v, pct(v, 0), src)
+        v = less(
+            n["replay.afterhours.bad_debt"]["value"], n["replay.always_weekday.bad_debt"]["value"]
+        )
+        n["rel.replay.b_less"] = _entry(v, pct(v, 0), n["replay.id"]["source"])
+
+    act_path = art / "backtest" / "option_b_activity.json"
+    if act_path.exists():
+        act = json.loads(act_path.read_text())
+        src = "artifacts/backtest/option_b_activity.json"
+        for u, pre in (("vault", "b5"), ("stock_tokens", "b35")):
+            a = act["universes"][u]
+            tot = a["total"]
+            n[f"{pre}.pulls.nights"] = _entry(tot["nights"], count(tot["nights"]), src)
+            n[f"{pre}.pulls.stock_nights"] = _entry(
+                tot["stock_nights"], count(tot["stock_nights"]), src
+            )
+            n[f"{pre}.pulls.usdg"] = _entry(tot["usdg_moved"], usd(tot["usdg_moved"]), src)
+            for y, v in a["per_year"].items():
+                n[f"{pre}.pulls.{y}.nights"] = _entry(v["nights"], str(v["nights"]), src)
+                n[f"{pre}.pulls.{y}.usdg"] = _entry(v["usdg_moved"], usd(v["usdg_moved"]), src)
+
     size_path = art / "discovery" / "market_size.json"
     if size_path.exists():
         src = "artifacts/discovery/market_size.json"
@@ -299,6 +342,25 @@ def build(cfg: AfterhoursConfig) -> dict[str, Any]:
         )
         n["market.usdg_supplied"] = _entry(u["supplied"], usd(u["supplied"]), src)
         n["market.usdg_borrowed"] = _entry(u["borrowed"], usd(u["borrowed"]), src)
+        if "rates" in ms:
+            r = ms["rates"]
+            n["market.supply_apy"] = _entry(
+                r["usdg_supply_apy_supply_weighted"],
+                pct(r["usdg_supply_apy_supply_weighted"], 4),
+                src,
+            )
+            n["market.borrow_apy"] = _entry(
+                r["usdg_borrow_apy_borrow_weighted"],
+                pct(r["usdg_borrow_apy_borrow_weighted"], 2),
+                src,
+            )
+            n["market.utilization"] = _entry(
+                r["usdg_utilization"], pct(r["usdg_utilization"], 2), src
+            )
+            n["market.markets_with_borrowing"] = _entry(
+                r["markets_with_borrowing"], str(r["markets_with_borrowing"]), src
+            )
+            n["market.usdg_markets"] = _entry(u["markets"], str(u["markets"]), src)
     return {"generated_from": "afterhours numbers", "numbers": n, "oracle": o}
 
 

@@ -1,23 +1,23 @@
 {
   "chain_id": 4663,
-  "block": 73382409,
-  "block_time": "2026-09-26T20:50:32+00:00",
+  "block": 73650323,
+  "block_time": "2026-09-27T04:22:21+00:00",
   "morpho_blue": "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010",
   "usdg": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
   "stock_tokens": 35,
-  "markets_created_total": 285,
-  "stock_token_markets": 149,
+  "markets_created_total": 286,
+  "stock_token_markets": 150,
   "stock_token_markets_in_morpho_api_at_discovery": 147,
   "usdg_loan": {
-    "markets": 147,
-    "supplied": 804926.000639,
-    "borrowed": 6114.673538000001
+    "markets": 148,
+    "supplied": 804926.0034439999,
+    "borrowed": 6181.676343000001
   },
   "by_loan_token": {
     "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168": {
-      "supplied": 804926.000639,
-      "borrowed": 6114.673538000001,
-      "markets": 147
+      "supplied": 804926.0034439999,
+      "borrowed": 6181.676343000001,
+      "markets": 148
     },
     "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73": {
       "supplied": 2.239441407705794,
@@ -27,8 +27,8 @@
   },
   "by_symbol_usdg": {
     "SPCX": {
-      "supplied": 280056.61991099996,
-      "borrowed": 225.836609
+      "supplied": 280056.62271599995,
+      "borrowed": 292.839414
     },
     "AAPL": {
       "supplied": 238984.949834,
@@ -174,22 +174,74 @@
     "events": "https://github.com/morpho-org/morpho-blue/blob/main/src/libraries/EventsLib.sol",
     "addresses": "deployments/fork.discovered.json"
   },
+  "rates": {
+    "method": "IIrm.borrowRateView at the block; borrow APY = exp(rate x seconds per year) - 1; supply APY = borrow APY x utilization x (1 - fee)",
+    "usdg_supply_apy_supply_weighted": 1.5515322863536236e-05,
+    "usdg_borrow_apy_borrow_weighted": 0.002020275105284583,
+    "usdg_utilization": 0.007679806984183322,
+    "markets_with_borrowing": 31,
+    "max_supply_apy": 1.3169962127865957,
+    "by_lltv": {
+      "0.385": {
+        "markets": 4,
+        "supplied": 328.767696,
+        "supply_apy_supply_weighted": 0.012100770403004687
+      },
+      "0.625": {
+        "markets": 48,
+        "supplied": 804436.8170469999,
+        "supply_apy_supply_weighted": 1.0360735323061254e-05
+      },
+      "0.77": {
+        "markets": 3,
+        "supplied": 49.347954,
+        "supply_apy_supply_weighted": 0.003507353696426336
+      },
+      "0.86": {
+        "markets": 8,
+        "supplied": 111.070745,
+        "supply_apy_supply_weighted": 2.4369558752001586e-05
+      },
+      "0.915": {
+        "markets": 1,
+        "supplied": 2e-06,
+        "supply_apy_supply_weighted": 0.0
+      }
+    }
+  },
   "markets": [
     {
       "id": "0xf4dff250826a86627545e5c6594b3b249db3ad2ec5eed56c02833d2a67acf445",
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0x280855A5BF983bf005f19992C157007930B3de2A",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 1537097,
       "supplied": 15.012678,
       "borrowed": 11.887334,
-      "last_update": 1784895393
+      "last_update": 1784895393,
+      "borrow_apy": 0.01009657426076479,
+      "utilization": 0.791819687333599,
+      "supply_apy": 0.007994666274299239
     },
     {
       "id": "0x9ecbc985b58baba5a91bbbb5116f6800537236c16df8dfd7ed51deb167f2a0a7",
       "symbol": "SGOV",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.915,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+        "0x7b205ba006ba6269298158A4AEaf89088EeaE286",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        915000000000000000
+      ],
       "created_block": 10874074,
       "supplied": 2e-06,
       "borrowed": 0.0,
@@ -200,6 +252,13 @@
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0xeB3a281fD7d4A375F3332805C02b2c84cC2dbec1",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 10874082,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -210,6 +269,13 @@
       "symbol": "QQQ",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
+        "0xc2eEdbe68687C5E45Ea9532A0d5516F2EC78E3b6",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 10874090,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -220,6 +286,13 @@
       "symbol": "SLV",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
+        "0x637e9531f03cC7f4f0Bb256Ec791176461F7ae4b",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 10874098,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -230,26 +303,53 @@
       "symbol": "AMZN",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+        "0x5480f1C1516C3EDCb79C449dcCc06C280502f632",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 12357219,
       "supplied": 0.00056,
       "borrowed": 0.00042,
-      "last_update": 1788808012
+      "last_update": 1788808012,
+      "borrow_apy": 0.0008753828930628605,
+      "utilization": 0.7500000000000001,
+      "supply_apy": 0.0006565371697971454
     },
     {
       "id": "0x66306c087add8907752320b309934abcc354d21626de8115c79df49d9c214edc",
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0xC5b8A6C5fDF14f9744dB1C8595f49E42Ce23031a",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18052573,
       "supplied": 6578.771208,
       "borrowed": 417.104502,
-      "last_update": 1790355990
+      "last_update": 1790355990,
+      "borrow_apy": 0.00030288048516250875,
+      "utilization": 0.06340158196910502,
+      "supply_apy": 1.9203101906873093e-05
     },
     {
       "id": "0x4edbd2f2f3b33bc5f80ab588def67fab8c10945fc99f855d80ff4bef2c4aa1f0",
       "symbol": "SLV",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
+        "0xf9D9F865B2fBE53F507E4430ee7319890B61c415",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18052863,
       "supplied": 102.500683,
       "borrowed": 0.0,
@@ -260,6 +360,13 @@
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0x955d3A41140d0409496bd406bBc5d1FDA98e0180",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18053154,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -270,6 +377,13 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0x83B04E51d7Db41928475272097cDB5F9BB0a48cF",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18053475,
       "supplied": 2e-06,
       "borrowed": 0.0,
@@ -280,6 +394,13 @@
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0x26Ca40DD99E6bAf699dAdfdf427c2D709C19D92c",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18114882,
       "supplied": 10.000951,
       "borrowed": 0.0,
@@ -290,26 +411,53 @@
       "symbol": "SPCX",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+        "0xE9D89DF41F3ED22832CC32fd64e94A145f757315",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 18200075,
       "supplied": 100.684295,
       "borrowed": 3.13,
-      "last_update": 1789252492
+      "last_update": 1789252492,
+      "borrow_apy": 0.0002759441012990354,
+      "utilization": 0.03108727135647123,
+      "supply_apy": 8.578349156300699e-06
     },
     {
       "id": "0x50bc39b5722fb5634c436d74c6787f3c125b879e7b73cf9e9ecc01bbb57b8e55",
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0xe8dAb19184f72b5a5a9d51A6C50A1b04b0669ce7",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18584009,
       "supplied": 11228.910532,
       "borrowed": 4342.685337,
-      "last_update": 1790429656
+      "last_update": 1790429656,
+      "borrow_apy": 0.0005724483033549657,
+      "utilization": 0.38674146744907023,
+      "supply_apy": 0.00022138949687822997
     },
     {
       "id": "0x315b99abb698487891243a84afd28a5ff56fe02143f203c03edd3f103936bf60",
       "symbol": "QQQ",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
+        "0x6126E6aec4139c660ab0e467Ff392c125E3FdF70",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18584385,
       "supplied": 10.00095,
       "borrowed": 0.0,
@@ -320,6 +468,13 @@
       "symbol": "GME",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x1b0E319c6A659F002271B69dB8A7df2F911c153E",
+        "0x5F35Bad049EF7bb69ea1fBBfa210D6B7e2eaD00d",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18626307,
       "supplied": 102.500547,
       "borrowed": 0.0,
@@ -330,16 +485,33 @@
       "symbol": "USO",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344",
+        "0xd60E92007CcDfC767544E8921f4F36bEE310F7a1",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18626451,
       "supplied": 2.500686,
       "borrowed": 0.000484,
-      "last_update": 1788808012
+      "last_update": 1788808012,
+      "borrow_apy": 0.0002501925681731858,
+      "utilization": 0.00019354689073318283,
+      "supply_apy": 4.8423993654469984e-08
     },
     {
       "id": "0xafc86936af4f7edf083eb2550b8c42311b83c685982742b9271b309a58268855",
       "symbol": "MSFT",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+        "0x4191d8f7B29FC68073C2f933A5481192D4a735f3",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 18626597,
       "supplied": 2.000818,
       "borrowed": 0.0,
@@ -350,6 +522,13 @@
       "symbol": "USAR",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd917B029C761D264c6A312BBbcDA868658eF86a6",
+        "0x199C58Dc69A7F15561Ae77c2F26EE1301402B70d",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 21754762,
       "supplied": 125.063287,
       "borrowed": 0.0,
@@ -360,16 +539,33 @@
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0xCa76875634e0b9759AA6610dC3092e92fcefE46E",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 21754878,
       "supplied": 6559.63143,
       "borrowed": 1.517297,
-      "last_update": 1789296831
+      "last_update": 1789296831,
+      "borrow_apy": 0.00025022404897597395,
+      "utilization": 0.00023130827031847426,
+      "supply_apy": 5.7878891960717726e-08
     },
     {
       "id": "0x69400cfe81f2ae381b9a9f27076a4d637338379d999e9ffdfbde52f0876312ee",
       "symbol": "META",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+        "0xf7282cD4277296D41d6Fdb80e2fBD73f03881B6C",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 21754990,
       "supplied": 100.784425,
       "borrowed": 0.0,
@@ -380,6 +576,13 @@
       "symbol": "AMD",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC",
+        "0xCf2fD48E4B5EFBff49F46351Aa3F25c6301A7961",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 21755101,
       "supplied": 100.684088,
       "borrowed": 0.0,
@@ -390,6 +593,13 @@
       "symbol": "MU",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD",
+        "0x8260cA944126C871E5F8e674D143E14139B8d9dF",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 21755212,
       "supplied": 100.684088,
       "borrowed": 0.0,
@@ -400,26 +610,53 @@
       "symbol": "PLTR",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
+        "0x3b1905b76Fa4cFf867BA33C6222D227E29F99bcc",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 21755323,
       "supplied": 30.001368,
       "borrowed": 30.001341,
-      "last_update": 1788808012
+      "last_update": 1788808012,
+      "borrow_apy": 0.023044010991542137,
+      "utilization": 0.9999991000410382,
+      "supply_apy": 0.02304399025287793
     },
     {
       "id": "0xda5584635e8b14ea18f674dbe4243365505910fefd8e3aa1ac9bfaac0eba74e8",
       "symbol": "INTC",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681",
+        "0x9395486F2F3e9a02929EA4f5587C2e7B05394EEe",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 21755476,
       "supplied": 100.684088,
       "borrowed": 5.4,
-      "last_update": 1789250931
+      "last_update": 1789250931,
+      "borrow_apy": 0.00029473766506083994,
+      "utilization": 0.05363310238257311,
+      "supply_apy": 1.580769536620857e-05
     },
     {
       "id": "0x7350ef542bf56a7e71f393b49dbce930b360c2ff042fd8af093d6eaedf0ec219",
       "symbol": "CRWV",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x5f10A1C971B69e47e059e1dC91901B59b3fB49C3",
+        "0x5e4132280A04040168cb021BfAd0c774371eF3e9",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 21755611,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -430,16 +667,33 @@
       "symbol": "SNDK",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xB90A19fF0Af67f7779afF50A882A9CfF42446400",
+        "0xaCc181B6ec81B2D444967e4f69254fD436Cf17D6",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 21755808,
       "supplied": 100.684092,
       "borrowed": 3.51,
-      "last_update": 1789252623
+      "last_update": 1789252623,
+      "borrow_apy": 0.0002790901855731227,
+      "utilization": 0.03486151516368643,
+      "supply_apy": 9.729506736393475e-06
     },
     {
       "id": "0xf6f3dbe0a19e948147e79e66502c6b05709d8dfde977fec7db1528fc8f0ebdfa",
       "symbol": "SGOV",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+        "0x3E349d0521e57C32CF1e3bE83eC828A3Ee42475D",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 21756318,
       "supplied": 110.980357,
       "borrowed": 0.0,
@@ -450,6 +704,13 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0xc7B219c58fF4Cc70F46Ef39cb40A6bcc84155077",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 22808420,
       "supplied": 0.001,
       "borrowed": 0.0,
@@ -460,6 +721,13 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xdB7b3F39178e8B1cE48424047557C023b54F0c64",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 22808465,
       "supplied": 0.001001,
       "borrowed": 0.0,
@@ -470,6 +738,13 @@
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0x2d3fc316Ef26Eb15a48bACCc43b1F11026b43165",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 22808502,
       "supplied": 0.001,
       "borrowed": 0.0,
@@ -480,6 +755,13 @@
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0xC5b5E605BF6c8A1371e0Cb0e348A0dFDE9e0c889",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 22808538,
       "supplied": 0.001,
       "borrowed": 0.0,
@@ -490,6 +772,13 @@
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0x436E106a92d6386C0E0dA44eB55Ede09fEeee4fF",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 22808582,
       "supplied": 0.001,
       "borrowed": 0.0,
@@ -500,6 +789,13 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0xf6B30Ac053Bc52F185eaC143Ac357730b2D40939",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 24443591,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -510,16 +806,33 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xd209B6D73F7C1D196F768f419f500161EBD437e6",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 24443591,
       "supplied": 0.085386,
       "borrowed": 0.076847,
-      "last_update": 1786378810
+      "last_update": 1786378810,
+      "borrow_apy": 0.03522252066972148,
+      "utilization": 0.8999953153912819,
+      "supply_apy": 0.03170010359902193
     },
     {
       "id": "0xc6a3f6238a3ac2db25af6a392ba974087717bc837e00dc7177172999b85afd5f",
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0x6f7F7D6729A07aC1B88AD89D5980D715cDBEfc5C",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 24443591,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -530,6 +843,13 @@
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0xacB27De3bD18fE20cE36fA498C142f4f354338b9",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 24443593,
       "supplied": 1e-06,
       "borrowed": 0.0,
@@ -540,6 +860,13 @@
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0x48004cCA6b10c05E5d3a8510C67E103caD57EfA9",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 24443596,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -550,6 +877,13 @@
       "symbol": "ORCL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xb0992820E760d836549ba69BC7598b4af75dEE03",
+        "0x2fFFD1C00D79709354900992296349071816EA51",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 25844859,
       "supplied": 100.000222,
       "borrowed": 0.0,
@@ -560,16 +894,33 @@
       "symbol": "COIN",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x6330D8C3178a418788dF01a47479c0ce7CCF450b",
+        "0x05dd0593082aEA1f5fBbE560D0a6a4D52451e980",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 28388343,
       "supplied": 110.001244,
       "borrowed": 68.000685,
-      "last_update": 1790305993
+      "last_update": 1790305993,
+      "borrow_apy": 0.0007654436434432554,
+      "utilization": 0.6181810543888031,
+      "supply_apy": 0.00047318275857895865
     },
     {
       "id": "0x243ac165f79a75a0590d2e994ffa9e260b70292fd1ca134ace95f3640895b19f",
       "symbol": "TSM",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x58FfE4a942d3885bAa22D7520691F611EF09e7AA",
+        "0x11Dcf9212643A89e3137C1d35C0B7Eb28A96B08B",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 31556424,
       "supplied": 100.000222,
       "borrowed": 0.0,
@@ -580,16 +931,33 @@
       "symbol": "MSTR",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xec262a75e413fAfD0dF80480274532C79D42da09",
+        "0x64FCE7f7526F6E4e38d5d69ffA2d7eE89462B4De",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 31981645,
       "supplied": 100.000561,
       "borrowed": 66.000001,
-      "last_update": 1789714651
+      "last_update": 1789714651,
+      "borrow_apy": 0.0008003169738221804,
+      "utilization": 0.6599963074207154,
+      "supply_apy": 0.0005282062474887603
     },
     {
       "id": "0xb74600c27a3424eac0a9288f539d5165a125a5102d08b5313c303e29c0eaf8bf",
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0x91b93178448D0769163eC59Ba7b01566013B45D4",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 32350110,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -600,6 +968,13 @@
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0xe22F21EC30d5725446c3B6f645e3e46fcB4bA526",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 32350226,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -610,6 +985,13 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xBe230340e497e87B546f334711d8AAF82e48B853",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 32350325,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -620,6 +1002,13 @@
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0x1c958B4c2d3539241e5b0868d274305eb8eD0241",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 32350425,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -630,6 +1019,13 @@
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0x004c9A862edBc066643D4C8944E5c54bd0952420",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 32350528,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -640,6 +1036,13 @@
       "symbol": "CRCL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5",
+        "0x5407188617476660Ff02833608C88C20394E52e1",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 32470546,
       "supplied": 100.000222,
       "borrowed": 0.0,
@@ -650,6 +1053,13 @@
       "symbol": "ASML",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x47F93d52cBeC7C6D2CfC080e154002370a60dAEA",
+        "0x3C1687628c310e4e46939218CE8e73168dc176D2",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 32900349,
       "supplied": 100.000222,
       "borrowed": 0.0,
@@ -660,6 +1070,13 @@
       "symbol": "BABA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xad25Ac6C84D497db898fa1E8387bf6Af3532a1c4",
+        "0x1858735689dEB5C9A0a05f5643A0807CaEF5A1F1",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 34596986,
       "supplied": 110.522725,
       "borrowed": 0.0,
@@ -670,6 +1087,13 @@
       "symbol": "DELL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x941AE714EC6D8130c7B75d67160Ca08f1e7d11Dd",
+        "0x9bA289ED9eAe000bE5E98eE694Af96a16ADeb82C",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 35264086,
       "supplied": 102.500222,
       "borrowed": 0.0,
@@ -680,6 +1104,13 @@
       "symbol": "IONQ",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x558378E000D634A36593E338eBacdd6207640EfE",
+        "0xF9ef3b4911c5061582ad0500bF23f581d2085057",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 36358917,
       "supplied": 100.000079,
       "borrowed": 0.0,
@@ -690,6 +1121,13 @@
       "symbol": "RGTI",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x284358abc07F9359f19f4b5b4aC91901Be2597Ba",
+        "0x4B3b07252e35635501c69118F97B4AF81C0dcB12",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 37161198,
       "supplied": 110.050832,
       "borrowed": 0.0,
@@ -700,6 +1138,13 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xA88e71306db8F5d8cCb8EbCC95f8033CAEF8f7a2",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 39456051,
       "supplied": 25.000771,
       "borrowed": 0.0,
@@ -710,6 +1155,13 @@
       "symbol": "RKLB",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x3b14C39E89D60D627b42a1A4CA45b5bb45Fc12e2",
+        "0xa78636E5E8718CE1543A426714d1afD3281D7122",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 40055396,
       "supplied": 100.000422,
       "borrowed": 0.0,
@@ -720,6 +1172,13 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0x5df8D763C1Ffb2DDa49FfA3cA7906a24B8797eac",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 40894247,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -730,6 +1189,13 @@
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0x11De06b53F9b976e21384E9B374086aEC7b7E585",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 40894255,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -740,6 +1206,13 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xfF1D77a191A338674Ccf17aF48f7F9384587E457",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 40894298,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -750,6 +1223,13 @@
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0xF6880F7080d77641fFe40a776c0D41ca0393e217",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 40894323,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -760,6 +1240,13 @@
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0xcdaE1cf00Bc20139d98Da6b7d1decD8F44a634F8",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 40894349,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -770,6 +1257,13 @@
       "symbol": "NBIS",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x9D9c6684F596F66a64C030B93A886D51Fd4D7931",
+        "0xAD95eFBCF91Af709A7Bf8cB6Ee5F99F4547187F8",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 40922858,
       "supplied": 125.000036,
       "borrowed": 0.0,
@@ -780,6 +1274,13 @@
       "symbol": "CLSK",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xcBB95BBF36099d34dA091dc6Fa6F49EfA257Cee3",
+        "0xFa145629c815491F8F0d4C0C97abD0445B9E72f2",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 41801966,
       "supplied": 100.000422,
       "borrowed": 0.0,
@@ -790,6 +1291,13 @@
       "symbol": "CRWV",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x5f10A1C971B69e47e059e1dC91901B59b3fB49C3",
+        "0xfc7dad09C0893d7359B946fEfFfEdE5a56c2f258",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 42541644,
       "supplied": 125.000037,
       "borrowed": 0.0,
@@ -800,6 +1308,13 @@
       "symbol": "EWY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x7f0aBeF0C07280F82c6a08ead09dEd6BAE2C13Fc",
+        "0xd119E96D5aD358713B94D8177391eb5B5B6B1F43",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 43575558,
       "supplied": 100.000422,
       "borrowed": 0.0,
@@ -810,6 +1325,13 @@
       "symbol": "SPY",
       "loan_token": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
       "lltv": 0.385,
+      "params": [
+        "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0xf201793d39bafB38778a8A575E56a292f9aAAF84",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 43777081,
       "supplied": 1.757408348531395,
       "borrowed": 0.0,
@@ -820,6 +1342,13 @@
       "symbol": "NVDA",
       "loan_token": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
       "lltv": 0.385,
+      "params": [
+        "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0x63c3ab00B12A7581af3eE8410E161650fBBb7829",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 43777219,
       "supplied": 0.4820330591743987,
       "borrowed": 0.0,
@@ -830,6 +1359,13 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0x94d7d2f6790c676a2d3133B4d7dd689526b7c4e5",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 45975493,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -840,16 +1376,33 @@
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0x3697E6E149B8F080a753d3f624600a3a3C9Cc72C",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 45975493,
       "supplied": 33.334276,
       "borrowed": 0.000942,
-      "last_update": 1788077256
+      "last_update": 1788077256,
+      "borrow_apy": 0.0019300736047532694,
+      "utilization": 2.825920082980053e-05,
+      "supply_apy": 5.454233761301969e-08
     },
     {
       "id": "0x6641d1333a00edf42f79b931554f1c81971656f18d881245f9547b471d5a49fb",
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xCe96f48Ee4404f06174E46f0D2020D2Bc5d705c2",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 45975493,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -860,6 +1413,13 @@
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0xe8598Bc02719c5b00133329743051D739B0321ae",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 45975493,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -870,6 +1430,13 @@
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0x1440704059616f3aa4a6087B1B52Fdb87183d20E",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 45975493,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -880,6 +1447,13 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0xcf29960266420A42f12061699ec2daBd7eEa8D6e",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 50134057,
       "supplied": 100.0,
       "borrowed": 0.0,
@@ -890,6 +1464,13 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0x4f6185269EbcAD4cFA0371d63b29d923956E60AC",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 53089335,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -900,6 +1481,13 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0xfA6e814Ab26b459C909F86C9650D433D5330B86D",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 53344156,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -910,6 +1498,13 @@
       "symbol": "QQQ",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
+        "0x10AC7506227bD990C898b9BF59afaf0e04E1568B",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 53344246,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -920,6 +1515,13 @@
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0xA6aAebAE5833776DaD374DbB4A3caBb9F2a39C22",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 53344334,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -930,6 +1532,13 @@
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0xEb247f0Ab23fbFA2409e4997Fd2e521c63b7A0DC",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 53344420,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -940,6 +1549,13 @@
       "symbol": "MU",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD",
+        "0xc4E6f466e9e69334Cc9A32E120D42AE9A21Ca4E4",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 53344502,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -950,6 +1566,13 @@
       "symbol": "GME",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x1b0E319c6A659F002271B69dB8A7df2F911c153E",
+        "0x2599449F32D6845789fAE5a6FD646971AE0D18b9",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 53344588,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -960,6 +1583,13 @@
       "symbol": "SPCX",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+        "0x244C80f271952d2CB5F005bEe56dDE0dFEA6De50",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 53344677,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -970,6 +1600,13 @@
       "symbol": "CRCL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5",
+        "0x721314Bf05e4736fF21A9f6BE83f47dff3eF95F8",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 53344783,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -980,6 +1617,13 @@
       "symbol": "USO",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344",
+        "0xA563885F7dE7757A6A1451729fe23e51196232c7",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 53344880,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -990,16 +1634,33 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0xB5736a58CE6370DaD1888d8996cf64A22e622BB8",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 54453980,
       "supplied": 0.500004,
       "borrowed": 0.040002,
-      "last_update": 1789597801
+      "last_update": 1789597801,
+      "borrow_apy": 0.0014207566114642109,
+      "utilization": 0.08000335997312022,
+      "supply_apy": 0.00011366530262116176
     },
     {
       "id": "0xf95832e36d9d8baf35eb78ce80cbed92d20198ba639659b3f9a2ab00ced0a0c1",
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0x1bb6b9792e9852CB7bfEB14A5951394D07817b7D",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 54454039,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1010,6 +1671,13 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xB5034A0167655415ca08eB255f3b6c7E47c72Ed2",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 54573451,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1020,6 +1688,13 @@
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0x621F64e2cb5AB5367B6Da286c3C126c6d7F5612F",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 54573468,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1030,6 +1705,13 @@
       "symbol": "SPCX",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+        "0x591BB612A232CD96a0B03DAa5bF75C6326AffdF4",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 54573523,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1040,6 +1722,13 @@
       "symbol": "MSFT",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+        "0x62Af5087dcFeA9a1971865854B67a28Ffd3849AC",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 54573573,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1050,6 +1739,13 @@
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0x17D1246A32CB40e0dB59FBC1B49660CaFae6cE47",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 54573590,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1060,6 +1756,13 @@
       "symbol": "AMZN",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+        "0x2e5Ee5bA2F128d9aF283f365A0D8b816bD9fb2B7",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 54573608,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1070,6 +1773,13 @@
       "symbol": "META",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+        "0xFEEBcdB299115ED9BddF72D142296A122c722F9e",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 54573624,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1080,6 +1790,13 @@
       "symbol": "QQQ",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
+        "0x886B223772133B2df2cE8974eF37F8079b80482B",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 54573643,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1090,6 +1807,13 @@
       "symbol": "SGOV",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+        "0x6507b6C441D46438f49882Eaf487e3aEABDD797A",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 54573662,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1100,6 +1824,13 @@
       "symbol": "BABA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xad25Ac6C84D497db898fa1E8387bf6Af3532a1c4",
+        "0x17E41f66223f35439D60dE7D71Dac657fBC5526e",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55134336,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1110,6 +1841,13 @@
       "symbol": "GME",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x1b0E319c6A659F002271B69dB8A7df2F911c153E",
+        "0xDd03e41f7c46eE394Ce8448A4101845AA5990521",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55134392,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1120,6 +1858,13 @@
       "symbol": "DELL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x941AE714EC6D8130c7B75d67160Ca08f1e7d11Dd",
+        "0x118B8d4627484b27E6AD9FEc0567983552185a35",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55134448,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1130,6 +1875,13 @@
       "symbol": "PLTR",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
+        "0x036E49BD73204A695526Aa40D9fd860462d37200",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 55134512,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1140,6 +1892,13 @@
       "symbol": "SNDK",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xB90A19fF0Af67f7779afF50A882A9CfF42446400",
+        "0x0ebC9e0F926940e5E61E4D8e3cD785dea7605A6f",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55134565,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1150,6 +1909,13 @@
       "symbol": "AMD",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC",
+        "0x75bBEAD4761D663C58097858ea72596574a5C160",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55134607,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1160,6 +1926,13 @@
       "symbol": "MU",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xfF080c8ce2E5feadaCa0Da81314Ae59D232d4afD",
+        "0x685983F76B0EC3EDf01203E15e3c7d34f613411D",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55134661,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1170,6 +1943,13 @@
       "symbol": "INTC",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681",
+        "0xC296F27753ee7F533803F22FF33Fa53B8C81F21A",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 55134716,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1180,6 +1960,13 @@
       "symbol": "TSM",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x58FfE4a942d3885bAa22D7520691F611EF09e7AA",
+        "0xaD11575B693b23BD916571B3A4939cDADC545C33",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55134803,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1190,6 +1977,13 @@
       "symbol": "CRCL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5",
+        "0x7Fd7FCDf781DcbEAE113243be5BD4f12fEd6Fa75",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55134873,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1200,6 +1994,13 @@
       "symbol": "ASML",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x47F93d52cBeC7C6D2CfC080e154002370a60dAEA",
+        "0x1e92a0c8a5f2F934f02180050b64ECE689ab23b3",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 55134949,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1210,6 +2011,13 @@
       "symbol": "USO",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xa30FA36Db767ad9eD3f7a60fC79526fB4d56D344",
+        "0x76128FD445d4E1785e59daA6B2BA2216436D9707",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55135030,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1220,6 +2028,13 @@
       "symbol": "SLV",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x411eFb0E7f985935DAec3D4C3ebaEa0d0AD7D89f",
+        "0x3A11E5919e1e742BBe7B2a501A1a70b60957fD38",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55135089,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1230,6 +2045,13 @@
       "symbol": "USAR",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd917B029C761D264c6A312BBbcDA868658eF86a6",
+        "0x4Bb9E561eb19D729718Eb167E99dbbdD83aa32Bc",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 55135142,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1240,6 +2062,13 @@
       "symbol": "MSTR",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xec262a75e413fAfD0dF80480274532C79D42da09",
+        "0xAF8c2596c36C7071F3a5ECEe18b6E6E19f4F4fA7",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 55135222,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1250,6 +2079,13 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0xF31147989Da4C19C060A1A6fc425981f499EE2b7",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 56849258,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1260,116 +2096,233 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0x418dA8bE2D981f152fd9Fc64ED42BE2Cdea52c5A",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 58487863,
       "supplied": 2.002371,
       "borrowed": 0.911371,
-      "last_update": 1789835452
+      "last_update": 1789835452,
+      "borrow_apy": 0.02266951216378212,
+      "utilization": 0.45514592450649755,
+      "supply_apy": 0.010317936071895904
     },
     {
       "id": "0x10151e2ac82a820153520d9d77d56de1c84775e23b79bdc11e2e34282d9afa10",
       "symbol": "SPCX",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+        "0xb9BdE79161100a218D8B036CBf69cbcdFb71440a",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 58488700,
       "supplied": 1.001,
       "borrowed": 0.91,
-      "last_update": 1788954864
+      "last_update": 1788954864,
+      "borrow_apy": 0.05826900056787825,
+      "utilization": 0.9090909090909092,
+      "supply_apy": 0.052971818698071146
     },
     {
       "id": "0x947ae981cc823024ea00b602f6ea72d049cac05d66ef096198ceeb998651c175",
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xc03399C6b3179859f0104Be26AeE6F20F83589f3",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 58489230,
       "supplied": 1.001,
       "borrowed": 0.91,
-      "last_update": 1788954871
+      "last_update": 1788954871,
+      "borrow_apy": 0.05827323588278028,
+      "utilization": 0.9090909090909092,
+      "supply_apy": 0.05297566898434571
     },
     {
       "id": "0xe29c7d3790037800101ecbad9c45de2067698d206cbcab7c25069a9f43c9eb98",
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0x21167CE53F2cD12Be8bC8525e0Fda8474B042158",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 58489775,
       "supplied": 1.001,
       "borrowed": 0.91,
-      "last_update": 1788954880
+      "last_update": 1788954880,
+      "borrow_apy": 0.0582777665063953,
+      "utilization": 0.9090909090909092,
+      "supply_apy": 0.05297978773308664
     },
     {
       "id": "0x7408b08b03e05ffd2d21c797489a0e77a28e4bb36acb4e827c69e805d06272b4",
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0x75e5f0E2Fa72E6633371868EC62Ddeaf534914D0",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 58490291,
       "supplied": 1.001,
       "borrowed": 0.91,
-      "last_update": 1788954656
+      "last_update": 1788954656,
+      "borrow_apy": 0.05830501126387581,
+      "utilization": 0.9090909090909092,
+      "supply_apy": 0.053004555694432555
     },
     {
       "id": "0x8b16891f032a93b771347c9cb470a780e6699dd701553d3402aa3cdba6189c3e",
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0xED29D310cfa91778A5850538DA28ed42234Cb78c",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 58919124,
       "supplied": 99941.250445,
       "borrowed": 902.063906,
-      "last_update": 1790365661
+      "last_update": 1790365661,
+      "borrow_apy": 0.003859807913670099,
+      "utilization": 0.009025941760618923,
+      "supply_apy": 3.4838401435962347e-05
     },
     {
       "id": "0x9b4b47cdf7e295341c6c6cdfd3efb9805c4a5b3d580dba0c0c39d3a4232b297b",
       "symbol": "SPCX",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+        "0x872F9D8955B34e841227a92dE755cd63042Ab7A5",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 58919124,
-      "supplied": 279954.933516,
-      "borrowed": 221.795609,
-      "last_update": 1790370871
+      "supplied": 279954.936321,
+      "borrowed": 288.798414,
+      "last_update": 1790467172,
+      "borrow_apy": 0.003796327353974327,
+      "utilization": 0.0010315889328304608,
+      "supply_apy": 3.916249283761463e-06
     },
     {
       "id": "0xdeb4782d012d5fd3b24962538c2f6559049d70bda4dabd2e4212dacb96c28d45",
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xD625d488D552775D2867194C618B945E5dDfE097",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 58919124,
       "supplied": 238958.860574,
       "borrowed": 27.866256,
-      "last_update": 1790382519
+      "last_update": 1790382519,
+      "borrow_apy": 0.003325456667998606,
+      "utilization": 0.00011661528655209867,
+      "supply_apy": 3.877990822552447e-07
     },
     {
       "id": "0x7fa81b10e5d21b2e4c571f862442bc11aff2ed14f02335868d0ff933fd40d0ba",
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0x12Ec3474D1e321e0aAB065278B97FBC7eDa5F424",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 58919124,
       "supplied": 158808.180035,
       "borrowed": 1.001486,
-      "last_update": 1790338934
+      "last_update": 1790338934,
+      "borrow_apy": 0.0041140186231015076,
+      "utilization": 6.306262056395842e-06,
+      "supply_apy": 2.5944079542170903e-08
     },
     {
       "id": "0x2e1859aa8f143b7220088f80562c6dfe0bf8e52b87d9cedf8da8805f231994ce",
       "symbol": "MSFT",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+        "0xcb9a035fe0e8f321e36286405fEBC70dE42DB34e",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 58919124,
       "supplied": 29.65962,
       "borrowed": 5.014604,
-      "last_update": 1790338953
+      "last_update": 1790338953,
+      "borrow_apy": 0.01358977092477979,
+      "utilization": 0.16907175479658876,
+      "supply_apy": 0.00229764641753618
     },
     {
       "id": "0x3ebd43d91c3960a9fac32bedd5c60428e0e414de5bdd67fda770207afb0eb615",
       "symbol": "COIN",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.385,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x6330D8C3178a418788dF01a47479c0ce7CCF450b",
+        "0x3ebD3088b69A5eeC3bDF03B82CcF19c3Bc1fa894",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        385000000000000000
+      ],
       "created_block": 58919124,
       "supplied": 3.020114,
       "borrowed": 3.020114,
-      "last_update": 1789835767
+      "last_update": 1789835767,
+      "borrow_apy": 1.3169962127865957,
+      "utilization": 1.0,
+      "supply_apy": 1.3169962127865957
     },
     {
       "id": "0x7c937a27516c7ce2cbcfd07d7558fc024d684361b82bcd9e6d4bb5f6dd9e8050",
       "symbol": "MSFT",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+        "0x11C5782FF9440Bf48f032D71840831be5f405Ab3",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 62158717,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1380,6 +2333,13 @@
       "symbol": "DELL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x941AE714EC6D8130c7B75d67160Ca08f1e7d11Dd",
+        "0xA8ddB73954ca5bCde36d68D61AB9237d03275fd0",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 62183405,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1390,6 +2350,13 @@
       "symbol": "SPCX",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+        "0x1a0995D2Bb8304a91C4D42AC13245F4CA036fADf",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 62183770,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1400,6 +2367,13 @@
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0xC53793F920182835532BC7E69eAAb0eD455D0558",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 62365785,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1410,6 +2384,13 @@
       "symbol": "QQQ",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
+        "0xEad960d619a70EEfb5d76A25895f8E0423CC6C4a",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 62365980,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1420,6 +2401,13 @@
       "symbol": "TSM",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x58FfE4a942d3885bAa22D7520691F611EF09e7AA",
+        "0x8d5EA9596311e766a01369B069A81fD468772ECd",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 62366184,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1430,6 +2418,13 @@
       "symbol": "INTC",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681",
+        "0x1F62414E13b10046A4CaE31168831Cd7148C3547",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 62366369,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1440,6 +2435,13 @@
       "symbol": "RGTI",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x284358abc07F9359f19f4b5b4aC91901Be2597Ba",
+        "0xc927890355242959AAd7e6e76E738Cec18f4e9df",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 62723086,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1450,6 +2452,13 @@
       "symbol": "SNDK",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xB90A19fF0Af67f7779afF50A882A9CfF42446400",
+        "0xd0D07692D28610d90798C2176c6953e40Fca2BD2",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 64398534,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1460,6 +2469,13 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0x13879886ff32A2eD8a59b203EAC46695BC0145AE",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65230895,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1470,6 +2486,13 @@
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0x48C07dA26c791f64E688454D5Fea9f2Dd4F4f825",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65230979,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1480,6 +2503,13 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0x68c24d810aE6480c8C2e9B0d98d4FDEB35dc4a90",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231063,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1490,6 +2520,13 @@
       "symbol": "MSFT",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+        "0x05C2Fbe2B37b99f07E84C2AAB550536b3482d1a1",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231147,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1500,6 +2537,13 @@
       "symbol": "AMZN",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+        "0xB1E9aE2B51875b5A0Af7290189Bdd77F9758eE3A",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231232,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1510,6 +2554,13 @@
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0x45E0391c9CA821C6D4B24dA757ef71A377682C1d",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231316,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1520,6 +2571,13 @@
       "symbol": "META",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+        "0x07731E851F11d0e2E9e862461497E56E47CDAC04",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231401,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1530,6 +2588,13 @@
       "symbol": "AMD",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC",
+        "0x1F293351B2C6c136D7d0f3cFEd020a1E927418f0",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231491,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1540,6 +2605,13 @@
       "symbol": "ORCL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xb0992820E760d836549ba69BC7598b4af75dEE03",
+        "0xF5af53159Be4b9907810682D346fA0D532DF3144",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231575,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1550,6 +2622,13 @@
       "symbol": "TSM",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x58FfE4a942d3885bAa22D7520691F611EF09e7AA",
+        "0x837FE12495ce129316BB50256953188f02cc9A24",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231660,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1560,6 +2639,13 @@
       "symbol": "SPY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "0x9c3c7a4D4107c73De1e2741b909fbA066b76E3Da",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231746,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1570,6 +2656,13 @@
       "symbol": "QQQ",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
+        "0x5e27992cc92B388dFF0E2f9c5d0f99dF82Fe8841",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65231835,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1580,6 +2673,13 @@
       "symbol": "SGOV",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.86,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5",
+        "0x92f819A8AA4A3f414C85A133Ac67A7Eff990c61D",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        860000000000000000
+      ],
       "created_block": 65231919,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1590,6 +2690,13 @@
       "symbol": "EWY",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x7f0aBeF0C07280F82c6a08ead09dEd6BAE2C13Fc",
+        "0x34344970956CE05304d113ca57254FdfFAcfA443",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 65232010,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1600,56 +2707,113 @@
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0x37CF511fA79B8446f1C23D6a81Df117F28240bE0",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 66554173,
       "supplied": 0.0011,
       "borrowed": 0.001,
-      "last_update": 1790014169
+      "last_update": 1790014169,
+      "borrow_apy": 0.03616456887553894,
+      "utilization": 0.9090909090909091,
+      "supply_apy": 0.03287688079594449
     },
     {
       "id": "0x21ea2a012b888120e328775c2a7bf6fb4619cf4c4c631ad1c9b6db51f8882d5a",
       "symbol": "SPCX",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+        "0x90805011F903b1d31CE2A3C6DBfDCCff282B30B4",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 66566832,
       "supplied": 0.0011,
       "borrowed": 0.001,
-      "last_update": 1790014169
+      "last_update": 1790014169,
+      "borrow_apy": 0.03625200307687536,
+      "utilization": 0.9090909090909091,
+      "supply_apy": 0.03295636643352305
     },
     {
       "id": "0xcaa167af7ba0422c76424fae56167b7db25bf19f4f435215e6dd7d06a943bdac",
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0xA39F2c101bCc19aD5d0C7b83281F94a5ADe2a344",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 66586535,
       "supplied": 0.0011,
       "borrowed": 0.001,
-      "last_update": 1790014169
+      "last_update": 1790014169,
+      "borrow_apy": 0.03636154014654172,
+      "utilization": 0.9090909090909091,
+      "supply_apy": 0.0330559455877652
     },
     {
       "id": "0xba01f6625137b692c5dd86afb8e654b4016d7b64e36dfca4124e84bef98bc4d2",
       "symbol": "GOOGL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "0xE8F50Ad9C0d52dd90c324d63Ae936681e6736B2D",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 66588297,
       "supplied": 0.0011,
       "borrowed": 0.001,
-      "last_update": 1790014169
+      "last_update": 1790014169,
+      "borrow_apy": 0.03635380287361108,
+      "utilization": 0.9090909090909091,
+      "supply_apy": 0.03304891170328279
     },
     {
       "id": "0x22e4598e5cc16cff0056e72d61c5f1f2f8bf5bbffc22da5277ab196939c8a59e",
       "symbol": "TSLA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "0xe343124476849d6F161E380d682b9603e97903d3",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 66592140,
       "supplied": 0.0011,
       "borrowed": 0.001,
-      "last_update": 1790014169
+      "last_update": 1790014169,
+      "borrow_apy": 0.03638656402137804,
+      "utilization": 0.9090909090909091,
+      "supply_apy": 0.03307869456488913
     },
     {
       "id": "0x1484485e9ebcd3c5b70c18ab30369ace2a2807e36962fd46f6c19be79a84a2c4",
       "symbol": "NVDA",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.77,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "0xc65d284Efa6A3Df34540CBC8BA7C7fcbD0258604",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        770000000000000000
+      ],
       "created_block": 70441454,
       "supplied": 0.0,
       "borrowed": 0.0,
@@ -1660,10 +2824,34 @@
       "symbol": "AAPL",
       "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0x69190621E300cd2BC4cBB80777b517691ee80f65",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
       "created_block": 72601542,
       "supplied": 0.0,
       "borrowed": 0.0,
       "last_update": 1790376983
+    },
+    {
+      "id": "0x3d9b0c04e374f7b50fa7a635393d2ecae23f45289e4e23f83793a6a611010918",
+      "symbol": "AAPL",
+      "loan_token": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "lltv": 0.625,
+      "params": [
+        "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "0x88b628472E595725178cC3E5E2eC70adA67f80f0",
+        "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+        625000000000000000
+      ],
+      "created_block": 73454024,
+      "supplied": 0.0,
+      "borrowed": 0.0,
+      "last_update": 1790463054
     }
   ]
 }

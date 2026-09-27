@@ -6,6 +6,8 @@ M1 discovery. Totals are Morpho's stored `market(id)` values at the pinned block
 borrowed assets as of each market's last update (interest accrued since then is not included).
 
 Sources (read 2026-09-27):
+- Rates: `IIrm.borrowRateView(MarketParams, Market)` (morpho-blue `src/interfaces/IIrm.sol`);
+  supply APY from `Morpho.sol` `_accrueInterest` (borrow interest credited to supply, less fee).
 - Event and struct layout: morpho-blue `src/interfaces/IMorpho.sol` and
   `src/libraries/EventsLib.sol` on GitHub (`CreateMarket(Id indexed id, MarketParams
   marketParams)`; `Market` is six uint128 fields, supply assets first, borrow assets third).
@@ -15,6 +17,7 @@ Sources (read 2026-09-27):
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from datetime import UTC, datetime
 from typing import Any
@@ -30,6 +33,12 @@ CREATE_MARKET = (
     "CreateMarket(bytes32 indexed id,(address,address,address,address,uint256) marketParams)"
 )
 MARKET = "market(bytes32)(uint128,uint128,uint128,uint128,uint128,uint128)"
+BORROW_RATE_VIEW = (
+    "borrowRateView((address,address,address,address,uint256),"
+    "(uint128,uint128,uint128,uint128,uint128,uint128))(uint256)"
+)
+SECONDS_PER_YEAR = 365 * 24 * 3600
+ZERO = "0x0000000000000000000000000000000000000000"  # hardcode-ok: the zero address (no IRM)
 
 
 def read(cfg: AfterhoursConfig, lag_blocks: int = 30) -> dict[str, Any]:
@@ -51,7 +60,7 @@ def read(cfg: AfterhoursConfig, lag_blocks: int = 30) -> dict[str, Any]:
     )
     markets = []
     for ev in created:
-        loan, collateral, _oracle, _irm, lltv = ev["marketParams"]
+        loan, collateral, oracle, irm, lltv = ev["marketParams"]
         collateral = to_checksum_address(collateral)
         if collateral in tokens:
             markets.append(
@@ -60,6 +69,13 @@ def read(cfg: AfterhoursConfig, lag_blocks: int = 30) -> dict[str, Any]:
                     "symbol": tokens[collateral],
                     "loan_token": to_checksum_address(loan),
                     "lltv": lltv / 1e18,
+                    "params": (
+                        to_checksum_address(loan),
+                        collateral,
+                        to_checksum_address(oracle),
+                        to_checksum_address(irm),
+                        int(lltv),
+                    ),
                     "created_block": ev["_block"],
                 }
             )
@@ -89,6 +105,7 @@ def read(cfg: AfterhoursConfig, lag_blocks: int = 30) -> dict[str, Any]:
         m["borrowed"] = int(st[2]) / unit
         m["last_update"] = int(st[4])
         last_updates.append(int(st[4]))
+        m["_state"] = tuple(int(x) for x in st)
         b = by_loan[m["loan_token"]]
         b["supplied"] += m["supplied"]
         b["borrowed"] += m["borrowed"]
@@ -96,6 +113,54 @@ def read(cfg: AfterhoursConfig, lag_blocks: int = 30) -> dict[str, Any]:
         if m["loan_token"] == usdg:
             by_symbol[m["symbol"]]["supplied"] += m["supplied"]
             by_symbol[m["symbol"]]["borrowed"] += m["borrowed"]
+    # Rates at the same block. Borrow rate per second from the market's IRM (IIrm.borrowRateView);
+    # Morpho Blue credits borrow interest to suppliers less the fee (Morpho.sol _accrueInterest),
+    # so supply APY = borrow APY x utilization x (1 - fee). APY compounds continuously.
+    live = [m for m in markets if m["params"][3] != ZERO and m["borrowed"] > 0]
+    per_sec = call_many(
+        w3,
+        [Call(m["params"][3], BORROW_RATE_VIEW, (m["params"], m["_state"])) for m in live],
+        block=block,
+    )
+    for m, r in zip(live, per_sec, strict=True):
+        borrow_apy = math.expm1(int(r) / 1e18 * SECONDS_PER_YEAR)
+        util = m["borrowed"] / m["supplied"] if m["supplied"] else 0.0
+        fee = m["_state"][5] / 1e18
+        m["borrow_apy"] = borrow_apy
+        m["utilization"] = util
+        m["supply_apy"] = borrow_apy * util * (1 - fee)
+    usdg_markets = [m for m in markets if m["loan_token"] == usdg and m["supplied"] > 0]
+
+    def weighted(rows: list[dict[str, Any]], key: str, weight: str) -> float:
+        w = sum(r[weight] for r in rows)
+        return sum(r.get(key, 0.0) * r[weight] for r in rows) / w if w else 0.0
+
+    by_lltv: dict[str, dict[str, float]] = {}
+    for lv in sorted({m["lltv"] for m in usdg_markets}):
+        rows = [m for m in usdg_markets if m["lltv"] == lv]
+        by_lltv[f"{lv:g}"] = {
+            "markets": len(rows),
+            "supplied": sum(r["supplied"] for r in rows),
+            "supply_apy_supply_weighted": weighted(rows, "supply_apy", "supplied"),
+        }
+    rates = {
+        "method": (
+            "IIrm.borrowRateView at the block; borrow APY = exp(rate x seconds per year) - 1; "
+            "supply APY = borrow APY x utilization x (1 - fee)"
+        ),
+        "usdg_supply_apy_supply_weighted": weighted(usdg_markets, "supply_apy", "supplied"),
+        "usdg_borrow_apy_borrow_weighted": weighted(
+            [m for m in usdg_markets if m["borrowed"] > 0], "borrow_apy", "borrowed"
+        ),
+        "usdg_utilization": sum(m["borrowed"] for m in usdg_markets)
+        / max(sum(m["supplied"] for m in usdg_markets), 1e-9),
+        "markets_with_borrowing": len([m for m in usdg_markets if m["borrowed"] > 0]),
+        "max_supply_apy": max((m.get("supply_apy", 0.0) for m in usdg_markets), default=0.0),
+        "by_lltv": by_lltv,
+    }
+    for m in markets:
+        m.pop("_state", None)
+        m["params"] = list(m["params"])
     api_count = sum(len(v["morpho_markets"]) for v in disc["stock_tokens"].values())
     u = by_loan.get(usdg, {"supplied": 0.0, "borrowed": 0.0, "markets": 0})
     return {
@@ -129,5 +194,6 @@ def read(cfg: AfterhoursConfig, lag_blocks: int = 30) -> dict[str, Any]:
             "events": cfg.discovery.sources.morpho_blue_events,
             "addresses": "deployments/fork.discovered.json",
         },
+        "rates": rates,
         "markets": markets,
     }

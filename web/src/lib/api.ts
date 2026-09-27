@@ -304,6 +304,11 @@ const DecisionUniverse = z.object({
   dynamic: FrontierPoint,
   nearest_blend: FrontierPoint.extend({ w: z.number() }),
   blends: z.array(FrontierPoint.extend({ w: z.number() })),
+  pulls: z.object({
+    per_year: z.record(z.string(), z.object({ nights: z.number(), usdg_moved: z.number() })),
+    total: z.object({ nights: z.number(), stock_nights: z.number(), usdg_moved: z.number() }),
+    by_symbol: z.record(z.string(), z.number()),
+  }),
 });
 export type DecisionUniverse = z.infer<typeof DecisionUniverse>;
 
@@ -318,6 +323,16 @@ export const ReportCardSchema = z.object({
     second_evaluation_note: z.string(),
     universes: z.object({ vault: DecisionUniverse, stock_tokens: DecisionUniverse }),
     assumed_apy: z.record(z.string(), z.number()),
+    market_now: z.object({
+      block: z.number(),
+      block_time: z.string(),
+      markets: z.number(),
+      usdg_supplied: z.number(),
+      usdg_borrowed: z.number(),
+      supply_apy: z.number(),
+      borrow_apy: z.number(),
+      utilization: z.number(),
+    }),
   }),
   oracle: z.object({
     weekends: z.number(),

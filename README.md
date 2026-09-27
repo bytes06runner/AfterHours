@@ -7,7 +7,8 @@ that could gap past every market's cushion, and writes the reason for every move
 In the held-out backtest (2022-01-03 to 2026-09-24, settings chosen on earlier years only) it
 earned 9.12% against 9.09% for the fixed weekday/weekend mix with the nearest yield, with 5,849
 USDG of bad debt against 11,132: the same yield as the best fixed mix, with about half the loss.
-Historical stock prices, simulated vault.
+Historical stock prices, simulated vault, modelled rates: real Stock Token markets on Morpho paid
+lenders 0.0016% at block 73,650,323.
 
 Built for the Colosseum Crypto World's Fair, Robinhood Chain track (the same code runs on
 Arbitrum). Status and evidence for every step: [PROGRESS.md](PROGRESS.md).
@@ -64,6 +65,11 @@ open, night after the closing bell, drawn entirely in code.
 All results are historical stock prices, simulated vault: a fresh 2,000,000 USDG vault, settings
 chosen on 2017 to 2021 only, evaluated on 2022-01-03 to 2026-09-24 (1,186 closed periods).
 
+**Yields here use modelled rates.** The backtest assumes supply APYs of 9.5%, 8.5% and 7.0% for
+the 91.5%, 86% and 77% tiers. Real Stock Token markets on Morpho paid lenders 0.0016% at block
+73,650,323 (see "The market today" below). The comparisons between strategies hold under the
+same assumed rates; the yield levels do not describe today's market.
+
 **How the policy was chosen.** Before running, we wrote down a rule for the design we expected to
 ship, which moved each stock between tiers night by night (the dynamic strategy):
 
@@ -105,6 +111,10 @@ Facts that go with these numbers:
 - The dynamic strategy had the least bad debt (748 USDG) and the smallest worst night (0.020%),
   but earned 963,015 USDG of interest against 1,030,359 for the fixed map, so under the rule it
   did not ship. It remains a documented alternative.
+- How often B acted: on the 5 vault stocks it pulled unborrowed money on 228 nights from 2022 to
+  2026-09-24 (83, 35, 40, 40 and 30 by year), 10,241,622 USDG in all, counting each pull (money
+  returns when the forecast allows, so it is pulled again). It was almost always META or NVDA
+  (`artifacts/backtest/option_b_activity.json`).
 - Tier yields are assumptions, not observed rates: supply APY 9.5%, 8.5% and 7.0% for the 91.5%,
   86% and 77% tiers. How much any strategy gains from the higher tiers depends on that spread.
 
@@ -119,9 +129,11 @@ years, so Afterhours ships the baseline (the report card says so in its first se
 forecast bad case 1.30% of the time against a 1% target; on earnings nights 1.08%
 (`artifacts/model/report_card.json`).
 
-**The market today.** At Robinhood Chain block 73,382,409 (2026-09-26), 149 Morpho markets used a
-Stock Token as collateral; together they held 804,926 USDG supplied and 6,115 USDG borrowed
-(`artifacts/discovery/market_size.json`). The market is early.
+**The market today.** At Robinhood Chain block 73,650,323 (2026-09-27), 150 Morpho markets used a
+Stock Token as collateral; the 148 lending USDG held 804,926 USDG supplied and 6,182 borrowed, a
+utilization of 0.77%. Borrowing happened in 31 of them. Lenders there earned a supply APY of
+0.0016% (supply-weighted) and borrowers paid 0.20% (`artifacts/discovery/market_size.json`,
+read with each market's interest rate model at that block). The market is early.
 
 ## Architecture
 

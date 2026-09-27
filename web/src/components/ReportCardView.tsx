@@ -220,6 +220,48 @@ function Facts({ d, u }: { d: DecisionData; u: DecisionUniverse }) {
   );
 }
 
+function Pulls({ u, name }: { u: DecisionUniverse; name: string }) {
+  const years = Object.entries(u.pulls.per_year).sort(([a], [b]) => a.localeCompare(b));
+  const top = Object.entries(u.pulls.by_symbol)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([s, n]) => `${s} ${n}`);
+  return (
+    <div>
+      <Table caption={`Nights B pulled unborrowed money, ${name}`}>
+        <thead>
+          <tr>
+            <th className={th}>Year</th>
+            <th className={th}>Nights with a pull</th>
+            <th className={th}>USDG moved to idle</th>
+          </tr>
+        </thead>
+        <tbody>
+          {years.map(([y, v]) => (
+            <tr key={y}>
+              <td className={td}>{y}</td>
+              <td className={td}>{v.nights}</td>
+              <td className={td}>{formatUsd(v.usdg_moved)}</td>
+            </tr>
+          ))}
+          <tr style={{ fontWeight: 700 }}>
+            <td className={td}>All</td>
+            <td className={td}>
+              {u.pulls.total.nights} ({u.pulls.total.stock_nights} stock-nights)
+            </td>
+            <td className={td}>{formatUsd(u.pulls.total.usdg_moved)}</td>
+          </tr>
+        </tbody>
+      </Table>
+      <p className="mt-2 text-[14px]">
+        A night counts when the pullback fired for a stock that held unborrowed vault money. Most
+        pulls: {top.join(", ")} (stock-nights). Money returns when the forecast allows, so the same
+        USDG can be pulled many times.
+      </p>
+    </div>
+  );
+}
+
 function Decision({ d }: { d: DecisionData }) {
   const [u5, u35] = [d.universes.vault, d.universes.stock_tokens];
   const apy = Object.entries(d.assumed_apy).map(([k, v]) => `${k} ${formatPct(v, 1)}`);
@@ -260,7 +302,22 @@ function Decision({ d }: { d: DecisionData }) {
       <h3 className="mt-8 text-[24px]">All {u35.stocks} Stock Token underlyings</h3>
       <DecisionTable u={u35} name={`${u35.stocks} Stock Token underlyings`} />
       <Facts d={d} u={u35} />
-      <p className="mt-6 text-[16px]">
+      <h3 className="mt-8 text-[24px]">How often B acted</h3>
+      <Pulls u={u5} name={`${u5.stocks} vault stocks`} />
+      <div className="mt-6">
+        <Pulls u={u35} name={`${u35.stocks} Stock Token underlyings`} />
+      </div>
+      <h3 className="mt-8 text-[24px]">Modelled rates against today&apos;s market</h3>
+      <p className="mt-2 text-[16px]">
+        At Robinhood Chain block {d.market_now.block.toLocaleString("en-US")} (
+        {d.market_now.block_time.slice(0, 10)}), the {d.market_now.markets} Morpho markets that take
+        a Stock Token as collateral held {formatUsd(d.market_now.usdg_supplied)} USDG supplied and{" "}
+        {formatUsd(d.market_now.usdg_borrowed)} borrowed ({formatPct(d.market_now.utilization, 2)}{" "}
+        utilization). Lenders earned a supply APY of {formatPct(d.market_now.supply_apy, 4)}{" "}
+        (supply-weighted) and borrowers paid {formatPct(d.market_now.borrow_apy, 2)}, read from each
+        market&apos;s interest rate model at that block. The yields above use modelled rates.
+      </p>
+      <p className="mt-4 text-[16px]">
         Tier yields are assumptions, not observed rates: supply APY {apy.join(", ")} by tier. The
         gap between tiers drives how much any strategy gains by lending at higher loan-to-value;
         with a smaller spread the higher tiers are worth less. Backtests: {d.label}.

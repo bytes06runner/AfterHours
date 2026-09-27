@@ -386,6 +386,8 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
         bt = ctx.artifact("backtest", "results.json")
         gaps = ctx.artifact("gaps", "summary.json")
         study = ctx.artifact("discovery", "oracle_study.json")
+        activity = ctx.artifact("backtest", "option_b_activity.json")["universes"]
+        market = ctx.artifact("discovery", "market_size.json")
         a_doc = ctx.artifact("backtest", "option_a.json")
         b_doc = ctx.artifact("backtest", "option_b.json")
         numbers = ctx.artifact("report", "numbers.json")["numbers"]
@@ -419,6 +421,11 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                 "nearest_blend": point(bu["compare_on_evaluation"]["nearest_blend"])
                 | {"w": bu["compare_on_evaluation"]["nearest_blend"]["w"]},
                 "blends": [point(x) | {"w": x["w"]} for x in au["blends"]["evaluation"]],
+                "pulls": {
+                    "per_year": activity[u]["per_year"],
+                    "total": activity[u]["total"],
+                    "by_symbol": activity[u]["by_symbol"],
+                },
             }
 
         return {
@@ -431,6 +438,16 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                 "label": b_doc["label"],
                 "second_evaluation_note": b_doc["note"],
                 "universes": {u: universe(u) for u in ("vault", "stock_tokens")},
+                "market_now": {
+                    "block": market["block"],
+                    "block_time": market["block_time"],
+                    "markets": market["stock_token_markets"],
+                    "usdg_supplied": market["usdg_loan"]["supplied"],
+                    "usdg_borrowed": market["usdg_loan"]["borrowed"],
+                    "supply_apy": market["rates"]["usdg_supply_apy_supply_weighted"],
+                    "borrow_apy": market["rates"]["usdg_borrow_apy_borrow_weighted"],
+                    "utilization": market["rates"]["usdg_utilization"],
+                },
                 "assumed_apy": {
                     name: cfg.backtest.apy(lltv) for name, lltv in cfg.morpho.lltv_tiers.ordered()
                 },

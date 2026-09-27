@@ -320,6 +320,20 @@ def option_b_cmd(
     typer.echo(f"wrote {write(cfg, data, jobs)}")
 
 
+@app.command("b-activity")
+def b_activity_cmd() -> None:
+    """Measure how often option B pulled money on the held-out years (no strategy change)."""
+    from afterhours.backtest.b_activity import write
+    from afterhours.data.pipeline import DATASET_KEY, make_cache
+
+    _logging()
+    cfg = load_config()
+    data = make_cache(cfg).get(DATASET_KEY, allow_stale=True)
+    if data is None:
+        raise typer.BadParameter("no dataset; run `afterhours data build` first")
+    typer.echo(f"wrote {write(cfg, data)}")
+
+
 @app.command("numbers")
 def numbers_cmd() -> None:
     """M12: write artifacts/report/numbers.json, the numbers the README and pitch quote."""

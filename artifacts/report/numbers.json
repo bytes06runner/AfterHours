@@ -822,29 +822,209 @@
       "text": "5",
       "source": "config policy"
     },
+    "rel.b_vs_blend.bad_debt_less": {
+      "value": 0.4746142387679926,
+      "text": "47%",
+      "source": "derived from option_a.json and option_b.json (5 vault stocks)"
+    },
+    "rel.b_vs_blend.worst_less": {
+      "value": 0.5116065709861846,
+      "text": "51%",
+      "source": "derived from option_a.json and option_b.json (5 vault stocks)"
+    },
+    "rel.b_vs_fixed_map.bad_debt_less": {
+      "value": 0.3104078009600484,
+      "text": "31%",
+      "source": "derived from option_a.json and option_b.json (5 vault stocks)"
+    },
+    "rel.b_vs_fixed_map.worst_less": {
+      "value": 0.4590734350812369,
+      "text": "46%",
+      "source": "derived from option_a.json and option_b.json (5 vault stocks)"
+    },
+    "rel.replay.b_less": {
+      "value": 0.5903999999999998,
+      "text": "59%",
+      "source": "artifacts/backtest/replay/META-2022-10-26-earnings.json"
+    },
+    "b5.pulls.nights": {
+      "value": 228,
+      "text": "228",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.stock_nights": {
+      "value": 284,
+      "text": "284",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.usdg": {
+      "value": 10241622.126287632,
+      "text": "10,241,622",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2022.nights": {
+      "value": 83,
+      "text": "83",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2022.usdg": {
+      "value": 2018214.3211681868,
+      "text": "2,018,214",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2023.nights": {
+      "value": 35,
+      "text": "35",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2023.usdg": {
+      "value": 1079450.8783266684,
+      "text": "1,079,451",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2024.nights": {
+      "value": 40,
+      "text": "40",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2024.usdg": {
+      "value": 3114562.8436422083,
+      "text": "3,114,563",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2025.nights": {
+      "value": 40,
+      "text": "40",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2025.usdg": {
+      "value": 2194824.733314154,
+      "text": "2,194,825",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2026.nights": {
+      "value": 30,
+      "text": "30",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b5.pulls.2026.usdg": {
+      "value": 1834569.3498364144,
+      "text": "1,834,569",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.nights": {
+      "value": 883,
+      "text": "883",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.stock_nights": {
+      "value": 2103,
+      "text": "2,103",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.usdg": {
+      "value": 10478972.338484017,
+      "text": "10,478,972",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2022.nights": {
+      "value": 166,
+      "text": "166",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2022.usdg": {
+      "value": 1509564.0424260742,
+      "text": "1,509,564",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2023.nights": {
+      "value": 191,
+      "text": "191",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2023.usdg": {
+      "value": 1386349.7080839833,
+      "text": "1,386,350",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2024.nights": {
+      "value": 207,
+      "text": "207",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2024.usdg": {
+      "value": 1012712.1692944198,
+      "text": "1,012,712",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2025.nights": {
+      "value": 169,
+      "text": "169",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2025.usdg": {
+      "value": 3339841.0667697457,
+      "text": "3,339,841",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2026.nights": {
+      "value": 150,
+      "text": "150",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
+    "b35.pulls.2026.usdg": {
+      "value": 3230505.3519097953,
+      "text": "3,230,505",
+      "source": "artifacts/backtest/option_b_activity.json"
+    },
     "market.block": {
-      "value": 73382409,
-      "text": "73,382,409",
+      "value": 73650323,
+      "text": "73,650,323",
       "source": "artifacts/discovery/market_size.json"
     },
     "market.date": {
-      "value": "2026-09-26T20:50:32+00:00",
-      "text": "2026-09-26",
+      "value": "2026-09-27T04:22:21+00:00",
+      "text": "2026-09-27",
       "source": "artifacts/discovery/market_size.json"
     },
     "market.stock_token_markets": {
-      "value": 149,
-      "text": "149",
+      "value": 150,
+      "text": "150",
       "source": "artifacts/discovery/market_size.json"
     },
     "market.usdg_supplied": {
-      "value": 804926.000639,
+      "value": 804926.0034439999,
       "text": "804,926",
       "source": "artifacts/discovery/market_size.json"
     },
     "market.usdg_borrowed": {
-      "value": 6114.673538000001,
-      "text": "6,115",
+      "value": 6181.676343000001,
+      "text": "6,182",
+      "source": "artifacts/discovery/market_size.json"
+    },
+    "market.supply_apy": {
+      "value": 1.5515322863536236e-05,
+      "text": "0.0016%",
+      "source": "artifacts/discovery/market_size.json"
+    },
+    "market.borrow_apy": {
+      "value": 0.002020275105284583,
+      "text": "0.20%",
+      "source": "artifacts/discovery/market_size.json"
+    },
+    "market.utilization": {
+      "value": 0.007679806984183322,
+      "text": "0.77%",
+      "source": "artifacts/discovery/market_size.json"
+    },
+    "market.markets_with_borrowing": {
+      "value": 31,
+      "text": "31",
+      "source": "artifacts/discovery/market_size.json"
+    },
+    "market.usdg_markets": {
+      "value": 148,
+      "text": "148",
       "source": "artifacts/discovery/market_size.json"
     }
   },
