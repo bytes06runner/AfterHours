@@ -111,10 +111,25 @@ export default function DepositPanel({ vault }: { vault: Vault | undefined }) {
       <div className="flex flex-col gap-3">
         <p className="text-[18px]">Connect a wallet to deposit USDG.</p>
         <ConnectButton label="Connect" chainStatus="none" showBalance={false} />
-        {pub.profile === "local" && (
+        {pub.profile === "local" ? (
           <p className="text-[14px]">
-            Local simulation: add the local chain to your wallet (chain id {pub.chain.chain_id}),
-            then use the test USDG faucet here.
+            Local simulation: your wallet will be asked to add {pub.chain.name} (chain id{" "}
+            {pub.chain.chain_id}), then use the test USDG faucet here.
+          </p>
+        ) : (
+          <p className="text-[14px]">
+            Afterhours runs on {pub.chain.name} (chain id {pub.chain.chain_id}); your wallet will be
+            asked to add it if needed.
+            {pub.chain.faucet_url && (
+              <>
+                {" "}
+                Need gas? Get test {pub.chain.native_currency.symbol} from the{" "}
+                <a href={pub.chain.faucet_url} target="_blank" rel="noreferrer">
+                  {pub.chain.name} faucet
+                </a>
+                .
+              </>
+            )}
           </p>
         )}
       </div>
@@ -127,7 +142,7 @@ export default function DepositPanel({ vault }: { vault: Vault | undefined }) {
         className="btn btn-brass"
         onClick={() => switchChain({ chainId: pub.chain.chain_id! })}
       >
-        Switch to the {pub.profile === "local" ? "local chain" : pub.chain.key}
+        Switch to {pub.chain.name}
       </button>
     );
   }

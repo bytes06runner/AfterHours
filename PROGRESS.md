@@ -33,6 +33,13 @@
    Then tell me in chat that it is ready and I run `PROFILE=rh-testnet make deploy seed` and the same for
    `arb-sepolia`, write the addresses to the README and point the hosted app at them.
 
+3. **WalletConnect project ID (phone wallets and QR codes).** Browser-extension wallets work
+   without it (Brave Wallet, Rabby, Phantom, Coinbase Wallet, MetaMask and any wallet that
+   announces itself through EIP-6963). Phone wallets and the WalletConnect QR code need a free
+   project ID from Reown (the WalletConnect cloud dashboard). Please create one and set
+   `NEXT_PUBLIC_WC_PROJECT_ID` in `.env` (and in the web host's environment when it is hosted);
+   MetaMask mobile, Rainbow, OKX and the QR option then appear under "More wallets".
+
 ## Milestones
 
 - [x] M0 Bootstrap (2026-09-26, `d185414`)
@@ -653,3 +660,20 @@ Secret scan (gitleaks 8.30.1, official release, checksum verified)
   whose values are 39 public Ethereum contract addresses (Stock Tokens and USDG on Robinhood
   Chain from discovery, and simulated USDG on the local chain). No private keys, `.env` files or
   key files are tracked.
+
+### 2026-09-27 Wallet connection for real users
+
+Reported: in Brave, choosing "Browser Wallet" left the modal spinning with no wallet window.
+- Chains carry their official names and gas currency in config (docs.robinhood.com/chain/connecting:
+  "Robinhood Chain", "Robinhood Chain Testnet", ETH; docs.arbitrum.io chain info: Arbitrum One,
+  Arbitrum Sepolia), served in `/v1/config/public`, so a wallet asked to add the network gets the
+  right name, currency, public RPC and explorer. No chain literal remains in the web app.
+- Wallet list: Brave Wallet (shown in Brave), Rabby, Phantom, Coinbase Wallet and the generic
+  browser wallet always; MetaMask, Rainbow, OKX and WalletConnect when a project ID is set
+  (BLOCKED 3); other installed wallets appear through EIP-6963 discovery.
+- Help under the wallet list (approve from the browser toolbar; in Brave the wallet icon), and
+  if a wallet has not answered after 15 seconds an alert says where to approve.
+- Testnet and mainnet: "Switch to <chain name>" and a link to the chain's faucet from config.
+- Evidence: `e2e/wallet-stuck.spec.ts` (a wallet that never answers gets the hint) passes; the
+  full suite passes.
+

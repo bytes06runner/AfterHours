@@ -14,7 +14,7 @@ export default defineConfig({
       name: "mobile",
       use: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true },
       // The wallet and demo flows are covered on desktop; phones get every page and state.
-      testIgnore: [/vault\.spec/, /demo\.spec/],
+      testIgnore: [/vault\.spec/, /demo\.spec/, /wallet-stuck\.spec/],
     },
   ],
 });

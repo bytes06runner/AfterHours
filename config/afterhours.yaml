@@ -67,25 +67,39 @@ profiles:
 # Chain facts verified in M1 with `cast chain-id` against each public RPC; sources in
 # docs/findings/m1-discovery.md. Public RPCs are rate limited: set the *_RPC_URL env vars for real use.
 chains:
+  # Names and gas currency shown to wallets when they add the network. Sources (2026-09-27):
+  # docs.robinhood.com/chain/connecting ("Robinhood Chain", "Robinhood Chain Testnet", currency
+  # symbol ETH; "Robinhood Chain uses ETH as its native gas token", docs.robinhood.com/chain) and
+  # docs.arbitrum.io/for-devs/dev-tools-and-resources/chain-info (Arbitrum One, Arbitrum Sepolia).
   anvil:
     chain_id: 31337                     # Anvil's default chain id (Foundry docs)
+    name: Local chain (simulation)
+    native_currency: { name: Ether, symbol: ETH, decimals: 18 }
   robinhood:
     chain_id: 4663
+    name: Robinhood Chain
+    native_currency: { name: Ether, symbol: ETH, decimals: 18 }
     public_rpc_url: https://rpc.mainnet.chain.robinhood.com
     explorer_url: https://robinhoodchain.blockscout.com
     explorer_api_url: https://robinhoodchain.blockscout.com/api
   robinhood-testnet:
     chain_id: 46630
+    name: Robinhood Chain Testnet
+    native_currency: { name: Ether, symbol: ETH, decimals: 18 }
     public_rpc_url: https://rpc.testnet.chain.robinhood.com
     explorer_url: https://explorer.testnet.chain.robinhood.com
     explorer_api_url: https://explorer.testnet.chain.robinhood.com/api
     faucet_url: https://faucet.testnet.chain.robinhood.com
   arbitrum:
     chain_id: 42161
+    name: Arbitrum One
+    native_currency: { name: Ether, symbol: ETH, decimals: 18 }
     public_rpc_url: https://arb1.arbitrum.io/rpc
     explorer_url: https://arbiscan.io
   arbitrum-sepolia:
     chain_id: 421614
+    name: Arbitrum Sepolia
+    native_currency: { name: Ether, symbol: ETH, decimals: 18 }
     public_rpc_url: https://sepolia-rollup.arbitrum.io/rpc
     explorer_url: https://sepolia.arbiscan.io
     faucet_url: https://arbitrum.faucet.dev

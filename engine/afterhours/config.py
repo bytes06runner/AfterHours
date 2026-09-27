@@ -64,8 +64,16 @@ class ProfileConfig(_Strict):
     requires_human_go: bool = False
 
 
+class NativeCurrency(_Strict):
+    name: str
+    symbol: str
+    decimals: PositiveInt
+
+
 class ChainConfig(_Strict):
     chain_id: PositiveInt | None = None
+    name: str
+    native_currency: NativeCurrency
     public_rpc_url: HttpUrlStr | None = None
     explorer_url: HttpUrlStr | None = None
     explorer_api_url: HttpUrlStr | None = None

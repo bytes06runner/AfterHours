@@ -356,6 +356,13 @@
           "default": null,
           "title": "Faucet Url"
         },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "native_currency": {
+          "$ref": "#/$defs/NativeCurrency"
+        },
         "public_rpc_url": {
           "anyOf": [
             {
@@ -370,6 +377,10 @@
           "title": "Public Rpc Url"
         }
       },
+      "required": [
+        "name",
+        "native_currency"
+      ],
       "title": "ChainConfig",
       "type": "object"
     },
@@ -1031,6 +1042,31 @@
         "liquidation_incentive"
       ],
       "title": "MorphoConfig",
+      "type": "object"
+    },
+    "NativeCurrency": {
+      "additionalProperties": false,
+      "properties": {
+        "decimals": {
+          "exclusiveMinimum": 0,
+          "title": "Decimals",
+          "type": "integer"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "symbol": {
+          "title": "Symbol",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "symbol",
+        "decimals"
+      ],
+      "title": "NativeCurrency",
       "type": "object"
     },
     "OnchainSelection": {

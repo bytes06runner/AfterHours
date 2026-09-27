@@ -20,7 +20,14 @@ export const PublicConfigSchema = z.object({
   profile: z.string().min(1),
   chain: z.object({
     key: z.string().min(1),
+    name: z.string().min(1),
+    native_currency: z.object({
+      name: z.string().min(1),
+      symbol: z.string().min(1),
+      decimals: z.number().int().positive(),
+    }),
     chain_id: z.number().int().positive().nullable(),
+    faucet_url: z.url({ protocol: /^https?$/ }).nullable(),
     explorer_url: z.url({ protocol: /^https?$/ }).nullable(),
     rpc_url: z.url({ protocol: /^https?$/ }).nullable(),
   }),

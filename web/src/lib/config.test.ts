@@ -4,7 +4,15 @@ import { fetchPublicConfig, parsePublicConfig, readWebEnv } from "./config";
 
 const sample = {
   profile: "fork",
-  chain: { key: "robinhood", chain_id: null, explorer_url: null, rpc_url: null },
+  chain: {
+    key: "robinhood",
+    name: "Robinhood Chain",
+    native_currency: { name: "Ether", symbol: "ETH", decimals: 18 },
+    chain_id: null,
+    faucet_url: null,
+    explorer_url: null,
+    rpc_url: null,
+  },
   simulation: { oracle: false, collateral: false },
   vault: { name: "Afterhours USDG", symbol: "ahUSDG" },
   exchange_calendar: "XNYS",

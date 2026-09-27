@@ -20,7 +20,10 @@ def public_config(cfg: AfterhoursConfig) -> dict[str, Any]:
         "profile": cfg.active_profile,
         "chain": {
             "key": profile.chain,
+            "name": chain.name,
+            "native_currency": chain.native_currency.model_dump(),
             "chain_id": chain.chain_id,
+            "faucet_url": chain.faucet_url,
             "explorer_url": chain.explorer_url,
             "rpc_url": browser_rpc(cfg),
         },
