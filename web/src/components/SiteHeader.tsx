@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DayNightSwitch } from "./DayNightSwitch";
 import { SessionBadge } from "./SessionBadge";
 import { WalletButton } from "./WalletButton";
 
@@ -13,7 +14,7 @@ const NAV = [
 
 export function SiteHeader() {
   return (
-    <header className="mx-auto flex max-w-[1280px] items-center gap-4 px-4 py-4 sm:px-8">
+    <header className="mx-auto flex max-w-[1440px] items-center gap-4 px-4 py-4 sm:px-8">
       <Link href="/" className="font-display text-[24px] no-underline sm:text-[28px]">
         Afterhours
       </Link>
@@ -27,6 +28,9 @@ export function SiteHeader() {
       <div className="ml-auto flex items-center gap-3">
         <span className="hidden md:inline-flex">
           <SessionBadge />
+        </span>
+        <span className="hidden sm:inline-flex">
+          <DayNightSwitch />
         </span>
         <WalletButton />
         <details className="relative lg:hidden">
@@ -46,6 +50,10 @@ export function SiteHeader() {
                 {n.label}
               </Link>
             ))}
+            <span className="flex items-center justify-between px-3 py-2 font-semibold sm:hidden">
+              Day and night
+              <DayNightSwitch />
+            </span>
           </nav>
         </details>
       </div>

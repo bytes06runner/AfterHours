@@ -33,9 +33,37 @@ async function main(): Promise<void> {
           deviceScaleFactor: 1,
         });
         const page = await ctx.newPage();
-        await page.goto(new URL(path, base).toString(), { waitUntil: "networkidle" });
-        await page.waitForTimeout(1500);
-        if (label === "bell") {
+        if (label !== "welcome") {
+          await page.addInitScript(() => {
+            try {
+              window.sessionStorage.setItem("ah:welcomed", "1");
+            } catch {
+              /* ignore */
+            }
+          });
+        }
+        if (label !== "welcome") {
+          await page.goto(new URL(path, base).toString(), { waitUntil: "networkidle" });
+          await page.waitForTimeout(1500);
+          // Scroll through once so charts that animate in when seen are drawn in the capture.
+          await page.evaluate(async () => {
+            for (let y = 0; y < document.body.scrollHeight; y += 400) {
+              window.scrollTo(0, y);
+              await new Promise((r) => setTimeout(r, 60));
+            }
+            window.scrollTo(0, 0);
+          });
+          await page.waitForTimeout(1500);
+        }
+        if (label === "welcome") {
+          // The curtain while loading, then mid-opening.
+          await page.goto(new URL(path, base).toString());
+          await page.waitForTimeout(700);
+          await page.screenshot({ path: join(dir, `welcome-loading-${w}.png`) });
+          await page.waitForSelector(".curtain-opening", { timeout: 8000 }).catch(() => undefined);
+          await page.waitForTimeout(450);
+          await page.screenshot({ path: join(dir, `welcome-opening-${w}.png`) });
+        } else if (label === "bell") {
           const wasNight = await page.evaluate(
             () => document.documentElement.dataset.phase === "night",
           );

@@ -38,11 +38,21 @@ interface Tower {
   steps: number;
 }
 
-function towers(seed: number, count: number, minH: number, maxH: number): Tower[] {
+/** Extra art on each side when the hero fills a wide screen. */
+const WING = 300;
+
+function towers(
+  seed: number,
+  count: number,
+  minH: number,
+  maxH: number,
+  from = -40,
+  to = W,
+): Tower[] {
   const r = rng(seed);
   const out: Tower[] = [];
-  let x = -40;
-  for (let i = 0; i < count && x < W; i++) {
+  let x = from;
+  for (let i = 0; i < count && x < to; i++) {
     const w = 56 + Math.round(r() * 7) * 8;
     out.push({
       x,
@@ -57,6 +67,25 @@ function towers(seed: number, count: number, minH: number, maxH: number): Tower[
 
 const FAR = towers(11, 24, 180, 360);
 const NEAR = towers(23, 22, 120, 260);
+// Wide screens: the same skyline, continued into the wings on both sides.
+const FAR_WIDE = [
+  ...towers(31, 10, 180, 360, -WING - 40, -40),
+  ...FAR,
+  ...towers(37, 10, 180, 360, W, W + WING),
+];
+const NEAR_WIDE = [
+  ...towers(41, 10, 120, 260, -WING - 40, -40),
+  ...NEAR,
+  ...towers(43, 10, 120, 260, W, W + WING),
+];
+const STARS_WIDE = (() => {
+  const r = rng(19);
+  return Array.from({ length: 30 }, () => ({
+    x: r() < 0.5 ? -WING + r() * WING : W + r() * WING,
+    y: r() * 300,
+    r: r() < 0.2 ? 2 : 1.25,
+  }));
+})();
 
 function towerPath(t: Tower, ground: number): string {
   // Stepped silhouette: the full width rises to the first setback, then each step is 8 px
@@ -95,7 +124,8 @@ function SkylineLayer({
           for (let c = 0; c < cols; c++) {
             // Activity decides how many windows can light at night.
             if (r() > 0.25 + 0.6 * activity) continue;
-            cells.push(
+            const flicker = r() < 0.08;
+            const win = (
               <rect
                 key={`${i}-${row}-${c}`}
                 x={t.x + 12 + c * 16}
@@ -104,7 +134,20 @@ function SkylineLayer({
                 height={8}
                 className="a-lit"
                 style={{ "--floor": 1 + (row % 4) } as React.CSSProperties}
-              />,
+              />
+            );
+            cells.push(
+              flicker ? (
+                <g
+                  key={`f-${i}-${row}-${c}`}
+                  className="flicker"
+                  style={{ animationDelay: `${(i * 7 + row * 3 + c) % 11}s` }}
+                >
+                  {win}
+                </g>
+              ) : (
+                win
+              ),
             );
           }
         }
@@ -114,6 +157,74 @@ function SkylineLayer({
   );
 }
 
+/** Day: stepped deco clouds drifting across the sky (fade out as night falls). */
+const CLOUDS = [
+  { x: 60, y: 96, s: 1, d: 0 },
+  { x: 420, y: 60, s: 0.7, d: -18 },
+  { x: 760, y: 120, s: 0.9, d: -34 },
+  { x: 1040, y: 74, s: 0.6, d: -52 },
+];
+
+function Clouds() {
+  return (
+    <g className="a-clouds" aria-hidden="true">
+      {CLOUDS.map((c) => (
+        <g key={c.x} className="drift" style={{ animationDelay: `${c.d}s` }}>
+          <g transform={`translate(${c.x} ${c.y}) scale(${c.s})`}>
+            <rect x={0} y={16} width={176} height={16} rx={8} className="a-cloud" />
+            <rect x={24} y={0} width={96} height={24} rx={12} className="a-cloud" />
+            <rect x={72} y={-12} width={64} height={24} rx={12} className="a-cloud" />
+          </g>
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** Night: two searchlights sweeping from behind the skyline (fade in after dusk). */
+function Searchlights() {
+  return (
+    <g className="a-beams" aria-hidden="true">
+      <defs>
+        <linearGradient id="beam" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stopColor="var(--night-brass)" stopOpacity="0.32" />
+          <stop offset="1" stopColor="var(--night-brass)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {[
+        { x: 300, d: 0 },
+        { x: 930, d: -4.5 },
+      ].map((b) => (
+        <g
+          key={b.x}
+          className="sweep"
+          style={{ transformOrigin: `${b.x}px 600px`, animationDelay: `${b.d}s` }}
+        >
+          <path
+            d={`M${b.x - 6} 600 L${b.x - 70} 0 L${b.x + 70} 0 L${b.x + 6} 600 Z`}
+            fill="url(#beam)"
+          />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** Street lamps on the plaza: posts by day, lamplight halos at night. */
+function Lamps() {
+  return (
+    <g aria-hidden="true">
+      {[80, 1120].map((x) => (
+        <g key={x}>
+          <rect x={x - 2} y={640} width={4} height={50} className="a-stone-deep" />
+          <rect x={x - 10} y={632} width={20} height={8} className="a-stone-deep" />
+          <circle cx={x} cy={628} r={26} className="a-halo" />
+          <circle cx={x} cy={628} r={6} className="a-lamp" />
+        </g>
+      ))}
+    </g>
+  );
+}
 /** The pediment bell. It swings once whenever `bells` increases. */
 function Bell({ bells }: { bells: number }) {
   return (
@@ -282,6 +393,8 @@ export interface ExchangeFacadeProps {
   activity?: number;
   ticker?: React.ReactNode;
   title?: string;
+  /** Wide screens: extend the sky and skyline into wings on both sides (1800 units wide). */
+  wide?: boolean;
 }
 
 export const ExchangeFacade = memo(function ExchangeFacade({
@@ -290,22 +403,31 @@ export const ExchangeFacade = memo(function ExchangeFacade({
   activity = 0.6,
   ticker,
   title = "An art deco stock exchange at the edge of a city skyline",
+  wide = false,
 }: ExchangeFacadeProps) {
+  const x0 = wide ? -WING : 0;
+  const vw = wide ? W + 2 * WING : W;
+  const stars = wide ? [...STARS, ...STARS_WIDE] : STARS;
   const iso = clockIso;
   return (
     <svg
-      viewBox={`0 ${CROP_TOP} ${W} ${H - CROP_TOP}`}
+      viewBox={`${x0} ${CROP_TOP} ${vw} ${H - CROP_TOP}`}
       role="img"
       aria-label={title}
       className="block h-auto w-full"
     >
-      <rect x={0} y={0} width={W} height={H} className="a-sky-0" />
-      <rect x={0} y={260} width={W} height={130} className="a-sky-1" />
-      <rect x={0} y={390} width={W} height={130} className="a-sky-2" />
-      <rect x={0} y={520} width={W} height={200} className="a-sky-3" />
-      {STARS.map((s, i) => (
-        <circle key={i} cx={s.x} cy={s.y} r={s.r} className="a-star" />
-      ))}
+      <rect x={x0} y={0} width={vw} height={H} className="a-sky-0" />
+      <rect x={x0} y={260} width={vw} height={130} className="a-sky-1" />
+      <rect x={x0} y={390} width={vw} height={130} className="a-sky-2" />
+      <rect x={x0} y={520} width={vw} height={200} className="a-sky-3" />
+      <g className="px-sky">
+        {stars.map((s, i) => (
+          <g key={i} className="twinkle" style={{ animationDelay: `${(i * 0.37) % 5}s` }}>
+            <circle cx={s.x} cy={s.y} r={s.r} className="a-star" />
+          </g>
+        ))}
+        <Clouds />
+      </g>
       <circle cx={980} cy={160} r={56} className="a-sun" />
       <g className="a-moon">
         <mask id="moon-cut">
@@ -314,9 +436,26 @@ export const ExchangeFacade = memo(function ExchangeFacade({
         </mask>
         <circle cx={220} cy={150} r={40} mask="url(#moon-cut)" />
       </g>
-      <SkylineLayer layer={FAR} ground={600} activity={activity * 0.8} className="a-far" />
-      <SkylineLayer layer={NEAR} ground={690} activity={activity} className="a-near" />
+      <Searchlights />
+      <g className="px-far">
+        <SkylineLayer
+          layer={wide ? FAR_WIDE : FAR}
+          ground={600}
+          activity={activity * 0.8}
+          className="a-far"
+        />
+      </g>
+      <g className="px-near">
+        <SkylineLayer
+          layer={wide ? NEAR_WIDE : NEAR}
+          ground={690}
+          activity={activity}
+          className="a-near"
+        />
+      </g>
+      {wide && <rect x={x0} y={690} width={vw} height={30} className="a-stone-deep" />}
       <Facade bells={bells} clockIso={iso} />
+      <Lamps />
       {ticker && (
         <foreignObject x={170} y={370} width={860} height={30}>
           {ticker}

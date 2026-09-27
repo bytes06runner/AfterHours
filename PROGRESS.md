@@ -602,3 +602,54 @@ Done
 Evidence
 - `make e2e`: 32 passed. `make test-integration`: 2 passed. `make test`: Python, vitest and
   forge green. `make lint` clean, including lint-numbers.
+
+### 2026-09-27 After the freeze: measurements, pitch cut, frontend, secret scan
+
+Analysis frozen: no strategy, setting or backtest changed.
+
+Measurements
+- `afterhours b-activity` (`artifacts/backtest/option_b_activity.json`): replays B's evaluated run
+  (reproduces its bad debt exactly) and counts nights the pullback fired for a stock holding
+  unborrowed vault money. 5 vault stocks, 2022 to 2026-09-24: 228 nights (83, 35, 40, 40, 30 by
+  year), 284 stock-nights, 10,241,622 USDG moved in all (money returns and is pulled again);
+  META 134 and NVDA 138 stock-nights, USO 12. 35 Stock Tokens: 883 nights, 10,478,972 USDG.
+  In numbers.json (`b5.pulls.*`, `b35.pulls.*`) and on the report card.
+- Live Morpho rates: the public RPC no longer serves the pinned block 73,382,409 (state kept for
+  about the last 1,000 blocks), so size and rates were re-read together at block 73,650,323
+  (2026-09-27 04:22 UTC): 150 Stock Token markets, 804,926 USDG supplied, 6,182 borrowed (0.77%
+  utilization), borrowing in 31 of 148 USDG markets; supply APY 0.0016% supply-weighted, borrow
+  APY 0.20% borrow-weighted. Rates from each market's IRM `borrowRateView` at the block; supply
+  APY = borrow APY x utilization x (1 - fee), from Morpho Blue `_accrueInterest`. README, pitch
+  and report card now say backtest yields use modelled rates (7.0% to 9.5%) and give this figure.
+
+Pitch
+- `docs/video/pitch.md` cut to one claim in relative terms (B vs the nearest blend: 47% less bad
+  debt, 51% smaller worst night; vs the fixed map: 31% and 46%, same yield), one replay (META
+  2022, 59% less loss), one sentence on the pre-registered test, and the market line. 266 spoken
+  words (about 1 minute 50 seconds), under 2:30 with the TEAM lines. Methods stay on the report card.
+
+Frontend
+- Welcome sequence (first visit per session, landing): bronze deco doors, bell medallion, a
+  loading bar tied to real readiness (fonts, /v1/status, /v1/report-card), the bell rings and the
+  doors swing open; Skip button and Escape; never with reduced motion; at most about 4 seconds.
+- Full-width hero: on wide screens the exchange is drawn with the sky and skyline continued into
+  wings on both sides, so the band fills the width without cropping the building; scroll parallax.
+- Day and night life, all driven by --phase: drifting clouds by day; sweeping searchlights,
+  twinkling stars, flickering windows and glowing street lamps at night.
+- Header day and night switch on every page (a preview; the session badge stays real).
+- Data animations on scroll: histogram bars grow, the blend line draws and points arrive in
+  order with a pulse on B, comparison numbers flip in on split-flap digits.
+- Full-width brass band of measured facts; skyline footer on every page.
+- Layout shift fixed: the Simulation banner is now rendered by the server, main reserves height.
+
+Evidence
+- `make e2e`: 36 passed (new: the welcome opens by itself, once per session, and can be skipped).
+- `make lighthouse`: landing 91, vault 86, almanac 95, ledger 87, replay 92, report card 89
+  (performance); accessibility 98 to 100; best practices 100.
+- `make lint` (including lint-numbers) and `make test` clean.
+
+Secret scan (gitleaks 8.30.1, official release, checksum verified)
+- Full history: 653 findings, all rule `generic-api-key`, all on JSON keys containing "token"
+  whose values are 39 public Ethereum contract addresses (Stock Tokens and USDG on Robinhood
+  Chain from discovery, and simulated USDG on the local chain). No private keys, `.env` files or
+  key files are tracked.

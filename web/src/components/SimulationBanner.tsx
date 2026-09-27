@@ -1,25 +1,23 @@
 "use client";
 
 import { useConfig } from "@/lib/queries";
+import { simulationParts } from "@/lib/simulation";
 
-/** Always visible when any data or contract on screen is simulated (DESIGN section 6). */
-export function SimulationBanner() {
+/**
+ * Always visible when any data or contract on screen is simulated (DESIGN section 6). The
+ * server renders it from the public config (`initial`) so it is in the first paint and never
+ * pushes the page down; the client keeps it current.
+ */
+export function SimulationBanner({ initial }: { initial: string | null }) {
   const { data } = useConfig();
-  if (!data) return null;
-  const parts = [
-    data.simulation.oracle ? "simulated prices" : null,
-    data.simulation.collateral ? "simulated Stock Tokens and USDG" : null,
-    data.chain.chain_id === null || data.profile === "local" || data.profile === "fork"
-      ? `a ${data.profile} chain`
-      : null,
-  ].filter(Boolean);
-  if (parts.length === 0) return null;
+  const parts = data ? simulationParts(data) : initial;
+  if (!parts) return null;
   return (
     <div
       role="note"
       className="border-b border-rule bg-surface px-4 py-2 text-center text-[14px] font-semibold"
     >
-      Simulation: {parts.join(", ")}. Nothing here is real money.
+      Simulation: {parts}. Nothing here is real money.
     </div>
   );
 }

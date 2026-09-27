@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 import { RPC } from "./env";
 import { injectTestWallet } from "./wallet";

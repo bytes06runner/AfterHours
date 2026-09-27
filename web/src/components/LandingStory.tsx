@@ -14,6 +14,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { GapHistogram } from "@/charts/GapHistogram";
 import { FrontierChart } from "@/charts/FrontierChart";
+import { useInView } from "@/charts/useInView";
+import { SplitFlap } from "@/components/SplitFlap";
 import {
   api,
   type DecisionUniverse,
@@ -165,6 +167,9 @@ function ReplayVisual({ scenario }: { scenario: Scenario }) {
 }
 
 function CompareVisual({ u }: { u: DecisionUniverse }) {
+  const [ref, shown] = useInView<HTMLElement>(0.4);
+  // Digits start at zero and flip to the measured value when the step scrolls into view.
+  const flip = (v: string) => (shown ? v : v.replace(/[0-9]/g, "0"));
   const cells = [
     { label: "Lender yield", b: formatPct(u.b.yield, 2), o: formatPct(u.nearest_blend.yield, 2) },
     {
@@ -179,12 +184,14 @@ function CompareVisual({ u }: { u: DecisionUniverse }) {
     },
   ];
   return (
-    <figure>
+    <figure ref={ref}>
       <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {cells.map((c) => (
           <div key={c.label}>
             <dt className="text-[14px] font-semibold">{c.label}</dt>
-            <dd className="font-display text-[40px] leading-none">{c.b}</dd>
+            <dd className="text-[30px] leading-none">
+              <SplitFlap value={flip(c.b)} label={c.b} />
+            </dd>
             <dd className="text-[14px]">
               vs {c.o} for the {formatPct(u.nearest_blend.w, 0)} weekday mix
             </dd>

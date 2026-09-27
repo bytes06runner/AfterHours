@@ -275,3 +275,247 @@ a {
     scroll-behavior: auto !important;
   }
 }
+
+/* Header day and night switch: the knob slides with --ui-phase, the sun sets and the moon rises. */
+.daynight-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--c-bg);
+  border: 1.25px solid var(--c-rule);
+  transform: translateX(calc(var(--ui-phase) * 30px));
+}
+.daynight-sun {
+  transform-origin: 12px 12px;
+  opacity: calc(1 - var(--ui-phase));
+  transform: rotate(calc(var(--ui-phase) * 90deg)) scale(calc(1 - var(--ui-phase) * 0.6));
+}
+.daynight-moon {
+  transform-origin: 12px 12px;
+  opacity: var(--ui-phase);
+  transform: rotate(calc((1 - var(--ui-phase)) * -60deg)) scale(calc(0.4 + var(--ui-phase) * 0.6));
+}
+
+/* Welcome sequence: two deco doors over the page, then they swing open. */
+.curtain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 80;
+  perspective: 1800px;
+  background: color-mix(in oklab, var(--night-bg) 92%, black);
+}
+.curtain-opening {
+  background: transparent;
+  pointer-events: none;
+  transition: background 300ms var(--ease-ui);
+}
+.curtain-door {
+  position: absolute;
+  top: 0;
+  height: 100vh;
+  width: 50vw;
+  transition: transform 1100ms cubic-bezier(0.65, 0, 0.35, 1);
+  backface-visibility: hidden;
+}
+.curtain-left {
+  left: 0;
+  transform-origin: left center;
+}
+.curtain-right {
+  left: 50vw;
+  transform-origin: right center;
+}
+.curtain-opening .curtain-left {
+  transform: rotateY(-104deg);
+}
+.curtain-opening .curtain-right {
+  transform: rotateY(104deg);
+}
+.curtain-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: opacity 400ms var(--ease-ui);
+}
+.curtain-opening .curtain-center {
+  opacity: 0;
+}
+.curtain .a-bell {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+.curtain-skip {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+}
+.curtain-opening .curtain-skip {
+  opacity: 0;
+}
+
+/* Full-bleed hero art: the art's own ratio on phones, then a tall band that fills the width. */
+.hero-art {
+  background: var(--a-bg);
+}
+.hero-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  border-top: 2px solid var(--a-brass);
+  border-bottom: 1.25px solid var(--a-rule);
+  pointer-events: none;
+}
+.hero-rule-top {
+  top: 0;
+}
+.hero-rule-bottom {
+  bottom: 0;
+}
+
+/* Data that arrives when it scrolls into view (charts). Reduced motion: shown at rest. */
+.grow-bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 700ms var(--ease-ui);
+}
+.frontier .draw-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1200ms var(--ease-ui);
+}
+.frontier.shown .draw-line {
+  stroke-dashoffset: 0;
+}
+.frontier .pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+  transition: transform 450ms cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.frontier.shown .pop {
+  transform: scale(1);
+}
+.pulse-ring {
+  fill: none;
+  stroke: var(--c-brass);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.frontier.shown .pulse-ring {
+  animation: pulse-ring 2.4s ease-out 1.8s 3;
+}
+@keyframes pulse-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grow-bar,
+  .frontier .draw-line,
+  .frontier .pop {
+    transition: none;
+  }
+  .frontier .draw-line {
+    stroke-dashoffset: 0;
+  }
+  .frontier .pop {
+    transform: none;
+  }
+  .frontier.shown .pulse-ring {
+    animation: none;
+  }
+}
+
+/* Facts band: full-width brass marquee (static with reduced motion). */
+.facts-band {
+  overflow: hidden;
+  min-height: 56px;
+  background: var(--c-brass);
+  color: var(--c-on-brass);
+  border-top: 2px solid var(--c-text);
+  border-bottom: 2px solid var(--c-text);
+  font-weight: 700;
+  font-size: 1.1875rem;
+  display: flex;
+  align-items: center;
+}
+.facts-track {
+  display: flex;
+  white-space: nowrap;
+  padding-left: 1.5em;
+  animation: ticker 60s linear infinite;
+}
+.facts-band:hover .facts-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .facts-track {
+    animation: none;
+  }
+}
+
+/* Welcome doors: bronze panels with a double brass border and fluting, sized to any screen. */
+.door {
+  position: absolute;
+  inset: 0;
+  background: var(--night-surface);
+}
+.door-panel {
+  position: absolute;
+  inset: 4vmin 3vmin;
+  border: 2px solid var(--night-brass);
+  outline: 1.25px solid var(--night-rule);
+  outline-offset: -14px;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0 22px,
+    color-mix(in oklab, var(--night-rule) 70%, transparent) 22px 23.25px
+  );
+}
+.door-left .door-panel {
+  right: 0;
+}
+.door-right .door-panel {
+  left: 0;
+}
+.door-handle {
+  position: absolute;
+  bottom: 18vh;
+  width: 10px;
+  height: 72px;
+  border-radius: 4px;
+  background: var(--night-brass);
+}
+.door-left .door-handle {
+  right: 14px;
+}
+.door-right .door-handle {
+  left: 14px;
+}
+.curtain-plaque {
+  margin-top: -8px;
+  padding: 20px 28px 16px;
+  background: var(--night-bg);
+  border-top: 2px solid var(--night-brass);
+  border-bottom: 2px solid var(--night-brass);
+  text-align: center;
+}

@@ -14,6 +14,7 @@ import { LinePath } from "@visx/shape";
 import type { DecisionUniverse, FrontierPoint } from "@/lib/api";
 import { formatPct } from "@/lib/time";
 
+import { useInView } from "./useInView";
 import { useWidth } from "./useWidth";
 
 type Labelled = FrontierPoint & { label: string; color: string; big?: boolean };
@@ -28,6 +29,7 @@ export function FrontierChart({
   height?: number;
 }) {
   const [ref, width] = useWidth<HTMLDivElement>();
+  const [seen, shown] = useInView<SVGSVGElement>();
   const m = { top: 16, right: 24, bottom: 44, left: 56 };
   const w = Math.max(260, width) - m.left - m.right;
   const h = height - m.top - m.bottom;
@@ -54,6 +56,8 @@ export function FrontierChart({
   return (
     <div ref={ref}>
       <svg
+        ref={seen}
+        className={shown ? "frontier shown" : "frontier"}
         width={w + m.left + m.right}
         height={height}
         role="img"
@@ -83,12 +87,23 @@ export function FrontierChart({
             y={(p) => y(p.yield)}
             stroke="var(--c-rule)"
             strokeWidth={2}
+            className="draw-line"
+            pathLength={1}
           />
-          {blends.map((p) => (
-            <circle key={p.w} cx={x(p.worst)} cy={y(p.yield)} r={3} fill="var(--c-rule)" />
+          {blends.map((p, i) => (
+            <circle
+              key={p.w}
+              cx={x(p.worst)}
+              cy={y(p.yield)}
+              r={3}
+              fill="var(--c-rule)"
+              className="pop"
+              style={{ transitionDelay: `${200 + i * 40}ms` }}
+            />
           ))}
-          {named.map((p) => (
-            <g key={p.label}>
+          {named.map((p, i) => (
+            <g key={p.label} className="pop" style={{ transitionDelay: `${1000 + i * 180}ms` }}>
+              {p.big && <circle cx={x(p.worst)} cy={y(p.yield)} r={7} className="pulse-ring" />}
               {/* On narrow screens only B is labelled on the chart; the list below names all. */}
               <circle
                 cx={x(p.worst)}

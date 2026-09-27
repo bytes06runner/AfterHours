@@ -178,3 +178,94 @@
 .almanac-night {
   fill: color-mix(in oklab, var(--night-bg) calc(100% - var(--ui-phase) * 30%), black);
 }
+
+/* ---- Ambience (all driven by --phase; still with reduced motion) ---- */
+.a-cloud {
+  fill: color-mix(in oklab, var(--day-bg) 70%, white);
+}
+.a-clouds {
+  opacity: clamp(0, calc(0.9 - var(--phase) * 1.6), 0.9);
+}
+.drift {
+  animation: drift 90s linear infinite;
+}
+@keyframes drift {
+  from {
+    transform: translateX(-260px);
+  }
+  to {
+    transform: translateX(1300px);
+  }
+}
+.a-beams {
+  opacity: clamp(0, calc((var(--phase) - 0.55) * 2.2), 1);
+}
+.sweep {
+  transform-box: view-box;
+  animation: sweep 9s ease-in-out infinite alternate;
+}
+@keyframes sweep {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+.twinkle {
+  animation: twinkle 4.5s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.flicker {
+  animation: flicker 11s steps(1, end) infinite;
+}
+@keyframes flicker {
+  0%,
+  62%,
+  100% {
+    opacity: 1;
+  }
+  63%,
+  78% {
+    opacity: 0;
+  }
+}
+.a-lamp {
+  fill: var(--a-brass);
+  opacity: clamp(0.25, var(--phase), 1);
+}
+.a-halo {
+  fill: var(--night-brass);
+  opacity: calc(var(--phase) * 0.22);
+}
+/* Scroll parallax: the hero sets --hero-scroll (px scrolled past the top of the art). */
+.px-sky {
+  transform: translateY(calc(var(--hero-scroll, 0) * 0.35px));
+}
+.px-far {
+  transform: translateY(calc(var(--hero-scroll, 0) * 0.18px));
+}
+.px-near {
+  transform: translateY(calc(var(--hero-scroll, 0) * 0.08px));
+}
+@media (prefers-reduced-motion: reduce) {
+  .drift,
+  .sweep,
+  .twinkle,
+  .flicker {
+    animation: none;
+  }
+  .px-sky,
+  .px-far,
+  .px-near {
+    transform: none;
+  }
+}

@@ -10,6 +10,7 @@ import { scaleLinear } from "@visx/scale";
 
 import { formatPct } from "@/lib/time";
 
+import { useInView } from "./useInView";
 import { useWidth } from "./useWidth";
 
 export function GapHistogram({
@@ -26,6 +27,7 @@ export function GapHistogram({
   height?: number;
 }) {
   const [ref, width] = useWidth<HTMLDivElement>();
+  const [seen, shown] = useInView<SVGSVGElement>();
   const m = { top: 8, right: 8, bottom: 32, left: 8 };
   const w = Math.max(200, width) - m.left - m.right;
   const h = height - m.top - m.bottom;
@@ -38,6 +40,7 @@ export function GapHistogram({
   return (
     <div ref={ref}>
       <svg
+        ref={seen}
         width={w + m.left + m.right}
         height={height}
         role="img"
@@ -57,6 +60,11 @@ export function GapHistogram({
                 height={y(s)}
                 fill={tail ? "var(--c-risk)" : "var(--c-brass)"}
                 opacity={tail ? 1 : 0.85}
+                className="grow-bar"
+                style={{
+                  transform: `scaleY(${shown ? 1 : 0})`,
+                  transitionDelay: `${i * 7}ms`,
+                }}
               />
             );
           })}

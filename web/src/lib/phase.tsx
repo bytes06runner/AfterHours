@@ -33,6 +33,8 @@ interface PhaseState {
   bells: number;
   previewing: boolean;
   previewClose: () => void;
+  /** Show the other phase for a while (the header's day and night switch), then return. */
+  previewToggle: () => void;
 }
 
 const PhaseContext = createContext<PhaseState | null>(null);
@@ -84,9 +86,29 @@ export function PhaseProvider({
     }
   }, [live]);
 
+  const previewToggle = useCallback(() => {
+    timers.current.forEach((t) => window.clearTimeout(t));
+    const target: Phase = phase === "day" ? "night" : "day";
+    if (target === live) {
+      setOverride(null);
+      return;
+    }
+    setOverride(target);
+    timers.current.push(window.setTimeout(() => setOverride(null), 12000));
+  }, [phase, live]);
+
   const value = useMemo(
-    () => ({ phase, live, status, statusAt, bells, previewing: override !== null, previewClose }),
-    [phase, live, status, statusAt, bells, override, previewClose],
+    () => ({
+      phase,
+      live,
+      status,
+      statusAt,
+      bells,
+      previewing: override !== null,
+      previewClose,
+      previewToggle,
+    }),
+    [phase, live, status, statusAt, bells, override, previewClose, previewToggle],
   );
   return <PhaseContext.Provider value={value}>{children}</PhaseContext.Provider>;
 }
