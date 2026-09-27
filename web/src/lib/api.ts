@@ -16,6 +16,15 @@ export class ApiError extends Error {
   }
 }
 
+/** The API's own words for a live-view 503 ("still reading", "answering slowly"), else the
+ *  fallback. A bare status code is not a message. */
+export function liveErrorText(err: unknown, fallback: string): string {
+  if (err instanceof ApiError && err.status === 503 && !/^\d+$/.test(err.message)) {
+    return err.message;
+  }
+  return fallback;
+}
+
 /** How often a failed query is retried; the error messages quote it. */
 export const ERROR_RETRY_MS = 10_000;
 export const RETRY_TEXT = `Retrying in ${ERROR_RETRY_MS / 1000} seconds.`;

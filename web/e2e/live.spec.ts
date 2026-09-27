@@ -1,7 +1,19 @@
 import { randomBytes } from "node:crypto";
 
+import type { APIRequestContext } from "@playwright/test";
+
 import { API, isApi } from "./env";
 import { expect, test } from "./fixtures";
+
+/** GET a live endpoint, waiting while the API answers "still reading" (503) after a start. */
+async function liveJson(request: APIRequestContext, path: string) {
+  for (let i = 0; i < 40; i++) {
+    const res = await request.get(new URL(path, API).href);
+    if (res.ok()) return res.json();
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+  throw new Error(`${path} did not answer`);
+}
 
 /**
  * The risk board and the position checker read Robinhood Chain mainnet through the local API,
@@ -13,7 +25,8 @@ test.describe("live risk board", () => {
     request,
   }) => {
     test.skip(!API, "needs API_BASE_URL and a running stack (make up)");
-    const board = await (await request.get(new URL("/v1/live/board", API).href)).json();
+    test.setTimeout(180_000);
+    const board = await liveJson(request, "/v1/live/board");
     await page.goto("/live");
     await expect(page.getByRole("heading", { level: 1, name: "Live risk board" })).toBeVisible();
     await expect(page.getByText(/^Live: .+ mainnet, read-only/)).toBeVisible();
@@ -36,6 +49,7 @@ test.describe("live risk board", () => {
 
   test("says when mainnet cannot be reached", async ({ page }) => {
     test.skip(!API, "needs API_BASE_URL");
+    test.setTimeout(150_000); // the board retries for about a minute before it gives up
     await page.route(
       (url) => isApi(url) && url.pathname.startsWith("/v1/live/"),
       (route) => route.fulfill({ status: 503, body: "{}" }),
@@ -43,7 +57,29 @@ test.describe("live risk board", () => {
     await page.goto("/live");
     await expect(page.getByRole("main").getByRole("alert").first()).toContainText(
       "Can't reach Robinhood Chain right now.",
-      { timeout: 30_000 },
+      { timeout: 120_000 },
+    );
+  });
+
+  test("while the first board is read, it says so instead of waiting", async ({ page }) => {
+    test.skip(!API, "needs API_BASE_URL");
+    test.setTimeout(150_000);
+    await page.route(
+      (url) => isApi(url) && url.pathname === "/v1/live/board",
+      (route) =>
+        route.fulfill({
+          status: 503,
+          contentType: "application/json",
+          body: JSON.stringify({
+            detail: "Still reading every Stock Token price feed on mainnet.",
+          }),
+        }),
+    );
+    await page.goto("/live");
+    await expect(page.getByText("Reading every Stock Token price feed on mainnet.")).toBeVisible();
+    await expect(page.getByRole("main").getByRole("alert").first()).toContainText(
+      "Still reading every Stock Token price feed on mainnet.",
+      { timeout: 120_000 },
     );
   });
 });
@@ -70,7 +106,7 @@ test.describe("position checker", () => {
   test("a live borrower shows LTV, liquidation price and tonight", async ({ page, request }) => {
     test.skip(!API, "needs API_BASE_URL and a running stack (make up)");
     test.setTimeout(180_000);
-    const ex = await (await request.get(new URL("/v1/live/examples", API).href)).json();
+    const ex = await liveJson(request, "/v1/live/examples");
     test.skip(ex.addresses.length === 0, "no open Stock Token borrow on mainnet right now");
     await page.goto("/positions");
     await page.getByText("Try a live borrower:").getByRole("button").first().click();
@@ -84,7 +120,7 @@ test.describe("position checker", () => {
     await expect(page.getByTestId("tonight").first()).toContainText("New York");
     // Debt is shown in the loan token's own onchain symbol, never assumed.
     const first = new URL(page.url()).searchParams.get("address") ?? "";
-    const pos = await (await request.get(new URL(`/v1/live/positions/${first}`, API).href)).json();
+    const pos = await liveJson(request, `/v1/live/positions/${first}`);
     const loan = pos.positions.find((p: { ltv?: number }) => p.ltv !== undefined);
     await expect(card).toContainText(`You borrowed`);
     await expect(card).toContainText(loan.loan_symbol);

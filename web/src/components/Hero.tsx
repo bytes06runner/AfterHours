@@ -59,13 +59,18 @@ const COPY = {
     title: ["The market is closed.", "Stock Tokens aren't."],
     sub: "Afterhours moved lender money to safer markets before the bell. Here's why.",
   },
+  // Until /v1/status answers: say nothing about whether the exchange is open.
+  unknown: {
+    title: ["Stock Tokens never close.", "Their price feeds do."],
+    sub: "Reading the exchange clock.",
+  },
 };
 
 export function Hero() {
-  const { phase, status, statusAt, bells, previewing, previewClose } = usePhase();
+  const { phase, known, status, statusAt, bells, previewing, previewClose } = usePhase();
   const wall = useNow(30_000);
   const clock = clockNow(status?.now, statusAt, wall)?.toISOString();
-  const copy = COPY[phase];
+  const copy = COPY[known || previewing ? phase : "unknown"];
   const art = useHeroScroll();
   const wide = useWide();
   return (

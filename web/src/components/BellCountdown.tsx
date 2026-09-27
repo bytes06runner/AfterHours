@@ -9,11 +9,15 @@ import { ZonedTime } from "./ZonedTime";
 
 /** Split-flap countdown to the next closing or opening bell. */
 export function BellCountdown() {
-  const { live, status } = usePhase();
+  const { live, status, known } = usePhase();
   const open = live === "day";
   const left = useSecondsTo(open ? status?.next_close : status?.next_open);
   const { h, m, s } = countdownParts(left);
-  const label = open ? "Next closing bell" : "Next opening bell";
+  const label = !known
+    ? "Reading the exchange clock"
+    : open
+      ? "Next closing bell"
+      : "Next opening bell";
   return (
     <div>
       <p className="mb-2 text-[18px] font-semibold">{label}</p>

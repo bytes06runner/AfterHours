@@ -21,11 +21,23 @@ function human(seconds: number): string {
   return `${m}m`;
 }
 
-/** "Exchange open" or "Afterhours", with the time until the next bell. */
+/** "Exchange open" or "Afterhours", with the time until the next bell; neutral until known. */
 export function SessionBadge() {
-  const { live, status } = usePhase();
+  const { live, status, known } = usePhase();
   const open = live === "day";
   const left = useSecondsTo(open ? status?.next_close : status?.next_open);
+  if (!known) {
+    return (
+      <span className="badge" aria-live="polite">
+        <span
+          aria-hidden="true"
+          className="inline-block h-2 w-2 rounded-full"
+          style={{ background: "var(--c-rule)" }}
+        />
+        Reading the exchange clock
+      </span>
+    );
+  }
   return (
     <span className="badge" aria-live="polite">
       <span

@@ -10,7 +10,7 @@ import { StatusSchema } from "@/lib/api";
 import { Analytics } from "@/components/Analytics";
 import { parsePublicConfig, type PublicConfig } from "@/lib/config";
 import { simulationParts } from "@/lib/simulation";
-import type { Phase } from "@/lib/phase";
+import { UNKNOWN_PHASE_LOOK, type Phase } from "@/lib/phase";
 
 import "./globals.css";
 
@@ -57,10 +57,11 @@ function analyticsConfig(pub: PublicConfig | null): { src: string; endpoint: str
   }
 }
 
-/** Render the first paint in the right phase, from the API's session state. */
-async function initialPhase(): Promise<Phase> {
+/** Render the first paint in the right phase, from the API's session state; null when the API
+ *  does not answer in time (the page then shows a neutral clock until the browser reads it). */
+async function initialPhase(): Promise<Phase | null> {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL;
-  if (!base) return "day";
+  if (!base) return null;
   try {
     const res = await fetch(new URL("/v1/status", base), {
       cache: "no-store",
@@ -69,7 +70,7 @@ async function initialPhase(): Promise<Phase> {
     const status = StatusSchema.parse(await res.json());
     return status.state === "open" ? "day" : "night";
   } catch {
-    return "day";
+    return null;
   }
 }
 
@@ -78,7 +79,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const simulation = pub ? simulationParts(pub) || null : null;
   const analytics = analyticsConfig(pub);
   return (
-    <html lang="en" data-phase={phase} className={`${display.variable} ${text.variable}`}>
+    <html
+      lang="en"
+      data-phase={phase ?? UNKNOWN_PHASE_LOOK}
+      className={`${display.variable} ${text.variable}`}
+    >
       <body>
         <a
           href="#main"

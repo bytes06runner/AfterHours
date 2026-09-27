@@ -13,7 +13,7 @@ export function Providers({
   initialPhase,
   children,
 }: {
-  initialPhase: Phase;
+  initialPhase: Phase | null;
   children: React.ReactNode;
 }) {
   const [client] = useState(

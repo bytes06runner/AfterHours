@@ -37,6 +37,7 @@ Arbitrum.
 - [Limitations](#limitations)
 - [Future work](#future-work)
 - [Prior work](#prior-work)
+- [License](#license)
 
 ## Results in brief
 
@@ -333,3 +334,8 @@ make lighthouse   # production build, every page
 This repository was started on 2026-09-26, during the hackathon (it opened on 2026-09-14). No
 code predates it. It composes with open-source protocols we did not write: Morpho Blue, Morpho
 Vault V2, Chainlink and Uniswap interfaces.
+
+## License
+
+[MIT](LICENSE). Morpho, Chainlink and the other protocols this composes with keep their own
+licenses.

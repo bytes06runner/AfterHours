@@ -17,11 +17,11 @@ from web3.types import BlockIdentifier
 from afterhours.chain.abi import decode_output, encode_call
 
 
-def connect(url: str, *, timeout: float = 30) -> Web3:
+def connect(url: str, *, timeout: float = 30, retries: int = 6) -> Web3:
     """HTTP Web3 client for an RPC URL, retrying rate-limited requests with backoff."""
     retry = ExceptionRetryConfiguration(
         errors=(requests.ConnectionError, requests.HTTPError, requests.Timeout),
-        retries=6,
+        retries=retries,
         backoff_factor=1.0,
     )
     return Web3(
@@ -46,8 +46,13 @@ def call_many(
     *,
     block: BlockIdentifier = "latest",
     chunk: int = 50,
+    deadline: float | None = None,
 ) -> list[Any]:
     """Run calls in raw JSON-RPC batches. A call that reverts yields None.
+
+    `deadline` (a `time.monotonic()` value) bounds the whole run: no retry waits past it and no
+    new request starts after it (TimeoutError), so a rate-limited node cannot hold a caller for
+    minutes.
 
     Raw batches let each call fail on its own; web3's batch helper fails the whole batch.
     Node lag is retried with backoff; any other RPC error raises `RpcError`, so a node
@@ -60,6 +65,7 @@ def call_many(
     pending = [calls[i : i + chunk] for i in range(0, len(calls), chunk)]
     attempt = 0
     while pending:
+        _check(deadline)
         part = pending.pop(0)
         payload = [
             {
@@ -79,16 +85,22 @@ def call_many(
         try:
             if not url:
                 raise RuntimeError("provider has no HTTP endpoint")
-            body = _post_with_backoff(str(url), payload)
+            body = _post_with_backoff(str(url), payload, deadline)
             if not isinstance(body, list):
                 raise RuntimeError(f"endpoint does not batch: {str(body)[:120]}")
             by_id = {int(r["id"]): r for r in body}
         except (httpx.HTTPError, RuntimeError, ValueError):
-            results.extend(_single(w3, c, block) for c in part)
+            for c in part:
+                _check(deadline)
+                results.append(_single(w3, c, block))
             continue
-        lagging = [r for r in by_id.values() if "error" in r and is_node_lag(r["error"])]
+        lagging = [
+            r
+            for r in by_id.values()
+            if "error" in r and (is_node_lag(r["error"]) or is_rate_limited(r["error"]))
+        ]
         if lagging and attempt < len(RETRY_DELAYS_S):
-            time.sleep(RETRY_DELAYS_S[attempt])
+            _sleep_within(RETRY_DELAYS_S[attempt], deadline)
             attempt += 1
             pending.insert(0, part)
             continue
@@ -118,6 +130,14 @@ def is_node_lag(error: Any) -> bool:
     return "unsupported block number" in text or "header not found" in text
 
 
+def is_rate_limited(error: Any) -> bool:
+    """True when the node refused a call in a batch for load (JSON-RPC code 429, or a provider's
+    "exceeded ... capacity" message, as Alchemy sends), which a later retry can pass."""
+    code = error.get("code") if isinstance(error, dict) else None
+    text = str(error).lower()
+    return code == 429 or "rate limit" in text or ("exceeded" in text and "capacity" in text)
+
+
 def is_revert(error: Any) -> bool:
     """True for a contract revert, as opposed to an RPC or node problem."""
     text = str(error).lower()
@@ -125,14 +145,27 @@ def is_revert(error: Any) -> bool:
     return code == 3 or "revert" in text or "invalid opcode" in text
 
 
-def _post_with_backoff(url: str, payload: Any) -> Any:
+def _check(deadline: float | None) -> None:
+    if deadline is not None and time.monotonic() >= deadline:
+        raise TimeoutError("the node did not answer within the time budget")
+
+
+def _sleep_within(delay: float, deadline: float | None) -> None:
+    """Sleep `delay`, unless that would pass the deadline (then fail now instead)."""
+    if deadline is not None and time.monotonic() + delay >= deadline:
+        raise TimeoutError("the node is rate limiting; out of time budget")
+    time.sleep(delay)
+
+
+def _post_with_backoff(url: str, payload: Any, deadline: float | None = None) -> Any:
     """POST JSON-RPC, waiting and retrying on HTTP 429 or 5xx before giving up."""
     for delay in (*RETRY_DELAYS_S, None):
-        resp = httpx.post(url, json=payload, timeout=60)
+        left = 60.0 if deadline is None else max(1.0, min(60.0, deadline - time.monotonic()))
+        resp = httpx.post(url, json=payload, timeout=left)
         if resp.status_code == 429 or resp.status_code >= 500:
             if delay is None:
                 resp.raise_for_status()
-            time.sleep(delay)  # type: ignore[arg-type]
+            _sleep_within(delay, deadline)  # type: ignore[arg-type]
             continue
         resp.raise_for_status()
         return resp.json()

@@ -1041,6 +1041,10 @@
           "title": "Lag Blocks",
           "type": "integer"
         },
+        "logs_from_public_rpc": {
+          "title": "Logs From Public Rpc",
+          "type": "boolean"
+        },
         "market_refresh_minutes": {
           "exclusiveMinimum": 0,
           "title": "Market Refresh Minutes",
@@ -1053,6 +1057,21 @@
         "quiet_after_minutes": {
           "exclusiveMinimum": 0,
           "title": "Quiet After Minutes",
+          "type": "integer"
+        },
+        "refresh_budget_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Refresh Budget Seconds",
+          "type": "integer"
+        },
+        "rpc_retries": {
+          "exclusiveMinimum": 0,
+          "title": "Rpc Retries",
+          "type": "integer"
+        },
+        "rpc_timeout_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Rpc Timeout Seconds",
           "type": "integer"
         },
         "warm_prices": {
@@ -1069,7 +1088,11 @@
         "market_refresh_minutes",
         "lag_blocks",
         "examples",
-        "warm_prices"
+        "warm_prices",
+        "refresh_budget_seconds",
+        "rpc_timeout_seconds",
+        "rpc_retries",
+        "logs_from_public_rpc"
       ],
       "title": "LiveConfig",
       "type": "object"

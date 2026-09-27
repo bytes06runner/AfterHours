@@ -94,9 +94,12 @@ class Store(BaseStore):
 
     @classmethod
     def for_profile(cls, cfg: AfterhoursConfig, profile: str | None = None) -> BaseStore:
-        """The shared store when configured (see `state` in config), else files."""
+        """The shared store when configured (see `state` in config) and the profile is a real
+        chain, else files."""
         name = profile or cfg.active_profile
-        kv = kv_from_config(cfg)
+        # Local and fork profiles run on Anvil and are never hosted: they keep files even when
+        # the shared store's env vars are in .env, so demos never mix into the hosted history.
+        kv = None if cfg.profiles[name].local_rpc_port_env else kv_from_config(cfg)
         if kv is not None:
             return KVStore(kv, name, cfg)
         root = cfg.path(cfg.paths.state_dir) / name

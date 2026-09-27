@@ -104,12 +104,27 @@ def feed_status(cfg: AfterhoursConfig, now: datetime, updated_at: datetime) -> d
     }
 
 
+class WarmingError(RuntimeError):
+    """The first risk board is still being read; the API answers "still reading"."""
+
+
 class Mainnet:
     """One read-only client for the live views (thread-safe caches, lazy RPC)."""
 
     def __init__(self, cfg: AfterhoursConfig) -> None:
         self.cfg = cfg
-        self.w3: Web3 = connect(cfg.rpc_url(cfg.live.profile))
+        self.w3: Web3 = connect(
+            cfg.rpc_url(cfg.live.profile),
+            timeout=cfg.live.rpc_timeout_seconds,
+            retries=cfg.live.rpc_retries,
+        )
+        public = cfg.chains[cfg.profiles[cfg.live.profile].chain].public_rpc_url
+        # Log scans need wide block ranges, which the public RPC allows (live.logs_from_public_rpc).
+        self.w3_logs: Web3 = (
+            connect(public, timeout=cfg.live.rpc_timeout_seconds, retries=cfg.live.rpc_retries)
+            if cfg.live.logs_from_public_rpc and public
+            else self.w3
+        )
         disc = load_discovered(cfg, cfg.live.discovery_profile)
         self.blue = to_checksum_address(disc["core"]["morpho_blue"]["address"])
         self.usdg = to_checksum_address(disc["core"]["usdg"]["address"])
@@ -131,37 +146,60 @@ class Mainnet:
         self.borrowers = cfg.path(cfg.paths.state_dir) / "live-borrowers.json"
 
     # ------------------------------------------------------------------ chain helpers
+    def deadline(self) -> float:
+        """The time budget for one live read (`live.refresh_budget_seconds`)."""
+        return time.monotonic() + self.cfg.live.refresh_budget_seconds
+
     def block(self) -> int:
         return int(self.w3.eth.block_number) - self.cfg.live.lag_blocks
 
-    def decimals(self, tokens: list[str], block: int) -> dict[str, int]:
+    def decimals(
+        self, tokens: list[str], block: int, deadline: float | None = None
+    ) -> dict[str, int]:
         missing = [t for t in tokens if t not in self._decimals]
         if missing:
-            vals = call_many(self.w3, [Call(t, "decimals()(uint8)") for t in missing], block=block)
+            calls = [Call(t, "decimals()(uint8)") for t in missing]
+            vals = call_many(self.w3, calls, block=block, deadline=deadline)
             for t, v in zip(missing, vals, strict=True):
                 self._decimals[t] = int(v) if v is not None else 18
         return {t: self._decimals[t] for t in tokens}
 
-    def symbols(self, tokens: list[str], block: int) -> dict[str, str | None]:
+    def symbols(
+        self, tokens: list[str], block: int, deadline: float | None = None
+    ) -> dict[str, str | None]:
         """Each token's own `symbol()`, read onchain (None if the token has none)."""
         missing = [t for t in tokens if t not in self._symbols]
         if missing:
-            vals = call_many(self.w3, [Call(t, "symbol()(string)") for t in missing], block=block)
+            calls = [Call(t, "symbol()(string)") for t in missing]
+            vals = call_many(self.w3, calls, block=block, deadline=deadline)
             for t, v in zip(missing, vals, strict=True):
                 self._symbols[t] = str(v) if v else None
         return {t: self._symbols[t] for t in tokens}
 
     # ------------------------------------------------------------------ market registry
     def markets(self) -> list[Market]:
-        """Every Morpho market with a Stock Token as collateral, from CreateMarket events."""
-        with self._lock:
-            doc: dict[str, Any] | None = (
-                json.loads(self.store.read_text()) if self.store.exists() else None
-            )
+        """Every Morpho market with a Stock Token as collateral, from CreateMarket events.
+
+        While another thread rescans, callers use the registry already on disk instead of
+        waiting; only the very first scan (no registry yet) is waited for.
+        """
+        saved = self._read_registry()
+        if not self._lock.acquire(blocking=saved is None):
+            return [Market(**m) for m in saved["markets"]] if saved else []
+        try:
+            doc = self._read_registry()
             limit = self.cfg.live.market_refresh_minutes * 60
             if doc is None or time.time() - doc["scanned_at"] >= limit:
                 doc = self._scan(doc)
             return [Market(**m) for m in doc["markets"]]
+        finally:
+            self._lock.release()
+
+    def _read_registry(self) -> dict[str, Any] | None:
+        if not self.store.exists():
+            return None
+        doc: dict[str, Any] = json.loads(self.store.read_text())
+        return doc
 
     def _scan(self, doc: dict[str, Any] | None) -> dict[str, Any]:
         head = self.block()
@@ -169,7 +207,9 @@ class Mainnet:
         markets = list(doc["markets"]) if doc else []
         if start <= head:
             span = self.cfg.discovery.oracle_study.max_log_block_range * 20
-            for ev in get_logs(self.w3, CREATE_MARKET, [self.blue], start, head, max_range=span):
+            for ev in get_logs(
+                self.w3_logs, CREATE_MARKET, [self.blue], start, head, max_range=span
+            ):
                 loan, collateral, oracle, irm, lltv = ev["marketParams"]
                 collateral = to_checksum_address(collateral)
                 if collateral in self.tokens:
@@ -202,20 +242,56 @@ class Mainnet:
         return f.to_json()
 
     # ------------------------------------------------------------------ risk board
-    def board(self, now: datetime | None = None) -> dict[str, Any]:
-        # One computation at a time; callers that arrive meanwhile get its result from the cache.
-        with self._board_lock:
-            cached = self._board
-            if cached and time.time() - cached[0] < self.cfg.live.board_cache_seconds:
-                return cached[1]
-            return self._board_now(now or datetime.now(UTC))
+    def board(self, now: datetime | None = None, *, wait: bool = False) -> dict[str, Any]:
+        """The risk board, never making a visitor wait behind a slow refresh.
+
+        A fresh board comes from the cache. A stale one is returned at once while one background
+        refresh runs. With no board yet, `WarmingError` is raised (the API answers "still reading")
+        unless `wait` is set (the startup warm-up and scheduled jobs wait).
+        """
+        cached = self._board
+        if cached and time.time() - cached[0] < self.cfg.live.board_cache_seconds:
+            return cached[1]
+        if wait:
+            with self._board_lock:
+                return self._refresh_board(now)
+        if self._board_lock.acquire(blocking=False):
+            threading.Thread(target=self._refresh_in_background, args=(now,), daemon=True).start()
+        if cached:
+            return cached[1]
+        raise WarmingError("Still reading every Stock Token price feed on mainnet.")
+
+    def _refresh_in_background(self, now: datetime | None) -> None:
+        try:
+            self._refresh_board(now)
+        except Exception as exc:  # the last board stays; the next request tries again
+            log.warning("board refresh failed: %s", exc)
+        finally:
+            self._board_lock.release()
+
+    def _refresh_board(self, now: datetime | None) -> dict[str, Any]:
+        cached = self._board
+        if cached and time.time() - cached[0] < self.cfg.live.board_cache_seconds:
+            return cached[1]
+        doc = self._board_now(now or datetime.now(UTC))
+        self._board = (time.time(), doc)
+        return doc
 
     def _board_now(self, now: datetime) -> dict[str, Any]:
         block = self.block()
         syms = sorted(self.feeds)
-        rounds = call_many(self.w3, [Call(self.feeds[s], LATEST_ROUND) for s in syms], block=block)
+        deadline = self.deadline()
+        rounds = call_many(
+            self.w3,
+            [Call(self.feeds[s], LATEST_ROUND) for s in syms],
+            block=block,
+            deadline=deadline,
+        )
         feed_dec = call_many(
-            self.w3, [Call(self.feeds[s], "decimals()(uint8)") for s in syms], block=block
+            self.w3,
+            [Call(self.feeds[s], "decimals()(uint8)") for s in syms],
+            block=block,
+            deadline=deadline,
         )
         by_symbol: dict[str, list[Market]] = {}
         for m in self.markets():
@@ -261,25 +337,31 @@ class Mainnet:
             raise ValueError("not an address")
         user = to_checksum_address(address)
         now = now or datetime.now(UTC)
+        deadline = self.deadline()
         block = self.block()
         markets = self.markets()
         pos = call_many(
             self.w3,
             [Call(self.blue, POSITION, (bytes.fromhex(m.id[2:]), user)) for m in markets],
             block=block,
+            deadline=deadline,
         )
         held = [(m, p) for m, p in zip(markets, pos, strict=True) if p and any(int(x) for x in p)]
         states = call_many(
             self.w3,
             [Call(self.blue, MARKET, (bytes.fromhex(m.id[2:]),)) for m, _ in held],
             block=block,
+            deadline=deadline,
         )
         prices = call_many(
-            self.w3, [Call(m.oracle, "price()(uint256)") for m, _ in held], block=block
+            self.w3,
+            [Call(m.oracle, "price()(uint256)") for m, _ in held],
+            block=block,
+            deadline=deadline,
         )
         tokens = sorted({m.loan_token for m, _ in held} | {m.collateral for m, _ in held})
-        dec = self.decimals(tokens, block)
-        names = self.symbols(sorted({m.loan_token for m, _ in held}), block)
+        dec = self.decimals(tokens, block, deadline)
+        names = self.symbols(sorted({m.loan_token for m, _ in held}), block, deadline)
         out = []
         for (m, p), st, price in zip(held, states, prices, strict=True):
             supply_shares, borrow_shares, collateral = (int(x) for x in p)
@@ -342,7 +424,7 @@ class Mainnet:
             if start <= block:
                 span = self.cfg.discovery.oracle_study.max_log_block_range * 20
                 logs = get_logs(
-                    self.w3, BORROW, [self.blue], start, block, topics=[ids], max_range=span
+                    self.w3_logs, BORROW, [self.blue], start, block, topics=[ids], max_range=span
                 )
                 for ev in logs:
                     who = str(to_checksum_address(ev["onBehalf"]))

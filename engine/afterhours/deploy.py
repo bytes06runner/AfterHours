@@ -156,13 +156,15 @@ def role_keys(
     Ask only for the roles you sign with: the hosted bot needs ALLOCATOR_PK alone, so the
     deployer, curator and guardian keys never have to be on the server.
     """
+    if profile in LOCAL_PROFILES_FOR_THROWAWAY_KEYS:
+        # Anvil chains use their own cached throwaway keys, even when .env holds testnet keys:
+        # the local deployment is owned by them, so the testnet keys would be refused there.
+        return {r: k for r, k in _throwaway_keys(cfg).items() if r in roles}
     env = {r: os.environ.get(r, "") for r in roles}
     if all(env.values()):
         return env
-    if profile not in LOCAL_PROFILES_FOR_THROWAWAY_KEYS:
-        missing = ", ".join(r for r, v in env.items() if not v)
-        raise KeyError(f"set {missing} in .env (throwaway keys from `cast wallet new`)")
-    return {r: k for r, k in _throwaway_keys(cfg).items() if r in roles}
+    missing = ", ".join(r for r, v in env.items() if not v)
+    raise KeyError(f"set {missing} in .env (throwaway keys from `cast wallet new`)")
 
 
 def addresses(keys: dict[str, str]) -> dict[str, str]:

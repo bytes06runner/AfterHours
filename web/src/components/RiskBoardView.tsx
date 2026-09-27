@@ -7,7 +7,7 @@
  */
 import { useMemo, useState } from "react";
 
-import { RETRY_TEXT, type LiveBoard } from "@/lib/api";
+import { liveErrorText, RETRY_TEXT, type LiveBoard } from "@/lib/api";
 import { useLiveBoard } from "@/lib/queries";
 import { formatPct } from "@/lib/time";
 
@@ -146,7 +146,7 @@ export function RiskBoardView() {
       </div>
       {q.isError && (
         <p role="alert" className="mt-8 text-[18px]">
-          Can&apos;t reach Robinhood Chain right now. {RETRY_TEXT}
+          {liveErrorText(q.error, "Can't reach Robinhood Chain right now.")} {RETRY_TEXT}
         </p>
       )}
       {!d && !q.isError && (

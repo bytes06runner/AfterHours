@@ -26,7 +26,7 @@ class FakeSource:
         self.drop = drop
         self.calls = 0
 
-    def board(self, now: datetime | None = None) -> dict[str, Any]:
+    def board(self, now: datetime | None = None, *, wait: bool = False) -> dict[str, Any]:
         self.calls += 1
         cushion = 0.05
         return {

@@ -277,7 +277,7 @@ class Source(Protocol):
     @property
     def feeds(self) -> Mapping[str, object]: ...  # symbol -> feed address
 
-    def board(self, now: datetime | None = None) -> dict[str, Any]: ...
+    def board(self, now: datetime | None = None, *, wait: bool = False) -> dict[str, Any]: ...
     def positions(self, address: str, now: datetime | None = None) -> dict[str, Any]: ...
 
 
@@ -295,7 +295,7 @@ def run_checks(
             tag = f"{chat}|{sym}"
             if tag in done:
                 continue
-            board = board or source.board(now)
+            board = board or source.board(now, wait=True)  # a job has no cached board
             row = next((r for r in board["stocks"] if r["symbol"] == sym), None)
             msg = stock_alert(row) if row else None
             if msg:

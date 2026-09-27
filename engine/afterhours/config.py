@@ -413,6 +413,10 @@ class LiveConfig(_Strict):
     lag_blocks: PositiveInt
     examples: PositiveInt
     warm_prices: bool
+    refresh_budget_seconds: PositiveInt
+    rpc_timeout_seconds: PositiveInt
+    rpc_retries: PositiveInt
+    logs_from_public_rpc: bool
 
 
 class FundingConfig(_Strict):

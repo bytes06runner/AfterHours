@@ -921,3 +921,36 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   Telegram variables and stops .env reloading in every test. Removing the two fake records waits
   for the team's OK.
 - README: live links at the top.
+
+### 2026-09-27 Live views never block; neutral market status; Alchemy limits; license; runbook
+
+- Production: `/v1/live/board` hung about 10 minutes and the checker timed out. Cause: the public
+  mainnet RPC rate-limits Render's shared address, `call_many` then waited through long backoffs
+  and one-by-one retries, and the board's single-flight lock made every visitor wait behind it.
+- Fix: the board never makes a visitor wait. Fresh board from cache; a stale one is returned at
+  once while one background refresh runs; with none yet, 503 "Still reading ..." with
+  Retry-After (the page keeps showing its loading line and retries). The registry rescan no
+  longer blocks position checks. Each live read has a budget (`live.refresh_budget_seconds` 60,
+  RPC timeout 10 s, 2 retries); `call_many` never sleeps or starts a request past it. Tests:
+  `tests/test_live_budget.py`, E2E "while the first board is read, it says so".
+- `RH_MAINNET_RPC_URL` (Alchemy) added to `.env` by request; the team adds it on Render. Found:
+  Alchemy's free tier allows `eth_getLogs` over 10 blocks only and answers some batched calls
+  with a per-call 429 (compute units per second). Log scans (registry, borrower examples) now use
+  the chain's public RPC (`live.logs_from_public_rpc`); per-call rate limits are retried within
+  the budget. With Alchemy for reads: board 35 stocks in 6.4 s, positions 7.6 s, examples 30 s.
+- Neutral market status: the layout no longer assumes "day" when `/v1/status` is slow; until a
+  real status arrives the badge and countdown say "Reading the exchange clock", the hero shows
+  neutral copy, colours rest on the night palette, and learning the status rings no bell.
+- Local demo after `.env` gained testnet keys and Upstash: Anvil profiles (local, fork) now always
+  use their own throwaway keys (the testnet deployer was refused by the local contracts) and
+  always keep bot state in files (never the shared store). Tests for both.
+- Upstash: the fake test subscription (chat 9) and the test pre-close record deleted by request;
+  bot history unchanged (20 events, 4 reasons).
+- MIT LICENSE added; README has a License section.
+- `docs/video/demo.md` rewritten as a click-by-click Recordly runbook: live site for landing,
+  risk board, position checker and report card; local stack for deposit, closing bell, ledger and
+  verify; one testnet explorer shot of a real allocate transaction (0xb61d...ad6e, allocator to
+  vault). The hosted site has no test USDG faucet for visitor wallets (API 403 on non-local
+  profiles, button shown only on local), so the deposit is recorded locally.
+- Checks: `make test-py` 91 passed, web 25, `make e2e` 48 passed (all 12 live tests pass), lint
+  clean.

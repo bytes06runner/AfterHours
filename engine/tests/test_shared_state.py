@@ -101,7 +101,7 @@ def test_api_and_job_do_not_overwrite_each_other() -> None:
         def __init__(self) -> None:
             self.feeds = {"NVDA": "0x1"}
 
-        def board(self, now: datetime | None = None) -> dict[str, Any]:
+        def board(self, now: datetime | None = None, *, wait: bool = False) -> dict[str, Any]:
             return {"stocks": []}
 
         def positions(self, address: str, now: datetime | None = None) -> dict[str, Any]:
@@ -245,3 +245,17 @@ def test_copy_local_history_to_shared(tmp_path: Any, cfg: AfterhoursConfig) -> N
     with pytest.raises(ValueError, match="already has history"):
         copy_to_shared(src, dst)  # a second run cannot duplicate
     assert fresh.events_end() == 3
+
+
+def test_anvil_profiles_never_use_the_shared_store(
+    monkeypatch: pytest.MonkeyPatch, cfg: AfterhoursConfig, tmp_path: Any
+) -> None:
+    from afterhours.state import Store
+
+    monkeypatch.setenv(cfg.state.kv_url_env, "https://kv.test")
+    monkeypatch.setenv(cfg.state.kv_token_env, "t")
+    paths = cfg.paths.model_copy(update={"state_dir": str(tmp_path)})
+    c = cfg.model_copy(update={"paths": paths})
+    assert isinstance(Store.for_profile(c, "local"), Store)
+    assert isinstance(Store.for_profile(c, "fork"), Store)
+    assert isinstance(Store.for_profile(c, "rh-testnet"), KVStore)

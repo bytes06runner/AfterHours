@@ -22,11 +22,17 @@ import { useStatus } from "./queries";
 
 export type Phase = "day" | "night";
 
+/** The resting look while the session is not known yet: the brand's night palette. It is only
+ *  colour; badges and countdowns say the clock is being read and never claim open or closed. */
+export const UNKNOWN_PHASE_LOOK: Phase = "night";
+
 interface PhaseState {
   /** What the page shows (the live phase, or the preview). */
   phase: Phase;
   /** The real session phase; badges and countdowns use this, never the preview. */
   live: Phase;
+  /** False until a real /v1/status has arrived (server or browser); never assume open. */
+  known: boolean;
   status: Status | undefined;
   /** Wall-clock ms when `status` arrived, to advance its clock between refreshes. */
   statusAt: number;
@@ -48,24 +54,29 @@ export function PhaseProvider({
   initial,
   children,
 }: {
-  initial: Phase;
+  /** The phase the server read from /v1/status, or null if it could not in time. */
+  initial: Phase | null;
   children: React.ReactNode;
 }) {
   const { data: status, dataUpdatedAt: statusAt } = useStatus();
-  const live = phaseFor(status, initial);
+  const known = status !== undefined || initial !== null;
+  const live = phaseFor(status, initial ?? UNKNOWN_PHASE_LOOK);
   const [override, setOverride] = useState<Phase | null>(null);
   const phase = override ?? live;
   const [bells, setBells] = useState(0);
   const previous = useRef<Phase>(phase);
   const timers = useRef<number[]>([]);
 
+  const wasKnown = useRef(known);
   useEffect(() => {
     document.documentElement.dataset.phase = phase;
     if (previous.current !== phase) {
       previous.current = phase;
-      setBells((b) => b + 1);
+      // Learning the session for the first time is not a bell: only real changes ring.
+      if (wasKnown.current) setBells((b) => b + 1);
     }
-  }, [phase]);
+    wasKnown.current = known;
+  }, [phase, known]);
 
   useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
 
@@ -101,6 +112,7 @@ export function PhaseProvider({
     () => ({
       phase,
       live,
+      known,
       status,
       statusAt,
       bells,
@@ -108,7 +120,7 @@ export function PhaseProvider({
       previewClose,
       previewToggle,
     }),
-    [phase, live, status, statusAt, bells, override, previewClose, previewToggle],
+    [phase, live, known, status, statusAt, bells, override, previewClose, previewToggle],
   );
   return <PhaseContext.Provider value={value}>{children}</PhaseContext.Provider>;
 }

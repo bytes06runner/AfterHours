@@ -331,6 +331,15 @@ live:
   lag_blocks: 30                       # read a little behind the head (public nodes lag)
   examples: 3                          # live borrower addresses offered as examples in the checker
   warm_prices: true                    # the API refreshes every Stock Token's prices at start
+  # A rate-limited public RPC can stall a read for minutes; visitors never wait behind one. Each
+  # live read (board refresh, position check) gets this budget; RPC calls give up sooner.
+  refresh_budget_seconds: 60
+  rpc_timeout_seconds: 10
+  rpc_retries: 2
+  # Log scans (market registry, borrower examples) use the chain's public RPC: Alchemy's free
+  # tier answers eth_getLogs only over a 10-block range (its error message, 2026-09-27), while
+  # these scans cover millions of blocks. Reads still use RH_MAINNET_RPC_URL when it is set.
+  logs_from_public_rpc: true
 
 # Telegram alerts (core.telegram.org/bots/api: https://api.telegram.org/bot<token>/METHOD_NAME).
 # Testnet gas, all sent by the deployer, so only the deployer needs faucet ETH. Measured on an

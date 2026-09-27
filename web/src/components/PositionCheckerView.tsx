@@ -9,7 +9,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
-import { ApiError, type LivePositions } from "@/lib/api";
+import { ApiError, liveErrorText, type LivePositions } from "@/lib/api";
 import { useConfig, useLiveExamples, useLivePositions } from "@/lib/queries";
 import { formatPct } from "@/lib/time";
 
@@ -249,7 +249,7 @@ export function PositionCheckerView() {
           <p role="alert" className="text-[18px]">
             {err.status === 400
               ? "That is not a valid address."
-              : "Can't reach Robinhood Chain right now. Try again in a minute."}
+              : liveErrorText(err, "Can't reach Robinhood Chain right now. Try again in a minute.")}
           </p>
         )}
         {d && (

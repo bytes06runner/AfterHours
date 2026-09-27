@@ -531,10 +531,20 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
 
     # ---------------------------------------------------------------- live mainnet (read-only)
     def _live(fn: Any) -> Any:
+        from afterhours.live.mainnet import WarmingError
+
         try:
             return fn()
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc
+        except WarmingError as exc:
+            wait = str(cfg.live.board_cache_seconds)
+            raise HTTPException(503, str(exc), headers={"Retry-After": wait}) from exc
+        except TimeoutError as exc:
+            log.warning("live read out of time budget: %s", exc)
+            raise HTTPException(
+                503, "Robinhood Chain is answering slowly right now. Try again in a minute."
+            ) from exc
         except Exception as exc:  # RPC down, rate limited, ...
             log.warning("live read failed: %s", exc)
             raise HTTPException(503, "Can't reach Robinhood Chain right now.") from exc
@@ -582,7 +592,10 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                 fetch_symbols(cfg, stock_token_tickers(cfg, cfg.live.discovery_profile)[0])
             except Exception as exc:
                 log.warning("warming prices failed, using what is cached: %s", exc)
-        for name, fn in (("board", lambda: ctx.mainnet().board()), ("examples", refresh_examples)):
+        for name, fn in (
+            ("board", lambda: ctx.mainnet().board(wait=True)),
+            ("examples", refresh_examples),
+        ):
             try:
                 fn()
             except Exception as exc:
