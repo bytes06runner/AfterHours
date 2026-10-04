@@ -530,7 +530,8 @@ class Mainnet:
             "network": self.cfg.chains[self.cfg.profiles[self.cfg.live.profile].chain].name,
             "block": block,
             "as_of": now.isoformat(),
-            "regimes": self.regimes(rows, now, block, deadline),
+            # Its own budget: on a slow host the feed reads can use most of theirs.
+            "regimes": self.regimes(rows, now, block, self.deadline()),
             "stocks": rows,
         }
         self._board = (time.time(), doc)
