@@ -62,5 +62,13 @@ background() {
   wait
 }
 
+# Prices for every Stock Token first, in a process of its own that exits before the API starts:
+# yfinance's HTTP stack and the download's buffers stay resident (over 100 MB measured), so the
+# API's own warm-up would keep them for its whole life. The API then skips that step.
+if [ "${PREFETCH_PRICES:-1}" = 1 ]; then
+  "${AH[@]}" data fetch --stock-tokens > /dev/null || log "price fetch failed; the API uses what is cached"
+  export AFTERHOURS_LIVE__WARM_PRICES=false
+fi
+
 background &
 exec "${AH[@]}" api

@@ -11,15 +11,17 @@ import json
 import math
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime, timedelta
+from statistics import NormalDist
 from typing import Any
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
 
 from afterhours.config import AfterhoursConfig
 from afterhours.data.cache import ParquetCache
 from afterhours.features.dataset import closed_periods, earnings_flags, sessions
+
+NORMAL = NormalDist()  # the standard normal
 
 
 @dataclass(frozen=True)
@@ -164,7 +166,9 @@ class LiveRisk:
         sigma = ewma_sigma(
             prices, now.astimezone(UTC).date(), float(self.production["ewma_lambda"])
         )
-        z = float(norm.ppf(alpha))
+        # Same value as scipy.stats.norm.ppf (bit for bit at alpha 0.01, tested) without
+        # loading scipy into the API process.
+        z = NORMAL.inv_cdf(alpha)
         out = []
         for period in upcoming_periods(self.cfg.data.exchange_calendar, now, horizon, events):
             scale = sigma * math.sqrt(period.hours / 24)

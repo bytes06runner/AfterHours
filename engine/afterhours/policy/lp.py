@@ -21,7 +21,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 import numpy as np
-from scipy.optimize import linprog
 
 TIERS = ("weekday", "weekend")
 
@@ -150,6 +149,8 @@ def solve(
     rows.append(total_row)
     rhs.append(max(total * (1 - idle_reserve_share), float(lower.sum())))
     bounds = [(lower[i], upper[i]) for i in range(n)] + [(0, None)] * (2 * n)
+    from scipy.optimize import linprog  # here, so the API never loads scipy
+
     res = linprog(
         c,
         A_ub=np.array(rows),
