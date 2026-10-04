@@ -53,8 +53,11 @@ def process_info(started: float) -> dict[str, Any]:
     import resource
     import sys
 
-    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    peak_mb = peak / 2**20 if sys.platform == "darwin" else peak / 2**10  # bytes vs KiB
+    unit = 2**20 if sys.platform == "darwin" else 2**10  # ru_maxrss: bytes on macOS, KiB on Linux
+    peak_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / unit
+    # serve.sh runs the price fetch as a child, then execs the API; usage survives exec, so this is
+    # that fetch's peak (0 when the API was started directly).
+    children_mb = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss / unit
     rss_mb: float | None = None
     try:
         for line in Path("/proc/self/status").read_text().splitlines():
@@ -66,6 +69,7 @@ def process_info(started: float) -> dict[str, Any]:
         "uptime_seconds": round(time.time() - started),
         "rss_mb": None if rss_mb is None else round(rss_mb),
         "peak_rss_mb": round(peak_mb),
+        "children_peak_rss_mb": round(children_mb),
         "threads": threading.active_count(),
     }
 
