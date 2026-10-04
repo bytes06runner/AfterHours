@@ -199,3 +199,27 @@ def test_health_is_cheap_and_reports_the_process(monkeypatch: pytest.MonkeyPatch
     assert reads == [1]  # the chain was read once, not five times
     assert body["process"]["uptime_seconds"] >= 0
     assert body["process"]["peak_rss_mb"] > 0
+
+
+def test_scan_files_survive_a_wiped_disk(tmp_path: Any) -> None:
+    # Render free wipes the disk on restart; rescanning every Borrow event took over 14 minutes.
+    live = Mainnet(load_config(load_env_file=False))
+    live.store = tmp_path / "live-markets.json"
+    live.borrowers = tmp_path / "live-borrowers.json"
+    shared: dict[str, Any] = {}
+
+    class Shared:
+        def read(self, name: str) -> Any:
+            return shared.get(name)
+
+        def write(self, name: str, doc: Any) -> None:
+            shared[name] = doc
+
+    live.shared = Shared()
+    doc = {"last_block": 5, "markets": ["0x01"], "borrowers": ["0xabc"]}
+    live._save(live.borrowers, "live_borrowers", doc)
+    assert shared["live_borrowers"] == doc
+    live.borrowers.unlink()  # the restart
+    assert live._load(live.borrowers, "live_borrowers") == doc
+    assert live.borrowers.exists()  # written back to disk
+    assert live._read_registry() is None  # nothing saved yet: a first scan, as before

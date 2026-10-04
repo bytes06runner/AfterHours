@@ -357,6 +357,11 @@ agents:
   # appends the real client address; entries further left are the caller's own claims).
   trusted_proxy_hops: 1
   max_tracked_clients: 10000
+  # How an MCP client starts the server (agents/README.md): `uvx --from <mcp_source> <mcp_command>`
+  # with <api_url_env> set to this API's base URL. Shown on the web app's Agents page.
+  mcp_source: "git+https://github.com/bytes06runner/AfterHours#subdirectory=agents"
+  mcp_command: afterhours-mcp
+  api_url_env: AFTERHOURS_API_URL
 
 # Telegram alerts. Nothing here signs a transaction or holds funds.
 live:

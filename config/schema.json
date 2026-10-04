@@ -26,10 +26,23 @@
     "AgentsConfig": {
       "additionalProperties": false,
       "properties": {
+        "api_url_env": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Api Url Env",
+          "type": "string"
+        },
         "max_tracked_clients": {
           "exclusiveMinimum": 0,
           "title": "Max Tracked Clients",
           "type": "integer"
+        },
+        "mcp_command": {
+          "title": "Mcp Command",
+          "type": "string"
+        },
+        "mcp_source": {
+          "title": "Mcp Source",
+          "type": "string"
         },
         "rate_limit_burst": {
           "exclusiveMinimum": 0,
@@ -51,7 +64,10 @@
         "rate_limit_per_minute",
         "rate_limit_burst",
         "trusted_proxy_hops",
-        "max_tracked_clients"
+        "max_tracked_clients",
+        "mcp_source",
+        "mcp_command",
+        "api_url_env"
       ],
       "title": "AgentsConfig",
       "type": "object"

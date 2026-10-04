@@ -453,6 +453,9 @@ class AgentsConfig(_Strict):
     rate_limit_burst: PositiveInt
     trusted_proxy_hops: PositiveInt
     max_tracked_clients: PositiveInt
+    mcp_source: str
+    mcp_command: str
+    api_url_env: EnvName
 
 
 class FundingConfig(_Strict):

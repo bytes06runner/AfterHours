@@ -114,6 +114,7 @@ class Context:
                     m = Mainnet(self.cfg)
                     m.restore_board(self.store.read(BOARD_SNAPSHOT))
                     m.on_board = self._save_board
+                    m.shared = self.store
                     self._mainnet = m
         return self._mainnet
 
@@ -701,6 +702,12 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
         return agents.position_check(
             cast(dict[str, Any], _live(lambda: ctx.mainnet().positions(address)))
         )
+
+    @app.get("/v1/agents/example-session", tags=tag)
+    def agent_example_session() -> dict[str, Any]:
+        """A captured session of real tool calls and answers, for the Agents page."""
+        path = cfg.path(cfg.paths.artifacts_dir) / "agents" / "example-session.json"
+        return _read_json(str(path), path.stat().st_mtime if path.exists() else 0.0)
 
     @app.get("/v1/agent/moves/{reason_id}", tags=tag, response_model=agents.MoveExplanation)
     def agent_move(reason_id: str) -> dict[str, Any]:

@@ -40,6 +40,11 @@ def public_config(cfg: AfterhoursConfig) -> dict[str, Any]:
             "script_src": cfg.web.analytics.script_src,
             "endpoint_domain": cfg.web.analytics.endpoint_domain,
         },
+        "agents": {
+            "mcp_source": cfg.agents.mcp_source,
+            "mcp_command": cfg.agents.mcp_command,
+            "api_url_env": cfg.agents.api_url_env,
+        },
         "exchange_calendar": cfg.data.exchange_calendar,
         "schedule": {
             "hourly": cfg.schedule.hourly,

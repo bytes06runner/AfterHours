@@ -30,7 +30,8 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from pathlib import Path
+from typing import Any, cast
 from zoneinfo import ZoneInfo
 
 from eth_utils import is_address, to_checksum_address
@@ -216,6 +217,9 @@ class Mainnet:
         self._board_lock = threading.Lock()
         self._board: tuple[float, dict[str, Any]] | None = None
         self.on_board: Callable[[dict[str, Any]], None] | None = None  # e.g. save a snapshot
+        # A store shared across restarts (the API's), for the scan files: a free host's disk is
+        # wiped on every restart, and rescanning every event from block 0 takes many minutes.
+        self.shared: Any = None
         self._decimals: dict[str, int] = {}
         self._symbols: dict[str, str | None] = {}
         self.store = cfg.path(cfg.paths.state_dir) / "live-markets.json"
@@ -272,10 +276,33 @@ class Mainnet:
             self._lock.release()
 
     def _read_registry(self) -> dict[str, Any] | None:
-        if not self.store.exists():
+        return self._load(self.store, "live_markets")
+
+    def _load(self, path: Path, key: str) -> dict[str, Any] | None:
+        """A scan file from disk, else the copy in the shared store (written back to disk)."""
+        if path.exists():
+            doc: dict[str, Any] = json.loads(path.read_text())
+            return doc
+        if self.shared is None:
             return None
-        doc: dict[str, Any] = json.loads(self.store.read_text())
-        return doc
+        try:
+            saved = self.shared.read(key)
+        except Exception as exc:
+            log.warning("reading %s from the shared store failed: %s", key, exc)
+            return None
+        if saved:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(saved))
+        return cast(dict[str, Any] | None, saved)
+
+    def _save(self, path: Path, key: str, doc: dict[str, Any]) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(doc))
+        if self.shared is not None:
+            try:
+                self.shared.write(key, doc)
+            except Exception as exc:  # the disk copy still serves this process
+                log.warning("saving %s to the shared store failed: %s", key, exc)
 
     def _scan(self, doc: dict[str, Any] | None) -> dict[str, Any]:
         head = self.block()
@@ -301,8 +328,7 @@ class Mainnet:
                         }
                     )
         out = {"last_block": head, "scanned_at": time.time(), "markets": markets}
-        self.store.parent.mkdir(parents=True, exist_ok=True)
-        self.store.write_text(json.dumps(out))
+        self._save(self.store, "live_markets", out)
         return out
 
     # ------------------------------------------------------------------ forecasts
@@ -622,7 +648,7 @@ class Mainnet:
         if not ids:
             return []
         with self._lock:
-            doc = json.loads(self.borrowers.read_text()) if self.borrowers.exists() else None
+            doc = self._load(self.borrowers, "live_borrowers")
             if doc is not None and doc.get("markets") != sorted(ids):
                 doc = None  # a new market appeared: rescan from the start
             start = doc["last_block"] + 1 if doc else 0
@@ -636,7 +662,7 @@ class Mainnet:
                     who = str(to_checksum_address(ev["onBehalf"]))
                     seen = [who, *(w for w in seen if w != who)]
             out_doc = {"last_block": block, "markets": sorted(ids), "borrowers": seen}
-            self.borrowers.write_text(json.dumps(out_doc))
+            self._save(self.borrowers, "live_borrowers", out_doc)
         out: list[str] = []
         for who in seen:
             if len(out) >= self.cfg.live.examples:
