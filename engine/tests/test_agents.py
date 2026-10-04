@@ -166,7 +166,17 @@ def test_agent_routes(client: TestClient) -> None:
         assert list(paths[f"/v1/agent/{p}"]) == ["get"]  # read-only
 
 
-def test_agent_routes_are_rate_limited(client: TestClient) -> None:
+def test_agent_routes_are_rate_limited(monkeypatch: pytest.MonkeyPatch) -> None:
+    from afterhours.api.app import Context, create_app
+    from afterhours.live.mainnet import Mainnet
+
+    monkeypatch.setattr(Mainnet, "board", lambda self, *a, **k: BOARD)
+    monkeypatch.setattr(Context, "now", lambda self: datetime(2026, 10, 4, 10, tzinfo=UTC))
+    # Refill one token a minute, so a slow test run cannot refill the bucket mid-test.
+    slow = CFG.model_copy(
+        update={"agents": CFG.agents.model_copy(update={"rate_limit_per_minute": 1})}
+    )
+    client = TestClient(create_app(slow))
     burst = CFG.agents.rate_limit_burst
     codes = [
         client.get(

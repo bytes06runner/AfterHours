@@ -413,8 +413,9 @@ export function ReportCardView() {
           <p className="mt-2 max-w-[72ch]">
             Robinhood has announced weekend trading, pending regulatory review. If Stock Token feeds
             start following a weekend venue, the risk changes from a frozen price to a thin one, so
-            we keep reading the same study, {rc.oracle_readings.window}, and never rewrite an
-            earlier reading. {rc.oracle_readings.weekends_read} weekends read so far.
+            we keep reading the same study of the weekend window ({rc.oracle_readings.window}) and
+            never rewrite an earlier reading. {rc.oracle_readings.weekends_read} weekends read so
+            far.
           </p>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-[640px] border-collapse text-left">
