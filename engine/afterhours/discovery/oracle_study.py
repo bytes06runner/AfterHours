@@ -53,9 +53,12 @@ class ClosedPeriod:
 
 
 def recent_closed_periods(
-    calendar: str, now: datetime, count: int
+    calendar: str, now: datetime, count: int, *, since: datetime | None = None
 ) -> tuple[list[ClosedPeriod], list[ClosedPeriod]]:
-    """The last `count` completed weekend-type and overnight closed periods before `now`."""
+    """The last `count` completed weekend-type and overnight closed periods before `now`.
+
+    With `since`, only periods that close after it (a new reading never repeats an old one).
+    """
     cal = mcal.get_calendar(calendar)
     sched = cal.schedule(
         start_date=(now - timedelta(days=7 * (count + 3))).date(), end_date=now.date()
@@ -63,6 +66,8 @@ def recent_closed_periods(
     opens = [t.to_pydatetime() for t in sched["market_open"]]
     closes = [t.to_pydatetime() for t in sched["market_close"]]
     periods = [ClosedPeriod(c, o) for c, o in zip(closes[:-1], opens[1:], strict=True) if o <= now]
+    if since is not None:
+        periods = [p for p in periods if p.close > since]
     weekends = [p for p in periods if p.is_weekend][-count:]
     overnights = [p for p in periods if not p.is_weekend][-count:]
     return weekends, overnights
@@ -146,24 +151,31 @@ def study(
     head_block: int,
     max_range: int,
     now: datetime | None = None,
+    since: datetime | None = None,
+    w3_logs: Web3 | None = None,
 ) -> dict[str, Any]:
-    """Run the weekend and overnight study for `proxies` ({symbol: proxy})."""
+    """Run the weekend and overnight study for `proxies` ({symbol: proxy}).
+
+    `since` limits it to periods closing after that time; `w3_logs` is the node for log scans
+    (one that allows wide block ranges), `w3` the one for state reads.
+    """
+    logs_w3 = w3_logs or w3
     now = now or datetime.fromtimestamp(int(w3.eth.get_block(head_block)["timestamp"]), UTC)
     aggs = feed_aggregators(w3, proxies, head_block)
     by_agg = {a.lower(): s for s, lst in aggs.items() for a in lst}
     results = {s: FeedStudy(s, p, aggs[s]) for s, p in proxies.items()}
-    wk, ov = recent_closed_periods(calendar, now, weekends)
+    wk, ov = recent_closed_periods(calendar, now, weekends, since=since)
     all_aggs = sorted({a for lst in aggs.values() for a in lst})
     periods_out: list[dict[str, Any]] = []
     for kind, periods in (("weekend", wk), ("overnight", ov)):
         for period in periods:
             start = block_at_or_after(
-                w3, int((period.close - timedelta(hours=1)).timestamp()), hi=head_block
+                logs_w3, int((period.close - timedelta(hours=1)).timestamp()), hi=head_block
             )
             end = block_at_or_after(
-                w3, int((period.open + timedelta(hours=1)).timestamp()), hi=head_block
+                logs_w3, int((period.open + timedelta(hours=1)).timestamp()), hi=head_block
             )
-            logs = get_logs(w3, ANSWER_UPDATED, all_aggs, start, end, max_range=max_range)
+            logs = get_logs(logs_w3, ANSWER_UPDATED, all_aggs, start, end, max_range=max_range)
             periods_out.append(
                 {
                     "kind": kind,

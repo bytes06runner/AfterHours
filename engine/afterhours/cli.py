@@ -497,6 +497,28 @@ def sim_seed() -> None:
     )
 
 
+@app.command("oracle-reading")
+def oracle_reading_cmd() -> None:
+    """A new dated reading of the weekend oracle study (the M1 reading is never rewritten)."""
+    from afterhours.discovery import oracle_readings
+
+    _logging()
+    cfg = load_config()
+    reading = oracle_readings.take(cfg)
+    if reading is None:
+        typer.echo(f"no weekend has ended since {oracle_readings.last_covered(cfg).isoformat()}")
+        oracle_readings.write_index(cfg)
+        return
+    path = oracle_readings.write(cfg, reading)
+    s = reading["summary"]
+    typer.echo(
+        f"{s['weekends']} weekend(s) from {s['first_weekend_close']}: {s['feeds_without_update']} "
+        f"of {s['feeds']} feeds posted nothing inside the window; "
+        f"posted: {', '.join(s['feeds_with_update']) or 'none'} ({s['updates_in_window']} updates)"
+    )
+    typer.echo(f"wrote {path}")
+
+
 @app.command("market-size")
 def market_size_cmd() -> None:
     """Supplied and borrowed across Stock Token Morpho markets on mainnet, at a recent block."""

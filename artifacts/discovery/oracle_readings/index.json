@@ -1,0 +1,51 @@
+{
+  "question": "Does any Stock Token feed post a price inside the weekend window?",
+  "window": "Friday 20:00 to Sunday 20:00 New York",
+  "readings": [
+    {
+      "file": "discovery/oracle_study.json",
+      "taken_at": "2026-09-26T11:17:50+00:00",
+      "weekends": 8,
+      "first_weekend_close": "2026-07-31T20:00:00+00:00",
+      "last_weekend_close": "2026-09-18T20:00:00+00:00",
+      "feeds": 35,
+      "feeds_without_update": 32,
+      "feeds_with_update": [
+        "AMD",
+        "SGOV",
+        "SNDK"
+      ],
+      "updates_in_window": 5,
+      "max_seconds_after_window_opened": 105.0
+    },
+    {
+      "file": "discovery/oracle_readings/reading-2026-10-04.json",
+      "taken_at": "2026-10-04T10:23:36.947297+00:00",
+      "weekends": 1,
+      "first_weekend_close": "2026-09-25T20:00:00+00:00",
+      "last_weekend_close": "2026-09-25T20:00:00+00:00",
+      "feeds": 35,
+      "feeds_without_update": 34,
+      "feeds_with_update": [
+        "SGOV"
+      ],
+      "updates_in_window": 1,
+      "max_seconds_after_window_opened": 87.0
+    }
+  ],
+  "weekends_read": 9,
+  "latest": {
+    "file": "discovery/oracle_readings/reading-2026-10-04.json",
+    "taken_at": "2026-10-04T10:23:36.947297+00:00",
+    "weekends": 1,
+    "first_weekend_close": "2026-09-25T20:00:00+00:00",
+    "last_weekend_close": "2026-09-25T20:00:00+00:00",
+    "feeds": 35,
+    "feeds_without_update": 34,
+    "feeds_with_update": [
+      "SGOV"
+    ],
+    "updates_in_window": 1,
+    "max_seconds_after_window_opened": 87.0
+  }
+}
