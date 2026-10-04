@@ -1085,3 +1085,37 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
 - Production after deploy: `/v1/live/regimes` 200 in 0.8 s, 35 tokens with DEX prices from the
   second refresh on; RSS 474 MB, peak 482 MB. Fix after watching it: DEX reads get their own time
   budget (the first refresh after a deploy spent the shared one on feed reads).
+
+### 2026-10-04 Priority 3: weekend risk for AI agents
+
+- REST, versioned (`docs/AGENTS.md`): `GET /v1/agent/market-status`, `weekend-risk/{ticker}`,
+  `positions/{address}`, `moves/{reason_id}`, each with a one-paragraph plain-English summary,
+  pydantic response models in the OpenAPI schema, and a per-client token bucket (config
+  `agents`: 30 a minute, burst 10; 429 with Retry-After). GET only.
+- MCP server: `agents/` (`afterhours-mcp`), official MCP Python SDK 2.3 (`MCPServer`; API checked
+  with Context7 and the SDK docs). Four tools, `read_only_hint=True`, each a thin call to the
+  REST route; errors reach the agent in plain words. Depends on the SDK only.
+- Streamable HTTP on Render: measured, does not fit. Importing the SDK adds 25 MB; production
+  peaks at 482 of 512 MB. Shipped as stdio with install steps instead (`agents/README.md`, the
+  Agents page). Render's `uv sync --no-dev` does not install it (dev-group workspace member).
+- Real session: `agents/scripts/capture_example.py` launched the server with the README's exact
+  `uvx --from git+...#subdirectory=agents afterhours-mcp` and called all four tools against the
+  hosted API (`artifacts/agents/example-session.json`, 2026-10-04 15:02 UTC, 5 calls, no error).
+- Web: `/agents` (Claude Desktop config and stdio command built from `/v1/config/public`, tools
+  with REST paths and OpenAPI link, the captured session), linked in header and footer.
+  Screenshots `artifacts/screens/agents/` (1440, 1024, 390; night and day). Fixed an overflow at
+  390 px (a flex list growing to its code block; an unbreakable wallet address).
+- Found while capturing, fixed:
+  - Render free wipes the disk on restart, so the borrower scan restarted from block 0 and had
+    not finished after 15 minutes (no live borrowers in the checker). The market registry and
+    borrower scan are now copied to the shared store and restored: live borrowers 3.5 minutes
+    after a restart (`test_scan_files_survive_a_wiped_disk`).
+  - Security: an Alchemy 429 traceback quotes the RPC URL with its key, and the live views log
+    exceptions, so the key could reach Render's logs. A log record factory now redacts every
+    URL path and query in every log line, tracebacks included (`afterhours/logsafe.py`,
+    `tests/test_logsafe.py`). The key was printed in this session's own tool output once (a
+    local traceback); recommend rotating the Alchemy key.
+  - One rate-limited position check no longer discards the whole borrower example list.
+- Tests: `make test-py` 128 passed (engine and agents), web 25, E2E `agents.spec.ts` and
+  `pages.spec.ts` 16 passed; `make lint` clean.
+- Stretch (x402 on testnet) not started: Priority 4 comes first.
