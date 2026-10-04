@@ -16,7 +16,12 @@ export API_PORT="${PORT:-${API_PORT:?set PORT (the host sets it) or API_PORT}}"
 #   - glibc gives every thread its own malloc arena, and a burst of visitors runs dozens of
 #     request threads, so cap the arenas;
 #   - run the installed entry point directly: `uv run` stays resident as a parent process.
+#   - numeric libraries start one worker thread (with its own buffers) per host core, and the
+#     host has many cores even though the service gets a fraction of one, so use one thread.
 export MALLOC_ARENA_MAX="${MALLOC_ARENA_MAX:-2}"
+for v in OPENBLAS_NUM_THREADS OMP_NUM_THREADS MKL_NUM_THREADS NUMEXPR_NUM_THREADS; do
+  export "$v=${!v:-1}"
+done
 if [ -x .venv/bin/afterhours ]; then
   AH=(.venv/bin/afterhours)
 else
