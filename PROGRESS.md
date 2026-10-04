@@ -1055,3 +1055,33 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   it opened (the M1 pattern: stragglers within 105 s). No Stock Token feed updates on weekends.
 - Next reading: after the 2026-10-02 to 10-05 weekend ends (Monday 2026-10-05 13:30 UTC).
 
+
+### 2026-10-04 Priority 2: price regime monitor
+
+- Every Stock Token on mainnet is classified at each board refresh as regular session,
+  extended hours, weekend price or frozen (`engine/afterhours/live/regime.py`, method and score
+  formula in `docs/REGIME.md`). Inputs: the XNYS calendar through the oracle study's own segments;
+  the feed's last post against its typical interval (`artifacts/regime/cadence.json`, from the
+  M1 study and the new reading: 21 closed periods, 42 h of regular session and 367.5 h of
+  extended hours read); the DEX mid of the 2 deepest USDG pools (v3 `slot0`, v4
+  `StateView.getSlot0`, both checked with cast on 2026-10-04); quoted depth within 2%.
+- Price quality 0 to 100: staleness 0.4, divergence 0.4, depth 0.2 (config `regime`), missing
+  marks renormalised. The bad-case forecast is not adjusted: no weekend-venue history exists to
+  calibrate against. Strategy, settings and backtests unchanged.
+- API: `GET /v1/live/regimes`; a `regime` block on each `/v1/live/board` row. CLI and make:
+  `regime-cadence`, `regime-snapshot`.
+- First snapshot (`artifacts/regime/snapshot-2026-10-04T1034Z.json`, Saturday): all 35 feeds
+  frozen since Friday 20:00 New York; all 35 have a DEX price; median absolute divergence 0.36%;
+  IONQ (-3.4%) and RGTI (+7.3%) beyond the 2% divergence trigger.
+- Web: risk board "Price regime" column (badge, score, plain line, last feed update), regime
+  counts, "Poor price quality" filter; landing "Frozen today, thin tomorrow" with live counts
+  and the least trustworthy prices. Screenshots at 1440, 1024, 390 in night and day:
+  `artifacts/screens/regime/`.
+- Tests: `tests/test_regime.py` (16: calendar states including Thanksgiving, the shut stretch's
+  start, classification and the straggler grace, each mark, renormalisation, pool price both
+  ways against the cast reading, the plain line, cadence artifact reproducible from the study
+  files, endpoint); E2E: regime column and filters, landing counts, a stubbed weekend price
+  (15 passed, desktop and mobile).
+- Production after deploy: `/v1/live/regimes` 200 in 0.8 s, 35 tokens with DEX prices from the
+  second refresh on; RSS 474 MB, peak 482 MB. Fix after watching it: DEX reads get their own time
+  budget (the first refresh after a deploy spent the shared one on feed reads).
