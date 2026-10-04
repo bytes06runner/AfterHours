@@ -41,6 +41,8 @@ export const useLiveRegimes = () =>
     refetchInterval: MINUTE,
     retry: 6,
   });
+export const useAgentSession = () =>
+  useQuery({ queryKey: ["agent-session"], queryFn: api.agentSession, staleTime: 60 * MINUTE });
 export const useLiveExamples = () =>
   useQuery({ queryKey: ["live-examples"], queryFn: api.liveExamples, staleTime: 10 * MINUTE });
 export const useLivePositions = (address: string | null) =>

@@ -591,6 +591,27 @@ export const LiveBoardSchema = z.object({
 });
 export type LiveBoard = z.infer<typeof LiveBoardSchema>;
 
+/** A captured session of real MCP tool calls (artifacts/agents/example-session.json). */
+export const AgentSessionSchema = z.object({
+  captured_at: z.string(),
+  api: z.string(),
+  server_started_with: z.string(),
+  note: z.string(),
+  session: z.array(
+    z.union([
+      z.object({ listed_tools: z.array(z.string()) }),
+      z.object({
+        question: z.string(),
+        tool: z.string(),
+        arguments: z.record(z.string(), z.unknown()),
+        is_error: z.boolean(),
+        result: z.record(z.string(), z.unknown()),
+      }),
+    ]),
+  ),
+});
+export type AgentSession = z.infer<typeof AgentSessionSchema>;
+
 export const LivePositionsSchema = z.object({
   network: z.string(),
   address: z.string(),
@@ -638,6 +659,7 @@ export const api = {
   replay: (id: string) => get(`/v1/replay/${encodeURIComponent(id)}`, ReplaySchema),
   liveBoard: () => get("/v1/live/board", LiveBoardSchema),
   liveRegimes: () => get("/v1/live/regimes", LiveRegimesSchema),
+  agentSession: () => get("/v1/agents/example-session", AgentSessionSchema),
   livePositions: (address: string) =>
     get(`/v1/live/positions/${encodeURIComponent(address)}`, LivePositionsSchema),
   liveExamples: () => get("/v1/live/examples", z.object({ addresses: z.array(z.string()) })),

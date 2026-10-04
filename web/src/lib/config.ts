@@ -38,6 +38,14 @@ export const PublicConfigSchema = z.object({
   live: z
     .object({ network: z.string(), explorer_url: z.url({ protocol: /^https?$/ }).nullable() })
     .optional(),
+  agents: z
+    .object({
+      mcp_source: z.string().min(1),
+      mcp_command: z.string().min(1),
+      api_url_env: z.string().min(1),
+      rate_limit_per_minute: z.number(),
+    })
+    .optional(),
   analytics: z
     .object({ script_src: z.url({ protocol: /^https$/ }), endpoint_domain: z.string().min(1) })
     .optional(),

@@ -50,6 +50,7 @@ const PAGES = [
   { href: "/report-card", label: "Report card" },
   { href: "/live", label: "Live risk board" },
   { href: "/positions", label: "Check a position" },
+  { href: "/agents", label: "Agents" },
 ];
 
 export function SiteFooter() {

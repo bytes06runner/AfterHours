@@ -12,6 +12,7 @@ const NAV = [
   { href: "/report-card", label: "Report card" },
   { href: "/live", label: "Risk board" },
   { href: "/positions", label: "Check a position" },
+  { href: "/agents", label: "Agents" },
 ];
 
 export function SiteHeader() {
