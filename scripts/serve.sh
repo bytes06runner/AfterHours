@@ -12,7 +12,16 @@ cd "$(dirname "$0")/.."
 
 export API_HOST="${API_HOST:-0.0.0.0}"  # hardcode-ok: every Render web service binds 0.0.0.0
 export API_PORT="${PORT:-${API_PORT:?set PORT (the host sets it) or API_PORT}}"
-AH=(uv run --frozen --no-dev afterhours)
+# Memory (Render free has 512 MB for the whole service; measured 2026-10-04 via /v1/health):
+#   - glibc gives every thread its own malloc arena, and a burst of visitors runs dozens of
+#     request threads, so cap the arenas;
+#   - run the installed entry point directly: `uv run` stays resident as a parent process.
+export MALLOC_ARENA_MAX="${MALLOC_ARENA_MAX:-2}"
+if [ -x .venv/bin/afterhours ]; then
+  AH=(.venv/bin/afterhours)
+else
+  AH=(uv run --frozen --no-dev afterhours)
+fi
 RESTART_SECONDS="${RESTART_SECONDS:-30}"
 
 log() { echo "serve: $*" >&2; }
