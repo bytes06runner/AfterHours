@@ -15,6 +15,7 @@ import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
+from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Any, cast
@@ -211,7 +212,17 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
             threading.Thread(target=fn, daemon=True).start()
         yield
 
-    app = FastAPI(title="Afterhours API", version="1", lifespan=lifespan)
+    app = FastAPI(
+        title="Afterhours API",
+        version="1",
+        description=(
+            "Read-only. Live Stock Token risk on Robinhood Chain mainnet (`/v1/live`, "
+            "`/v1/agent`), and the Afterhours vault (a simulation on its local chain, a "
+            "testnet deployment when hosted). Nothing here signs or sends a transaction. "
+            "Not financial advice."
+        ),
+        lifespan=lifespan,
+    )
     origins = [o.strip() for o in (cfg.env(cfg.api.cors_origins_env) or "").split(",") if o.strip()]
     if not origins:
         ports = [p for p in (cfg.env(e) for e in cfg.api.web_port_envs) if p]
@@ -634,6 +645,68 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     def live_regimes() -> dict[str, Any]:
         """Price regime, quality score and one plain line per Stock Token (docs/REGIME.md)."""
         return cast(dict[str, Any], _live(regimes_doc))
+
+    # ---------------------------------------------------------------- agents (docs/AGENTS.md)
+    from afterhours import agents
+
+    limiter = agents.RateLimiter(
+        cfg.agents.rate_limit_per_minute,
+        cfg.agents.rate_limit_burst,
+        cfg.agents.max_tracked_clients,
+    )
+
+    @app.middleware("http")
+    async def agent_rate_limit(request: Request, call_next: Any) -> Any:
+        if request.url.path.startswith("/v1/agent/"):
+            client = agents.client_address(
+                request.headers.get("x-forwarded-for"),
+                request.client.host if request.client else None,
+                cfg.agents.trusted_proxy_hops,
+            )
+            wait = limiter.take(client)
+            if wait > 0:
+                from fastapi.responses import JSONResponse
+
+                return JSONResponse(
+                    {"detail": "Too many requests. Slow down and retry after the given seconds."},
+                    status_code=429,
+                    headers={"Retry-After": str(max(1, round(wait)))},
+                )
+        return await call_next(request)
+
+    tag: list[str | Enum] = ["agents"]
+
+    @app.get("/v1/agent/market-status", tags=tag, response_model=agents.MarketStatus)
+    def agent_market_status() -> dict[str, Any]:
+        """Session state, next open and close, where feeds stand, regime counts."""
+        try:  # the regime summary is a bonus: the exchange clock alone still answers
+            regimes = cast(dict[str, Any], ctx.mainnet().board()).get("regimes")
+        except Exception:
+            regimes = None
+        return agents.market_status(status(), regimes)
+
+    @app.get("/v1/agent/weekend-risk/{ticker}", tags=tag, response_model=agents.WeekendRisk)
+    def agent_weekend_risk(ticker: str) -> dict[str, Any]:
+        """One Stock Token: regime, price quality, next closed period, bad case, summary."""
+        board = cast(dict[str, Any], _live(lambda: ctx.mainnet().board()))
+        try:
+            return agents.weekend_risk(board, ticker)
+        except KeyError as exc:
+            known = ", ".join(sorted(r["symbol"] for r in board["stocks"]))
+            raise HTTPException(404, f"No Stock Token {ticker!r}. Known: {known}.") from exc
+
+    @app.get("/v1/agent/positions/{address}", tags=tag, response_model=agents.PositionCheck)
+    def agent_positions(address: str) -> dict[str, Any]:
+        """Every Stock Token Morpho loan of an address, against tonight's bad case."""
+        return agents.position_check(
+            cast(dict[str, Any], _live(lambda: ctx.mainnet().positions(address)))
+        )
+
+    @app.get("/v1/agent/moves/{reason_id}", tags=tag, response_model=agents.MoveExplanation)
+    def agent_move(reason_id: str) -> dict[str, Any]:
+        """A reason card from the vault's ledger and its onchain verification."""
+        doc = reason(reason_id)
+        return agents.explain_move(doc["card"], doc["canonical_json"], doc["verification"])
 
     @app.get("/v1/live/positions/{address}")
     def live_positions(address: str) -> dict[str, Any]:

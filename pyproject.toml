@@ -8,13 +8,15 @@ dependencies = ["afterhours"]
 package = false
 
 [tool.uv.workspace]
-members = ["engine"]
+members = ["engine", "agents"]
 
 [tool.uv.sources]
 afterhours = { workspace = true }
+afterhours-mcp = { workspace = true }
 
 [dependency-groups]
 dev = [
+  "afterhours-mcp",  # the MCP server (agents/), tested here; not installed on the API host
   "mypy>=1.13",
   "pandas-stubs>=3.0.5.260914",
   "pytest>=8.3",
@@ -39,16 +41,16 @@ ignore = [
 [tool.mypy]
 python_version = "3.12"
 plugins = ["pydantic.mypy"]
-files = ["engine/afterhours"]
+files = ["engine/afterhours", "agents/afterhours_mcp"]
 strict = true
 
 [tool.pytest.ini_options]
-testpaths = ["engine/tests"]
+testpaths = ["engine/tests", "agents/tests"]
 addopts = "-q -m 'not integration'"
 markers = ["integration: needs anvil and forge; run with make test-integration"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["afterhours"]
+known-first-party = ["afterhours", "afterhours_mcp"]
 
 [[tool.mypy.overrides]]
 module = ["yfinance", "yfinance.*", "pandas_market_calendars", "lightgbm", "scipy.*", "sklearn.*", "apscheduler.*", "rfc8785"]

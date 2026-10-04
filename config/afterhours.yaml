@@ -347,6 +347,17 @@ regime:
   depth_probes_usd: [1000, 10000, 100000, 1000000]
   depth_refresh_minutes: 30
 
+# Read-only weekend risk for AI agents (docs/AGENTS.md): versioned REST under /v1/agent/ and an
+# MCP server (the agents/ package, stdio) that calls it. Nothing here can sign or send a
+# transaction. Rate limit per client address, as a token bucket.
+agents:
+  rate_limit_per_minute: 30
+  rate_limit_burst: 10
+  # The client address is X-Forwarded-For's entry this many hops from the right (Render's proxy
+  # appends the real client address; entries further left are the caller's own claims).
+  trusted_proxy_hops: 1
+  max_tracked_clients: 10000
+
 # Telegram alerts. Nothing here signs a transaction or holds funds.
 live:
   profile: rh-mainnet                  # RPC from RH_MAINNET_RPC_URL, else the chain's public RPC

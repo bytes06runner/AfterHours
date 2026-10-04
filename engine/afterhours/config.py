@@ -448,6 +448,13 @@ class RegimeConfig(_Strict):
     depth_refresh_minutes: PositiveInt
 
 
+class AgentsConfig(_Strict):
+    rate_limit_per_minute: PositiveInt
+    rate_limit_burst: PositiveInt
+    trusted_proxy_hops: PositiveInt
+    max_tracked_clients: PositiveInt
+
+
 class FundingConfig(_Strict):
     allocator_eth: PositiveFloat
     curator_eth: PositiveFloat
@@ -524,6 +531,7 @@ class AfterhoursConfig(BaseSettings):
     alerts: AlertsConfig
     live: LiveConfig
     regime: RegimeConfig
+    agents: AgentsConfig
     funding: FundingConfig
     state: StateConfig
 

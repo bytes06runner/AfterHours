@@ -23,6 +23,39 @@
       "title": "AcceptanceConfig",
       "type": "object"
     },
+    "AgentsConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "max_tracked_clients": {
+          "exclusiveMinimum": 0,
+          "title": "Max Tracked Clients",
+          "type": "integer"
+        },
+        "rate_limit_burst": {
+          "exclusiveMinimum": 0,
+          "title": "Rate Limit Burst",
+          "type": "integer"
+        },
+        "rate_limit_per_minute": {
+          "exclusiveMinimum": 0,
+          "title": "Rate Limit Per Minute",
+          "type": "integer"
+        },
+        "trusted_proxy_hops": {
+          "exclusiveMinimum": 0,
+          "title": "Trusted Proxy Hops",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "rate_limit_per_minute",
+        "rate_limit_burst",
+        "trusted_proxy_hops",
+        "max_tracked_clients"
+      ],
+      "title": "AgentsConfig",
+      "type": "object"
+    },
     "AlertsConfig": {
       "additionalProperties": false,
       "properties": {
@@ -2271,6 +2304,9 @@
       "title": "Active Profile",
       "type": "string"
     },
+    "agents": {
+      "$ref": "#/$defs/AgentsConfig"
+    },
     "alerts": {
       "$ref": "#/$defs/AlertsConfig"
     },
@@ -2372,6 +2408,7 @@
     "alerts",
     "live",
     "regime",
+    "agents",
     "funding",
     "state"
   ],
