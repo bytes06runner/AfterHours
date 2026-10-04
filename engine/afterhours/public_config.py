@@ -44,6 +44,7 @@ def public_config(cfg: AfterhoursConfig) -> dict[str, Any]:
             "mcp_source": cfg.agents.mcp_source,
             "mcp_command": cfg.agents.mcp_command,
             "api_url_env": cfg.agents.api_url_env,
+            "rate_limit_per_minute": cfg.agents.rate_limit_per_minute,
         },
         "exchange_calendar": cfg.data.exchange_calendar,
         "schedule": {

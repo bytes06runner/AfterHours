@@ -664,9 +664,13 @@ class Mainnet:
             out_doc = {"last_block": block, "markets": sorted(ids), "borrowers": seen}
             self._save(self.borrowers, "live_borrowers", out_doc)
         out: list[str] = []
-        for who in seen:
+        # Newest first; a rate-limited check skips that borrower instead of losing the list.
+        for who in seen[: self.cfg.live.examples * 5]:
             if len(out) >= self.cfg.live.examples:
                 break
-            if any("ltv" in p for p in self.positions(who)["positions"]):
-                out.append(who)
+            try:
+                if any("ltv" in p for p in self.positions(who)["positions"]):
+                    out.append(who)
+            except Exception as exc:
+                log.warning("checking example borrower %s failed: %s", who, exc)
         return out

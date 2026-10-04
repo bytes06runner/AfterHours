@@ -1,0 +1,302 @@
+{
+  "captured_at": "2026-10-04T15:02:07.902065+00:00",
+  "api": "https://afterhours-api.onrender.com",
+  "server_started_with": "uvx --from git+https://github.com/bytes06runner/AfterHours#subdirectory=agents afterhours-mcp",
+  "note": "Questions are examples; every tool call and answer is real, from the API above.",
+  "session": [
+    {
+      "listed_tools": [
+        "market_status",
+        "get_weekend_risk",
+        "check_position",
+        "explain_move"
+      ]
+    },
+    {
+      "question": "Is the stock market open right now?",
+      "tool": "market_status",
+      "arguments": {},
+      "is_error": false,
+      "result": {
+        "as_of": "2026-10-04T15:01:41.130011+00:00",
+        "session": "closed",
+        "next_open": "2026-10-05T13:30:00+00:00",
+        "next_close": "2026-10-05T20:00:00+00:00",
+        "seconds_to_open": 80898,
+        "seconds_to_close": 104298,
+        "feeds_window": "closed",
+        "closed_since": "2026-10-03T00:00:00+00:00",
+        "regime_counts": {
+          "regular": 0,
+          "extended": 0,
+          "weekend_venue": 0,
+          "frozen": 35
+        },
+        "summary": "The US stock exchange is closed. It opens at Mon Oct 5, 09:30 New York. Stock Token price feeds are inside a shut stretch that began at Fri Oct 2, 20:00 New York; they normally post nothing until it ends. Stock Tokens by price regime: 35 frozen."
+      }
+    },
+    {
+      "question": "Is NVDA safe to lend against this weekend?",
+      "tool": "get_weekend_risk",
+      "arguments": {
+        "ticker": "NVDA"
+      },
+      "is_error": false,
+      "result": {
+        "symbol": "NVDA",
+        "network": "Robinhood Chain",
+        "block": 80022844,
+        "as_of": "2026-10-04T14:56:38.483679+00:00",
+        "feed_price": 234.99711907,
+        "regime": {
+          "regime": "frozen",
+          "label": "Frozen",
+          "since": "2026-10-03T00:00:00+00:00",
+          "feed_age_seconds": 164946,
+          "typical_interval_minutes": 272.2,
+          "dex_price": 234.86419742588942,
+          "divergence": -0.00057,
+          "depth_usd": 1077797,
+          "quality": {
+            "score": 59,
+            "grade": "fair",
+            "marks": {
+              "staleness": 0.0,
+              "divergence": 0.972,
+              "depth": 1.0
+            },
+            "used": [
+              "depth",
+              "divergence",
+              "staleness"
+            ]
+          },
+          "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 46 hours. Its DEX price is within 0.1% of the feed. About 1,077,797 USDG of it can be sold within 2%."
+        },
+        "next_closed_period": {
+          "starts": "2026-10-02T20:00:00+00:00",
+          "ends": "2026-10-05T13:30:00+00:00",
+          "segment": "weekend",
+          "hours": 65.5
+        },
+        "bad_case_drop": 0.028592524199829557,
+        "alpha": 0.01,
+        "markets": [
+          {
+            "lltv": 0.86,
+            "cushion": 0.10229645093945713
+          },
+          {
+            "lltv": 0.77,
+            "cushion": 0.17293233082706763
+          },
+          {
+            "lltv": 0.625,
+            "cushion": 0.2957746478873239
+          },
+          {
+            "lltv": 0.385,
+            "cushion": 0.55725
+          }
+        ],
+        "beyond_cushion_of": [],
+        "summary": "Frozen since Friday 20:00 New York: the feed has posted nothing for 46 hours. Its DEX price is within 0.1% of the feed. About 1,077,797 USDG of it can be sold within 2%. Price quality 59 of 100 (fair). The next closed period is a weekend from Fri Oct 2, 16:00 New York to Mon Oct 5, 09:30 New York (65.5 hours closed). Its bad case, the fall beaten only about 1 night in 100, is 2.9%. That stays inside the cushion of every USDG Morpho market lending against NVDA (4). Read-only risk information from Afterhours, not financial advice."
+      }
+    },
+    {
+      "question": "Which price should I trust least right now? Check IONQ.",
+      "tool": "get_weekend_risk",
+      "arguments": {
+        "ticker": "IONQ"
+      },
+      "is_error": false,
+      "result": {
+        "symbol": "IONQ",
+        "network": "Robinhood Chain",
+        "block": 80022844,
+        "as_of": "2026-10-04T14:56:38.483679+00:00",
+        "feed_price": 43.8494,
+        "regime": {
+          "regime": "frozen",
+          "label": "Frozen",
+          "since": "2026-10-03T00:00:00+00:00",
+          "feed_age_seconds": 154341,
+          "typical_interval_minutes": 52.1,
+          "dex_price": 42.35454181088961,
+          "divergence": -0.03409,
+          "depth_usd": 50,
+          "quality": {
+            "score": 0,
+            "grade": "poor",
+            "marks": {
+              "staleness": 0.0,
+              "divergence": 0.0,
+              "depth": 0.0
+            },
+            "used": [
+              "depth",
+              "divergence",
+              "staleness"
+            ]
+          },
+          "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 43 hours. Its DEX price is 3.4% below the feed. About 50 USDG of it can be sold within 2%."
+        },
+        "next_closed_period": {
+          "starts": "2026-10-02T20:00:00+00:00",
+          "ends": "2026-10-05T13:30:00+00:00",
+          "segment": "weekend",
+          "hours": 65.5
+        },
+        "bad_case_drop": 0.05074162954142036,
+        "alpha": 0.01,
+        "markets": [
+          {
+            "lltv": 0.625,
+            "cushion": 0.2957746478873239
+          }
+        ],
+        "beyond_cushion_of": [],
+        "summary": "Frozen since Friday 20:00 New York: the feed has posted nothing for 43 hours. Its DEX price is 3.4% below the feed. About 50 USDG of it can be sold within 2%. Price quality 0 of 100 (poor). The next closed period is a weekend from Fri Oct 2, 16:00 New York to Mon Oct 5, 09:30 New York (65.5 hours closed). Its bad case, the fall beaten only about 1 night in 100, is 5.1%. That stays inside the cushion of every USDG Morpho market lending against IONQ (1). Read-only risk information from Afterhours, not financial advice."
+      }
+    },
+    {
+      "question": "Could tonight's gap liquidate this wallet?",
+      "tool": "check_position",
+      "arguments": {
+        "address": "0x498752D5fa0600CBd613074C151Abe15B3FeC7CB"
+      },
+      "is_error": false,
+      "result": {
+        "address": "0x498752D5fa0600CBd613074C151Abe15B3FeC7CB",
+        "network": "Robinhood Chain",
+        "block": 80025890,
+        "as_of": "2026-10-04T15:01:44.606729+00:00",
+        "loans": [
+          {
+            "symbol": "NVDA",
+            "market_id": "0x8b16891f032a93b771347c9cb470a780e6699dd701553d3402aa3cdba6189c3e",
+            "lltv": 0.625,
+            "borrowed": 609068.218179,
+            "loan_symbol": "USDG",
+            "collateral_tokens": 6474.62,
+            "ltv": 0.4000490342049021,
+            "liquidation_price": 150.5121766352929,
+            "drop_to_liquidation": 0.3599215452721565,
+            "bad_case_tonight": 0.028592524199829557,
+            "tonight_reaches_liquidation": false
+          },
+          {
+            "symbol": "SPCX",
+            "market_id": "0x9b4b47cdf7e295341c6c6cdfd3efb9805c4a5b3d580dba0c0c39d3a4232b297b",
+            "lltv": 0.625,
+            "borrowed": 512742.323455,
+            "loan_symbol": "USDG",
+            "collateral_tokens": 8075.650000000001,
+            "ltv": 0.40007090683078245,
+            "liquidation_price": 101.58782482252202,
+            "drop_to_liquidation": 0.35988654907074813,
+            "bad_case_tonight": 0.04854312016290062,
+            "tonight_reaches_liquidation": false
+          },
+          {
+            "symbol": "AAPL",
+            "market_id": "0xdeb4782d012d5fd3b24962538c2f6559049d70bda4dabd2e4212dacb96c28d45",
+            "lltv": 0.625,
+            "borrowed": 197164.058525,
+            "loan_symbol": "USDG",
+            "collateral_tokens": 1444.69,
+            "ltv": 0.40864910722883085,
+            "liquidation_price": 218.3599897832753,
+            "drop_to_liquidation": 0.34616142843387065,
+            "bad_case_tonight": 0.02145815779620392,
+            "tonight_reaches_liquidation": false
+          },
+          {
+            "symbol": "GOOGL",
+            "market_id": "0x7fa81b10e5d21b2e4c571f862442bc11aff2ed14f02335868d0ff933fd40d0ba",
+            "lltv": 0.625,
+            "borrowed": 259548.958044,
+            "loan_symbol": "USDG",
+            "collateral_tokens": 1887.78,
+            "ltv": 0.4000490810164476,
+            "liquidation_price": 219.9823776448527,
+            "drop_to_liquidation": 0.3599214703736838,
+            "bad_case_tonight": 0.024877462727525064,
+            "tonight_reaches_liquidation": false
+          }
+        ],
+        "summary": "4 open Stock Token loan(s) for 0x498752D5fa0600CBd613074C151Abe15B3FeC7CB on Robinhood Chain. NVDA: 609,068.22 USDG borrowed at 62.5% LLTV, LTV 40.0%, liquidated after a 36.0% fall (at 150.51); tonight's bad case (2.9%) does not reach it. SPCX: 512,742.32 USDG borrowed at 62.5% LLTV, LTV 40.0%, liquidated after a 36.0% fall (at 101.59); tonight's bad case (4.9%) does not reach it. AAPL: 197,164.06 USDG borrowed at 62.5% LLTV, LTV 40.9%, liquidated after a 34.6% fall (at 218.36); tonight's bad case (2.1%) does not reach it. GOOGL: 259,548.96 USDG borrowed at 62.5% LLTV, LTV 40.0%, liquidated after a 36.0% fall (at 219.98); tonight's bad case (2.5%) does not reach it. Read-only risk information from Afterhours, not financial advice."
+      }
+    },
+    {
+      "question": "Why did the vault make its latest move?",
+      "tool": "explain_move",
+      "arguments": {
+        "reason_id": "4bfe54c6-880e-48bd-9183-e4fcafa73577"
+      },
+      "is_error": false,
+      "result": {
+        "reason_id": "4bfe54c6-880e-48bd-9183-e4fcafa73577",
+        "card": {
+          "id": "4bfe54c6-880e-48bd-9183-e4fcafa73577",
+          "created_at": "2026-09-27T12:07:04.167042+00:00",
+          "profile": "rh-testnet",
+          "subject": "0x52dd6a28dab4e278ead27d34355d658bcc6dbf6b3a1103a14a41b988c86adfe1",
+          "stock": "NVDA",
+          "action": "queue_reorder",
+          "from_tier": null,
+          "to_tier": "NVDA:weekend",
+          "amount_usdg": "0.00",
+          "closed_period": {
+            "starts": "2026-09-25T20:00:00+00:00",
+            "ends": "2026-09-28T13:30:00+00:00",
+            "segment": "weekend",
+            "hours": "65.50"
+          },
+          "prediction": {
+            "alpha": "0.0100",
+            "bad_case_drop": "0.031513",
+            "model_version": "2975043dcd63122f",
+            "method": "ewma_normal"
+          },
+          "top_drivers": [
+            {
+              "feature": "segment_weekend",
+              "contribution": "-0.049054",
+              "detail": "calibrated weekend correction -1.36 volatility units"
+            },
+            {
+              "feature": "stock_volatility",
+              "contribution": "0.042489",
+              "detail": "EWMA daily volatility 2.19%"
+            },
+            {
+              "feature": "closed_hours",
+              "contribution": "0.038078",
+              "detail": "65.5 hours closed"
+            }
+          ],
+          "drivers_method": "exact additive split of the calibrated EWMA baseline (volatility, closed hours, segment)",
+          "rule_fired": "New deposits and withdrawals now use NVDA's weekend tier market, the safest allowed market: bad case 3.2% against a cushion of 17.3%.",
+          "tx": {
+            "chain_id": 46630,
+            "reallocate_tx": "0x47e8b922fa1df91acf4250d9b7cac4cd3f4496afe4975e50fb93564aeda9c3bc",
+            "registry_tx": "0x5650e953856f90b909d4f16592c6bac6fd9f8debca94cd9e96a00bbbe355fab5"
+          },
+          "reason_hash": "0xc70d05db21c76fee71c43b341301c23ebb92b00ce3bc793e4a63f92a1521e0e2"
+        },
+        "canonical_json": "{\"action\":\"queue_reorder\",\"amount_usdg\":\"0.00\",\"closed_period\":{\"ends\":\"2026-09-28T13:30:00+00:00\",\"hours\":\"65.50\",\"segment\":\"weekend\",\"starts\":\"2026-09-25T20:00:00+00:00\"},\"created_at\":\"2026-09-27T12:07:04.167042+00:00\",\"drivers_method\":\"exact additive split of the calibrated EWMA baseline (volatility, closed hours, segment)\",\"from_tier\":null,\"id\":\"4bfe54c6-880e-48bd-9183-e4fcafa73577\",\"prediction\":{\"alpha\":\"0.0100\",\"bad_case_drop\":\"0.031513\",\"method\":\"ewma_normal\",\"model_version\":\"2975043dcd63122f\"},\"profile\":\"rh-testnet\",\"rule_fired\":\"New deposits and withdrawals now use NVDA's weekend tier market, the safest allowed market: bad case 3.2% against a cushion of 17.3%.\",\"stock\":\"NVDA\",\"subject\":\"0x52dd6a28dab4e278ead27d34355d658bcc6dbf6b3a1103a14a41b988c86adfe1\",\"to_tier\":\"NVDA:weekend\",\"top_drivers\":[{\"contribution\":\"-0.049054\",\"detail\":\"calibrated weekend correction -1.36 volatility units\",\"feature\":\"segment_weekend\"},{\"contribution\":\"0.042489\",\"detail\":\"EWMA daily volatility 2.19%\",\"feature\":\"stock_volatility\"},{\"contribution\":\"0.038078\",\"detail\":\"65.5 hours closed\",\"feature\":\"closed_hours\"}]}",
+        "verification": {
+          "status": "matched",
+          "recomputed_hash": "0xc70d05db21c76fee71c43b341301c23ebb92b00ce3bc793e4a63f92a1521e0e2",
+          "onchain_hash": "0xc70d05db21c76fee71c43b341301c23ebb92b00ce3bc793e4a63f92a1521e0e2",
+          "seq": 4,
+          "block": 125152131,
+          "registry_tx": "0x5650e953856f90b909d4f16592c6bac6fd9f8debca94cd9e96a00bbbe355fab5",
+          "uri": "afterhours:reason:4bfe54c6-880e-48bd-9183-e4fcafa73577"
+        },
+        "summary": "On Sun Sep 27, 08:07 New York the Afterhours bot (rh-testnet) wrote: New deposits and withdrawals now use NVDA's weekend tier market, the safest allowed market: bad case 3.2% against a cushion of 17.3%. Its hash matches the ReasonLogged event onchain."
+      }
+    }
+  ]
+}
