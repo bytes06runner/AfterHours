@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><mask id="m70927c"><rect width="512" height="512" fill="white"/>
+      <circle cx="256" cy="238" r="152" fill="black"/></mask>
+<circle cx="256" cy="284" r="150" fill="#F1C76B" mask="url(#m70927c)"/>
+<g stroke="#F1C76B" stroke-width="7" stroke-linecap="round"><line x1="144.5" y1="229.6" x2="110.3" y2="198.9"/><line x1="167.8" y1="208.6" x2="140.8" y2="171.4"/><line x1="195.0" y1="193.0" x2="176.3" y2="150.9"/><line x1="224.8" y1="183.3" x2="215.2" y2="138.3"/><line x1="256.0" y1="180.0" x2="256.0" y2="134.0"/><line x1="287.2" y1="183.3" x2="296.8" y2="138.3"/><line x1="317.0" y1="193.0" x2="335.7" y2="150.9"/><line x1="344.2" y1="208.6" x2="371.2" y2="171.4"/><line x1="367.5" y1="229.6" x2="401.7" y2="198.9"/></g>
+<path d="M 250.00 176.00 h 12.00 v 13.50 C 295.00 192.50 299.50 221.00 301.00 254.00 C 302.50 281.00 310.00 296.00 320.50 308.00 L 320.50 320.00 L 191.50 320.00 L 191.50 308.00 C 202.00 296.00 209.50 281.00 211.00 254.00 C 212.50 221.00 217.00 192.50 250.00 189.50 Z" fill="#F1C76B" mask="url(#m70927l)"/>
+<circle cx="256" cy="336" r="15" fill="#F1C76B"/>
+<mask id="m70927l"><rect width="512" height="512" fill="white"/><rect x="186" y="300" width="140" height="5" fill="black"/></mask>
+<circle cx="256" cy="256" r="238" fill="none" stroke="#F1C76B" stroke-width="10"/>
+<circle cx="256" cy="256" r="222" fill="none" stroke="#F1C76B" stroke-width="3"/></svg>

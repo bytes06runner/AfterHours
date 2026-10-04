@@ -5,3 +5,5 @@ public/*.wav
 # Your own recording stays on your machine.
 public/voiceover.*
 .tts/
+# Screen demo clips, rebuilt by docs/video/screen-demo/assemble.mjs.
+public/demo/*.mp4

@@ -6,6 +6,7 @@ tick.wav   a short clock tick
 boom.wav   a low impact for the price gap
 stamp.wav  a short thud for the hash landing onchain
 pad.wav    a quiet ambient night pad, looped under the whole video
+click.wav  a soft mouse click (press and release) for the screen demo
 """
 
 from __future__ import annotations
@@ -77,6 +78,22 @@ def tick(seconds: float = 0.08) -> list[float]:
     ]
 
 
+def click(seconds: float = 0.12) -> list[float]:
+    # Two short, band-limited transients: the button going down, then coming back up.
+    n = int(seconds * RATE)
+    rng = random.Random(11)
+    out, lp, hp_prev, prev = [], 0.0, 0.0, 0.0
+    for i in range(n):
+        t = i / RATE
+        noise = rng.random() * 2 - 1
+        env = math.exp(-t / 0.0035) + 0.55 * math.exp(-max(0.0, t - 0.07) / 0.003) * (t >= 0.07)
+        lp += 0.35 * (noise - lp)  # soften the top end
+        hp = lp - prev + 0.97 * hp_prev  # and drop the rumble
+        prev, hp_prev = lp, hp
+        out.append((hp + 0.4 * math.sin(2 * math.pi * 1800 * t)) * env)
+    return out
+
+
 def boom(seconds: float = 1.6) -> list[float]:
     n = int(seconds * RATE)
     rng = random.Random(5)
@@ -123,4 +140,5 @@ if __name__ == "__main__":
     write("boom.wav", boom())
     write("stamp.wav", stamp(), 0.8)
     write("pad.wav", pad(), 0.5)
+    write("click.wav", click(), 0.6)
     print("wrote", ", ".join(sorted(p.name for p in OUT.glob("*.wav"))))
