@@ -1741,6 +1741,130 @@
       "title": "Range",
       "type": "object"
     },
+    "RegimeConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "cadence_step_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Cadence Step Minutes",
+          "type": "integer"
+        },
+        "depth_floor_usd": {
+          "exclusiveMinimum": 0,
+          "title": "Depth Floor Usd",
+          "type": "number"
+        },
+        "depth_full_usd": {
+          "exclusiveMinimum": 0,
+          "title": "Depth Full Usd",
+          "type": "number"
+        },
+        "depth_probes_usd": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "title": "Depth Probes Usd",
+          "type": "array"
+        },
+        "depth_refresh_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Depth Refresh Minutes",
+          "type": "integer"
+        },
+        "grades": {
+          "$ref": "#/$defs/RegimeGrades"
+        },
+        "pools_per_token": {
+          "exclusiveMinimum": 0,
+          "title": "Pools Per Token",
+          "type": "integer"
+        },
+        "stale_floor_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Stale Floor Minutes",
+          "type": "integer"
+        },
+        "stale_multiple": {
+          "exclusiveMinimum": 1,
+          "title": "Stale Multiple",
+          "type": "number"
+        },
+        "weights": {
+          "$ref": "#/$defs/RegimeWeights"
+        },
+        "window_grace_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Window Grace Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "cadence_step_minutes",
+        "window_grace_seconds",
+        "stale_multiple",
+        "stale_floor_minutes",
+        "depth_floor_usd",
+        "depth_full_usd",
+        "weights",
+        "grades",
+        "pools_per_token",
+        "depth_probes_usd",
+        "depth_refresh_minutes"
+      ],
+      "title": "RegimeConfig",
+      "type": "object"
+    },
+    "RegimeGrades": {
+      "additionalProperties": false,
+      "properties": {
+        "fair": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Fair",
+          "type": "integer"
+        },
+        "good": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Good",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "good",
+        "fair"
+      ],
+      "title": "RegimeGrades",
+      "type": "object"
+    },
+    "RegimeWeights": {
+      "additionalProperties": false,
+      "properties": {
+        "depth": {
+          "minimum": 0,
+          "title": "Depth",
+          "type": "number"
+        },
+        "divergence": {
+          "minimum": 0,
+          "title": "Divergence",
+          "type": "number"
+        },
+        "staleness": {
+          "minimum": 0,
+          "title": "Staleness",
+          "type": "number"
+        }
+      },
+      "required": [
+        "staleness",
+        "divergence",
+        "depth"
+      ],
+      "title": "RegimeWeights",
+      "type": "object"
+    },
     "ReplayConfig": {
       "additionalProperties": false,
       "properties": {
@@ -2203,6 +2327,9 @@
       "title": "Profiles",
       "type": "object"
     },
+    "regime": {
+      "$ref": "#/$defs/RegimeConfig"
+    },
     "schedule": {
       "$ref": "#/$defs/ScheduleConfig"
     },
@@ -2244,6 +2371,7 @@
     "web",
     "alerts",
     "live",
+    "regime",
     "funding",
     "state"
   ],

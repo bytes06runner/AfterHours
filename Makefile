@@ -27,7 +27,7 @@ WEB := pnpm --filter @afterhours/web
 
 NAME ?= closing_bell
 
-.PHONY: help setup scenario gen-schema discover oracle-reading verify-discovered local-chain screens lighthouse e2e fork deploy seed testnet-keys fund-allocator engine api alerts telegram-webhook state-to-upstash web up demo report \
+.PHONY: help setup scenario gen-schema discover oracle-reading regime-cadence regime-snapshot verify-discovered local-chain screens lighthouse e2e fork deploy seed testnet-keys fund-allocator engine api alerts telegram-webhook state-to-upstash web up demo report \
         test test-py test-web test-sol test-config test-integration lint lint-py lint-web lint-sol lint-hardcode lint-numbers
 
 help: ## List commands
@@ -54,6 +54,13 @@ discover: ## M1: find and verify protocol addresses, write deployments/<profile>
 
 oracle-reading: ## New dated reading of the weekend oracle study (M1 reading untouched)
 	$(AH) oracle-reading
+	$(AH) regime-cadence
+
+regime-cadence: ## Typical feed update intervals per regime, from the oracle study readings
+	$(AH) regime-cadence
+
+regime-snapshot: ## Every Stock Token's price regime on mainnet now, as a dated artifact
+	$(AH) regime-snapshot
 
 verify-discovered: ## Re-check the discovered file with plain cast calls
 	./scripts/verify-discovered.sh

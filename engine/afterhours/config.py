@@ -36,6 +36,7 @@ EnvName = Annotated[str, StringConstraints(pattern=r"^[A-Z][A-Z0-9_]*$")]
 Fraction = Annotated[float, Field(ge=0, le=1)]
 PositiveInt = Annotated[int, Field(gt=0)]
 PositiveFloat = Annotated[float, Field(gt=0)]
+NonNegativeFloat = Annotated[float, Field(ge=0)]
 
 
 class _Strict(BaseModel):
@@ -422,6 +423,31 @@ class LiveConfig(_Strict):
     board_snapshot_minutes: PositiveInt
 
 
+class RegimeWeights(_Strict):
+    staleness: NonNegativeFloat
+    divergence: NonNegativeFloat
+    depth: NonNegativeFloat
+
+
+class RegimeGrades(_Strict):
+    good: Annotated[int, Field(ge=0, le=100)]
+    fair: Annotated[int, Field(ge=0, le=100)]
+
+
+class RegimeConfig(_Strict):
+    cadence_step_minutes: PositiveInt
+    window_grace_seconds: PositiveInt
+    stale_multiple: Annotated[float, Field(gt=1)]
+    stale_floor_minutes: PositiveInt
+    depth_floor_usd: PositiveFloat
+    depth_full_usd: PositiveFloat
+    weights: RegimeWeights
+    grades: RegimeGrades
+    pools_per_token: PositiveInt
+    depth_probes_usd: list[PositiveFloat]
+    depth_refresh_minutes: PositiveInt
+
+
 class FundingConfig(_Strict):
     allocator_eth: PositiveFloat
     curator_eth: PositiveFloat
@@ -497,6 +523,7 @@ class AfterhoursConfig(BaseSettings):
     web: WebConfig
     alerts: AlertsConfig
     live: LiveConfig
+    regime: RegimeConfig
     funding: FundingConfig
     state: StateConfig
 

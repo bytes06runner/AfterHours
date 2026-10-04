@@ -1,0 +1,1007 @@
+{
+  "network": "Robinhood Chain",
+  "block": 79868354,
+  "as_of": "2026-10-04T10:34:40.712050+00:00",
+  "calendar": "closed",
+  "segment": "frozen",
+  "closed_since": "2026-10-03T00:00:00+00:00",
+  "counts": {
+    "regular": 0,
+    "extended": 0,
+    "weekend_venue": 0,
+    "frozen": 35
+  },
+  "method": "docs/REGIME.md",
+  "tokens": [
+    {
+      "symbol": "AAPL",
+      "feed_price": 333.82386412,
+      "feed_updated_at": "2026-10-02T16:39:40+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 150901,
+      "typical_interval_minutes": 525.0,
+      "dex_price": 334.0397187894793,
+      "divergence": 0.00065,
+      "depth_usd": 221258,
+      "quality": {
+        "score": 52,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.968,
+          "depth": 0.672
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 42 hours. Its DEX price is within 0.1% of the feed. About 221,258 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "AMD",
+      "feed_price": 632.82895,
+      "feed_updated_at": "2026-10-02T18:51:35+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 142986,
+      "typical_interval_minutes": 97.1,
+      "dex_price": 635.4691029729956,
+      "divergence": 0.00417,
+      "depth_usd": 98166,
+      "quality": {
+        "score": 42,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.791,
+          "depth": 0.496
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 40 hours. Its DEX price is 0.4% above the feed. About 98,166 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "AMZN",
+      "feed_price": 251.64999999,
+      "feed_updated_at": "2026-10-02T19:51:17+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 139404,
+      "typical_interval_minutes": 329.1,
+      "dex_price": 251.57737980776736,
+      "divergence": -0.00029,
+      "depth_usd": 133611,
+      "quality": {
+        "score": 51,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.986,
+          "depth": 0.563
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is within 0.1% of the feed. About 133,611 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "ASML",
+      "feed_price": 1866.58910971,
+      "feed_updated_at": "2026-10-02T19:25:56+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 140925,
+      "typical_interval_minutes": 109.2,
+      "dex_price": 1853.2309309343339,
+      "divergence": -0.00716,
+      "depth_usd": 1167,
+      "quality": {
+        "score": 26,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.642,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.7% below the feed. About 1,167 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "BABA",
+      "feed_price": 106.0699,
+      "feed_updated_at": "2026-10-02T19:53:37+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 139264,
+      "typical_interval_minutes": 98.9,
+      "dex_price": 106.15357741072145,
+      "divergence": 0.00079,
+      "depth_usd": 4139,
+      "quality": {
+        "score": 38,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.961,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is within 0.1% of the feed. About 4,139 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "CLSK",
+      "feed_price": 12.735,
+      "feed_updated_at": "2026-10-02T19:59:38+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 138903,
+      "typical_interval_minutes": 61.8,
+      "dex_price": 12.794151901979937,
+      "divergence": 0.00464,
+      "depth_usd": 61,
+      "quality": {
+        "score": 31,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.768,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.5% above the feed. About 61 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "COIN",
+      "feed_price": 182.635,
+      "feed_updated_at": "2026-10-02T19:35:47+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 140334,
+      "typical_interval_minutes": 59.9,
+      "dex_price": 183.25067676004977,
+      "divergence": 0.00337,
+      "depth_usd": 70967,
+      "quality": {
+        "score": 42,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.831,
+          "depth": 0.426
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.3% above the feed. About 70,967 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "CRCL",
+      "feed_price": 81.68315,
+      "feed_updated_at": "2026-10-02T20:17:50+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 137811,
+      "typical_interval_minutes": 43.7,
+      "dex_price": 82.94697483495801,
+      "divergence": 0.01547,
+      "depth_usd": 225451,
+      "quality": {
+        "score": 23,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.226,
+          "depth": 0.677
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 38 hours. Its DEX price is 1.5% above the feed. About 225,451 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "CRWV",
+      "feed_price": 89.23785,
+      "feed_updated_at": "2026-10-02T20:16:14+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 137907,
+      "typical_interval_minutes": 52.8,
+      "dex_price": 89.53515952101307,
+      "divergence": 0.00333,
+      "depth_usd": 8415,
+      "quality": {
+        "score": 33,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.833,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 38 hours. Its DEX price is 0.3% above the feed. About 8,415 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "DELL",
+      "feed_price": 563.76306427,
+      "feed_updated_at": "2026-10-02T19:11:38+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 141783,
+      "typical_interval_minutes": 81.7,
+      "dex_price": 560.796278034401,
+      "divergence": -0.00526,
+      "depth_usd": 23277,
+      "quality": {
+        "score": 33,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.737,
+          "depth": 0.183
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.5% below the feed. About 23,277 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "EWY",
+      "feed_price": 190.9396,
+      "feed_updated_at": "2026-10-02T22:47:22+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 128839,
+      "typical_interval_minutes": 90.0,
+      "dex_price": 188.62317305579995,
+      "divergence": -0.01213,
+      "depth_usd": 829,
+      "quality": {
+        "score": 16,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.393,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 36 hours. Its DEX price is 1.2% below the feed. About 829 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "GME",
+      "feed_price": 25.19345,
+      "feed_updated_at": "2026-10-02T21:55:01+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 131980,
+      "typical_interval_minutes": 107.6,
+      "dex_price": 25.18808007963733,
+      "divergence": -0.00021,
+      "depth_usd": 172001,
+      "quality": {
+        "score": 52,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.989,
+          "depth": 0.618
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 37 hours. Its DEX price is within 0.1% of the feed. About 172,001 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "GOOGL",
+      "feed_price": 343.66163145,
+      "feed_updated_at": "2026-10-02T16:06:58+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 152863,
+      "typical_interval_minutes": 247.8,
+      "dex_price": 344.0949366176963,
+      "divergence": 0.00126,
+      "depth_usd": 236598,
+      "quality": {
+        "score": 51,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.937,
+          "depth": 0.687
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 42 hours. Its DEX price is 0.1% above the feed. About 236,598 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "INTC",
+      "feed_price": 119.301,
+      "feed_updated_at": "2026-10-02T19:55:32+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 139149,
+      "typical_interval_minutes": 54.7,
+      "dex_price": 118.84931191039402,
+      "divergence": -0.00379,
+      "depth_usd": 25942,
+      "quality": {
+        "score": 37,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.811,
+          "depth": 0.207
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.4% below the feed. About 25,942 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "IONQ",
+      "feed_price": 43.8494,
+      "feed_updated_at": "2026-10-02T20:04:17+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 138624,
+      "typical_interval_minutes": 52.1,
+      "dex_price": 42.35454181088961,
+      "divergence": -0.03409,
+      "depth_usd": 50,
+      "quality": {
+        "score": 0,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.0,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 3.4% below the feed. About 50 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "META",
+      "feed_price": 730.13257355,
+      "feed_updated_at": "2026-10-02T15:24:56+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 155385,
+      "typical_interval_minutes": 146.0,
+      "dex_price": 728.8216544273275,
+      "divergence": -0.0018,
+      "depth_usd": 816262,
+      "quality": {
+        "score": 56,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.91,
+          "depth": 0.956
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 43 hours. Its DEX price is 0.2% below the feed. About 816,262 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "MSFT",
+      "feed_price": 517.51076919,
+      "feed_updated_at": "2026-10-02T19:57:25+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 139036,
+      "typical_interval_minutes": 373.7,
+      "dex_price": 517.1839259177302,
+      "divergence": -0.00063,
+      "depth_usd": 215084,
+      "quality": {
+        "score": 52,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.968,
+          "depth": 0.666
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is within 0.1% of the feed. About 215,084 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "MSTR",
+      "feed_price": 160.665,
+      "feed_updated_at": "2026-10-02T20:07:21+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 138440,
+      "typical_interval_minutes": 40.4,
+      "dex_price": 163.72918609198103,
+      "divergence": 0.01907,
+      "depth_usd": 364881,
+      "quality": {
+        "score": 17,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.046,
+          "depth": 0.781
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 38 hours. Its DEX price is 1.9% above the feed. About 364,881 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "MU",
+      "feed_price": 1071.82519141,
+      "feed_updated_at": "2026-10-02T21:10:41+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 134640,
+      "typical_interval_minutes": 74.0,
+      "dex_price": 1067.1124190549463,
+      "divergence": -0.0044,
+      "depth_usd": 146122,
+      "quality": {
+        "score": 43,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.78,
+          "depth": 0.582
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 37 hours. Its DEX price is 0.4% below the feed. About 146,122 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "NBIS",
+      "feed_price": 242.591,
+      "feed_updated_at": "2026-10-02T19:48:20+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 139581,
+      "typical_interval_minutes": 43.6,
+      "dex_price": 243.42020880172248,
+      "divergence": 0.00342,
+      "depth_usd": 4968,
+      "quality": {
+        "score": 33,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.829,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.3% above the feed. About 4,968 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "NVDA",
+      "feed_price": 234.99711907,
+      "feed_updated_at": "2026-10-02T17:07:32+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 149229,
+      "typical_interval_minutes": 272.2,
+      "dex_price": 234.82741380119276,
+      "divergence": -0.00072,
+      "depth_usd": 1048417,
+      "quality": {
+        "score": 59,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.964,
+          "depth": 1.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 41 hours. Its DEX price is within 0.1% of the feed. About 1,048,417 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "ORCL",
+      "feed_price": 142.65470163,
+      "feed_updated_at": "2026-10-02T19:18:13+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 141388,
+      "typical_interval_minutes": 113.1,
+      "dex_price": 141.56754728699687,
+      "divergence": -0.00762,
+      "depth_usd": 1267,
+      "quality": {
+        "score": 25,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.619,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.8% below the feed. About 1,267 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "PLTR",
+      "feed_price": 188.546,
+      "feed_updated_at": "2026-10-02T19:50:57+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 139424,
+      "typical_interval_minutes": 185.3,
+      "dex_price": 190.161319883569,
+      "divergence": 0.00857,
+      "depth_usd": 164631,
+      "quality": {
+        "score": 35,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.572,
+          "depth": 0.608
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.9% above the feed. About 164,631 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "QQQ",
+      "feed_price": 751.99912534,
+      "feed_updated_at": "2026-10-02T12:57:12+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 164249,
+      "typical_interval_minutes": 490.0,
+      "dex_price": 751.9667381204823,
+      "divergence": -4e-05,
+      "depth_usd": 163111,
+      "quality": {
+        "score": 52,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.998,
+          "depth": 0.606
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 46 hours. Its DEX price is within 0.1% of the feed. About 163,111 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "RGTI",
+      "feed_price": 15.3637,
+      "feed_updated_at": "2026-10-02T20:05:06+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 138575,
+      "typical_interval_minutes": 63.5,
+      "dex_price": 16.484839794244632,
+      "divergence": 0.07297,
+      "depth_usd": 73,
+      "quality": {
+        "score": 0,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.0,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 38 hours. Its DEX price is 7.3% above the feed. About 73 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "RKLB",
+      "feed_price": 74.015,
+      "feed_updated_at": "2026-10-02T19:49:42+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 139499,
+      "typical_interval_minutes": 67.2,
+      "dex_price": 74.91999469239593,
+      "divergence": 0.01223,
+      "depth_usd": 1264,
+      "quality": {
+        "score": 16,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.389,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 1.2% above the feed. About 1,264 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "SGOV",
+      "feed_price": 101.15681945,
+      "feed_updated_at": "2026-10-02T00:02:05+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 210756,
+      "typical_interval_minutes": 1050.0,
+      "dex_price": 101.04279963592028,
+      "divergence": -0.00113,
+      "depth_usd": 1121548,
+      "quality": {
+        "score": 58,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.944,
+          "depth": 1.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 2 days. Its DEX price is 0.1% below the feed. About 1,121,548 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "SLV",
+      "feed_price": 54.673,
+      "feed_updated_at": "2026-10-02T19:14:42+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 141599,
+      "typical_interval_minutes": 102.6,
+      "dex_price": 54.5931833054331,
+      "divergence": -0.00146,
+      "depth_usd": 13944,
+      "quality": {
+        "score": 39,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.927,
+          "depth": 0.072
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.1% below the feed. About 13,944 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "SNDK",
+      "feed_price": 1718.19855,
+      "feed_updated_at": "2026-10-02T16:51:21+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 150200,
+      "typical_interval_minutes": 50.2,
+      "dex_price": 1728.7875159978175,
+      "divergence": 0.00616,
+      "depth_usd": 26622,
+      "quality": {
+        "score": 32,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.692,
+          "depth": 0.213
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 42 hours. Its DEX price is 0.6% above the feed. About 26,622 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "SPCX",
+      "feed_price": 158.725,
+      "feed_updated_at": "2026-10-02T20:11:31+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 138190,
+      "typical_interval_minutes": 141.3,
+      "dex_price": 159.3002695312182,
+      "divergence": 0.00362,
+      "depth_usd": 670416,
+      "quality": {
+        "score": 51,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.819,
+          "depth": 0.913
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 38 hours. Its DEX price is 0.4% above the feed. About 670,416 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "SPY",
+      "feed_price": 770.71210575,
+      "feed_updated_at": "2026-10-02T12:30:38+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 165843,
+      "typical_interval_minutes": 1102.5,
+      "dex_price": 771.2340952413663,
+      "divergence": 0.00068,
+      "depth_usd": 1131856,
+      "quality": {
+        "score": 59,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.966,
+          "depth": 1.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 46 hours. Its DEX price is within 0.1% of the feed. About 1,131,856 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "TSLA",
+      "feed_price": 370.448,
+      "feed_updated_at": "2026-10-02T19:55:31+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 139150,
+      "typical_interval_minutes": 232.1,
+      "dex_price": 371.3413918775229,
+      "divergence": 0.00241,
+      "depth_usd": 227027,
+      "quality": {
+        "score": 49,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.879,
+          "depth": 0.678
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.2% above the feed. About 227,027 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "TSM",
+      "feed_price": 473.9208948,
+      "feed_updated_at": "2026-10-02T19:26:21+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 140900,
+      "typical_interval_minutes": 210.0,
+      "dex_price": 471.1401837578009,
+      "divergence": -0.00587,
+      "depth_usd": 12149,
+      "quality": {
+        "score": 29,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.707,
+          "depth": 0.042
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.6% below the feed. About 12,149 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "USAR",
+      "feed_price": 13.575,
+      "feed_updated_at": "2026-10-02T19:18:06+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 141395,
+      "typical_interval_minutes": 74.0,
+      "dex_price": 13.674794222284445,
+      "divergence": 0.00735,
+      "depth_usd": 6902,
+      "quality": {
+        "score": 25,
+        "grade": "poor",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.632,
+          "depth": 0.0
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 39 hours. Its DEX price is 0.7% above the feed. About 6,902 USDG of it can be sold within 2%."
+    },
+    {
+      "symbol": "USO",
+      "feed_price": 146.83305,
+      "feed_updated_at": "2026-10-02T18:28:23+00:00",
+      "regime": "frozen",
+      "label": "Frozen",
+      "since": "2026-10-03T00:00:00+00:00",
+      "feed_age_seconds": 144378,
+      "typical_interval_minutes": 63.0,
+      "dex_price": 146.80863851779569,
+      "divergence": -0.00017,
+      "depth_usd": 687684,
+      "quality": {
+        "score": 58,
+        "grade": "fair",
+        "marks": {
+          "staleness": 0.0,
+          "divergence": 0.992,
+          "depth": 0.919
+        },
+        "used": [
+          "depth",
+          "divergence",
+          "staleness"
+        ]
+      },
+      "line": "Frozen since Friday 20:00 New York: the feed has posted nothing for 40 hours. Its DEX price is within 0.1% of the feed. About 687,684 USDG of it can be sold within 2%."
+    }
+  ],
+  "summary": {
+    "tokens": 35,
+    "with_dex_price": 35,
+    "median_abs_divergence": 0.00362,
+    "beyond_divergence_trigger": [
+      "IONQ",
+      "RGTI"
+    ],
+    "largest_divergence": "RGTI"
+  }
+}

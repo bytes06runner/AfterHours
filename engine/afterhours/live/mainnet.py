@@ -41,6 +41,8 @@ from afterhours.chain.rpc import Call, call_many, connect
 from afterhours.config import AfterhoursConfig
 from afterhours.data.pipeline import make_cache
 from afterhours.deployments import load_discovered
+from afterhours.discovery.pools import Pool, measure_depth
+from afterhours.live import regime as rg
 from afterhours.policy.lp import tier_spec
 from afterhours.risk.live import LiveRisk
 
@@ -110,6 +112,25 @@ def feed_status(cfg: AfterhoursConfig, now: datetime, updated_at: datetime) -> d
     }
 
 
+# Uniswap reads for the regime monitor, verified on Robinhood Chain mainnet on 2026-10-04 with
+# cast against the NVDA/USDG pools (docs/REGIME.md): v3 `slot0()` on the pool, v4
+# `StateView.getSlot0(poolId)`; both start with sqrtPriceX96.
+V3_SLOT0 = "slot0()(uint160,int24,uint16,uint16,uint16,uint8,bool)"
+V4_GET_SLOT0 = "getSlot0(bytes32)(uint160,int24,uint24,uint24)"
+Q96 = 2**96  # Uniswap's sqrtPriceX96 fixed point
+
+
+def pool_price(
+    sqrt_price_x96: int, token: str, quote: str, token_dec: int, quote_dec: int
+) -> float:
+    """Price of `token` in `quote` from a pool's sqrtPriceX96 (currency0 is the lower address)."""
+    ratio = (sqrt_price_x96 / Q96) ** 2  # raw currency1 per raw currency0
+    scale = 10.0 ** (token_dec - quote_dec)
+    if token.lower() < quote.lower():  # token is currency0
+        return float(ratio * scale)
+    return float(scale / ratio)
+
+
 def lower_thread_priority(nice: int) -> None:
     """Run this thread at a lower CPU priority (Linux sets niceness per thread).
 
@@ -163,6 +184,34 @@ class Mainnet:
             if v.get("feed")
         }
         self.risk = LiveRisk(cfg, make_cache(cfg))
+        # Price regime monitor: the deepest USDG pools per token (depth measured at discovery),
+        # the Uniswap contracts to read them with, and each feed's typical update interval.
+        core = disc["core"]
+        self.v3_quoter = to_checksum_address(core["uniswap_v3_quoter_v2"]["address"])
+        self.v4_quoter = to_checksum_address(core["uniswap_v4_quoter"]["address"])
+        self.state_view = to_checksum_address(core["uniswap_v4_state_view"]["address"])
+        self.pools: dict[str, list[Pool]] = {}
+        for sym, v in disc["stock_tokens"].items():
+            usdg_pools = [p for p in v.get("pools", []) if p["quote"].lower() == self.usdg.lower()]
+            usdg_pools.sort(key=lambda p: p.get("depth_usd") or 0, reverse=True)
+            self.pools[sym] = [
+                Pool(
+                    version=p["version"],
+                    address_or_id=p["address_or_id"],
+                    token=to_checksum_address(p["token"]),
+                    quote=to_checksum_address(p["quote"]),
+                    quote_symbol=p["quote_symbol"],
+                    fee=int(p["fee"]),
+                    tick_spacing=p.get("tick_spacing"),
+                    hooks=p.get("hooks"),
+                )
+                for p in usdg_pools[: cfg.regime.pools_per_token]
+            ]
+        cadence_file = cfg.path(cfg.paths.artifacts_dir) / "regime" / "cadence.json"
+        self.cadence: dict[str, Any] | None = (
+            json.loads(cadence_file.read_text()) if cadence_file.exists() else None
+        )
+        self._depth: tuple[float, dict[str, float]] | None = None
         self._lock = threading.Lock()
         self._board_lock = threading.Lock()
         self._board: tuple[float, dict[str, Any]] | None = None
@@ -316,6 +365,122 @@ class Mainnet:
             self.on_board(doc)
         return doc
 
+    # ------------------------------------------------------------------ price regime monitor
+    def dex_prices(
+        self, syms: list[str], block: int, deadline: float | None = None
+    ) -> dict[str, float | None]:
+        """Mid price in USDG of each token's deepest USDG pool that answers (v3 or v4)."""
+        calls: list[Call] = []
+        owners: list[tuple[str, Pool]] = []
+        for s in syms:
+            for p in self.pools.get(s, []):
+                if p.version == "v3":
+                    calls.append(Call(p.address_or_id, V3_SLOT0))
+                else:
+                    calls.append(
+                        Call(self.state_view, V4_GET_SLOT0, (bytes.fromhex(p.address_or_id[2:]),))
+                    )
+                owners.append((s, p))
+        dec = self.decimals(sorted({p.token for _, p in owners} | {self.usdg}), block, deadline)
+        res = call_many(self.w3, calls, block=block, deadline=deadline) if calls else []
+        out: dict[str, float | None] = {s: None for s in syms}
+        for (s, p), r in zip(owners, res, strict=True):
+            if out[s] is not None or not r or not int(r[0]):
+                continue
+            out[s] = pool_price(int(r[0]), p.token, self.usdg, dec[p.token], dec[self.usdg])
+        return out
+
+    def dex_depth(
+        self, prices: dict[str, float | None], block: int, deadline: float | None = None
+    ) -> dict[str, float]:
+        """USD sellable within `vault.max_slippage` across each token's pools (re-quoted at most
+        every `regime.depth_refresh_minutes`)."""
+        cached = self._depth
+        if cached and time.time() - cached[0] < self.cfg.regime.depth_refresh_minutes * 60:
+            return cached[1]
+        pools = [
+            Pool(**{**p.to_json(), "probes": [], "depth_usd": 0.0})
+            for s, price in prices.items()
+            if price
+            for p in self.pools.get(s, [])
+        ]
+        if not pools:
+            return {}
+        dec = self.decimals(sorted({p.token for p in pools} | {self.usdg}), block, deadline)
+        by_token: dict[str, str] = {str(a): sym for a, sym in self.tokens.items()}
+        measure_depth(
+            self.w3,
+            pools,
+            v3_quoter=self.v3_quoter,
+            v4_quoter=self.v4_quoter,
+            token_price_usd={p.token: float(prices[by_token[p.token]] or 0) for p in pools},
+            quote_price_usd={self.usdg: 1.0},
+            token_decimals=dec,
+            quote_decimals=dec,
+            probes_usd=self.cfg.regime.depth_probes_usd,
+            max_slippage=self.cfg.vault.max_slippage,
+            block=block,
+            deadline=deadline,
+        )
+        depth: dict[str, float] = {}
+        for p in pools:
+            sym = by_token[p.token]
+            depth[sym] = depth.get(sym, 0.0) + p.depth_usd
+        self._depth = (time.time(), depth)
+        return depth
+
+    def regimes(
+        self,
+        rows: list[dict[str, Any]],
+        now: datetime,
+        block: int,
+        deadline: float | None = None,
+    ) -> dict[str, Any]:
+        """Add `regime` to each board row; return the calendar state and counts."""
+        cal_name = self.cfg.data.exchange_calendar
+        cal = rg.calendar_state(cal_name, now)
+        since = (
+            rg.closed_since(cal_name, now, self.cfg.regime.cadence_step_minutes)
+            if cal["state"] == "closed"
+            else None
+        )
+        syms = [r["symbol"] for r in rows]
+        # DEX reads add marks to the score; regimes come from the calendar and feeds regardless.
+        prices: dict[str, float | None] = {}
+        depth: dict[str, float] = {}
+        try:
+            prices = self.dex_prices(syms, block, deadline)
+        except Exception as exc:
+            log.warning("DEX prices failed: %s", exc)
+        try:
+            feed = {r["symbol"]: r["price"] for r in rows}
+            depth = self.dex_depth({s: feed[s] for s in syms if prices.get(s)}, block, deadline)
+        except Exception as exc:  # e.g. out of the refresh budget: re-quoted next time
+            log.warning("DEX depth failed: %s", exc)
+        counts = dict.fromkeys(rg.REGIMES, 0)
+        for r in rows:
+            updated = datetime.fromisoformat(r["updated_at"]) if r["updated_at"] else None
+            r["regime"] = rg.regime_row(
+                self.cfg,
+                symbol=r["symbol"],
+                now=now,
+                cal=cal,
+                since=since,
+                updated_at=updated,
+                feed_price=r["price"],
+                dex_price=prices.get(r["symbol"]),
+                depth_usd=depth.get(r["symbol"]),
+                cadence_doc=self.cadence,
+            )
+            counts[r["regime"]["regime"]] += 1
+        return {
+            "calendar": cal["state"],
+            "segment": cal["segment"],
+            "closed_since": since.isoformat() if since else None,
+            "counts": counts,
+            "method": "docs/REGIME.md",
+        }
+
     def _board_now(self, now: datetime) -> dict[str, Any]:
         block = self.block()
         syms = sorted(self.feeds)
@@ -365,6 +530,7 @@ class Mainnet:
             "network": self.cfg.chains[self.cfg.profiles[self.cfg.live.profile].chain].name,
             "block": block,
             "as_of": now.isoformat(),
+            "regimes": self.regimes(rows, now, block, deadline),
             "stocks": rows,
         }
         self._board = (time.time(), doc)

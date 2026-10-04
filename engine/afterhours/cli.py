@@ -519,6 +519,77 @@ def oracle_reading_cmd() -> None:
     typer.echo(f"wrote {path}")
 
 
+@app.command("regime-cadence")
+def regime_cadence_cmd() -> None:
+    """Typical feed update intervals per regime, from every weekend oracle study reading."""
+    from afterhours.discovery import oracle_readings
+    from afterhours.live.regime import cadence
+
+    cfg = load_config()
+    files = ["/".join(oracle_readings.ORIGINAL)]
+    studies = [oracle_readings.original(cfg)]
+    for p in sorted(oracle_readings.readings_dir(cfg).glob("reading-*.json")):
+        studies.append(json.loads(p.read_text())["study"])
+        files.append("/".join((*oracle_readings.READINGS, p.name)))
+    doc = {"sources": files, **cadence(studies, cfg.regime.cadence_step_minutes)}
+    out = cfg.path(cfg.paths.artifacts_dir) / "regime" / "cadence.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(doc, indent=2) + "\n")
+    typer.echo(
+        f"{doc['periods_read']} closed periods: {doc['regular_hours_read']} h regular session, "
+        f"{doc['extended_hours_read']} h extended hours read; wrote {out}"
+    )
+
+
+@app.command("regime-snapshot")
+def regime_snapshot_cmd() -> None:
+    """Read every Stock Token's price regime on mainnet now; write a dated artifact."""
+    from datetime import UTC, datetime
+
+    from afterhours.live.mainnet import Mainnet
+
+    _logging()
+    cfg = load_config()
+    board = Mainnet(cfg).board(wait=True)
+    doc = {
+        "network": board["network"],
+        "block": board["block"],
+        "as_of": board["as_of"],
+        **board["regimes"],
+        "tokens": [
+            {
+                "symbol": r["symbol"],
+                "feed_price": r["price"],
+                "feed_updated_at": r["updated_at"],
+                **r["regime"],
+            }
+            for r in board["stocks"]
+        ],
+    }
+    divs = [t for t in doc["tokens"] if t["divergence"] is not None]
+    doc["summary"] = {
+        "tokens": len(doc["tokens"]),
+        "with_dex_price": len(divs),
+        "median_abs_divergence": sorted(abs(t["divergence"]) for t in divs)[len(divs) // 2]
+        if divs
+        else None,
+        "beyond_divergence_trigger": sorted(
+            t["symbol"]
+            for t in divs
+            if abs(t["divergence"]) >= cfg.schedule.triggers.divergence_pct
+        ),
+        "largest_divergence": max(divs, key=lambda t: abs(t["divergence"]))["symbol"]
+        if divs
+        else None,
+    }
+    stamp = datetime.now(UTC).strftime("%Y-%m-%dT%H%MZ")
+    out = cfg.path(cfg.paths.artifacts_dir) / "regime" / f"snapshot-{stamp}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(doc, indent=2) + "\n")
+    typer.echo(f"{doc['calendar']} ({doc['segment']}): {doc['counts']}; {doc['summary']}")
+    typer.echo(f"wrote {out}")
+
+
 @app.command("market-size")
 def market_size_cmd() -> None:
     """Supplied and borrowed across Stock Token Morpho markets on mainnet, at a recent block."""

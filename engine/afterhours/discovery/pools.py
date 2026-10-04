@@ -171,6 +171,7 @@ def measure_depth(
     probes_usd: Sequence[float],
     max_slippage: float,
     block: BlockIdentifier,
+    deadline: float | None = None,
 ) -> None:
     """Fill `probes` and `depth_usd` on each pool by quoting sells of token for quote."""
     calls: list[Call] = []
@@ -189,7 +190,7 @@ def measure_depth(
                 key = (c0, c1, p.fee, p.tick_spacing, p.hooks)
                 calls.append(Call(v4_quoter, V4_QUOTE_SIG, ((key, zero_for_one, amount_in, b""),)))
             index.append((p, usd, amount_in))
-    results = call_many(w3, calls, block=block, chunk=20)
+    results = call_many(w3, calls, block=block, chunk=20, deadline=deadline)
     for (p, usd, _), res in zip(index, results, strict=True):
         if res is None:
             p.probes.append({"usd_in": usd, "usd_out": 0.0, "slippage": 1.0})

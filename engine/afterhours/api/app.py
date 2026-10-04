@@ -613,6 +613,28 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     def live_board() -> dict[str, Any]:
         return cast(dict[str, Any], _live(lambda: ctx.mainnet().board()))
 
+    def regimes_doc() -> dict[str, Any]:
+        from afterhours.live.mainnet import WarmingError
+
+        board = cast(dict[str, Any], ctx.mainnet().board())
+        rows = [r for r in board["stocks"] if r.get("regime")]
+        if not rows or "regimes" not in board:  # a board saved before the monitor existed
+            raise WarmingError("Still reading every Stock Token price feed on mainnet.")
+        return {
+            "network": board["network"],
+            "block": board["block"],
+            "as_of": board["as_of"],
+            **board["regimes"],
+            "tokens": [
+                {"symbol": r["symbol"], "feed_price": r["price"], **r["regime"]} for r in rows
+            ],
+        }
+
+    @app.get("/v1/live/regimes")
+    def live_regimes() -> dict[str, Any]:
+        """Price regime, quality score and one plain line per Stock Token (docs/REGIME.md)."""
+        return cast(dict[str, Any], _live(regimes_doc))
+
     @app.get("/v1/live/positions/{address}")
     def live_positions(address: str) -> dict[str, Any]:
         return cast(dict[str, Any], _live(lambda: ctx.mainnet().positions(address)))

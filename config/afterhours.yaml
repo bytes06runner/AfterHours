@@ -319,6 +319,34 @@ api:
   health_chain_cache_seconds: 30          # /v1/health reads the chain at most this often (cheap probes)
 
 # Live, read-only views of Robinhood Chain mainnet: the position checker, the risk board and the
+# Price regime monitor (docs/REGIME.md): which pricing regime each Stock Token is in right now,
+# and a price quality score. Read-only. Nothing here changes the evaluated strategy, its
+# settings or the bad-case forecast.
+regime:
+  # Typical update interval per feed and regime, measured from the weekend oracle study files
+  # (artifacts/regime/cadence.json, `make regime-cadence`), in steps of this many minutes.
+  cadence_step_minutes: 5
+  # A feed posting inside the weekend window counts as a weekend price source only if the post
+  # lands this long after the window opened (M1 found stragglers up to 105 s after it).
+  window_grace_seconds: 300
+  # Staleness: full marks up to the feed's typical interval for the regime, zero at this
+  # multiple of it (never below stale_floor_minutes, so a calm feed is not punished at once).
+  stale_multiple: 6
+  stale_floor_minutes: 30
+  # Divergence: DEX mid price vs the feed; zero marks at schedule.triggers.divergence_pct.
+  # Depth: USD of the token sellable within vault.max_slippage across the pools read; zero marks
+  # at or below depth_floor_usd, full marks at depth_full_usd (log scale between).
+  depth_floor_usd: 10000
+  depth_full_usd: 1000000
+  weights: { staleness: 0.4, divergence: 0.4, depth: 0.2 }
+  grades: { good: 80, fair: 50 }   # score at or above: good, fair; below fair: poor
+  # DEX reads: the deepest pools quoted in USDG (taken as 1 USD, as in M1 discovery), ranked by
+  # the depth measured at discovery. Mid price every board refresh; depth re-quoted at the probe
+  # sizes below, at most this often (quoter calls are the expensive part).
+  pools_per_token: 2
+  depth_probes_usd: [1000, 10000, 100000, 1000000]
+  depth_refresh_minutes: 30
+
 # Telegram alerts. Nothing here signs a transaction or holds funds.
 live:
   profile: rh-mainnet                  # RPC from RH_MAINNET_RPC_URL, else the chain's public RPC
