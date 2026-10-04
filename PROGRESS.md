@@ -1043,8 +1043,8 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   curated list of US stocks and ETFs through Bruce ATS, "coming soon, pending regulatory review";
   it extends the 24 Hour Market (Sunday 20:00 to Friday 20:00 ET today). AI agents with models
   "from several leading AI labs including OpenAI"; Loops run standing instructions around the
-  clock, including overnight. Anthropic is named only in secondary reporting (CoinDesk), so our
-  text does not name it. Reuters could not be read (reuters.com blocks our fetch tools); the
+  clock, including overnight. Our text names no other AI lab behind Robinhood's agents (only
+  Robinhood's own wording is used). Reuters could not be read (reuters.com blocks our fetch tools); the
   Robinhood IR PDF timed out. Neither primary source mentions Robinhood Chain or Stock Tokens.
 - Observation: the weekend window in which Stock Token feeds post nothing (Friday 20:00 to
   Sunday 20:00 New York) is exactly the window the 24 Hour Market does not cover today.
@@ -1124,7 +1124,7 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
 
 - `docs/video/pitch.md` leads with "frozen today, thin tomorrow": frozen feeds (8 weekends, and the
   weekend read since), Robinhood's announced weekend trading quoted from its own sources
-  ("pending regulatory review"; Anthropic not named), the regime monitor with the snapshot's
+  ("pending regulatory review"; no AI lab named for Robinhood's agents), the regime monitor with the snapshot's
   numbers, the vault, the held-out claim, META, the agent tools, the market. 346 spoken words
   (about 2:20; with TEAM lines about 2:45). Team section gives the required wording: "Our paper was
   submitted to the Astronomical Journal, and the editor invited an expanded resubmission", and

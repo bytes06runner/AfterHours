@@ -46,13 +46,13 @@ Not in either primary source: anything about Robinhood Chain or Stock Tokens.
 
 ## Secondary reporting (not used for claims)
 
-- CoinDesk, 2026-09-29 (Helene Braun): customers select "a model from OpenAI or Anthropic".
+- CoinDesk, 2026-09-29 (Helene Braun), on the agents and weekend trading.
   https://www.coindesk.com/markets/2026/09/29/robinhood-adds-ai-agents-perps-and-weekend-trading-in-push-to-win-active-traders
 - Yahoo Finance, Bloomberg (paywalled), Traders Magazine (reprint of source 2).
 
-Anthropic is named only in secondary reporting, so our text says "AI trading agents" or "agents
-built on models from leading AI labs, including OpenAI", and does not name Anthropic as a
-Robinhood partner.
+Which AI labs' models the agents use: Robinhood's own post names only OpenAI ("several leading AI
+labs including OpenAI"). Secondary reports go further than that; we do not repeat them. Our text
+says "AI trading agents" and names no other lab as a Robinhood partner.
 
 ## What it means for Afterhours (our reading, not Robinhood's)
 

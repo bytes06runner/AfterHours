@@ -9,7 +9,7 @@ we do not write quotes, traction or backgrounds we have not got.
 
 What Robinhood announced is quoted only from its own newsroom post and the Bruce Markets press
 release (`docs/findings/robinhood-2026-09-29.md`): weekend trading is "pending regulatory
-review", and their posts do not name Anthropic, so neither does this script.
+review", and this script names no AI lab behind Robinhood's agents.
 
 The animated version in [animation/](animation/README.md) follows the earlier cut (before the
 regime monitor and the agents); it still works as a backing track for sections 3 to 6.
