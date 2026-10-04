@@ -356,6 +356,7 @@ class ApiConfig(_Strict):
     sse_heartbeat_seconds: Annotated[float, Field(gt=0)]
     almanac_max_days: PositiveInt
     reasons_page_size: PositiveInt
+    health_chain_cache_seconds: PositiveInt
 
 
 class DiscoverySources(_Strict):
@@ -417,6 +418,8 @@ class LiveConfig(_Strict):
     rpc_timeout_seconds: PositiveInt
     rpc_retries: PositiveInt
     logs_from_public_rpc: bool
+    refresh_nice: Annotated[int, Field(ge=0, le=19)]
+    board_snapshot_minutes: PositiveInt
 
 
 class FundingConfig(_Strict):

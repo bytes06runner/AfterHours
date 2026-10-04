@@ -316,6 +316,7 @@ api:
   sse_heartbeat_seconds: 15
   almanac_max_days: 60
   reasons_page_size: 20
+  health_chain_cache_seconds: 30          # /v1/health reads the chain at most this often (cheap probes)
 
 # Live, read-only views of Robinhood Chain mainnet: the position checker, the risk board and the
 # Telegram alerts. Nothing here signs a transaction or holds funds.
@@ -340,6 +341,11 @@ live:
   # tier answers eth_getLogs only over a 10-block range (its error message, 2026-09-27), while
   # these scans cover millions of blocks. Reads still use RH_MAINNET_RPC_URL when it is set.
   logs_from_public_rpc: true
+  # Render free gives a fraction of a CPU: board refreshes run at this niceness (Linux, per
+  # thread) so requests and health checks stay quick. The last board is saved to the shared store
+  # at most this often, and a restarted API shows it while it reads a fresh one.
+  refresh_nice: 10
+  board_snapshot_minutes: 10
 
 # Telegram alerts (core.telegram.org/bots/api: https://api.telegram.org/bot<token>/METHOD_NAME).
 # Testnet gas, all sent by the deployer, so only the deployer needs faucet ETH. Measured on an

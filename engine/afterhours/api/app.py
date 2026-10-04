@@ -42,6 +42,32 @@ from afterhours.state import Store
 
 log = logging.getLogger(__name__)
 
+# Shared-store key for the last risk board, so a restarted process can show it at once.
+BOARD_SNAPSHOT = "live_board"
+
+
+def process_info(started: float) -> dict[str, Any]:
+    """Uptime and memory for /v1/health: a restart shows as a small uptime, memory near the
+    host's limit shows before it is hit (Render free has 512 MB)."""
+    import resource
+    import sys
+
+    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    peak_mb = peak / 2**20 if sys.platform == "darwin" else peak / 2**10  # bytes vs KiB
+    rss_mb: float | None = None
+    try:
+        for line in Path("/proc/self/status").read_text().splitlines():
+            if line.startswith("VmRSS:"):
+                rss_mb = int(line.split()[1]) / 2**10
+    except OSError:
+        pass  # not Linux
+    return {
+        "uptime_seconds": round(time.time() - started),
+        "rss_mb": None if rss_mb is None else round(rss_mb),
+        "peak_rss_mb": round(peak_mb),
+        "threads": threading.active_count(),
+    }
+
 
 class Shock(BaseModel):
     """Body of POST /v1/sim/shock."""
@@ -66,15 +92,56 @@ class Context:
         self._w3: Web3 | None = None
         self._verified: dict[str, dict[str, Any]] = {}
         self._mainnet: Any = None
+        self._mainnet_lock = threading.Lock()
         self._examples: tuple[float, list[str]] | None = None
+        self._chain: tuple[float, dict[str, Any]] | None = None
+        self.started = time.time()
 
     def mainnet(self) -> Any:
-        """The read-only mainnet client for the live views (created on first use)."""
-        if self._mainnet is None:
-            from afterhours.live.mainnet import Mainnet
+        """The read-only mainnet client for the live views (created once, on first use).
 
-            self._mainnet = Mainnet(self.cfg)
+        Locked: a burst of visitors on a fresh process must not build one client each, since
+        each would start its own full board refresh (that ran a small host out of memory).
+        The client starts from the last board saved in the shared store, so a restarted process
+        shows it (with its own read time) instead of "still reading".
+        """
+        if self._mainnet is None:
+            with self._mainnet_lock:
+                if self._mainnet is None:
+                    from afterhours.live.mainnet import Mainnet
+
+                    m = Mainnet(self.cfg)
+                    m.restore_board(self.store.read(BOARD_SNAPSHOT))
+                    m.on_board = self._save_board
+                    self._mainnet = m
         return self._mainnet
+
+    def _save_board(self, doc: dict[str, Any]) -> None:
+        saved = self.store.read(BOARD_SNAPSHOT)
+        every = self.cfg.live.board_snapshot_minutes * 60
+        if saved and time.time() - float(saved.get("saved_at", 0)) < every:
+            return
+        try:
+            self.store.write(BOARD_SNAPSHOT, {"saved_at": time.time(), "board": doc})
+        except Exception as exc:  # the shared store is a convenience; the board still serves
+            log.warning("saving the board snapshot failed: %s", exc)
+
+    def chain_health(self) -> dict[str, Any]:
+        """Chain id and head for /v1/health, cached so health checks stay cheap and fast."""
+        cached = self._chain
+        if cached and time.time() - cached[0] < self.cfg.api.health_chain_cache_seconds:
+            return cached[1]
+        try:
+            w3 = self.w3()
+            info: dict[str, Any] = {
+                "reachable": True,
+                "chain_id": int(w3.eth.chain_id),
+                "block": int(w3.eth.block_number),
+            }
+        except Exception:
+            info = {"reachable": False}
+        self._chain = (time.time(), info)
+        return info
 
     @property
     def deployment(self) -> dict[str, Any]:
@@ -180,19 +247,12 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
             "profile": cfg.active_profile,
             "clock": "chain" if ctx.chain_clock else "wall",
         }
-        try:
-            w3 = ctx.w3()
-            chain |= {
-                "reachable": True,
-                "chain_id": int(w3.eth.chain_id),
-                "block": int(w3.eth.block_number),
-            }
-        except Exception:
-            chain |= {"reachable": False}
+        chain |= ctx.chain_health()
         plan = ctx.store.read("plan")
         prod = ctx.risk.production
         return {
             "service": "ok",
+            "process": process_info(ctx.started),
             "chain": chain,
             "model": {"shipped": prod["shipped"], "model_version": prod["model_version"]},
             "scheduler": {

@@ -17,11 +17,17 @@ Sources for every call (read 2026-09-27):
 
 from __future__ import annotations
 
+import contextlib
+import ctypes
+import gc
 import json
 import logging
 import math
+import os
+import sys
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -104,6 +110,26 @@ def feed_status(cfg: AfterhoursConfig, now: datetime, updated_at: datetime) -> d
     }
 
 
+def lower_thread_priority(nice: int) -> None:
+    """Run this thread at a lower CPU priority (Linux sets niceness per thread).
+
+    On a host with a fraction of a CPU, a board refresh then cannot starve request handling
+    and health checks. Elsewhere, or without permission, nothing changes.
+    """
+    if nice <= 0 or not sys.platform.startswith("linux"):
+        return
+    with contextlib.suppress(OSError):
+        os.setpriority(os.PRIO_PROCESS, threading.get_native_id(), nice)
+
+
+def release_free_memory() -> None:
+    """Hand freed heap back to the OS after a large read (glibc keeps it otherwise)."""
+    gc.collect()
+    if sys.platform.startswith("linux"):
+        with contextlib.suppress(OSError, AttributeError):
+            ctypes.CDLL("libc.so.6").malloc_trim(0)
+
+
 class WarmingError(RuntimeError):
     """The first risk board is still being read; the API answers "still reading"."""
 
@@ -140,6 +166,7 @@ class Mainnet:
         self._lock = threading.Lock()
         self._board_lock = threading.Lock()
         self._board: tuple[float, dict[str, Any]] | None = None
+        self.on_board: Callable[[dict[str, Any]], None] | None = None  # e.g. save a snapshot
         self._decimals: dict[str, int] = {}
         self._symbols: dict[str, str | None] = {}
         self.store = cfg.path(cfg.paths.state_dir) / "live-markets.json"
@@ -261,13 +288,23 @@ class Mainnet:
             return cached[1]
         raise WarmingError("Still reading every Stock Token price feed on mainnet.")
 
+    def restore_board(self, snapshot: dict[str, Any] | None) -> None:
+        """Start from a saved board (`{"board": ..., "saved_at": ...}`), treated as stale.
+
+        Visitors see it, with its own block and read time, while the first refresh runs.
+        """
+        if self._board is None and snapshot and isinstance(snapshot.get("board"), dict):
+            self._board = (0.0, snapshot["board"])
+
     def _refresh_in_background(self, now: datetime | None) -> None:
+        lower_thread_priority(self.cfg.live.refresh_nice)
         try:
             self._refresh_board(now)
         except Exception as exc:  # the last board stays; the next request tries again
             log.warning("board refresh failed: %s", exc)
         finally:
             self._board_lock.release()
+            release_free_memory()
 
     def _refresh_board(self, now: datetime | None) -> dict[str, Any]:
         cached = self._board
@@ -275,6 +312,8 @@ class Mainnet:
             return cached[1]
         doc = self._board_now(now or datetime.now(UTC))
         self._board = (time.time(), doc)
+        if self.on_board:
+            self.on_board(doc)
         return doc
 
     def _board_now(self, now: datetime) -> dict[str, Any]:

@@ -132,6 +132,11 @@
           "title": "Cors Origins Env",
           "type": "string"
         },
+        "health_chain_cache_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Health Chain Cache Seconds",
+          "type": "integer"
+        },
         "host_env": {
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Host Env",
@@ -184,7 +189,8 @@
         "sse_poll_seconds",
         "sse_heartbeat_seconds",
         "almanac_max_days",
-        "reasons_page_size"
+        "reasons_page_size",
+        "health_chain_cache_seconds"
       ],
       "title": "ApiConfig",
       "type": "object"
@@ -1024,6 +1030,11 @@
           "title": "Board Cache Seconds",
           "type": "integer"
         },
+        "board_snapshot_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Board Snapshot Minutes",
+          "type": "integer"
+        },
         "discovery_profile": {
           "title": "Discovery Profile",
           "type": "string"
@@ -1064,6 +1075,12 @@
           "title": "Refresh Budget Seconds",
           "type": "integer"
         },
+        "refresh_nice": {
+          "maximum": 19,
+          "minimum": 0,
+          "title": "Refresh Nice",
+          "type": "integer"
+        },
         "rpc_retries": {
           "exclusiveMinimum": 0,
           "title": "Rpc Retries",
@@ -1092,7 +1109,9 @@
         "refresh_budget_seconds",
         "rpc_timeout_seconds",
         "rpc_retries",
-        "logs_from_public_rpc"
+        "logs_from_public_rpc",
+        "refresh_nice",
+        "board_snapshot_minutes"
       ],
       "title": "LiveConfig",
       "type": "object"

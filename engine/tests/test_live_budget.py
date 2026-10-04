@@ -114,3 +114,88 @@ def test_rate_limited_calls_in_a_batch_are_retried(monkeypatch: pytest.MonkeyPat
     monkeypatch.setattr(rpc, "_post_with_backoff", lambda *a, **k: next(replies))
     w3 = connect("http://node.invalid")
     assert call_many(w3, [Call("0x" + "11" * 20, "decimals()(uint8)")]) == [6]
+
+
+# ---------------------------------------------------------------- a burst on a fresh process
+def test_a_burst_on_a_fresh_process_builds_one_client(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Production 2026-10-04: 30 visitors during the warm-up each built a client, each started a
+    # full board refresh, and the 512 MB host restarted. One client, one refresh.
+    from afterhours.api import app as api
+    from afterhours.live import mainnet
+
+    built: list[int] = []
+
+    class SlowMainnet:
+        def __init__(self, cfg: Any) -> None:
+            built.append(1)
+            time.sleep(0.2)  # discovery files, RPC handles
+            self.on_board = None
+
+        def restore_board(self, snapshot: Any) -> None:
+            pass
+
+    monkeypatch.setattr(mainnet, "Mainnet", SlowMainnet)
+    ctx = api.Context(load_config(load_env_file=False))
+    got: list[Any] = []
+    threads = [threading.Thread(target=lambda: got.append(ctx.mainnet())) for _ in range(30)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert built == [1]
+    assert len({id(m) for m in got}) == 1
+
+
+def test_a_restarted_process_shows_the_saved_board_at_once(
+    board_env: tuple[Mainnet, threading.Event, list[int]],
+) -> None:
+    live, release, calls = board_env
+    saved = {"network": "Robinhood Chain", "block": 7, "as_of": "earlier", "stocks": []}
+    live.restore_board({"saved_at": 0, "board": saved})
+    start = time.monotonic()
+    assert live.board() == saved  # no "still reading" after a restart
+    assert time.monotonic() - start < 1
+    release.set()
+    for _ in range(50):
+        if calls and live._board and live._board[0] > 0:
+            break
+        time.sleep(0.05)
+    assert calls == [1]  # and it reads a fresh one in the background
+
+
+def test_a_fresh_board_is_saved_for_the_next_process(
+    board_env: tuple[Mainnet, threading.Event, list[int]],
+) -> None:
+    live, release, _calls = board_env
+    saved: list[dict[str, Any]] = []
+    live.on_board = saved.append
+    release.set()
+    live.board(wait=True)
+    assert saved == [{"stocks": [], "n": 1}]
+
+
+def test_health_is_cheap_and_reports_the_process(monkeypatch: pytest.MonkeyPatch) -> None:
+    from fastapi.testclient import TestClient
+
+    from afterhours.api import app as api
+
+    reads: list[int] = []
+
+    class FakeEth:
+        @property
+        def chain_id(self) -> int:
+            reads.append(1)
+            return 46630
+
+        block_number = 1
+
+    class FakeW3:
+        eth = FakeEth()
+
+    monkeypatch.setattr(api.Context, "w3", lambda self: FakeW3())
+    client = TestClient(api.create_app(load_config(load_env_file=False)))
+    for _ in range(5):  # a host's health checks, seconds apart
+        body = client.get("/v1/health").json()
+    assert reads == [1]  # the chain was read once, not five times
+    assert body["process"]["uptime_seconds"] >= 0
+    assert body["process"]["peak_rss_mb"] > 0
