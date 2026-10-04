@@ -1119,3 +1119,35 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
 - Tests: `make test-py` 128 passed (engine and agents), web 25, E2E `agents.spec.ts` and
   `pages.spec.ts` 16 passed; `make lint` clean.
 - Stretch (x402 on testnet) not started: Priority 4 comes first.
+
+### 2026-10-04 Priority 4: story and submission
+
+- `docs/video/pitch.md` leads with "frozen today, thin tomorrow": frozen feeds (8 weekends, and the
+  weekend read since), Robinhood's announced weekend trading quoted from its own sources
+  ("pending regulatory review"; Anthropic not named), the regime monitor with the snapshot's
+  numbers, the vault, the held-out claim, META, the agent tools, the market. 346 spoken words
+  (about 2:20; with TEAM lines about 2:45). Team section gives the required wording: "Our paper was
+  submitted to the Astronomical Journal, and the editor invited an expanded resubmission", and
+  says never to call it "under review".
+- `docs/video/demo.md`: new shots for the regime monitor (landing panel, risk board column, Poor
+  price quality) and an AI agent (Claude Desktop calling `get_weekend_risk`, then the Agents
+  page); 10 shots, under 3:00; the old Preview the close shot cut.
+- Demo-record helper: `docs/video/screen-demo/scenes.mjs` gains `regimes` and `agents` (both
+  recorded against the live site); the rendered screen demo gains both chapters (2:59, replay
+  shot dropped, old risk board shot replaced). Cue sheet updated; Desktop copies refreshed.
+- README: new opening section "Frozen today, thin tomorrow", the regime monitor and its
+  snapshot, "For AI agents" (tools, REST, Claude Desktop config), Agents page, regime and agent
+  limitations, architecture with the agent routes and the MCP server.
+- Report card: "Weekend feeds, reading by reading" from `/v1/report-card` `oracle_readings`.
+  Screenshots `artifacts/screens/report-card/feeds-*`. The landing's story now has the "Frozen
+  today, thin tomorrow" panel (Priority 2).
+- `numbers.json` gains the oracle readings and the regime snapshot (`oracle_readings.*`,
+  `regime.*`); `make lint-numbers` clean on README, pitch, demo and the cue sheet.
+- Builder updates: `updates/2026-10-04-price-regime-monitor.md`,
+  `updates/2026-10-04-afterhours-for-agents.md`.
+- A process slip, fixed: one commit (`4f4377f`) went in with a failing test because the test
+  output was piped into `tail`; the test (rate limit refilling on a slow run) is now
+  deterministic (`c1bf007`) and checks run with pipefail. `make test-py` 128 passed.
+- Next: the Oct 2 to 5 weekend reading after Monday 13:30 UTC (`make oracle-reading`, then
+  `make regime-cadence` and `afterhours numbers`); optional stretch x402 on testnet; the
+  2026-10-10 pre-submission audit.
