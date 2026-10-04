@@ -204,6 +204,29 @@ def test_workflow_gets_only_hosted_secrets() -> None:
     assert by_step["Telegram pre-close alerts"] == {"TELEGRAM_BOT_TOKEN"}
 
 
+def test_workflow_skips_without_configuration() -> None:
+    (job,) = workflow()["jobs"].values()
+    steps = job["steps"]
+    assert steps[0]["id"] == "config"  # before checkout, so nothing can fail first
+    for name in ("AFTERHOURS_ACTIVE_PROFILE", "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"):
+        assert name in steps[0]["run"]
+    for step in steps[1:]:
+        gate = step.get("if", "")
+        assert "steps.config.outputs.ready" in gate or "steps.window" in gate
+    by_name = {s.get("name", ""): s for s in steps}
+    for name in ("Bot pre-close cycle", "Telegram pre-close alerts"):
+        assert "::notice" in by_name[name]["run"]
+        assert "exit 0" in by_name[name]["run"]
+
+
+def test_workflow_actions_use_published_tags() -> None:
+    # setup-uv publishes no moving major tag after v7; "@v10" failed every run from 2026-09-28.
+    uses = [s["uses"] for s in workflow()["jobs"]["pre-close"]["steps"] if "uses" in s]
+    setup_uv = [u for u in uses if u.startswith("astral-sh/setup-uv@")]
+    assert setup_uv
+    assert all(re.fullmatch(r"astral-sh/setup-uv@v\d+\.\d+\.\d+", u) for u in setup_uv)
+
+
 def test_workflow_env_names_match_config(cfg: AfterhoursConfig) -> None:
     env = set(workflow()["jobs"]["pre-close"]["env"])
     assert {cfg.state.kv_url_env, cfg.state.kv_token_env} <= env
