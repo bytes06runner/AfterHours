@@ -2,6 +2,16 @@
 
 ## BLOCKED
 
+0. **GitHub Actions configuration for the pre-close jobs (2026-10-04).** The workflow now runs
+   and skips with a notice for anything missing. In the repository's Settings > Secrets and
+   variables > Actions, please make sure these exist:
+   - variable `AFTERHOURS_ACTIVE_PROFILE` = `rh-testnet`
+   - secrets `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (bot history, subscriptions)
+   - secret `ALLOCATOR_PK` (the bot cycle; testnet key only)
+   - secret `TELEGRAM_BOT_TOKEN` (pre-close alerts)
+   - optional secrets `RH_MAINNET_RPC_URL`, `RH_TESTNET_RPC_URL`, `ARB_SEPOLIA_RPC_URL`
+   Then Actions > Pre-close jobs > Run workflow once (or wait for Monday's scheduled run).
+
 1. **Archive RPC for Robinhood Chain mainnet (needed for the fork).** The public RPC
    (`rpc.mainnet.chain.robinhood.com`) serves state for only about the last 1,000 blocks
    (under 16 minutes; `cast code ... --block head-10000` fails with "historical state ... is not
@@ -55,10 +65,14 @@
    only in production builds and only from `web.analytics.script_src`; nothing is shown to
    visitors.
 
-## FEATURE FREEZE (2026-09-27)
+## FEATURE FREEZE (2026-09-27), lifted for the final brief (2026-10-04)
 
-From now on only bug fixes, hosting configuration and documentation changes. No new features,
-pages, endpoints, strategies, settings or backtests. Analysis stays frozen as before.
+The team's final brief (2026-10-04) reopens features for exactly this list, in order:
+production health; the Robinhood 2026-09-29 news and new oracle study readings; a price regime
+monitor; read-only weekend risk for AI agents (MCP server, versioned REST); story and submission.
+Feature cutoff 2026-10-09 23:59 IST, then only fixes, docs and recording support. Still frozen:
+the evaluated strategy, its settings, backtests and their numbers. No mainnet deployment, no
+user funds, no agent that can sign or send a transaction.
 
 ## Milestones
 
@@ -991,3 +1005,53 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
   live, and read every line of the code on GitHub."); the team can edit them.
 - Loudness: renders are normalised to -16 LUFS, true peak -1.5 dB (measured -16.6 LUFS, -1.47
   dB); checked that speech windows are louder than the old render and quiet windows ducked.
+
+### 2026-10-04 Final brief, priority 0: production health
+
+- Pre-close workflow failed at "Set up job" on every run since 2026-09-28, in about 2 s. Run
+  annotations (GitHub API, public): "Unable to resolve action `astral-sh/setup-uv@v10`".
+  setup-uv publishes no moving major tag after v7 (tags checked: v10.0.0 to v10.2.0 only).
+  Pinned `astral-sh/setup-uv@v10.2.0`. Missing configuration now skips with a notice naming the
+  secret or variable (checked before checkout); ALLOCATOR_PK and TELEGRAM_BOT_TOKEN still reach
+  only their own step, each of which skips with a notice when its key is unset. Tests:
+  `test_workflow_skips_without_configuration`, `test_workflow_actions_use_published_tags`.
+  The next scheduled run is Monday (cron `23 * * * 1-5`); `gh` is not installed here, so it was
+  not dispatched by hand.
+- Live risk board under load: 30 parallel requests, twice, against production. Before: 30 x 503,
+  then 16 timeouts at 90 s, then 502 while Render restarted the instance. Cause: the mainnet
+  client was created lazily without a lock, so visitors arriving during the warm-up (minutes of
+  price fetching on a fraction of a CPU) each built a client and each started a full board
+  refresh. Fix: one client under a lock (`test_a_burst_on_a_fresh_process_builds_one_client`).
+- Also: the last board is saved to the shared store at most every 10 minutes
+  (`live.board_snapshot_minutes`) and a restarted process serves it at once while it reads a
+  fresh one; refresh threads run at niceness 10 (`live.refresh_nice`, Linux) and return freed
+  heap; `/v1/health` reads the chain at most every 30 s (`api.health_chain_cache_seconds`) and
+  reports uptime, RSS, peak RSS and threads. serve.sh runs the installed entry point (no
+  resident `uv` parent), caps glibc arenas, and runs numeric libraries on one thread.
+- After (production, d6a7e63): a fresh deploy answered the board 200 at 42 s uptime (saved
+  board); 2 x 30 parallel requests all 200, p50 0.6 to 1.1 s, max 1.3 s; RSS 472 to 474 MB, peak
+  473 MB (was 507 MB under the same load, limit 512). No restart during the test (uptime kept
+  rising). Health, status, config, vault, reasons, report card all 200; site 200.
+- Memory is the constraint for everything that follows: about 40 MB of headroom. Same warm-up on
+  this Mac: 295 MB.
+- Checks: `make test-py` 97 passed, web 25 passed, `make lint` clean.
+
+### 2026-10-04 Priority 1: the Robinhood news, and new oracle study readings
+
+- `docs/findings/robinhood-2026-09-29.md`. Primary sources: Robinhood's newsroom post (2026-09-29)
+  and the Bruce Markets press release (PR Newswire, 2026-09-30). Supported: weekend trading of a
+  curated list of US stocks and ETFs through Bruce ATS, "coming soon, pending regulatory review";
+  it extends the 24 Hour Market (Sunday 20:00 to Friday 20:00 ET today). AI agents with models
+  "from several leading AI labs including OpenAI"; Loops run standing instructions around the
+  clock, including overnight. Anthropic is named only in secondary reporting (CoinDesk), so our
+  text does not name it. Reuters could not be read (reuters.com blocks our fetch tools); the
+  Robinhood IR PDF timed out. Neither primary source mentions Robinhood Chain or Stock Tokens.
+- Observation: the weekend window in which Stock Token feeds post nothing (Friday 20:00 to
+  Sunday 20:00 New York) is exactly the window the 24 Hour Market does not cover today.
+- `make oracle-reading`: a dated reading of the same study for closed periods after everything
+  read before, written to `artifacts/discovery/oracle_readings/reading-<date>.json` plus
+  `index.json`; the M1 file is never rewritten. Reading 2026-10-04 (weekend from 2026-09-25 20:00
+  UTC, head 79.8M): 34 of 35 feeds posted nothing inside the window; SGOV posted once, 87 s after
+  it opened (the M1 pattern: stragglers within 105 s). No Stock Token feed updates on weekends.
+- Next reading: after the 2026-10-02 to 10-05 weekend ends (Monday 2026-10-05 13:30 UTC).
+
