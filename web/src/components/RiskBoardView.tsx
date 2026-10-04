@@ -12,6 +12,7 @@ import { useLiveBoard } from "@/lib/queries";
 import { formatPct } from "@/lib/time";
 
 import { LiveLabel } from "./LiveLabel";
+import { RegimeBadge } from "./RegimeBadge";
 import { ZonedTime } from "./ZonedTime";
 
 type Row = LiveBoard["stocks"][number];
@@ -51,6 +52,22 @@ function FeedState({ r }: { r: Row }) {
       <span className="text-[14px]">
         Last update {ago(s.age_seconds)}: <ZonedTime iso={r.updated_at} />
       </span>
+    </span>
+  );
+}
+
+/** Regime, price quality and the plain line; the older feed state if the API has no regime. */
+function PriceCell({ r }: { r: Row }) {
+  if (!r.regime) return <FeedState r={r} />;
+  return (
+    <span className="flex flex-col gap-1">
+      <RegimeBadge r={r.regime} />
+      <span className="max-w-[48ch] text-[14px]">{r.regime.line}</span>
+      {r.updated_at && (
+        <span className="text-[14px]">
+          Last feed update <ZonedTime iso={r.updated_at} />
+        </span>
+      )}
     </span>
   );
 }
@@ -96,17 +113,25 @@ function Markets({ r }: { r: Row }) {
 
 export function RiskBoardView() {
   const q = useLiveBoard();
-  const [filter, setFilter] = useState<"all" | "breach" | "frozen">("all");
+  const [filter, setFilter] = useState<"all" | "breach" | "frozen" | "poor">("all");
   const rows = useMemo(() => {
     const all = [...(q.data?.stocks ?? [])].sort(
       (a, b) => (b.tonight?.bad_case_drop ?? -1) - (a.tonight?.bad_case_drop ?? -1),
     );
     if (filter === "breach") return all.filter((r) => r.breached.length > 0);
-    if (filter === "frozen") return all.filter((r) => r.status?.state === "frozen");
+    if (filter === "frozen")
+      return all.filter((r) =>
+        r.regime ? r.regime.regime === "frozen" : r.status?.state === "frozen",
+      );
+    if (filter === "poor") return all.filter((r) => r.regime?.quality.grade === "poor");
     return all;
   }, [q.data, filter]);
   const d = q.data;
-  const frozen = d?.stocks.filter((r) => r.status?.state === "frozen").length ?? 0;
+  const frozen =
+    d?.stocks.filter((r) =>
+      r.regime ? r.regime.regime === "frozen" : r.status?.state === "frozen",
+    ).length ?? 0;
+  const counts = d?.regimes?.counts;
   const alpha = d?.stocks.find((r) => r.tonight)?.tonight?.alpha;
   const oneIn = alpha ? Math.round(1 / alpha) : null;
   return (
@@ -123,7 +148,11 @@ export function RiskBoardView() {
       </p>
       {d && (
         <p className="mt-2 text-[16px] font-semibold">
-          {frozen} of {d.stocks.length} feeds are frozen now. Read at <ZonedTime iso={d.as_of} />.
+          {frozen} of {d.stocks.length} feeds are frozen now
+          {counts
+            ? `; ${counts.weekend_venue ?? 0} on a weekend price, ${counts.extended ?? 0} in extended hours, ${counts.regular ?? 0} in the regular session`
+            : ""}
+          . Read at <ZonedTime iso={d.as_of} />.
         </p>
       )}
       <div role="group" aria-label="Filter" className="mt-6 flex flex-wrap gap-2">
@@ -132,6 +161,7 @@ export function RiskBoardView() {
             ["all", "All stocks"],
             ["breach", "Beyond a cushion tonight"],
             ["frozen", "Frozen now"],
+            ["poor", "Poor price quality"],
           ] as const
         ).map(([k, label]) => (
           <button
@@ -157,14 +187,14 @@ export function RiskBoardView() {
       )}
       {d && (
         <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[760px] border-collapse text-left">
+          <table className="w-full min-w-[960px] border-collapse text-left">
             <caption className="sr-only">Stock Token feeds and tonight&apos;s bad case</caption>
             <thead>
               <tr className="text-[14px]">
                 {[
                   "Stock",
                   "Price (USD)",
-                  "Price feed",
+                  "Price regime",
                   "Tonight's bad case",
                   "Lending markets",
                 ].map((h) => (
@@ -186,7 +216,7 @@ export function RiskBoardView() {
                       : "n/a"}
                   </td>
                   <td className="border-b-[1.25px] border-rule py-3 pr-4">
-                    <FeedState r={r} />
+                    <PriceCell r={r} />
                   </td>
                   <td className="border-b-[1.25px] border-rule py-3 pr-4">
                     <Tonight r={r} />
@@ -202,10 +232,13 @@ export function RiskBoardView() {
         </div>
       )}
       <p className="mt-6 max-w-[70ch] text-[14px]">
-        Frozen: inside the weekend window (Friday 20:00 to Sunday 20:00 New York) in which, over the
-        8 weekends we measured, these feeds posted nothing. Forecasts are the shipped model&apos;s
-        1-in-100 bad case for the closed period now in progress or the next one. Not financial
-        advice.
+        Price regimes: regular session, extended hours (the feeds keep posting), weekend price (the
+        exchange is shut but the feed is posting, so it follows a weekend source, which can be thin)
+        and frozen (shut, and the feed has posted nothing since). Price quality, 0 to 100, weighs
+        how stale the feed is for its usual pace, how far the DEX price has drifted from it, and how
+        much can be sold within 2%; the formula is in docs/REGIME.md. Forecasts are the shipped
+        model&apos;s 1-in-100 bad case for the closed period now in progress or the next one, not
+        adjusted for the regime. Not financial advice.
       </p>
     </div>
   );

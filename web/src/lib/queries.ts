@@ -34,6 +34,13 @@ export const useAlmanac = (days: number) =>
 export const useLiveBoard = () =>
   // More retries: right after the API starts, the first board can take a minute to read.
   useQuery({ queryKey: ["live-board"], queryFn: api.liveBoard, refetchInterval: MINUTE, retry: 6 });
+export const useLiveRegimes = () =>
+  useQuery({
+    queryKey: ["live-regimes"],
+    queryFn: api.liveRegimes,
+    refetchInterval: MINUTE,
+    retry: 6,
+  });
 export const useLiveExamples = () =>
   useQuery({ queryKey: ["live-examples"], queryFn: api.liveExamples, staleTime: 10 * MINUTE });
 export const useLivePositions = (address: string | null) =>

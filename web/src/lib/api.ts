@@ -529,10 +529,45 @@ const LiveForecast = z.object({
   bad_case_drop: z.number(),
   alpha: z.number(),
 });
+/** Price regime of one Stock Token (docs/REGIME.md). */
+export const LiveRegime = z.object({
+  regime: z.enum(["regular", "extended", "weekend_venue", "frozen"]),
+  label: z.string(),
+  since: z.string().nullable(),
+  feed_age_seconds: z.number().nullable(),
+  typical_interval_minutes: z.number().nullable(),
+  dex_price: z.number().nullable(),
+  divergence: z.number().nullable(),
+  depth_usd: z.number().nullable(),
+  quality: z.object({
+    score: z.number().nullable(),
+    grade: z.enum(["good", "fair", "poor"]).nullable(),
+    marks: z.record(z.string(), z.number().nullable()),
+    used: z.array(z.string()),
+  }),
+  line: z.string(),
+});
+export type LiveRegimeT = z.infer<typeof LiveRegime>;
+const RegimeSummary = z.object({
+  calendar: z.string(),
+  segment: z.string(),
+  closed_since: z.string().nullable(),
+  counts: z.record(z.string(), z.number()),
+  method: z.string(),
+});
+export const LiveRegimesSchema = RegimeSummary.extend({
+  network: z.string(),
+  block: z.number(),
+  as_of: z.string(),
+  tokens: z.array(LiveRegime.extend({ symbol: z.string(), feed_price: z.number().nullable() })),
+});
+export type LiveRegimes = z.infer<typeof LiveRegimesSchema>;
+
 export const LiveBoardSchema = z.object({
   network: z.string(),
   block: z.number(),
   as_of: z.string(),
+  regimes: RegimeSummary.nullish(),
   stocks: z.array(
     z.object({
       symbol: z.string(),
@@ -550,6 +585,7 @@ export const LiveBoardSchema = z.object({
       tonight: LiveForecast.nullable(),
       markets: z.array(z.object({ lltv: z.number(), cushion: z.number() })),
       breached: z.array(z.number()),
+      regime: LiveRegime.nullish(),
     }),
   ),
 });
@@ -601,6 +637,7 @@ export const api = {
   scenarios: () => get("/v1/replay/scenarios", ScenariosSchema),
   replay: (id: string) => get(`/v1/replay/${encodeURIComponent(id)}`, ReplaySchema),
   liveBoard: () => get("/v1/live/board", LiveBoardSchema),
+  liveRegimes: () => get("/v1/live/regimes", LiveRegimesSchema),
   livePositions: (address: string) =>
     get(`/v1/live/positions/${encodeURIComponent(address)}`, LivePositionsSchema),
   liveExamples: () => get("/v1/live/examples", z.object({ addresses: z.array(z.string()) })),
