@@ -121,6 +121,50 @@ def build(cfg: AfterhoursConfig) -> dict[str, Any]:
         secs, f"{secs:.0f}" if secs is not None else "none", src
     )
 
+    # Dated readings of the same study since M1 (artifacts/discovery/oracle_readings/).
+    idx_path = art / "discovery" / "oracle_readings" / "index.json"
+    if idx_path.exists():
+        src = "artifacts/discovery/oracle_readings/index.json"
+        idx = json.loads(idx_path.read_text())
+        latest = idx["latest"]
+        n["oracle_readings.weekends_read"] = _entry(
+            idx["weekends_read"], str(idx["weekends_read"]), src
+        )
+        n["oracle_readings.latest.weekends"] = _entry(
+            latest["weekends"], str(latest["weekends"]), src
+        )
+        n["oracle_readings.latest.first_weekend_close"] = _entry(
+            latest["first_weekend_close"], latest["first_weekend_close"][:10], src
+        )
+        n["oracle_readings.latest.feeds_without_update"] = _entry(
+            latest["feeds_without_update"], str(latest["feeds_without_update"]), src
+        )
+        n["oracle_readings.latest.feeds_with_update"] = _entry(
+            latest["feeds_with_update"], ", ".join(latest["feeds_with_update"]) or "none", src
+        )
+
+    # The latest price regime snapshot (artifacts/regime/snapshot-*.json, make regime-snapshot).
+    snaps = sorted((art / "regime").glob("snapshot-*.json"))
+    if snaps:
+        src = f"artifacts/regime/{snaps[-1].name}"
+        snap = json.loads(snaps[-1].read_text())
+        sm = snap["summary"]
+        n["regime.as_of"] = _entry(snap["as_of"], snap["as_of"][:10], src)
+        n["regime.block"] = _entry(snap["block"], count(snap["block"]), src)
+        n["regime.tokens"] = _entry(sm["tokens"], str(sm["tokens"]), src)
+        for k in ("frozen", "weekend_venue", "extended", "regular"):
+            n[f"regime.counts.{k}"] = _entry(snap["counts"][k], str(snap["counts"][k]), src)
+        n["regime.with_dex_price"] = _entry(sm["with_dex_price"], str(sm["with_dex_price"]), src)
+        med = sm["median_abs_divergence"]
+        n["regime.median_abs_divergence"] = _entry(med, f"{med:.2%}", src)
+        n["regime.beyond_divergence_trigger"] = _entry(
+            sm["beyond_divergence_trigger"], ", ".join(sm["beyond_divergence_trigger"]), src
+        )
+        by = {t["symbol"]: t for t in snap["tokens"]}
+        for sym in sm["beyond_divergence_trigger"]:
+            d = by[sym]["divergence"]
+            n[f"regime.divergence.{sym}"] = _entry(d, f"{abs(d):.1%}", src)
+
     src = "artifacts/model/report_card.json"
     acc = card["acceptance"]
     perf = card["shipped_performance"]

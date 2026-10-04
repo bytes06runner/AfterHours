@@ -259,6 +259,74 @@ const SCENES = {
   },
 };
 
+// ------------------------------------------------------------------ added for the final brief
+Object.assign(SCENES, {
+  async regimes() {
+    const s = await Session.open();
+    await s.goto(`${LIVE}/`);
+    const panel = s.page.getByTestId("regimes-now");
+    await panel.getByRole("list", { name: "Stock Tokens by price regime" }).waitFor({ timeout: 120_000 });
+    await s.start("10-regimes", { top: false });
+    const heading = s.page.getByRole("heading", { name: "Frozen today, thin tomorrow" });
+    await s.hover(heading, 600);
+    const { y: hy } = await s.centerOf(heading);
+    s.focus(520, hy + 40, 1.45, 2.6); // the heading and the Robinhood line
+    await s.wait(2800);
+    const tiles = panel.getByRole("list", { name: "Stock Tokens by price regime" });
+    const { x, y } = await s.hover(tiles, 400);
+    s.focus(x, y, 1.35, 2.6); // the four regime counts
+    await s.wait(2800);
+    const weakest = panel.getByRole("heading", { name: "Least trustworthy prices right now" });
+    await s.hover(weakest, 300);
+    await s.scroll(260, 1200);
+    const first = panel.locator("li").filter({ hasText: "Price quality" }).first();
+    const p1 = await s.hover(first, 300);
+    s.focus(p1.x, p1.y, 1.6, 3.0); // one token's plain line
+    await s.wait(3200);
+    await s.click(panel.getByRole("link", { name: "Every Stock Token on the live risk board" }), { zoom: 1.6 });
+    await s.page.getByTestId("board-row").first().waitFor({ timeout: 120_000 });
+    await s.wait(900);
+    const cell = s.page.getByTestId("board-row").first().locator("td").nth(2);
+    const c = await s.hover(cell, 300);
+    s.focus(c.x, c.y, 1.6, 2.8); // regime badge, price quality and line
+    await s.wait(3000);
+    await s.click(s.page.getByRole("button", { name: "Poor price quality" }), { hold: 1.6 });
+    await s.wait(1800);
+    await s.click(s.page.getByRole("button", { name: "All stocks" }), { hold: 1.0 });
+    await s.wait(900);
+    await s.stop();
+    await s.close();
+  },
+
+  async agents() {
+    const s = await Session.open();
+    await s.goto(`${LIVE}/agents`);
+    await s.page.getByTestId("agent-session").waitFor({ timeout: 120_000 });
+    await s.page.getByRole("button", { name: "Copy Claude Desktop config" }).waitFor();
+    await s.start("11-agents");
+    await s.wait(900);
+    s.focus(520, 260, 1.4, 2.4); // what it is, and "Read-only"
+    await s.wait(2600);
+    const copy = s.page.getByRole("button", { name: "Copy Claude Desktop config" });
+    const { y } = await s.hover(copy, 300);
+    s.focus(560, y + 120, 1.45, 2.6); // the config block
+    await s.wait(1600);
+    await s.click(copy, { zoom: 1.7, hold: 1.4 });
+    await s.wait(900);
+    await s.scroll(700, 1600);
+    await s.wait(1600);
+    const session = s.page.getByTestId("agent-session");
+    await s.hover(session.locator("blockquote").nth(1), 300);
+    const b = await s.centerOf(session.locator("blockquote").nth(1));
+    s.focus(b.x, b.y, 1.5, 3.2); // a real get_weekend_risk answer
+    await s.wait(3400);
+    await s.scroll(600, 1600);
+    await s.wait(2200);
+    await s.stop();
+    await s.close();
+  },
+});
+
 const which = process.argv[2] || "all";
 const order = which === "all" ? Object.keys(SCENES) : which.split(",");
 for (const name of order) {

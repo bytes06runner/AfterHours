@@ -457,5 +457,147 @@
    }
   ],
   "clip": "demo/09-report.mp4"
+ },
+ "10-regimes": {
+  "name": "10-regimes",
+  "view": {
+   "width": 1440,
+   "height": 810
+  },
+  "scale": 2,
+  "duration": 49.609,
+  "events": [
+   {
+    "t": -0.05,
+    "type": "page",
+    "url": "https://after-hours-web-eta.vercel.app/"
+   },
+   {
+    "t": 0.697,
+    "type": "focus",
+    "x": 520,
+    "y": 445.21875,
+    "scale": 1.45,
+    "hold": 2.6
+   },
+   {
+    "t": 4.635,
+    "type": "focus",
+    "x": 720,
+    "y": 687.65234375,
+    "scale": 1.35,
+    "hold": 2.6
+   },
+   {
+    "t": 8.267,
+    "type": "scroll",
+    "dy": 260
+   },
+   {
+    "t": 10.358,
+    "type": "focus",
+    "x": 720,
+    "y": 592.58984375,
+    "scale": 1.6,
+    "hold": 3
+   },
+   {
+    "t": 14.648,
+    "type": "click",
+    "x": 157.4,
+    "y": 404.8,
+    "scale": 1.6,
+    "hold": 1.3
+   },
+   {
+    "t": 35.648,
+    "type": "page",
+    "url": "https://after-hours-web-eta.vercel.app/live"
+   },
+   {
+    "t": 40.209,
+    "type": "focus",
+    "x": 455.5859375,
+    "y": 698.24609375,
+    "scale": 1.6,
+    "hold": 2.8
+   },
+   {
+    "t": 44.029,
+    "type": "click",
+    "x": 603.7,
+    "y": 511,
+    "scale": 1.7,
+    "hold": 1.6
+   },
+   {
+    "t": 47.613,
+    "type": "click",
+    "x": 88.5,
+    "y": 511,
+    "scale": 1.7,
+    "hold": 1
+   }
+  ],
+  "clip": "demo/10-regimes.mp4"
+ },
+ "11-agents": {
+  "name": "11-agents",
+  "view": {
+   "width": 1440,
+   "height": 810
+  },
+  "scale": 2,
+  "duration": 19.688,
+  "events": [
+   {
+    "t": -0.031,
+    "type": "page",
+    "url": "https://after-hours-web-eta.vercel.app/agents"
+   },
+   {
+    "t": 0.87,
+    "type": "focus",
+    "x": 520,
+    "y": 260,
+    "scale": 1.4,
+    "hold": 2.4
+   },
+   {
+    "t": 4.365,
+    "type": "focus",
+    "x": 560,
+    "y": 748.0703125,
+    "scale": 1.45,
+    "hold": 2.6
+   },
+   {
+    "t": 6.165,
+    "type": "click",
+    "x": 712.1,
+    "y": 628.1,
+    "scale": 1.7,
+    "hold": 1.4
+   },
+   {
+    "t": 7.848,
+    "type": "scroll",
+    "dy": 700
+   },
+   {
+    "t": 12.168,
+    "type": "focus",
+    "x": 354.55859375,
+    "y": 404.984375,
+    "scale": 1.5,
+    "hold": 3.2
+   },
+   {
+    "t": 15.57,
+    "type": "scroll",
+    "dy": 600
+   }
+  ],
+  "clip": "demo/11-agents.mp4"
  }
 }

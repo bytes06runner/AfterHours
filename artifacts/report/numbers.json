@@ -100,6 +100,96 @@
       "text": "105",
       "source": "artifacts/discovery/oracle_study.json"
     },
+    "oracle_readings.weekends_read": {
+      "value": 9,
+      "text": "9",
+      "source": "artifacts/discovery/oracle_readings/index.json"
+    },
+    "oracle_readings.latest.weekends": {
+      "value": 1,
+      "text": "1",
+      "source": "artifacts/discovery/oracle_readings/index.json"
+    },
+    "oracle_readings.latest.first_weekend_close": {
+      "value": "2026-09-25T20:00:00+00:00",
+      "text": "2026-09-25",
+      "source": "artifacts/discovery/oracle_readings/index.json"
+    },
+    "oracle_readings.latest.feeds_without_update": {
+      "value": 34,
+      "text": "34",
+      "source": "artifacts/discovery/oracle_readings/index.json"
+    },
+    "oracle_readings.latest.feeds_with_update": {
+      "value": [
+        "SGOV"
+      ],
+      "text": "SGOV",
+      "source": "artifacts/discovery/oracle_readings/index.json"
+    },
+    "regime.as_of": {
+      "value": "2026-10-04T10:34:40.712050+00:00",
+      "text": "2026-10-04",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.block": {
+      "value": 79868354,
+      "text": "79,868,354",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.tokens": {
+      "value": 35,
+      "text": "35",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.counts.frozen": {
+      "value": 35,
+      "text": "35",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.counts.weekend_venue": {
+      "value": 0,
+      "text": "0",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.counts.extended": {
+      "value": 0,
+      "text": "0",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.counts.regular": {
+      "value": 0,
+      "text": "0",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.with_dex_price": {
+      "value": 35,
+      "text": "35",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.median_abs_divergence": {
+      "value": 0.00362,
+      "text": "0.36%",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.beyond_divergence_trigger": {
+      "value": [
+        "IONQ",
+        "RGTI"
+      ],
+      "text": "IONQ, RGTI",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.divergence.IONQ": {
+      "value": -0.03409,
+      "text": "3.4%",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.divergence.RGTI": {
+      "value": 0.07297,
+      "text": "7.3%",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
     "model.shipped": {
       "value": "ewma_normal",
       "text": "ewma_normal",
