@@ -191,6 +191,10 @@ def _read_json(path: str, mtime: float) -> dict[str, Any]:
     return data
 
 
+def _optional_json(path: Path) -> dict[str, Any] | None:
+    return json.loads(path.read_text()) if path.exists() else None
+
+
 def next_pre_close(cfg: AfterhoursConfig, now: datetime) -> datetime:
     """The next pre-close check strictly after `now`: today's if ahead, else the next session's."""
     from afterhours.features.dataset import sessions
@@ -559,6 +563,10 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                 },
             },
             "oracle": {k: v for k, v in oracle_summary(study).items() if k != "updates"},
+            # Dated readings since M1 (make oracle-reading); None until the first one exists.
+            "oracle_readings": _optional_json(
+                cfg.path(cfg.paths.artifacts_dir) / "discovery" / "oracle_readings" / "index.json"
+            ),
             "model": {
                 k: card[k]
                 for k in (

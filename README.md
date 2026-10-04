@@ -1,9 +1,10 @@
 # Afterhours
 
-A risk-curated lending vault for Robinhood Stock Tokens on Morpho. It lends USDG to each stock in
-the riskiest market that stock's history allows, pulls back the money borrowers are not using
-before nights that could gap past every market's cushion, and writes the reason for every move
-onchain.
+A risk-curated lending vault for Robinhood Stock Tokens on Morpho, and the read-only risk layer
+behind it. The vault lends USDG to each stock in the riskiest market that stock's history allows,
+pulls back the money borrowers are not using before nights that could gap past every market's
+cushion, and writes the reason for every move onchain. The risk layer tells people and AI agents,
+live, which pricing regime every Stock Token is in and how far its price can be trusted.
 
 **[Live app](https://after-hours-web-eta.vercel.app)** ·
 **[API health](https://afterhours-api.onrender.com/v1/health)** ·
@@ -25,10 +26,12 @@ Arbitrum.
 
 ## Contents
 
+- [Frozen today, thin tomorrow](#frozen-today-thin-tomorrow)
 - [Results in brief](#results-in-brief)
 - [The problem](#the-problem)
 - [How it works](#how-it-works)
 - [What you can use today](#what-you-can-use-today)
+- [For AI agents](#for-ai-agents)
 - [Results](#results)
 - [Architecture](#architecture)
 - [Run it locally](#run-it-locally)
@@ -38,6 +41,32 @@ Arbitrum.
 - [Future work](#future-work)
 - [Prior work](#prior-work)
 - [License](#license)
+
+## Frozen today, thin tomorrow
+
+**Frozen today.** Stock Token price feeds on Robinhood Chain post nothing from Friday 20:00 to
+Sunday 20:00 New York time. Over the 8 weekends of our first reading, 32 of 35 feeds posted
+nothing in that window (the other three only closing prints within 105 seconds of it opening).
+We have kept reading, never rewriting the first reading: 9 weekends so far, and in the latest
+(from 2026-09-25) 34 of 35 posted nothing, SGOV once right after the window opened
+(`artifacts/discovery/oracle_readings/`). No Stock Token feed follows a weekend market yet.
+
+**Thin tomorrow.** On 2026-09-29 Robinhood announced weekend trading of a curated list of US
+stocks and ETFs through Bruce ATS, "coming soon, pending regulatory review", and AI trading agents
+whose Loops can run a strategy around the clock ([sources and exact wording](docs/findings/robinhood-2026-09-29.md)).
+If the feeds start following a weekend venue, the risk moves from "no price" to "thin price": a
+weekend price from one venue can gap and be pushed around while the regular market is shut.
+
+**So Afterhours knows which regime each Stock Token is in, hour by hour.** The
+[price regime monitor](docs/REGIME.md) classifies every token as regular session, extended hours,
+weekend price or frozen, from the exchange calendar, its feed's cadence measured from the study,
+and its DEX price and depth against the feed, and gives each a price quality score with a
+documented formula. On Saturday 2026-10-04 (block 79,868,354) all 35 were frozen, the median DEX
+price sat 0.36% from its frozen feed, and IONQ and RGTI had drifted 3.4% and 7.3%, past the
+divergence trigger (`artifacts/regime/`). People see it on the landing page and the risk board;
+agents get it through four read-only [MCP tools](#for-ai-agents).
+
+![The risk board's price regime column: regime, price quality and a plain line per Stock Token](artifacts/screens/regime/board-night-1440.png)
 
 ## Results in brief
 
@@ -96,13 +125,15 @@ All of these are live at [after-hours-web-eta.vercel.app](https://after-hours-we
 
 | Page | What it shows | Data |
 | --- | --- | --- |
-| Landing, Vault | The vault's allocation across stocks and tiers, the exchange clock, deposit and withdraw | Robinhood Chain Testnet, simulated tokens |
+| Landing | The exchange clock, and "Frozen today, thin tomorrow": live counts per price regime and the least trustworthy prices | Robinhood Chain mainnet, read-only |
+| Vault | The vault's allocation across stocks and tiers, deposit and withdraw | Robinhood Chain Testnet, simulated tokens |
 | Ledger | Every move the vault made with its reason card; "Verify on chain" recomputes the hash and checks the registry | Testnet registry |
 | Almanac | Each stock's forecast bad case for the closed periods ahead | Historical prices, live model |
 | Replay | Past nights replayed on a simulated vault, such as META's 2022 earnings gap | Historical stock prices, simulated vault |
 | Report card | How the policy and the forecasting model were chosen and judged | Generated artifacts |
-| Risk board | Every Stock Token: when its feed last moved, whether it is frozen now, and tonight's bad case against each lending market's cushion | Robinhood Chain mainnet, read-only |
+| Risk board | Every Stock Token: its price regime, price quality score and a plain line, when its feed last moved, and tonight's bad case against each lending market's cushion | Robinhood Chain mainnet, read-only |
 | Check a position | Any address's Morpho loans against Stock Tokens: loan-to-value, liquidation price, and whether tonight's bad case reaches it | Robinhood Chain mainnet, read-only |
+| Agents | How to connect Claude Desktop or any MCP client in under a minute, and a real captured session | The hosted API |
 
 ![The live risk board: every Stock Token feed on Robinhood Chain mainnet, frozen for the weekend, with tonight's bad case](artifacts/screens/live/risk-board.png)
 
@@ -115,6 +146,37 @@ signed.
 **Telegram alerts.** A bot follows a stock (`/watch NVDA`) or an address (`/watch 0x...`) and
 messages before the close only when tonight looks risky for it. Setup is in
 [docs/HOSTING.md](docs/HOSTING.md), steps 2 and 7.
+
+## For AI agents
+
+Robinhood's agents are meant to act overnight, while their owners sleep; they need risk they can
+read. Afterhours serves it two ways, both read-only ([docs/AGENTS.md](docs/AGENTS.md)):
+
+| MCP tool | REST | Answers |
+| --- | --- | --- |
+| `market_status()` | `GET /v1/agent/market-status` | Exchange open or shut, next open and close, where feeds stand, tokens per price regime |
+| `get_weekend_risk(ticker)` | `GET /v1/agent/weekend-risk/{ticker}` | Regime, price quality, next closed period, bad-case drop, which market cushions it passes, a plain paragraph |
+| `check_position(address)` | `GET /v1/agent/positions/{address}` | Every Stock Token Morpho loan of a wallet against tonight's bad case |
+| `explain_move(reason_id)` | `GET /v1/agent/moves/{reason_id}` | A vault reason card and its onchain verification |
+
+The MCP server is the small [`agents/`](agents/README.md) package (official MCP Python SDK, stdio,
+no key, no write path). Add it to Claude Desktop:
+
+```json
+{
+  "mcpServers": {
+    "afterhours": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/bytes06runner/AfterHours#subdirectory=agents", "afterhours-mcp"],
+      "env": { "AFTERHOURS_API_URL": "https://afterhours-api.onrender.com" }
+    }
+  }
+}
+```
+
+The REST routes have an OpenAPI schema at `/openapi.json` and a per-client rate limit. A real
+session, captured through exactly this install, is on the [Agents page](https://after-hours-web-eta.vercel.app/agents)
+(`artifacts/agents/example-session.json`).
 
 ## Results
 
@@ -205,9 +267,11 @@ flowchart LR
   end
   subgraph api[API: FastAPI on Render]
     R[Live risk: bad-case drop per closed period]
-    LIVE[Risk board and position checker]
+    LIVE[Risk board, price regimes, position checker]
+    AGT[Agent routes /v1/agent]
     TGW[Telegram webhook]
   end
+  MCP[MCP server, stdio, on the agent's machine]
   subgraph jobs[Scheduled: GitHub Actions]
     BOT[Pre-close bot cycle: policy LP, allocator]
     AL[Pre-close Telegram alerts]
@@ -231,6 +295,8 @@ flowchart LR
   TGW --> KV
   FEEDS --> LIVE
   MM --> LIVE
+  LIVE --> AGT
+  AGT --> MCP
   KV --> api
   api --> WEB
   WEB -- verify hash --> REG
@@ -238,7 +304,8 @@ flowchart LR
 
 | Folder | What is there |
 | --- | --- |
-| `engine/afterhours/` | Python: discovery, data, features, model, risk, policy, backtest, bot, API, live mainnet views, Telegram alerts, simulation |
+| `engine/afterhours/` | Python: discovery, data, features, model, risk, policy, backtest, bot, API, live mainnet views and price regimes, agent routes, Telegram alerts, simulation |
+| `agents/` | The MCP server (`afterhours-mcp`): four read-only tools over the agent routes |
 | `contracts/` | Foundry: reason registry, simulated tokens and oracle, deploy script for Morpho markets and Vault V2 |
 | `web/` | Next.js 16, React 19, Tailwind 4, visx, wagmi and RainbowKit, Playwright |
 | `config/afterhours.yaml` | Every address source, parameter and URL; nothing is hardcoded (`make lint-hardcode`) |
@@ -328,6 +395,12 @@ make lighthouse   # production build, every page
 - **Free hosting.** The API runs on a free instance that sleeps without traffic, and the live
   mainnet views use a public RPC that can rate-limit; both are described in
   [docs/HOSTING.md](docs/HOSTING.md).
+- **Price regimes.** No weekend price source has appeared yet, so the weekend price regime has
+  never been observed live; it is tested with stubs. DEX prices and depth use the two deepest USDG
+  pools per token and take USDG as 1 USD, as in discovery. The bad-case forecast is not adjusted
+  for the regime: there is no weekend-venue history to calibrate an adjustment on.
+- **Agents.** The MCP server runs on the agent's machine over stdio and calls the hosted API; it
+  is not served from the API host, which has no memory to spare on the free plan. It reads only.
 - **Not audited.** The contracts we wrote are small (the registry and simulated tokens), and the
   vault and markets are Morpho's, but nothing here has had a security review.
 

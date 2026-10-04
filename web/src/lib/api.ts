@@ -353,6 +353,26 @@ export const ReportCardSchema = z.object({
     first_weekend_close: z.string().nullable(),
     last_weekend_close: z.string().nullable(),
   }),
+  oracle_readings: z
+    .object({
+      window: z.string(),
+      weekends_read: z.number(),
+      readings: z.array(
+        z.object({
+          file: z.string(),
+          taken_at: z.string(),
+          weekends: z.number(),
+          first_weekend_close: z.string().nullable(),
+          last_weekend_close: z.string().nullable(),
+          feeds: z.number(),
+          feeds_without_update: z.number(),
+          feeds_with_update: z.array(z.string()),
+          updates_in_window: z.number(),
+          max_seconds_after_window_opened: z.number().nullable(),
+        }),
+      ),
+    })
+    .nullish(),
   model: z.object({
     first_sentence: z.string(),
     label: z.string(),

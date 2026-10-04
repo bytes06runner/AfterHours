@@ -405,6 +405,64 @@ export function ReportCardView() {
         <Coverage rc={rc} />
       </section>
 
+      {rc.oracle_readings && (
+        <section aria-labelledby="feeds" className="mt-12">
+          <h2 id="feeds" className="text-[36px]">
+            Weekend feeds, reading by reading
+          </h2>
+          <p className="mt-2 max-w-[72ch]">
+            Robinhood has announced weekend trading, pending regulatory review. If Stock Token feeds
+            start following a weekend venue, the risk changes from a frozen price to a thin one, so
+            we keep reading the same study, {rc.oracle_readings.window}, and never rewrite an
+            earlier reading. {rc.oracle_readings.weekends_read} weekends read so far.
+          </p>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[640px] border-collapse text-left">
+              <thead>
+                <tr className="text-[14px]">
+                  {["Read on", "Weekends", "From", "To", "Feeds silent", "Feeds that posted"].map(
+                    (h) => (
+                      <th key={h} className="border-b-[1.25px] border-rule py-2 pr-4 font-semibold">
+                        {h}
+                      </th>
+                    ),
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {rc.oracle_readings.readings.map((r) => (
+                  <tr key={r.file} className="tabular-nums">
+                    <td className="border-b-[1.25px] border-rule py-2 pr-4">
+                      {r.taken_at.slice(0, 10)}
+                    </td>
+                    <td className="border-b-[1.25px] border-rule py-2 pr-4">{r.weekends}</td>
+                    <td className="border-b-[1.25px] border-rule py-2 pr-4">
+                      {r.first_weekend_close?.slice(0, 10) ?? "none"}
+                    </td>
+                    <td className="border-b-[1.25px] border-rule py-2 pr-4">
+                      {r.last_weekend_close?.slice(0, 10) ?? "none"}
+                    </td>
+                    <td className="border-b-[1.25px] border-rule py-2 pr-4">
+                      {r.feeds_without_update} of {r.feeds}
+                    </td>
+                    <td className="border-b-[1.25px] border-rule py-2 pr-4">
+                      {r.feeds_with_update.length
+                        ? `${r.feeds_with_update.join(", ")}: ${r.updates_in_window} update${r.updates_in_window === 1 ? "" : "s"}, the last ${r.max_seconds_after_window_opened ?? 0} s after the window opened`
+                        : "none"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-[14px]">
+            Dates are each weekend&apos;s Friday close. Files in
+            artifacts/discovery/oracle_readings/; how each token is priced right now is on the risk
+            board.
+          </p>
+        </section>
+      )}
+
       <section aria-labelledby="tail" className="mt-12">
         <h2 id="tail" className="text-[36px]">
           How often prices gap down
