@@ -45,15 +45,10 @@
    `NEXT_PUBLIC_WC_PROJECT_ID` in `.env` (and in the web host's environment when it is hosted);
    MetaMask mobile, Rainbow, OKX and the QR option then appear under "More wallets".
 
-4. **Telegram alert bot needs a bot token.** The bot is built and tested with fakes; it has not
-   talked to Telegram yet. Please:
-   a. In Telegram, message @BotFather, send `/newbot`, pick a name and a username ending in `bot`.
-   b. Put the token it gives you in `.env` as `TELEGRAM_BOT_TOKEN=...` (git-ignored; I never
-      read `.env`). Optionally send BotFather `/setcommands` with: watch, unwatch, list, stop, help.
-   c. Hosted (free setup): set `TELEGRAM_WEBHOOK_SECRET` too, and after the API is on Render run
-      `make telegram-webhook URL=<Render URL>` (docs/HOSTING.md steps 2 and 7). Pre-close alerts
-      are sent by the GitHub Actions workflow. Locally, `make alerts` still long-polls.
-   Then message your bot `/watch NVDA` and tell me in chat; I will check a real round trip.
+4. **Resolved 2026-10-05: Telegram alerts live.** Bot @afterhours_time_bot. Token in GitHub
+   secrets and on Render, webhook secret on Render, webhook registered (getWebhookInfo: no
+   pending updates, no errors). `/watch NVDA` from Telegram reached the API and was saved in
+   Upstash (1 chat, symbols NVDA).
 
 5. **GoatCounter analytics needs your site's count endpoint** (replaced Plausible, which is
    paid). Sign up at goatcounter.com, pick a code, and set `NEXT_PUBLIC_GOATCOUNTER_URL` to
@@ -1173,4 +1168,15 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
 - The Oct 2 to 5 weekend reading is scheduled as a one-off task for 2026-10-05 14:00 UTC
   (`afterhours-oct5-oracle-reading`): `make oracle-reading`, numbers, README, pitch, PROGRESS,
   tests, push.
+
+### 2026-10-05 Telegram alerts end to end
+
+- Token checked with getMe (@afterhours_time_bot), saved as the GitHub secret
+  `TELEGRAM_BOT_TOKEN` without printing it; webhook secret generated; webhook registered with
+  `afterhours alerts set-webhook` to `/v1/telegram/webhook`. The team added both values on Render.
+- Check: the endpoint answers 403 without the secret; `/watch NVDA` sent from Telegram arrived
+  and is stored in Upstash (`{'symbols': ['NVDA'], 'addresses': []}`); Telegram reports no
+  delivery errors. Pre-close alerts will now run in the GitHub workflow.
+- Production at the same time: every API endpoint and site page 200; API RSS 229 MB (peak 233),
+  price fetch peak 376 MB.
 
