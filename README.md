@@ -7,15 +7,27 @@ cushion, and writes the reason for every move onchain. The risk layer tells peop
 live, which pricing regime every Stock Token is in and how far its price can be trusted.
 
 **[Live app](https://after-hours-web-eta.vercel.app)** ·
-**[API health](https://afterhours-api.onrender.com/v1/health)** ·
+**[Risk board](https://after-hours-web-eta.vercel.app/live)** ·
+**[For agents](https://after-hours-web-eta.vercel.app/agents)** ·
+**[Telegram bot](https://t.me/afterhours_time_bot)** ·
+**[API](https://afterhours-api.onrender.com/docs)** ·
 **[Testnet vault](https://explorer.testnet.chain.robinhood.com/address/0xD4791630C02FF7462536bAEae7BcE13c5917E6d3)** ·
-**[Build log](PROGRESS.md)** ·
-**[Hosting guide](docs/HOSTING.md)**
+**[Build log](PROGRESS.md)**
 
 ![The Afterhours landing page at night, with the exchange closed and the price ticker](artifacts/screens/live/landing.png)
 
 Built for the Colosseum Crypto World's Fair, Robinhood Chain track; the same code runs on
 Arbitrum.
+
+## At a glance
+
+| Part | Where it runs | Status |
+| --- | --- | --- |
+| Lending vault (Morpho Vault V2, three tiers per stock, onchain reason registry) | Robinhood Chain Testnet, simulated tokens | Deployed; bot runs before each US close from GitHub Actions |
+| Risk board, price regime monitor, position checker | Robinhood Chain mainnet, read-only | Live on the web app and API |
+| Telegram alerts (`/watch NVDA`, `/watch 0x...`) | [@afterhours_time_bot](https://t.me/afterhours_time_bot) | Live, messages before a risky close |
+| Weekend risk for AI agents (MCP server and REST) | Your machine (MCP, stdio) calling the hosted API | Live; install in one config block |
+| Backtest, replays, report card | Historical stock prices, simulated vault | Published with every run in `artifacts/` |
 
 > **What is real and what is simulated.** The vault runs on Robinhood Chain Testnet with
 > simulated USDG, Stock Tokens and price feeds, and the app labels it Simulation. The risk board
@@ -26,6 +38,7 @@ Arbitrum.
 
 ## Contents
 
+- [At a glance](#at-a-glance)
 - [Frozen today, thin tomorrow](#frozen-today-thin-tomorrow)
 - [Results in brief](#results-in-brief)
 - [The problem](#the-problem)
@@ -143,9 +156,12 @@ Session and forecast times show in New York time and in the visitor's own time z
 connect through RainbowKit (browser wallets and WalletConnect); nothing on mainnet is ever
 signed.
 
-**Telegram alerts.** A bot follows a stock (`/watch NVDA`) or an address (`/watch 0x...`) and
-messages before the close only when tonight looks risky for it. Setup is in
-[docs/HOSTING.md](docs/HOSTING.md), steps 2 and 7.
+**Telegram alerts.** Message [@afterhours_time_bot](https://t.me/afterhours_time_bot): `/watch NVDA`
+follows a stock, `/watch 0x...` follows a wallet's Stock Token loans, `/list`, `/unwatch` and
+`/stop` manage them. Before each close, inside the pre-close window, it messages only when
+tonight's bad case reaches a market's cushion (a stock) or a loan's liquidation price (a wallet).
+Commands arrive through a webhook on the API; the checks run in GitHub Actions. Running your own
+copy: [docs/HOSTING.md](docs/HOSTING.md), steps 2 and 7.
 
 ## For AI agents
 
@@ -311,7 +327,7 @@ flowchart LR
 | `config/afterhours.yaml` | Every address source, parameter and URL; nothing is hardcoded (`make lint-hardcode`) |
 | `artifacts/` | Generated results: discovery, gap study, model report card, backtest, replays, screenshots, Lighthouse |
 | `deployments/` | Deployed and discovered addresses per profile |
-| `docs/` | Hosting guide, findings, pitch script |
+| `docs/` | [Price regimes](docs/REGIME.md), [agents](docs/AGENTS.md), [hosting](docs/HOSTING.md), findings, [pitch](docs/video/pitch.md) and [demo](docs/video/demo.md) scripts, the animated pitch and screen demo projects |
 | `.github/workflows/` | The scheduled pre-close jobs |
 
 ## Run it locally
@@ -347,6 +363,8 @@ it pulls META's unborrowed money and anchors the reason in the onchain registry.
 | Where | Status |
 | --- | --- |
 | Web app and API | [after-hours-web-eta.vercel.app](https://after-hours-web-eta.vercel.app) (Vercel) and [afterhours-api.onrender.com](https://afterhours-api.onrender.com/v1/health) (Render), free tiers; set up with [docs/HOSTING.md](docs/HOSTING.md) |
+| Scheduled jobs | GitHub Actions, `Pre-close jobs`: the bot's pre-close cycle on the testnet vault and the Telegram pre-close alerts, hourly on weekdays |
+| Telegram bot | [@afterhours_time_bot](https://t.me/afterhours_time_bot), webhook on the API, subscriptions in Upstash Redis |
 | Robinhood Chain testnet | Deployed 2026-09-27 (`deployments/rh-testnet.json`), simulated USDG, collateral and oracles: vault [`0xD4791630C02FF7462536bAEae7BcE13c5917E6d3`](https://explorer.testnet.chain.robinhood.com/address/0xD4791630C02FF7462536bAEae7BcE13c5917E6d3), reason registry [`0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0`](https://explorer.testnet.chain.robinhood.com/address/0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0) |
 | Arbitrum Sepolia | Rehearsed on a fork of the testnet (`scripts/rehearse-testnet.sh arb-sepolia`); not deployed yet |
 | Local chain (Anvil) | `make demo`; addresses in `deployments/local.json` |
@@ -366,6 +384,10 @@ make e2e          # Playwright against a running stack: every page on desktop an
 make lighthouse   # production build, every page
 ```
 
+- Python tests cover the engine and the MCP server (`engine/tests`, `agents/tests`), including
+  the read-only tool hints, a real stdio session, the rate limit, the regime classifier on
+  calendar edges such as Thanksgiving, and memory guards that keep heavy modules out of the
+  hosted API.
 - `make lint-hardcode` fails on any address, URL or protocol parameter outside `config/` and
   `deployments/`.
 - `make lint-numbers` fails if this README or the pitch quotes a number that is not in
@@ -392,8 +414,9 @@ make lighthouse   # production build, every page
 - **Money already lent cannot move.** Afterhours can only pull what borrowers are not using.
 - **Universe.** The stock universe for the gap study is today's S&P 500 plus Stock Tokens, so it
   has survivorship bias.
-- **Free hosting.** The API runs on a free instance that sleeps without traffic, and the live
-  mainnet views use a public RPC that can rate-limit; both are described in
+- **Free hosting.** The API runs on a free instance (512 MB) that sleeps without traffic, so a
+  first request after a sleep can take about a minute, and the live mainnet views use RPCs that
+  can rate-limit. Saved boards and scan state let a restarted instance answer at once; details in
   [docs/HOSTING.md](docs/HOSTING.md).
 - **Price regimes.** No weekend price source has appeared yet, so the weekend price regime has
   never been observed live; it is tested with stubs. DEX prices and depth use the two deepest USDG
@@ -407,6 +430,11 @@ make lighthouse   # production build, every page
 ## Future work
 
 - Use the real testnet Stock Tokens the Robinhood Chain faucet hands out (TSLA, AMZN, PLTR, NFLX, AMD) as testnet collateral instead of simulated ones.
+- Once a Stock Token feed follows a weekend venue, measure how weekend prices behave and decide,
+  on that data, whether the bad-case forecast should change in the weekend price regime.
+- Serve the MCP server over streamable HTTP from a host with memory to spare.
+- Deploy the testnet vault on Arbitrum Sepolia too (rehearsed, not deployed), then a security
+  review before any mainnet vault.
 
 ## Prior work
 
