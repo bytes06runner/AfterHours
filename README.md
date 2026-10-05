@@ -60,8 +60,8 @@ Arbitrum.
 **Frozen today.** Stock Token price feeds on Robinhood Chain post nothing from Friday 20:00 to
 Sunday 20:00 New York time. Over the 8 weekends of our first reading, 32 of 35 feeds posted
 nothing in that window (the other three only closing prints within 105 seconds of it opening).
-We have kept reading, never rewriting the first reading: 9 weekends so far, and in the latest
-(from 2026-09-25) 34 of 35 posted nothing, SGOV once right after the window opened
+We have kept reading, never rewriting the first reading: 10 weekends so far, and in the latest
+(from 2026-10-02) all 35 posted nothing in the window
 (`artifacts/discovery/oracle_readings/`). No Stock Token feed follows a weekend market yet.
 
 **Thin tomorrow.** On 2026-09-29 Robinhood announced weekend trading of a curated list of US

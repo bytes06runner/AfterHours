@@ -1180,3 +1180,24 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
 - Production at the same time: every API endpoint and site page 200; API RSS 229 MB (peak 233),
   price fetch peak 376 MB.
 
+
+### 2026-10-05 Weekend oracle reading for Oct 2 to 5
+
+- `make oracle-reading` (scheduled run). The first attempt at 14:00 UTC failed with "timestamp
+  is in the future of the chain head": the study reads to one hour after the reopening
+  (13:30 + 1 h), so a reading can only run after 14:30 UTC. Rerun at 14:36 UTC, exit 0.
+- Result: the weekend from 2026-10-02 20:00 UTC, 35 of 35 feeds posted nothing inside the
+  Friday 20:00 to Sunday 20:00 New York window (0 updates, no stragglers). 10 weekends read in
+  all across 3 readings (M1 study 8, 2026-10-04 1, 2026-10-05 1). No Stock Token feed posts on
+  weekends. `artifacts/discovery/oracle_study.json` unchanged (git diff empty).
+- `regime-cadence`: 22 closed periods, 44.0 h regular session and 385.0 h extended hours read.
+- `afterhours numbers`: `oracle_readings.weekends_read` 10, latest from 2026-10-02, 35 silent,
+  none posted.
+- README "Frozen today, thin tomorrow" now gives 10 weekends and the latest reading; pitch.md
+  section 1 says "and so did the two weekends since" (one word longer). demo.md and the
+  screen-demo cue sheet quote only the first reading and stay as they are.
+- Checks: `tests/test_oracle_readings.py` pass, `make test-py` 131 passed, `make lint` clean
+  (lint-numbers and lint-hardcode included).
+- Files: `artifacts/discovery/oracle_readings/{reading-2026-10-05.json,index.json}`,
+  `artifacts/regime/cadence.json`, `artifacts/report/numbers.json`, `README.md`,
+  `docs/video/pitch.md`, `PROGRESS.md`.

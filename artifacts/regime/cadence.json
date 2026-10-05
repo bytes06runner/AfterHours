@@ -1,290 +1,291 @@
 {
   "sources": [
     "discovery/oracle_study.json",
-    "discovery/oracle_readings/reading-2026-10-04.json"
+    "discovery/oracle_readings/reading-2026-10-04.json",
+    "discovery/oracle_readings/reading-2026-10-05.json"
   ],
-  "periods_read": 21,
-  "regular_hours_read": 42.0,
-  "extended_hours_read": 367.5,
+  "periods_read": 22,
+  "regular_hours_read": 44.0,
+  "extended_hours_read": 385.0,
   "feeds": {
     "AAPL": {
-      "regular_updates": 70,
-      "extended_updates": 42,
+      "regular_updates": 73,
+      "extended_updates": 44,
       "typical_interval_minutes": {
-        "regular": 36.0,
+        "regular": 36.2,
         "extended": 525.0
       }
     },
     "AMD": {
-      "regular_updates": 191,
-      "extended_updates": 227,
+      "regular_updates": 196,
+      "extended_updates": 234,
       "typical_interval_minutes": {
-        "regular": 13.2,
-        "extended": 97.1
+        "regular": 13.5,
+        "extended": 98.7
       }
     },
     "AMZN": {
-      "regular_updates": 73,
-      "extended_updates": 67,
+      "regular_updates": 75,
+      "extended_updates": 69,
       "typical_interval_minutes": {
-        "regular": 34.5,
-        "extended": 329.1
+        "regular": 35.2,
+        "extended": 334.8
       }
     },
     "ASML": {
-      "regular_updates": 93,
-      "extended_updates": 202,
+      "regular_updates": 96,
+      "extended_updates": 210,
       "typical_interval_minutes": {
-        "regular": 27.1,
-        "extended": 109.2
+        "regular": 27.5,
+        "extended": 110.0
       }
     },
     "BABA": {
-      "regular_updates": 66,
-      "extended_updates": 223,
+      "regular_updates": 69,
+      "extended_updates": 231,
       "typical_interval_minutes": {
-        "regular": 38.2,
-        "extended": 98.9
+        "regular": 38.3,
+        "extended": 100.0
       }
     },
     "CLSK": {
-      "regular_updates": 483,
-      "extended_updates": 357,
+      "regular_updates": 504,
+      "extended_updates": 371,
       "typical_interval_minutes": {
         "regular": 5.2,
-        "extended": 61.8
+        "extended": 62.3
       }
     },
     "COIN": {
-      "regular_updates": 316,
-      "extended_updates": 368,
+      "regular_updates": 326,
+      "extended_updates": 381,
       "typical_interval_minutes": {
-        "regular": 8.0,
-        "extended": 59.9
+        "regular": 8.1,
+        "extended": 60.6
       }
     },
     "CRCL": {
-      "regular_updates": 392,
-      "extended_updates": 505,
+      "regular_updates": 404,
+      "extended_updates": 519,
       "typical_interval_minutes": {
-        "regular": 6.4,
-        "extended": 43.7
+        "regular": 6.5,
+        "extended": 44.5
       }
     },
     "CRWV": {
-      "regular_updates": 374,
-      "extended_updates": 418,
+      "regular_updates": 382,
+      "extended_updates": 426,
       "typical_interval_minutes": {
-        "regular": 6.7,
-        "extended": 52.8
+        "regular": 6.9,
+        "extended": 54.2
       }
     },
     "DELL": {
-      "regular_updates": 312,
-      "extended_updates": 270,
+      "regular_updates": 323,
+      "extended_updates": 277,
       "typical_interval_minutes": {
-        "regular": 8.1,
-        "extended": 81.7
+        "regular": 8.2,
+        "extended": 83.4
       }
     },
     "EWY": {
-      "regular_updates": 82,
-      "extended_updates": 245,
+      "regular_updates": 86,
+      "extended_updates": 251,
       "typical_interval_minutes": {
         "regular": 30.7,
-        "extended": 90.0
+        "extended": 92.0
       }
     },
     "GME": {
-      "regular_updates": 165,
-      "extended_updates": 205,
+      "regular_updates": 176,
+      "extended_updates": 225,
       "typical_interval_minutes": {
-        "regular": 15.3,
-        "extended": 107.6
+        "regular": 15.0,
+        "extended": 102.7
       }
     },
     "GOOGL": {
-      "regular_updates": 86,
-      "extended_updates": 89,
+      "regular_updates": 87,
+      "extended_updates": 91,
       "typical_interval_minutes": {
-        "regular": 29.3,
-        "extended": 247.8
+        "regular": 30.3,
+        "extended": 253.8
       }
     },
     "INTC": {
-      "regular_updates": 259,
-      "extended_updates": 403,
+      "regular_updates": 269,
+      "extended_updates": 425,
       "typical_interval_minutes": {
-        "regular": 9.7,
-        "extended": 54.7
+        "regular": 9.8,
+        "extended": 54.4
       }
     },
     "IONQ": {
-      "regular_updates": 398,
-      "extended_updates": 423,
+      "regular_updates": 413,
+      "extended_updates": 429,
       "typical_interval_minutes": {
-        "regular": 6.3,
-        "extended": 52.1
+        "regular": 6.4,
+        "extended": 53.8
       }
     },
     "META": {
-      "regular_updates": 153,
-      "extended_updates": 151,
+      "regular_updates": 158,
+      "extended_updates": 152,
       "typical_interval_minutes": {
-        "regular": 16.5,
-        "extended": 146.0
+        "regular": 16.7,
+        "extended": 152.0
       }
     },
     "MSFT": {
-      "regular_updates": 85,
-      "extended_updates": 59,
+      "regular_updates": 93,
+      "extended_updates": 63,
       "typical_interval_minutes": {
-        "regular": 29.6,
-        "extended": 373.7
+        "regular": 28.4,
+        "extended": 366.7
       }
     },
     "MSTR": {
-      "regular_updates": 343,
-      "extended_updates": 546,
+      "regular_updates": 357,
+      "extended_updates": 563,
       "typical_interval_minutes": {
-        "regular": 7.3,
-        "extended": 40.4
+        "regular": 7.4,
+        "extended": 41.0
       }
     },
     "MU": {
-      "regular_updates": 215,
-      "extended_updates": 298,
+      "regular_updates": 220,
+      "extended_updates": 301,
       "typical_interval_minutes": {
-        "regular": 11.7,
-        "extended": 74.0
+        "regular": 12.0,
+        "extended": 76.7
       }
     },
     "NBIS": {
-      "regular_updates": 424,
-      "extended_updates": 506,
+      "regular_updates": 434,
+      "extended_updates": 513,
       "typical_interval_minutes": {
-        "regular": 5.9,
-        "extended": 43.6
+        "regular": 6.1,
+        "extended": 45.0
       }
     },
     "NVDA": {
-      "regular_updates": 77,
-      "extended_updates": 81,
+      "regular_updates": 80,
+      "extended_updates": 85,
       "typical_interval_minutes": {
-        "regular": 32.7,
-        "extended": 272.2
+        "regular": 33.0,
+        "extended": 271.8
       }
     },
     "ORCL": {
-      "regular_updates": 211,
-      "extended_updates": 195,
+      "regular_updates": 215,
+      "extended_updates": 199,
       "typical_interval_minutes": {
-        "regular": 11.9,
-        "extended": 113.1
+        "regular": 12.3,
+        "extended": 116.1
       }
     },
     "PLTR": {
-      "regular_updates": 189,
-      "extended_updates": 119,
+      "regular_updates": 197,
+      "extended_updates": 122,
       "typical_interval_minutes": {
-        "regular": 13.3,
-        "extended": 185.3
+        "regular": 13.4,
+        "extended": 189.3
       }
     },
     "QQQ": {
-      "regular_updates": 19,
-      "extended_updates": 45,
+      "regular_updates": 20,
+      "extended_updates": 47,
       "typical_interval_minutes": {
-        "regular": 132.6,
-        "extended": 490.0
+        "regular": 132.0,
+        "extended": 491.5
       }
     },
     "RGTI": {
-      "regular_updates": 332,
-      "extended_updates": 347,
+      "regular_updates": 344,
+      "extended_updates": 359,
       "typical_interval_minutes": {
-        "regular": 7.6,
-        "extended": 63.5
+        "regular": 7.7,
+        "extended": 64.3
       }
     },
     "RKLB": {
-      "regular_updates": 355,
-      "extended_updates": 328,
+      "regular_updates": 377,
+      "extended_updates": 336,
       "typical_interval_minutes": {
-        "regular": 7.1,
-        "extended": 67.2
+        "regular": 7.0,
+        "extended": 68.7
       }
     },
     "SGOV": {
       "regular_updates": 0,
-      "extended_updates": 21,
+      "extended_updates": 22,
       "typical_interval_minutes": {
         "regular": null,
         "extended": 1050.0
       }
     },
     "SLV": {
-      "regular_updates": 46,
-      "extended_updates": 215,
+      "regular_updates": 51,
+      "extended_updates": 225,
       "typical_interval_minutes": {
-        "regular": 54.8,
-        "extended": 102.6
+        "regular": 51.8,
+        "extended": 102.7
       }
     },
     "SNDK": {
-      "regular_updates": 331,
-      "extended_updates": 439,
+      "regular_updates": 336,
+      "extended_updates": 443,
       "typical_interval_minutes": {
-        "regular": 7.6,
-        "extended": 50.2
+        "regular": 7.9,
+        "extended": 52.1
       }
     },
     "SPCX": {
-      "regular_updates": 232,
-      "extended_updates": 156,
+      "regular_updates": 240,
+      "extended_updates": 161,
       "typical_interval_minutes": {
-        "regular": 10.9,
-        "extended": 141.3
+        "regular": 11.0,
+        "extended": 143.5
       }
     },
     "SPY": {
       "regular_updates": 11,
-      "extended_updates": 20,
+      "extended_updates": 21,
       "typical_interval_minutes": {
-        "regular": 229.1,
-        "extended": 1102.5
+        "regular": 240.0,
+        "extended": 1100.0
       }
     },
     "TSLA": {
-      "regular_updates": 153,
-      "extended_updates": 95,
+      "regular_updates": 163,
+      "extended_updates": 100,
       "typical_interval_minutes": {
-        "regular": 16.5,
-        "extended": 232.1
+        "regular": 16.2,
+        "extended": 231.0
       }
     },
     "TSM": {
-      "regular_updates": 63,
-      "extended_updates": 105,
+      "regular_updates": 66,
+      "extended_updates": 110,
       "typical_interval_minutes": {
         "regular": 40.0,
         "extended": 210.0
       }
     },
     "USAR": {
-      "regular_updates": 319,
-      "extended_updates": 298,
+      "regular_updates": 333,
+      "extended_updates": 305,
       "typical_interval_minutes": {
         "regular": 7.9,
-        "extended": 74.0
+        "extended": 75.7
       }
     },
     "USO": {
       "regular_updates": 48,
-      "extended_updates": 350,
+      "extended_updates": 372,
       "typical_interval_minutes": {
-        "regular": 52.5,
-        "extended": 63.0
+        "regular": 55.0,
+        "extended": 62.1
       }
     }
   }

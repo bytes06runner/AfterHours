@@ -31,21 +31,31 @@
       ],
       "updates_in_window": 1,
       "max_seconds_after_window_opened": 87.0
+    },
+    {
+      "file": "discovery/oracle_readings/reading-2026-10-05.json",
+      "taken_at": "2026-10-05T14:37:00.925353+00:00",
+      "weekends": 1,
+      "first_weekend_close": "2026-10-02T20:00:00+00:00",
+      "last_weekend_close": "2026-10-02T20:00:00+00:00",
+      "feeds": 35,
+      "feeds_without_update": 35,
+      "feeds_with_update": [],
+      "updates_in_window": 0,
+      "max_seconds_after_window_opened": null
     }
   ],
-  "weekends_read": 9,
+  "weekends_read": 10,
   "latest": {
-    "file": "discovery/oracle_readings/reading-2026-10-04.json",
-    "taken_at": "2026-10-04T10:23:36.947297+00:00",
+    "file": "discovery/oracle_readings/reading-2026-10-05.json",
+    "taken_at": "2026-10-05T14:37:00.925353+00:00",
     "weekends": 1,
-    "first_weekend_close": "2026-09-25T20:00:00+00:00",
-    "last_weekend_close": "2026-09-25T20:00:00+00:00",
+    "first_weekend_close": "2026-10-02T20:00:00+00:00",
+    "last_weekend_close": "2026-10-02T20:00:00+00:00",
     "feeds": 35,
-    "feeds_without_update": 34,
-    "feeds_with_update": [
-      "SGOV"
-    ],
-    "updates_in_window": 1,
-    "max_seconds_after_window_opened": 87.0
+    "feeds_without_update": 35,
+    "feeds_with_update": [],
+    "updates_in_window": 0,
+    "max_seconds_after_window_opened": null
   }
 }

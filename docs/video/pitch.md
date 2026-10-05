@@ -19,9 +19,9 @@ regime monitor and the agents); it still works as a backing track for sections 3
 **1. Frozen today (0:00 to 0:20).** Speaker on camera, then the landing page at night.
 
 > Stock Tokens on Robinhood Chain trade all weekend. Their price feeds do not: over 8 weekends,
-> 32 of the 35 feeds posted nothing from Friday night to Sunday night, and so did the weekend
-> since. With prices frozen nobody can be liquidated, so when trading resumes, lenders take the
-> gap.
+> 32 of the 35 feeds posted nothing from Friday night to Sunday night, and so did the two
+> weekends since. With prices frozen nobody can be liquidated, so when trading resumes,
+> lenders take the gap.
 
 **2. Thin tomorrow (0:20 to 0:45).** The landing's "Frozen today, thin tomorrow" panel, then the
 risk board's price regime column.

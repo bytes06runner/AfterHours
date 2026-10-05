@@ -1,0 +1,970 @@
+{
+  "taken_at": "2026-10-05T14:37:00.925353+00:00",
+  "since": "2026-10-02T13:30:00+00:00",
+  "head_block": 80860404,
+  "network": "Robinhood Chain",
+  "method": "same as the M1 study (engine/afterhours/discovery/oracle_study.py)",
+  "summary": {
+    "weekends": 1,
+    "first_weekend_close": "2026-10-02T20:00:00+00:00",
+    "last_weekend_close": "2026-10-02T20:00:00+00:00",
+    "feeds": 35,
+    "feeds_without_update": 35,
+    "feeds_with_update": [],
+    "updates_in_window": 0,
+    "max_seconds_after_window_opened": null,
+    "window": "Friday 20:00 to Sunday 20:00 New York",
+    "updates_inside_window": []
+  },
+  "study": {
+    "calendar": "XNYS",
+    "now": "2026-10-05T14:36:21+00:00",
+    "periods": [
+      {
+        "kind": "weekend",
+        "close": "2026-10-02T20:00:00+00:00",
+        "open": "2026-10-05T13:30:00+00:00",
+        "hours": 65.5,
+        "from_block": 78464466,
+        "to_block": 80856693,
+        "updates": 520
+      }
+    ],
+    "feeds": [
+      {
+        "symbol": "NVDA",
+        "proxy": "0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15",
+        "aggregators": [
+          "0xC9d16E4f2569b9E3ea0468fD85844953713DC2a2"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 3,
+          "pre_market": 1,
+          "after_open": 3
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:42+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "SPY",
+        "proxy": "0x319724394D3A0e3669269846abE664Cd621f9f6A",
+        "aggregators": [
+          "0x78BCB218fA04B9b3a278eBc865Ed320BF8DEFBAc"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 1
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:20+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "META",
+        "proxy": "0x7C38C00C30BEe9378381E7B6135d7283356D71b1",
+        "aggregators": [
+          "0xc190B6164B9e320A6400cdaB0085a2e0E2b9738e"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 1,
+          "after_open": 5
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:51+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "SGOV",
+        "proxy": "0xa0DF4ee0fFf975306345875E3548Fcc519577A11",
+        "aggregators": [
+          "0x0E96B7708487f91baAC09697593D3e8bf253f2d8"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 1
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:38+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "USO",
+        "proxy": "0x75a9c76Ef439e2C7c2E5a34Ab105EcFe3766431c",
+        "aggregators": [
+          "0xa6aC45e27D19f91c55109191D71CfBA4A9f5fBe1"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 7,
+          "pre_market": 15
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:50+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "SPCX",
+        "proxy": "0xB265810950ba6c5C0Ff821c9963014a56fD8Bffb",
+        "aggregators": [
+          "0x5eaa223c585F40CDcA2D119ea91B97C491245631"
+        ],
+        "weekend_updates_by_segment": {
+          "after_hours": 1,
+          "overnight": 2,
+          "pre_market": 2,
+          "after_open": 8
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T20:11:31+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:51+00:00",
+            "oracle_move_across_frozen": 0.004568
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.004568
+      },
+      {
+        "symbol": "MSTR",
+        "proxy": "0x396118bdFB181e6240E74D243F266B061c0edc3D",
+        "aggregators": [
+          "0x55bd01F666c99E4590E084FdEfF88041BB50CCD1"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 6,
+          "after_hours": 1,
+          "overnight": 10,
+          "pre_market": 6,
+          "after_open": 8
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T20:07:21+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:40+00:00",
+            "oracle_move_across_frozen": 0.028693
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.028693
+      },
+      {
+        "symbol": "AAPL",
+        "proxy": "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0",
+        "aggregators": [
+          "0xBb11A21267cFDb63d4935d99a499133DD1744ACb"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 1,
+          "pre_market": 1,
+          "after_open": 3
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:34+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "TSLA",
+        "proxy": "0x4A1166a659A55625345e9515b32adECea5547C38",
+        "aggregators": [
+          "0x7A6b81ba7FbCB90104d8C496158Cf383cD7233b1"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 3,
+          "overnight": 3,
+          "pre_market": 2,
+          "after_open": 7
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:55:31+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:41+00:00",
+            "oracle_move_across_frozen": 0.004972
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.004972
+      },
+      {
+        "symbol": "CRCL",
+        "proxy": "0x6652eDf64bA3731C4F2D3ce821A0Fb1f1f6b482a",
+        "aggregators": [
+          "0x901D8DF245E48Dfc82D6483FC45b5BE6ddc5281a"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 2,
+          "after_hours": 2,
+          "overnight": 6,
+          "pre_market": 6,
+          "after_open": 10
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T20:17:50+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:39+00:00",
+            "oracle_move_across_frozen": 0.024997
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.024997
+      },
+      {
+        "symbol": "GOOGL",
+        "proxy": "0xF6f373a037c30F0e5010d854385cA89185AE638b",
+        "aggregators": [
+          "0x11eD6d598eF565DDA86fAfE7E779303e7CC6b2Bd"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 1,
+          "pre_market": 1,
+          "after_open": 1
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:17+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "MSFT",
+        "proxy": "0x45C3C877C15E6BA2EBB19eA114Ea508d14C1Af2E",
+        "aggregators": [
+          "0xc3b117F52cf17Dd4369eaF5eaf7cF0E2f91b4E30"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 2,
+          "pre_market": 2,
+          "after_open": 7
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:57:25+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:45+00:00",
+            "oracle_move_across_frozen": 0.000634
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.000634
+      },
+      {
+        "symbol": "QQQ",
+        "proxy": "0x80901d846d5D7B030F26B480776EE3b29374C2ae",
+        "aggregators": [
+          "0x25e996ce8b3529885D429241156e83e7b7744049"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 1,
+          "pre_market": 1,
+          "after_open": 1
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:47+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "MU",
+        "proxy": "0x425EEFdCf05ed6526C3cE61Af99429A228a6d596",
+        "aggregators": [
+          "0xA088FaD0A0A62693aF068E2EdB80B1578c8A9365"
+        ],
+        "weekend_updates_by_segment": {
+          "after_hours": 1,
+          "overnight": 1,
+          "pre_market": 1,
+          "after_open": 5
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T21:10:41+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:24+00:00",
+            "oracle_move_across_frozen": 0.00474
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.00474
+      },
+      {
+        "symbol": "PLTR",
+        "proxy": "0x820ABedFF239034956B7A9d2F0a331f9F075eB4c",
+        "aggregators": [
+          "0x315afd0f71D5407B99ad19ab001a67af40fbAAF4"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 2,
+          "pre_market": 1,
+          "after_open": 7
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:50:57+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:47+00:00",
+            "oracle_move_across_frozen": 0.00445
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.00445
+      },
+      {
+        "symbol": "COIN",
+        "proxy": "0xA3a468A452940B7D6b69991207B508c609a98Ef2",
+        "aggregators": [
+          "0x30398b0B0df82a009bB2D507BC7fE1dc6d3ca294"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 6,
+          "pre_market": 7,
+          "after_open": 9
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:35:47+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:37+00:00",
+            "oracle_move_across_frozen": 0.028116
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.028116
+      },
+      {
+        "symbol": "GME",
+        "proxy": "0x27C71df6A64fB476468EdF256CF72c038baB5B67",
+        "aggregators": [
+          "0xf83Cde62D1Cd90dE8d2Bf3332B90c590985aD679"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 3,
+          "after_hours": 5,
+          "overnight": 7,
+          "pre_market": 8,
+          "after_open": 8
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T21:55:01+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:32+00:00",
+            "oracle_move_across_frozen": -0.002122
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.002122
+      },
+      {
+        "symbol": "AMZN",
+        "proxy": "0xD5a1508ceD74c084eBf3cBe853e2C968fB2a651C",
+        "aggregators": [
+          "0x93503dFc97157cdB8aADcCaf70452621d598FDeb"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 1,
+          "pre_market": 1,
+          "after_open": 1
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:51:17+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:37+00:00",
+            "oracle_move_across_frozen": 0.000854
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.000854
+      },
+      {
+        "symbol": "TSM",
+        "proxy": "0x874cF94aa8eC88Fd9560094dD065f2fB3E41Fc2F",
+        "aggregators": [
+          "0x2B3A9A18998e9464760658233ab093e6aEbF45d0"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 4,
+          "pre_market": 1,
+          "after_open": 2
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:26:21+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:42+00:00",
+            "oracle_move_across_frozen": 0.004536
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.004536
+      },
+      {
+        "symbol": "AMD",
+        "proxy": "0x943A29E7ae51A4798823ca9eEd2ed533B2A22C72",
+        "aggregators": [
+          "0xdAD54b8Ee51Af258e5A6Faa9a84a3300f4775f7d"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 5,
+          "pre_market": 2,
+          "after_open": 5
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:17+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "SLV",
+        "proxy": "0x209b73908e92Ae021826eD79609845451Ecba2ce",
+        "aggregators": [
+          "0xcdF6F7043b3aF6Afa0CAAACe1230B355096B5386"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 8,
+          "pre_market": 2,
+          "after_open": 4
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:14:42+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:50+00:00",
+            "oracle_move_across_frozen": 0.001957
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.001957
+      },
+      {
+        "symbol": "DELL",
+        "proxy": "0x1C6c8cADBe02E19129c39dDB92281cE4c0bf206b",
+        "aggregators": [
+          "0xD6ed4e7D4ABA1111EB42A349899b5c72EE1C9FEF"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 4,
+          "pre_market": 3,
+          "after_open": 10
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:11:38+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:23+00:00",
+            "oracle_move_across_frozen": 0.011562
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.011562
+      },
+      {
+        "symbol": "INTC",
+        "proxy": "0x3f390C5C24628Ac7C489515402235FeAD71D1913",
+        "aggregators": [
+          "0x95fB52f75aEcBCa8E12aA4403f840C8bc18CFbd4"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 11,
+          "pre_market": 11,
+          "after_open": 9
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:55:32+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:39+00:00",
+            "oracle_move_across_frozen": -0.008097
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.008097
+      },
+      {
+        "symbol": "BABA",
+        "proxy": "0x62Cc8F9b5f56a33c9C8A60c8B92779f523c4E984",
+        "aggregators": [
+          "0xFf5F85e4888782e66f1dd9cabaDF4822Fbeb1439"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 2,
+          "overnight": 8,
+          "after_open": 1
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:53:37+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:22+00:00",
+            "oracle_move_across_frozen": -0.002497
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.002497
+      },
+      {
+        "symbol": "SNDK",
+        "proxy": "0xfb133Fa4B7b385802B693a293606682Df47109A3",
+        "aggregators": [
+          "0x7B2FdfcEa772f093DD33b3aCF8EE294B368f6c23"
+        ],
+        "weekend_updates_by_segment": {
+          "overnight": 2,
+          "pre_market": 2,
+          "after_open": 5
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": null,
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:20+00:00",
+            "oracle_move_across_frozen": null
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": null
+      },
+      {
+        "symbol": "ORCL",
+        "proxy": "0x0e6a64a2B58A6693a531E6c555f3A5d042eEA844",
+        "aggregators": [
+          "0x4a9aBC759e0B7b0ba98b5fd39c419A5D3e962aAf"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 3,
+          "pre_market": 1,
+          "after_open": 3
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:18:13+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:35+00:00",
+            "oracle_move_across_frozen": 0.004953
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.004953
+      },
+      {
+        "symbol": "CRWV",
+        "proxy": "0xe1b3aABCAFAd1c94708dc1367dcfF8Aa4407487C",
+        "aggregators": [
+          "0xd9C04B7353421fC4deb1614Ed13Fe10D90E586cc"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "after_hours": 1,
+          "overnight": 4,
+          "pre_market": 3,
+          "after_open": 7
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T20:16:14+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:17+00:00",
+            "oracle_move_across_frozen": 0.00361
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.00361
+      },
+      {
+        "symbol": "ASML",
+        "proxy": "0xB4106147E8cce40b7d46124090d373A71b70f87D",
+        "aggregators": [
+          "0xF795030a46ad6CA4b07Bf5fB704dC36039118c9F"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 5,
+          "pre_market": 3,
+          "after_open": 2
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:25:56+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:34+00:00",
+            "oracle_move_across_frozen": -0.003057
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.003057
+      },
+      {
+        "symbol": "USAR",
+        "proxy": "0xA994d3684e8400A6c8078226925779FdeE682DD9",
+        "aggregators": [
+          "0x76ba75c6c362900B275D9D4d5C422F0275e85578"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "overnight": 7,
+          "after_open": 13
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:18:06+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:22+00:00",
+            "oracle_move_across_frozen": 0.016206
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.016206
+      },
+      {
+        "symbol": "EWY",
+        "proxy": "0xEFdf54610B62A7753Ec30bDc380847c12D32e1D1",
+        "aggregators": [
+          "0x105Cbe427BBD3225826a450f67EA80FeC6417F93"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 1,
+          "after_hours": 2,
+          "overnight": 2,
+          "pre_market": 2,
+          "after_open": 3
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T22:47:22+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:39+00:00",
+            "oracle_move_across_frozen": 0.004113
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.004113
+      },
+      {
+        "symbol": "NBIS",
+        "proxy": "0xE1D87B116Ba0fe898998f1D140339D1fA1E09705",
+        "aggregators": [
+          "0xE50c4775FeFc1E3C9206771dd0056AEe30F51b2F"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 2,
+          "overnight": 5,
+          "pre_market": 2,
+          "after_open": 8
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:48:20+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:41+00:00",
+            "oracle_move_across_frozen": 0.011517
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.011517
+      },
+      {
+        "symbol": "RKLB",
+        "proxy": "0x045477BF65Aef6f4F2386ad0164579e48381CC74",
+        "aggregators": [
+          "0x59aB60B1D63DE8b282852573D18a3a99c04C787c"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 4,
+          "overnight": 3,
+          "pre_market": 5,
+          "after_open": 18
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:49:42+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:49+00:00",
+            "oracle_move_across_frozen": 0.009998
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.009998
+      },
+      {
+        "symbol": "IONQ",
+        "proxy": "0x22EfeC4919baf55F360E0EDee4AbEB26DE4971eb",
+        "aggregators": [
+          "0x886E11c1053289Eed882C734e1864EfE3430BC24"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 4,
+          "after_hours": 1,
+          "overnight": 3,
+          "pre_market": 2,
+          "after_open": 11
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T20:04:17+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:37+00:00",
+            "oracle_move_across_frozen": 0.006171
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.006171
+      },
+      {
+        "symbol": "CLSK",
+        "proxy": "0x810c12D3a554Bc47fd39597Fe3b3AAC4941F50eF",
+        "aggregators": [
+          "0xEff19B88E3c72f046e4a19A1E62544D5869d4275"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 3,
+          "overnight": 11,
+          "pre_market": 3,
+          "after_open": 18
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T19:59:38+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:22+00:00",
+            "oracle_move_across_frozen": 0.006675
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.006675
+      },
+      {
+        "symbol": "RGTI",
+        "proxy": "0x2A045cF1C49c61c166C036d2f06FA2D2d984f765",
+        "aggregators": [
+          "0x42B1C5174cE84Be751A23489d7DbDc969Bc17eA2"
+        ],
+        "weekend_updates_by_segment": {
+          "before_close": 2,
+          "after_hours": 2,
+          "overnight": 3,
+          "pre_market": 7,
+          "after_open": 10
+        },
+        "overnight_updates_by_segment": {},
+        "frozen_updates": 0,
+        "weekends": [
+          {
+            "close": "2026-10-02T20:00:00+00:00",
+            "open": "2026-10-05T13:30:00+00:00",
+            "last_update_before_frozen": "2026-10-02T20:05:06+00:00",
+            "updates_inside_frozen": 0,
+            "inside_frozen_detail": [],
+            "first_update_after_frozen": "2026-10-05T00:00:27+00:00",
+            "oracle_move_across_frozen": -0.001868
+          }
+        ],
+        "max_abs_oracle_move_across_frozen": 0.001868
+      }
+    ]
+  }
+}
