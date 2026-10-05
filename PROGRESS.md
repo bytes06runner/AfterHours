@@ -2,15 +2,11 @@
 
 ## BLOCKED
 
-0. **GitHub Actions configuration for the pre-close jobs (2026-10-04).** The workflow now runs
-   and skips with a notice for anything missing. In the repository's Settings > Secrets and
-   variables > Actions, please make sure these exist:
-   - variable `AFTERHOURS_ACTIVE_PROFILE` = `rh-testnet`
-   - secrets `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (bot history, subscriptions)
-   - secret `ALLOCATOR_PK` (the bot cycle; testnet key only)
-   - secret `TELEGRAM_BOT_TOKEN` (pre-close alerts)
-   - optional secrets `RH_MAINNET_RPC_URL`, `RH_TESTNET_RPC_URL`, `ARB_SEPOLIA_RPC_URL`
-   Then Actions > Pre-close jobs > Run workflow once (or wait for Monday's scheduled run).
+0. **Resolved 2026-10-05: GitHub Actions configuration.** Set with `gh` (signed in as
+   bytes06runner): variable `AFTERHOURS_ACTIVE_PROFILE=rh-testnet`; secrets
+   `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `ALLOCATOR_PK`, `RH_MAINNET_RPC_URL`,
+   copied from `.env` by a script that piped each value to `gh secret set` without printing it.
+   `TELEGRAM_BOT_TOKEN` is not in `.env` (item 4), so the alerts step skips with a notice.
 
 1. **Archive RPC for Robinhood Chain mainnet (needed for the fork).** The public RPC
    (`rpc.mainnet.chain.robinhood.com`) serves state for only about the last 1,000 blocks
@@ -1151,3 +1147,30 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
 - Next: the Oct 2 to 5 weekend reading after Monday 13:30 UTC (`make oracle-reading`, then
   `make regime-cadence` and `afterhours numbers`); optional stretch x402 on testnet; the
   2026-10-10 pre-submission audit.
+
+### 2026-10-05 Feature freeze: memory, Actions, wording, scheduled reading
+
+- Memory (goal: peak under 400 MB, no change in behaviour). Same load test before and after
+  (2 x 30 parallel `/v1/live/board`). Production before: API peak 482 MB. After: API peak 232
+  MB under load, settling at about 214 MB; the price fetch, now a separate process that exits
+  before the API starts, peaked at 367 MB (`/v1/health` `children_peak_rss_mb`), so the
+  service's peak is 367 MB and the two never overlap. Locally (empty price cache): peak 421 to
+  324 MB, API steady 421 to 198 MB. Output unchanged: 35 forecasts, 35 DEX prices.
+  Changes: the live quantile uses `statistics.NormalDist` (equal to scipy's `norm.ppf` bit for
+  bit at alpha 0.01, tested); the LP imports scipy only when the bot plans; serve.sh runs
+  `data fetch --stock-tokens` before the API and sets `AFTERHOURS_LIVE__WARM_PRICES=false`
+  (yfinance's HTTP stack and buffers, over 100 MB, never live in the API). Caches checked: the
+  artifact cache holds 1.4 MB of files, the calendar cache small tuples; left as they are.
+  Tests: `tests/test_memory.py` (no scipy, yfinance, lxml, curl_cffi in the API process; the
+  quantile; serve.sh order). Trade-off: a cold start binds the port after the price fetch
+  instead of before it.
+- GitHub: `gh` 2.102.0 installed from the official release (checksum verified). Actions
+  variable and secrets set (BLOCKED 0). `Pre-close jobs` dispatched by hand: success
+  (configuration, checkout, setup-uv, install, window check green; bot and alerts skipped
+  outside a pre-close window). The first real cycle is the 18:23 or 19:23 UTC run today.
+- No text anywhere says which AI labs' models Robinhood's agents use beyond Robinhood's own
+  wording; the findings note no longer restates secondary reports.
+- The Oct 2 to 5 weekend reading is scheduled as a one-off task for 2026-10-05 14:00 UTC
+  (`afterhours-oct5-oracle-reading`): `make oracle-reading`, numbers, README, pitch, PROGRESS,
+  tests, push.
+
