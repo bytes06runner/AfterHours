@@ -599,5 +599,169 @@
    }
   ],
   "clip": "demo/11-agents.mp4"
+ },
+ "w3-01-landing": {
+  "name": "01-landing",
+  "view": {
+   "width": 1440,
+   "height": 810
+  },
+  "scale": 2,
+  "duration": 35.142,
+  "events": [
+   {
+    "t": -0.009,
+    "type": "page",
+    "url": "about:blank"
+   },
+   {
+    "t": 2.847,
+    "type": "page",
+    "url": "https://after-hours-web-eta.vercel.app/"
+   },
+   {
+    "t": 9.441,
+    "type": "focus",
+    "x": 720,
+    "y": 400,
+    "scale": 1.35,
+    "hold": 2.2
+   },
+   {
+    "t": 11.843,
+    "type": "scroll",
+    "dy": 760
+   },
+   {
+    "t": 13.2,
+    "type": "focus",
+    "x": 1010,
+    "y": 235,
+    "scale": 1.55,
+    "hold": 1.9,
+    "label": "countdown"
+   },
+   {
+    "t": 15.259,
+    "type": "scroll",
+    "dy": 900
+   },
+   {
+    "t": 18.874,
+    "type": "scroll",
+    "dy": 900
+   },
+   {
+    "t": 22.287,
+    "type": "scroll",
+    "dy": -2560
+   },
+   {
+    "t": 25.968,
+    "type": "click",
+    "x": 1129,
+    "y": 405,
+    "scale": 1.5,
+    "hold": 1
+   }
+  ],
+  "clip": "demo/w3-01-landing.mp4"
+ },
+ "w3-03-checker": {
+  "name": "03-checker",
+  "view": {
+   "width": 1440,
+   "height": 810
+  },
+  "scale": 2,
+  "duration": 18.537,
+  "events": [
+   {
+    "t": -0.048,
+    "type": "page",
+    "url": "https://after-hours-web-eta.vercel.app/positions"
+   },
+   {
+    "t": 0.653,
+    "type": "focus",
+    "x": 560,
+    "y": 330,
+    "scale": 1.45,
+    "hold": 2
+   },
+   {
+    "t": 3.242,
+    "type": "click",
+    "x": 612.4,
+    "y": 542.8,
+    "scale": 1.8,
+    "hold": 1.3
+   },
+   {
+    "t": 3.32,
+    "type": "page",
+    "url": "https://after-hours-web-eta.vercel.app/positions?address=0x6b19a3E24a2E181793ef3Ed01cE0061978b8Ea47"
+   },
+   {
+    "t": 9.723,
+    "type": "scroll",
+    "dy": 360
+   },
+   {
+    "t": 12.514,
+    "type": "focus",
+    "x": 720,
+    "y": 488.5390625,
+    "scale": 1.7,
+    "hold": 2.6
+   },
+   {
+    "t": 15.316,
+    "type": "scroll",
+    "dy": 420
+   }
+  ],
+  "clip": "demo/w3-03-checker.mp4"
+ },
+ "w3-07-testnet": {
+  "name": "07-testnet",
+  "view": {
+   "width": 1440,
+   "height": 810
+  },
+  "scale": 2,
+  "duration": 7.558,
+  "events": [
+   {
+    "t": -0.05,
+    "type": "page",
+    "url": "https://after-hours-web-eta.vercel.app/ledger"
+   },
+   {
+    "t": -0.05,
+    "type": "focus",
+    "x": 560,
+    "y": 260,
+    "scale": 1.3,
+    "hold": 1.8
+   },
+   {
+    "t": 2.839,
+    "type": "click",
+    "x": 250.4,
+    "y": 787.9,
+    "scale": 1.8,
+    "hold": 1.2
+   },
+   {
+    "t": 4.454,
+    "type": "focus",
+    "x": 376.90234375,
+    "y": 787.73046875,
+    "scale": 1.9,
+    "hold": 2.4
+   }
+  ],
+  "clip": "demo/w3-07-testnet.mp4"
  }
 }

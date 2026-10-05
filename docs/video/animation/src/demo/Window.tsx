@@ -67,7 +67,7 @@ export const Window: React.FC<{ shot: Shot; frames: number; enter: "rise" | "fad
   const grow = enter === "rise" ? 0.965 + 0.035 * ease : 1;
   // The window leans in a touch while the camera is zoomed, for depth.
   const lean = 1 + (cam.s - 1) * 0.012;
-  const fastO = piece.speed > 1 ? interpolate(f, [piece.start, piece.start + 8, piece.start + piece.frames - 8, piece.start + piece.frames], [0, 1, 1, 0], clamp) : 0;
+  const fastO = piece.speed > 1 && !piece.quiet ? interpolate(f, [piece.start, piece.start + 8, piece.start + piece.frames - 8, piece.start + piece.frames], [0, 1, 1, 0], clamp) : 0;
   const clickFrames = REC[shot.rec].events
     .filter((e) => e.type === "click")
     .map((e) => outFrame(shot, e.t))
@@ -118,7 +118,7 @@ export const Window: React.FC<{ shot: Shot; frames: number; enter: "rise" | "fad
               ))}
             </div>
           </div>
-          {piece.speed > 1 && (
+          {piece.speed > 1 && !piece.quiet && (
             <div style={{ position: "absolute", left: 0, right: 0, bottom: 34, display: "flex", justifyContent: "center", opacity: fastO }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 22px", borderRadius: 999, background: "rgba(7,10,28,0.88)", border: `1px solid ${C.rule}`, color: C.text, fontFamily: FONT.sans, fontSize: 21, fontWeight: 600, boxShadow: "0 10px 30px rgba(0,0,0,0.4)" }}>
                 <span style={{ color: C.brass, fontWeight: 800 }}>{piece.speed}× speed</span>

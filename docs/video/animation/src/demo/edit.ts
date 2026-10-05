@@ -30,7 +30,7 @@ export type Shot = {
   from: number; // seconds into the recording
   to: number;
   /** Stretches where nothing happens but waiting on the network, played faster (and marked so). */
-  fast?: { from: number; to: number; speed: number; note: string }[];
+  fast?: { from: number; to: number; speed: number; note: string; quiet?: boolean }[];
 };
 
 export type Chapter = { n: string; title: string; line: string; env: Env; shots: Shot[] };
@@ -94,21 +94,21 @@ export const CARD = 60; // a chapter card, before the window comes in
 export const XFADE = 12; // frames two shots overlap by
 
 /** A shot cut into constant-speed pieces, each mapped to output frames. */
-export type Piece = { from: number; to: number; speed: number; note?: string; start: number; frames: number };
+export type Piece = { from: number; to: number; speed: number; note?: string; quiet?: boolean; start: number; frames: number };
 
 export function pieces(shot: Shot): Piece[] {
   const out: Piece[] = [];
   let t = shot.from;
   let start = 0;
-  const push = (from: number, to: number, speed: number, note?: string) => {
+  const push = (from: number, to: number, speed: number, note?: string, quiet?: boolean) => {
     if (to - from < 1 / FPS) return;
     const frames = Math.round(((to - from) * FPS) / speed);
-    out.push({ from, to, speed, note, start, frames });
+    out.push({ from, to, speed, note, quiet, start, frames });
     start += frames;
   };
   for (const f of [...(shot.fast ?? [])].sort((a, b) => a.from - b.from)) {
     push(t, f.from, 1);
-    push(f.from, f.to, f.speed, f.note);
+    push(f.from, f.to, f.speed, f.note, f.quiet);
     t = f.to;
   }
   push(t, shot.to, 1);
