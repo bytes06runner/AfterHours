@@ -63,8 +63,16 @@ class WeekendRisk(_Doc):
     feed_price: float | None
     regime: dict[str, Any] = Field(description="Regime, price quality and line (docs/REGIME.md).")
     next_closed_period: dict[str, Any] | None
-    bad_case_drop: float | None = Field(description="Fall beaten only about 1 night in 1/alpha.")
+    bad_case_drop: float | None = Field(
+        description="Calibrated bad-case fall; the forecast targets a fall beyond it on a share "
+        "alpha of closed periods (see held_out_miss_rate for the measured share)."
+    )
     alpha: float | None
+    held_out_miss_rate: float | None = Field(
+        default=None,
+        description="Share of held-out closed periods of this segment (walk-forward test years) "
+        "whose fall went beyond the bad case.",
+    )
     markets: list[dict[str, Any]] = Field(description="USDG Morpho markets: LLTV and cushion.")
     beyond_cushion_of: list[float] = Field(description="LLTVs whose cushion the bad case passes.")
     summary: str
@@ -133,6 +141,20 @@ def market_status(status: dict[str, Any], regimes: dict[str, Any] | None) -> dic
     }
 
 
+def coverage_sentence(t: dict[str, Any]) -> str:
+    """The bad case with the forecast's target and its measured held-out miss rate."""
+    target = f"the forecast aims for a fall beyond it on {_pct(t['alpha'])} of closed periods"
+    text = f"Its bad case is {_pct(t['bad_case_drop'])}: {target}."
+    miss, years = t.get("held_out_miss_rate"), t.get("held_out_years")
+    if miss:
+        span = f" {years[0]} to {years[1]}" if years else ""
+        text += (
+            f" On held-out years{span}, falls went beyond it on {miss:.2%} of "
+            f"{t['period']['segment']} periods (about 1 in {round(1 / miss)})."
+        )
+    return text
+
+
 def weekend_risk(board: dict[str, Any], symbol: str) -> dict[str, Any]:
     """One Stock Token from the live board. Raises KeyError for an unknown ticker."""
     sym = symbol.strip().upper()
@@ -147,11 +169,9 @@ def weekend_risk(board: dict[str, Any], symbol: str) -> dict[str, Any]:
         parts.append(f"Price quality {q} of 100 ({regime['quality']['grade']}).")
     if t:
         p = t["period"]
-        one_in = round(1 / t["alpha"]) if t["alpha"] else None
         parts.append(
             f"The next closed period is a {p['segment']} from {_ny(p['starts'])} to "
-            f"{_ny(p['ends'])} ({float(p['hours']):.1f} hours closed). Its bad case, the fall "
-            f"beaten only about 1 night in {one_in}, is {_pct(t['bad_case_drop'])}."
+            f"{_ny(p['ends'])} ({float(p['hours']):.1f} hours closed). " + coverage_sentence(t)
         )
         markets = row["markets"]
         if not markets:
@@ -181,6 +201,7 @@ def weekend_risk(board: dict[str, Any], symbol: str) -> dict[str, Any]:
         "next_closed_period": t["period"] if t else None,
         "bad_case_drop": t["bad_case_drop"] if t else None,
         "alpha": t["alpha"] if t else None,
+        "held_out_miss_rate": t.get("held_out_miss_rate") if t else None,
         "markets": row["markets"],
         "beyond_cushion_of": row["breached"],
         "summary": " ".join(parts),

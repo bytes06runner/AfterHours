@@ -9,7 +9,7 @@ import { useMemo, useState } from "react";
 
 import { liveErrorText, RETRY_TEXT, type LiveBoard } from "@/lib/api";
 import { useLiveBoard } from "@/lib/queries";
-import { formatPct } from "@/lib/time";
+import { coverageText, formatPct } from "@/lib/time";
 
 import { LiveLabel } from "./LiveLabel";
 import { RegimeBadge } from "./RegimeBadge";
@@ -132,8 +132,7 @@ export function RiskBoardView() {
       r.regime ? r.regime.regime === "frozen" : r.status?.state === "frozen",
     ).length ?? 0;
   const counts = d?.regimes?.counts;
-  const alpha = d?.stocks.find((r) => r.tonight)?.tonight?.alpha;
-  const oneIn = alpha ? Math.round(1 / alpha) : null;
+  const sample = d?.stocks.find((r) => r.tonight)?.tonight;
   return (
     <div className="mx-auto max-w-[1440px] px-4 pb-24 sm:px-8">
       <h1 className="mt-8 text-[48px] lg:text-[64px]">Live risk board</h1>
@@ -142,8 +141,8 @@ export function RiskBoardView() {
       </div>
       <p className="mt-4 max-w-[70ch] text-[18px]">
         Every Stock Token on {d?.network ?? "Robinhood Chain"}: when its price feed last moved,
-        whether it is frozen right now, and tonight&apos;s bad case, the fall we expect to be beaten
-        only about {oneIn ? `1 night in ${oneIn}` : "rarely"}. If that fall is bigger than a lending
+        whether it is frozen right now, and tonight&apos;s bad case
+        {sample ? ` (${coverageText(sample)})` : ""}. If that fall is bigger than a lending
         market&apos;s cushion, a loan at that market&apos;s limit could be left with bad debt.
       </p>
       {d && (
@@ -236,9 +235,11 @@ export function RiskBoardView() {
         exchange is shut but the feed is posting, so it follows a weekend source, which can be thin)
         and frozen (shut, and the feed has posted nothing since). Price quality, 0 to 100, weighs
         how stale the feed is for its usual pace, how far the DEX price has drifted from it, and how
-        much can be sold within 2%; the formula is in docs/REGIME.md. Forecasts are the shipped
-        model&apos;s 1-in-100 bad case for the closed period now in progress or the next one, not
-        adjusted for the regime. Not financial advice.
+        much can be sold within 2%; the formula is in docs/REGIME.md. When a DEX read fails, the
+        badge says &quot;DEX unavailable&quot; and the score uses feed staleness alone. Forecasts
+        are the shipped model&apos;s bad case (targeting 1% of closed periods; measured held-out
+        rates are higher on weekends and holidays) for the closed period now in progress or the next
+        one, not adjusted for the regime. Not financial advice.
       </p>
     </div>
   );

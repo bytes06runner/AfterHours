@@ -57,12 +57,12 @@ Keep the Simulation banner visible in every product shot: it is part of the prod
 | --- | --- | --- | --- | --- | --- |
 | 1 | 0:00 to 0:12 | LIVE | Tab 1, landing. Let the exchange sit; hover the ticker so it pauses | The ticker shows prices | "This is Afterhours, a lending vault and risk layer for Robinhood Stock Tokens." |
 | 2 | 0:12 to 0:35 | LIVE | Tab 1, scroll to "Frozen today, thin tomorrow". Rest on the four regime counts, then the least trustworthy prices | The counts and three lines | "Stock Tokens trade around the clock, but their price feeds follow the exchange. Over 8 weekends, 32 of 35 feeds posted nothing between Friday and Sunday night. Robinhood has announced weekend trading, pending regulatory review; if the feeds follow it, weekend prices will come from one venue and can be thin. So Afterhours reads every token's price regime, live." |
-| 3 | 0:35 to 0:50 | LIVE | Tab 2, risk board. Point at the Price regime column; click "Poor price quality" | Rows with a regime badge and a price quality score | "Each price gets a quality score from how stale the feed is, how far the DEX has drifted from it, and how much can be sold. Last Saturday all 35 were frozen, and IONQ and RGTI had drifted 3.4% and 7.3% on the DEX." |
+| 3 | 0:35 to 0:50 | LIVE | Tab 2, risk board. Point at the Price regime column; click "Poor price quality" | Rows with a regime badge and a price quality score | "Each price gets a quality score from how stale the feed is, how far the DEX has drifted from it, and how much can be sold. On Sunday, October 4th, all 35 were frozen; IONQ's and RGTI's DEX pools sat -3.4% and +7.3% from their feeds, in pools with $50 and $73 of depth, so thin they score as poor." |
 | 4 | 0:50 to 1:05 | LIVE | Tab 3, position checker. Click the first "Try a live borrower" address | A position card | "Anyone can check a real loan: how close it is to liquidation, and whether tonight's bad case would get there." |
 | 5 | 1:05 to 1:25 | LOCAL | Tab 4, vault. Click "Connect", pick your wallet; click "Switch to" if asked; click "Get test USDG (sim)"; type 1000 and click "Approve and deposit USDG"; approve in the wallet | "Received" notice, then your deposit in the panel | "Lenders deposit USDG. Each stock has three Morpho markets, at 91.5%, 86% and 77% loan-to-value, and lends in the riskiest one its last year of prices allows." |
 | 6 | 1:25 to 1:50 | LOCAL | Terminal: `make scenario NAME=closing_bell`. Switch to tab 4 and keep the allocation board on screen | META's bar shrinks and its row flashes | "Now the closing bell. META reports next week; its bad case is far above the 10.4% line every market can take, so the bot pulls the money borrowers are not using. Money already lent stays." |
 | 7 | 1:50 to 2:05 | LOCAL | Tab 5, ledger. Open the newest card; click "Verify on chain" | "Matched" | "Every move prints a reason, and its hash is written onchain. The browser checks it." |
-| 8 | 2:05 to 2:12 | EXPLORER | Tab 6. Point at From (the allocator), To (the vault) and the method | The transaction page | "The same bot runs on Robinhood Chain Testnet." |
+| 8 | 2:05 to 2:12 | EXPLORER | Tab 6. Point at From (the allocator), To (the vault) and the method | The transaction page | "The same contracts are deployed on Robinhood Chain Testnet. This is the bot's first allocation there, from the seed cycle on September 27th." |
 | 9 | 2:12 to 2:35 | AGENT | Claude Desktop: ask "Is NVDA safe to lend against this weekend?" Let it call `get_weekend_risk` (expand the tool call), then read the answer. Cut to tab 7, the Agents page | The tool call and its answer | "Robinhood's trading agents will run strategies overnight. Any agent can read this risk through four read-only MCP tools. They read; they cannot trade." |
 | 10 | 2:35 to 2:55 | LIVE | Tab 8, report card. Show the frontier chart, then scroll to the decision section | The chart | "On 2022 to 2026, with settings chosen on earlier years, Afterhours earned 9.12%, the same as the best fixed mix at 9.09%, with about half the bad debt. Historical stock prices, simulated vault." |
 
@@ -75,7 +75,8 @@ recorded with Recordly.
 - If the take runs long, shorten shot 4 first, then shot 8.
 - Shot 5 amount: type 1000; it is typed on camera, not a claim.
 - Shots 2 and 3 are live: regime counts and scores change with the clock. The voice-over's
-  numbers are from the dated snapshot (`artifacts/regime/`), so say "last Saturday" as written.
+  numbers are from the dated snapshot (`artifacts/regime/`, Sunday 2026-10-04 10:34 UTC), so say
+  the date as written, never "last Saturday".
 - Shot 9: if the hosted API was asleep, the first tool call can take about a minute; ask the
   throwaway question before recording.
 - Shot 6: the scenario steps through the pre-close checks of 2025-04-22, 04-23 and 04-24; META

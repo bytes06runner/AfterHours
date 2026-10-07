@@ -306,3 +306,65 @@ def finalise(
     }
     deployment_path(cfg, profile).write_text(json.dumps(doc, indent=2) + "\n")
     return doc
+
+
+# ---------------------------------------------------------------- timelock hardening (P1-I)
+INCREASE_TIMELOCK = "increaseTimelock(bytes4,uint256)"
+
+
+def timelock_plan(
+    read: Any, vault: str, functions: list[str], seconds: int
+) -> list[dict[str, Any]]:
+    """Each curator function's current timelock on `vault` and what hardening would do.
+
+    `read(calls)` runs `afterhours.chain.rpc.Call`s (call_many). A function already at or above
+    `seconds`, or abdicated, is left as it is.
+    """
+    from afterhours.chain.rpc import Call
+
+    sels = [keccak(text=f)[:4] for f in functions]
+    current = read([Call(vault, "timelock(bytes4)(uint256)", (s,)) for s in sels])
+    gone = read([Call(vault, "abdicated(bytes4)(bool)", (s,)) for s in sels])
+    plan = []
+    for f, s, t, a in zip(functions, sels, current, gone, strict=True):
+        if t is None:
+            raise RuntimeError(f"could not read the timelock of {f} on {vault}")
+        action = "abdicated" if a else "keep" if int(t) >= seconds else "raise"
+        plan.append(
+            {
+                "function": f,
+                "selector": "0x" + s.hex(),
+                "current": int(t),
+                "target": seconds,
+                "action": action,
+            }
+        )
+    return plan
+
+
+def harden_timelocks(
+    send: Any,
+    vault: str,
+    plan: list[dict[str, Any]],
+    pending: Any = lambda data: False,
+) -> list[str]:
+    """Raise each planned timelock: the curator submits `increaseTimelock`, then executes it.
+
+    `increaseTimelock` itself has no timelock on these vaults (read onchain first: the plan
+    only raises, never lowers), so the execution follows the submission at once.
+    `send(to, signature, *args)` signs as the curator (Signer.send). `pending(data)` says the
+    same data was already submitted (VaultV2 `executableAt`), e.g. by a run that stopped
+    halfway; then only the execution is sent. Returns the tx hashes.
+    """
+    from afterhours.chain.abi import encode_call
+
+    txs = []
+    for p in plan:
+        if p["action"] != "raise":
+            continue
+        sel = bytes.fromhex(p["selector"][2:])
+        data = encode_call(INCREASE_TIMELOCK, sel, p["target"])
+        if not pending(data):
+            txs.append(send(vault, "submit(bytes)", data).tx_hash)
+        txs.append(send(vault, INCREASE_TIMELOCK, sel, p["target"]).tx_hash)
+    return txs

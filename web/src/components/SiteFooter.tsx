@@ -49,6 +49,7 @@ const PAGES = [
   { href: "/replay", label: "Replay" },
   { href: "/report-card", label: "Report card" },
   { href: "/live", label: "Live risk board" },
+  { href: "/curators", label: "Curator view" },
   { href: "/positions", label: "Check a position" },
   { href: "/agents", label: "Agents" },
 ];

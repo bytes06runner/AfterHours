@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 
@@ -241,45 +241,110 @@ def bot_once(
     trigger: Annotated[str, typer.Option(help="Label recorded with the cycle.")] = "manual",
     dry_run: Annotated[bool, typer.Option(help="Plan without sending transactions.")] = False,
 ) -> None:
-    """Run one planning cycle now."""
-    from afterhours.bot.allocator import Allocator, dump
+    """Run one planning cycle now (recorded in the automation history as a manual cycle)."""
+    from afterhours.bot.allocator import Allocator
+    from afterhours.bot.automation import run_recorded
+    from afterhours.state import Store
 
     _logging()
-    typer.echo(dump(Allocator(load_config()).run_cycle(trigger, execute=not dry_run)))
+    cfg = load_config()
+    now = datetime.now(UTC)
+    out = run_recorded(
+        Store.for_profile(cfg),
+        cfg,
+        cycle_id=f"manual:cli:{now.isoformat()}",
+        kind="manual",
+        close=None,
+        source=f"cli:{trigger}",
+        run_ref=None,
+        make_runner=lambda: Allocator(cfg),
+        execute=not dry_run,
+    )
+    typer.echo(json.dumps(out, indent=2, default=str))
 
 
 @bot_app.command("due")
-def bot_due() -> None:
-    """One pre-close cycle per close, only inside the pre-close window (for scheduled jobs)."""
-    from afterhours.bot.allocator import Allocator, dump
-    from afterhours.bot.scheduler import pre_close_window
+def bot_due(
+    source: Annotated[str, typer.Option(help="What started this run (schedule, ...).")] = "cli",
+    run_ref: Annotated[str | None, typer.Option(help="CI run id, recorded with the cycle.")] = None,
+    force: Annotated[
+        bool, typer.Option(help="Run a manual cycle even outside a pre-close window.")
+    ] = False,
+) -> None:
+    """Scheduled jobs: heartbeat, then one recorded pre-close cycle per close (hold or act).
+
+    Inside a pre-close window the cycle's id is its close, so repeated invocations run it once.
+    A failed cycle is recorded as failed and exits non-zero; the next invocation retries it.
+    """
+    from afterhours.bot.allocator import Allocator
+    from afterhours.bot.automation import heartbeat, run_due
     from afterhours.deployments import deployment_path
     from afterhours.state import Store
 
     _logging()
     cfg = load_config()
-    close = pre_close_window(cfg, datetime.now(UTC))
-    if close is None:
-        typer.echo("not in a pre-close window; nothing to do")
-        return
+    store = Store.for_profile(cfg)
     if not deployment_path(cfg).exists():
+        heartbeat(store, cfg, datetime.now(UTC), source, run_ref)
         typer.echo(f"no deployment for {cfg.active_profile} yet; nothing to do")
         return
-    store = Store.for_profile(cfg)
-    done = store.read("pre_close_run")
-    if done and done.get("close") == close.isoformat():
-        typer.echo(f"already ran for the {close.isoformat()} close")
+    out = run_due(
+        store,
+        cfg,
+        source=source,
+        run_ref=run_ref,
+        make_runner=lambda: Allocator(cfg),
+        force=force,
+    )
+    if out["outcome"] == "not_due":
+        typer.echo("not in a pre-close window; heartbeat recorded, nothing to do")
         return
-    typer.echo(dump(Allocator(cfg).run_cycle("pre_close")))
-    store.write("pre_close_run", {"close": close.isoformat(), "at": datetime.now(UTC).isoformat()})
+    typer.echo(json.dumps(out, indent=2, default=str))
+
+
+@app.command("automation")
+def automation_cmd() -> None:
+    """Print the automation health: last cycle, last success, heartbeat, missed closes."""
+    from afterhours.bot.automation import status
+    from afterhours.deployments import deployment_path
+    from afterhours.state import Store
+
+    cfg = load_config()
+    doc = status(
+        Store.for_profile(cfg), cfg, datetime.now(UTC), deployed=deployment_path(cfg).exists()
+    )
+    typer.echo(json.dumps(doc, indent=2, default=str))
 
 
 @app.command("pre-close")
-def pre_close_cmd() -> None:
-    """Print `true` inside a pre-close window, else `false` (scheduled jobs gate on it)."""
+def pre_close_cmd(
+    record_heartbeat: Annotated[
+        bool, typer.Option("--heartbeat", help="Record that a scheduled job ran.")
+    ] = False,
+    source: Annotated[str, typer.Option(help="What started this run.")] = "cli",
+    run_ref: Annotated[str | None, typer.Option(help="CI run id.")] = None,
+) -> None:
+    """Print `true` inside a pre-close window, else `false` (scheduled jobs gate on it).
+
+    With --heartbeat, also records the run, and prints `done` inside a window whose pre-close
+    cycle has already completed (later runs in the window skip the price fetch and the bot).
+    """
     from afterhours.bot.scheduler import pre_close_window
 
-    typer.echo("true" if pre_close_window(load_config(), datetime.now(UTC)) else "false")
+    cfg = load_config()
+    now = datetime.now(UTC)
+    if record_heartbeat:
+        from afterhours.bot.automation import close_done, heartbeat
+        from afterhours.state import Store
+
+        store = Store.for_profile(cfg)
+        close = heartbeat(store, cfg, now, source, run_ref)
+        if close and close_done(store, close):
+            typer.echo("done")
+            return
+    else:
+        close = pre_close_window(cfg, now)
+    typer.echo("true" if close else "false")
 
 
 @bot_app.command("run")
@@ -315,19 +380,8 @@ def testnet_keys_cmd() -> None:
     typer.echo(f"Deployer address: {who['DEPLOYER_PK']}")
 
 
-@app.command("fund-allocator")
-def fund_allocator_cmd(
-    profile: Annotated[str, typer.Option(help="A testnet profile: rh-testnet or arb-sepolia.")],
-    yes: Annotated[bool, typer.Option("--yes", help="Send without asking.")] = False,
-) -> None:
-    """Send testnet ETH from the deployer to the allocator (keys from .env, never printed)."""
-    from eth_utils.address import to_checksum_address
-
-    from afterhours.chain.rpc import connect
-    from afterhours.chain.tx import Signer
-    from afterhours.deploy import addresses, role_keys
-
-    cfg = load_config()
+def _testnet_chain(cfg: Any, profile: str) -> Any:
+    """The chain of a testnet profile; refuses mainnet, local and unknown profiles."""
     prof = cfg.profiles.get(profile)
     chain = cfg.chains[prof.chain] if prof else None
     # Testnets only: a chain with a faucet, no local node, no mainnet go required.
@@ -336,7 +390,30 @@ def fund_allocator_cmd(
     )
     if not prof or not chain or not testnet:
         raise typer.BadParameter(f"{profile} is not a testnet profile with a faucet")
-    keys = role_keys(cfg, profile, ("DEPLOYER_PK", "ALLOCATOR_PK"))
+    return chain
+
+
+@app.command("fund-allocator")
+def fund_allocator_cmd(
+    profile: Annotated[str, typer.Option(help="A testnet profile: rh-testnet or arb-sepolia.")],
+    yes: Annotated[bool, typer.Option("--yes", help="Send without asking.")] = False,
+    role: Annotated[
+        str, typer.Option(help="Who gets the gas: allocator (funding.allocator_eth) or guardian.")
+    ] = "allocator",
+) -> None:
+    """Send testnet ETH from the deployer to the allocator or guardian (keys never printed)."""
+    from eth_utils.address import to_checksum_address
+
+    from afterhours.chain.rpc import connect
+    from afterhours.chain.tx import Signer
+    from afterhours.deploy import addresses, role_keys
+
+    cfg = load_config()
+    if role not in ("allocator", "guardian"):
+        raise typer.BadParameter("role must be allocator or guardian")
+    chain = _testnet_chain(cfg, profile)
+    target = f"{role.upper()}_PK"
+    keys = role_keys(cfg, profile, ("DEPLOYER_PK", target))
     who = addresses(keys)
     w3 = connect(cfg.rpc_url(profile))
 
@@ -346,22 +423,79 @@ def fund_allocator_cmd(
     if chain.chain_id and int(w3.eth.chain_id) != chain.chain_id:
         raise typer.BadParameter(f"RPC answers chain {w3.eth.chain_id}, expected {chain.chain_id}")
     unit = chain.native_currency.symbol
-    amount = int(cfg.funding.allocator_eth * 10**18)
+    eth = cfg.funding.allocator_eth if role == "allocator" else cfg.funding.guardian_eth
+    amount = int(eth * 10**18)
     keep = int(cfg.funding.keep_deployer_eth * 10**18)
     have = balance("DEPLOYER_PK")
     typer.echo(f"{chain.name}: deployer {who['DEPLOYER_PK']} has {have / 1e18:.6f} {unit}")
-    typer.echo(f"allocator {who['ALLOCATOR_PK']} has {balance('ALLOCATOR_PK') / 1e18:.6f} {unit}")
+    typer.echo(f"{role} {who[target]} has {balance(target) / 1e18:.6f} {unit}")
     if have < amount + keep:
         raise typer.BadParameter(
             f"the deployer needs at least {(amount + keep) / 1e18} {unit}: "
             f"fund it at {chain.faucet_url}"
         )
-    if not yes and not typer.confirm(f"Send {amount / 1e18} {unit} to the allocator?"):
+    if not yes and not typer.confirm(f"Send {amount / 1e18} {unit} to the {role}?"):
         raise typer.Exit(1)
-    sent = Signer(w3, keys["DEPLOYER_PK"]).transfer(who["ALLOCATOR_PK"], amount)
+    sent = Signer(w3, keys["DEPLOYER_PK"]).transfer(who[target], amount)
     link = f"{chain.explorer_url}/tx/{sent.tx_hash}" if chain.explorer_url else sent.tx_hash
     typer.echo(f"sent: {link}")
-    typer.echo(f"allocator now has {balance('ALLOCATOR_PK') / 1e18:.6f} {unit}")
+    typer.echo(f"{role} now has {balance(target) / 1e18:.6f} {unit}")
+
+
+@app.command("harden-timelocks")
+def harden_timelocks_cmd(
+    profile: Annotated[str, typer.Option(help="A testnet profile: rh-testnet or arb-sepolia.")],
+    yes: Annotated[bool, typer.Option("--yes", help="Send without asking.")] = False,
+) -> None:
+    """Timelock the vault's exit gates, adapter registry and fee setters (curator key; testnet).
+
+    Prints each function's current timelock first and sends nothing unless confirmed. Raises
+    only, to `vault.timelock_seconds`; never lowers or abdicates anything.
+    """
+    from afterhours.chain.rpc import Call, call_many, connect
+    from afterhours.chain.tx import Signer
+    from afterhours.deploy import harden_timelocks, role_keys, timelock_plan
+    from afterhours.deployments import load_deployment
+
+    cfg = load_config()
+    chain = _testnet_chain(cfg, profile)
+    deployment = load_deployment(cfg, profile)
+    if not deployment:
+        raise typer.BadParameter(f"no deployments/{profile}.json")
+    vault = deployment["vault"]["address"]
+    w3 = connect(cfg.rpc_url(profile))
+    if chain.chain_id and int(w3.eth.chain_id) != chain.chain_id:
+        raise typer.BadParameter(f"RPC answers chain {w3.eth.chain_id}, expected {chain.chain_id}")
+    seconds = int(cfg.vault.timelock_seconds or 0)
+    if seconds <= 0:
+        raise typer.BadParameter("vault.timelock_seconds is not set")
+    plan = timelock_plan(
+        lambda calls: call_many(w3, calls), vault, cfg.vault.harden_timelock_functions, seconds
+    )
+    typer.echo(f"{chain.name}: vault {vault}")
+    for p in plan:
+        typer.echo(f"  {p['function']:<42} {p['current']:>7} s -> {p['action']}")
+    todo = [p for p in plan if p["action"] == "raise"]
+    if not todo:
+        typer.echo("nothing to raise")
+        return
+    if not yes and not typer.confirm(
+        f"Raise {len(todo)} timelocks to {seconds} s with the curator key ({2 * len(todo)} txs)?"
+    ):
+        raise typer.Exit(1)
+    curator = Signer(w3, role_keys(cfg, profile, ("CURATOR_PK",))["CURATOR_PK"])
+
+    def pending(data: bytes) -> bool:  # submitted by an earlier run that stopped halfway
+        (at,) = call_many(w3, [Call(vault, "executableAt(bytes)(uint256)", (data,))])
+        return bool(at)
+
+    for tx in harden_timelocks(curator.send, vault, plan, pending):
+        typer.echo(f"sent: {chain.explorer_url}/tx/{tx}" if chain.explorer_url else f"sent: {tx}")
+    after = timelock_plan(
+        lambda calls: call_many(w3, calls), vault, cfg.vault.harden_timelock_functions, seconds
+    )
+    left = [p["function"] for p in after if p["action"] == "raise"]
+    typer.echo("all raised" if not left else f"still short: {', '.join(left)}")
 
 
 state_app = typer.Typer(no_args_is_help=True, help="Bot history storage.")
@@ -591,14 +725,27 @@ def regime_snapshot_cmd() -> None:
 
 
 @app.command("market-size")
-def market_size_cmd() -> None:
+def market_size_cmd(
+    snapshot: Annotated[
+        bool,
+        typer.Option(
+            help="Write a dated artifacts/report/market_snapshot_<block>.json instead of "
+            "replacing artifacts/discovery/market_size.json."
+        ),
+    ] = False,
+) -> None:
     """Supplied and borrowed across Stock Token Morpho markets on mainnet, at a recent block."""
     from afterhours.discovery.market_size import read
 
     _logging()
     cfg = load_config()
     doc = read(cfg)
-    out = cfg.path(cfg.paths.artifacts_dir) / "discovery" / "market_size.json"
+    artifacts = cfg.path(cfg.paths.artifacts_dir)
+    out = (
+        artifacts / "report" / f"market_snapshot_{doc['block']}.json"
+        if snapshot
+        else artifacts / "discovery" / "market_size.json"
+    )
     out.write_text(json.dumps(doc, indent=2) + "\n")
     u = doc["usdg_loan"]
     typer.echo(

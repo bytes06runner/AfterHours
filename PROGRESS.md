@@ -56,6 +56,18 @@
    only in production builds and only from `web.analytics.script_src`; nothing is shown to
    visitors.
 
+6. **2026-10-07 implementation pass: founder steps** (details and exact commands in
+   `competitive_analysis/IMPLEMENTATION_RESULT.md`, "Founder actions required"):
+   a. Review the local commits on `claude/fervent-fermi-dz6ion` and push and merge them; the
+      new schedule only runs from the default branch, and Render must redeploy for the DEX
+      fallback, `/v1/automation` and `/v1/live/curator`.
+   b. After the first window (18:00 to 20:00 UTC on a weekday), check `GET /v1/automation`
+      shows a completed scheduled cycle before any copy says the bot ran on schedule.
+   c. Testnet hardening: `uv run afterhours harden-timelocks --profile rh-testnet` (curator
+      key, 20 testnet transactions) and `uv run afterhours fund-allocator --profile rh-testnet
+      --role guardian`.
+   d. Rotate the Alchemy and Upstash credentials (exposed earlier, see 2026-10-04 and 2026-09-27).
+
 ## FEATURE FREEZE (2026-09-27), lifted for the final brief (2026-10-04)
 
 The team's final brief (2026-10-04) reopens features for exactly this list, in order:
@@ -1201,3 +1213,37 @@ named fallback, Render free. Vercel Hobby is free for non-commercial personal us
 - Files: `artifacts/discovery/oracle_readings/{reading-2026-10-05.json,index.json}`,
   `artifacts/regime/cadence.json`, `artifacts/report/numbers.json`, `README.md`,
   `docs/video/pitch.md`, `PROGRESS.md`.
+
+
+### 2026-10-07 Implementation pass after the competitive review (WAR_ROOM)
+
+Done (local commits, not pushed; evidence in `competitive_analysis/`):
+- Automation: the hourly schedule had fired 32 times since 2026-09-28 at irregular times, never
+  inside a pre-close window (GitHub Actions API). Now every 10 minutes over 18:00 to 20:59 UTC
+  and every 20 over 15:00 to 17:59 UTC on weekdays; each run records a heartbeat, each cycle a
+  record (id, source, run id, inputs, policy, hold or act, reason, status), idempotent per close.
+  `GET /v1/automation` (and `?strict=true` for a monitor); `/v1/health` stays ok. 14 tests.
+- Market re-measured at block 82,622,425 (2026-10-07 16:43 UTC): 1,721,781 USDG supplied,
+  1,665,217 borrowed, 96.7% utilization, 99.97% at 62.5% LLTV (`artifacts/report/market_snapshot_82622425.json`).
+- DEX reads: one rate-limited batch nulled all 35 prices. Fallback to the public RPC, explicit
+  `dex_status` per token, last good depth kept with its time. Locally 35 of 35 prices.
+- Testnet source: all 18 contracts already verified on the explorer (16:23 to 16:28 UTC,
+  before this pass). Roles and timelocks read onchain; guardian has 0 ETH.
+- Truth pass: README, pitch, demo, agent tools, risk board, landing facts band.
+  "1 night in 100" replaced by the target plus the measured held-out miss rate per segment.
+- Curator view: `GET /v1/live/curator` and `/curators`. On the snapshot with production's
+  forecasts: nothing breaches overnight; 6 markets with 99.6% of the debt are Watch (exit).
+- `harden-timelocks` (testnet, asks first) and `fund-allocator --role guardian`; not run.
+
+Evidence: `make test-py` (161 passed), `make lint-py`, `make lint-web`, `make test-web` (26),
+`make test-config`, `make lint-hardcode`, `make lint-numbers`; Playwright `e2e/curators.spec.ts`
+4 passed (desktop and mobile); screenshots `artifacts/screens/curators/`. Not run here:
+Foundry (installer host blocked), `make test-integration` and the full `make e2e` (no Anvil).
+
+Release audit before push (same day): curator market state read at the head (a restored board
+snapshot could be older than a pruned node keeps), concentration made best effort, dry runs
+recorded as `dry_run`, later runs in a window skip the price fetch once the close is done,
+`harden-timelocks` resumes a half-finished run, HOSTING.md schedule text updated. Details in
+`competitive_analysis/IMPLEMENTATION_RESULT.md`, "Release audit".
+
+Next: founder steps in BLOCKED 6, then watch the first in-window run.

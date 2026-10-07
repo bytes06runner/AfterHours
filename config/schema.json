@@ -244,6 +244,33 @@
       "title": "ApiConfig",
       "type": "object"
     },
+    "AutomationConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "history_cycles": {
+          "exclusiveMinimum": 0,
+          "title": "History Cycles",
+          "type": "integer"
+        },
+        "lookback_days": {
+          "exclusiveMinimum": 0,
+          "title": "Lookback Days",
+          "type": "integer"
+        },
+        "running_timeout_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Running Timeout Minutes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "history_cycles",
+        "running_timeout_minutes",
+        "lookback_days"
+      ],
+      "title": "AutomationConfig",
+      "type": "object"
+    },
     "BacktestConfig": {
       "additionalProperties": false,
       "properties": {
@@ -551,6 +578,35 @@
         "normalize"
       ],
       "title": "ConformalConfig",
+      "type": "object"
+    },
+    "CuratorConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "concentration_watch_share": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Concentration Watch Share",
+          "type": "number"
+        },
+        "min_supplied_usdg": {
+          "minimum": 0,
+          "title": "Min Supplied Usdg",
+          "type": "number"
+        },
+        "watch_utilization": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Watch Utilization",
+          "type": "number"
+        }
+      },
+      "required": [
+        "watch_utilization",
+        "min_supplied_usdg",
+        "concentration_watch_share"
+      ],
+      "title": "CuratorConfig",
       "type": "object"
     },
     "DataConfig": {
@@ -974,6 +1030,11 @@
           "title": "Faucet Profile",
           "type": "string"
         },
+        "guardian_eth": {
+          "exclusiveMinimum": 0,
+          "title": "Guardian Eth",
+          "type": "number"
+        },
         "keep_deployer_eth": {
           "exclusiveMinimum": 0,
           "title": "Keep Deployer Eth",
@@ -983,6 +1044,7 @@
       "required": [
         "allocator_eth",
         "curator_eth",
+        "guardian_eth",
         "keep_deployer_eth",
         "faucet_profile"
       ],
@@ -2202,6 +2264,13 @@
           "title": "Depth Multiplier",
           "type": "number"
         },
+        "harden_timelock_functions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Harden Timelock Functions",
+          "type": "array"
+        },
         "market_cap_usdg": {
           "exclusiveMinimum": 0,
           "title": "Market Cap Usdg",
@@ -2329,6 +2398,9 @@
     "api": {
       "$ref": "#/$defs/ApiConfig"
     },
+    "automation": {
+      "$ref": "#/$defs/AutomationConfig"
+    },
     "backtest": {
       "$ref": "#/$defs/BacktestConfig"
     },
@@ -2338,6 +2410,9 @@
       },
       "title": "Chains",
       "type": "object"
+    },
+    "curator": {
+      "$ref": "#/$defs/CuratorConfig"
     },
     "data": {
       "$ref": "#/$defs/DataConfig"
@@ -2426,7 +2501,9 @@
     "regime",
     "agents",
     "funding",
-    "state"
+    "state",
+    "automation",
+    "curator"
   ],
   "title": "Afterhours configuration",
   "type": "object"

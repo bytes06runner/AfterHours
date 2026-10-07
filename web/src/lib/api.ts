@@ -548,6 +548,9 @@ const LiveForecast = z.object({
   }),
   bad_case_drop: z.number(),
   alpha: z.number(),
+  /** Share of held-out closed periods of this segment whose fall went beyond the bad case. */
+  held_out_miss_rate: z.number().nullable().optional(),
+  held_out_years: z.array(z.number()).nullable().optional(),
 });
 /** Price regime of one Stock Token (docs/REGIME.md). */
 export const LiveRegime = z.object({
@@ -557,6 +560,8 @@ export const LiveRegime = z.object({
   feed_age_seconds: z.number().nullable(),
   typical_interval_minutes: z.number().nullable(),
   dex_price: z.number().nullable(),
+  /** Why a DEX price is or is not there: ok, no_pool, no_price, unavailable (read failed). */
+  dex_status: z.string().optional(),
   divergence: z.number().nullable(),
   depth_usd: z.number().nullable(),
   quality: z.object({
@@ -582,6 +587,72 @@ export const LiveRegimesSchema = RegimeSummary.extend({
   tokens: z.array(LiveRegime.extend({ symbol: z.string(), feed_price: z.number().nullable() })),
 });
 export type LiveRegimes = z.infer<typeof LiveRegimesSchema>;
+
+/** Curator view (/v1/live/curator): per live USDG Morpho market, tonight against its cushion. */
+export const CuratorSchema = z.object({
+  network: z.string(),
+  block: z.number(),
+  as_of: z.string(),
+  totals: z.object({
+    markets: z.number(),
+    supplied_usdg: z.number(),
+    borrowed_usdg: z.number(),
+    utilization: z.number(),
+  }),
+  summary: z.record(
+    z.string(),
+    z.object({ markets: z.number(), supplied_usdg: z.number(), borrowed_usdg: z.number() }),
+  ),
+  borrowers_scanned_to_block: z.number().nullable(),
+  policy: z.object({
+    margin_fraction: z.number(),
+    watch_utilization: z.number(),
+    concentration_watch_share: z.number(),
+  }),
+  markets: z.array(
+    z.object({
+      market_id: z.string(),
+      symbol: z.string(),
+      lltv: z.number(),
+      cushion: z.number(),
+      margin_limit: z.number(),
+      supplied_usdg: z.number(),
+      borrowed_usdg: z.number(),
+      utilization: z.number(),
+      exit_liquidity_usdg: z.number(),
+      oracle: z.object({
+        state: z.string().nullable().optional(),
+        regime_label: z.string().nullable().optional(),
+        quality: z.number().nullable().optional(),
+        quality_grade: z.string().nullable().optional(),
+        updated_at: z.string().nullable().optional(),
+      }),
+      borrowers: z.object({ count: z.number(), top_share: z.number() }).nullable(),
+      tonight: z
+        .object({
+          period: z.object({
+            starts: z.string(),
+            ends: z.string(),
+            segment: z.string(),
+            hours: z.number(),
+          }),
+          alpha: z.number(),
+          held_out_miss_rate: z.number().nullable().optional(),
+          held_out_years: z.array(z.number()).nullable().optional(),
+        })
+        .nullable(),
+      bad_case_drop: z.number().nullable(),
+      headroom: z.number().nullable(),
+      breach: z.boolean().nullable(),
+      highest_surviving_lltv: z.number().nullable(),
+      highest_lltv_with_margin: z.number().nullable(),
+      recommendation: z.enum(["reduce_cap", "do_not_increase", "watch", "survives", "no_forecast"]),
+      label: z.string(),
+      reason: z.string(),
+    }),
+  ),
+});
+export type Curator = z.infer<typeof CuratorSchema>;
 
 export const LiveBoardSchema = z.object({
   network: z.string(),
@@ -678,6 +749,7 @@ export const api = {
   scenarios: () => get("/v1/replay/scenarios", ScenariosSchema),
   replay: (id: string) => get(`/v1/replay/${encodeURIComponent(id)}`, ReplaySchema),
   liveBoard: () => get("/v1/live/board", LiveBoardSchema),
+  liveCurator: () => get("/v1/live/curator", CuratorSchema),
   liveRegimes: () => get("/v1/live/regimes", LiveRegimesSchema),
   agentSession: () => get("/v1/agents/example-session", AgentSessionSchema),
   livePositions: (address: string) =>

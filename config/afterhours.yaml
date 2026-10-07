@@ -154,6 +154,22 @@ vault:
   depth_multiplier: 0.5
   max_slippage: 0.02
   market_cap_usdg: 1000000              # absolute cap per market set at deploy; raises are timelocked
+  # Curator functions that `afterhours harden-timelocks` puts behind timelock_seconds on an existing
+  # vault. Signatures from VaultV2.sol as verified on the testnet explorer (2026-10-07). The deploy
+  # script already timelocks addAdapter, setIsAllocator, the cap raises and setPerformanceFee. The
+  # gates "can lock users out of exiting the vault" (VaultV2 NatSpec); the rest change depositors'
+  # terms. removeAdapter and the cap decreases stay instant: they only reduce risk.
+  harden_timelock_functions:
+    - setReceiveSharesGate(address)
+    - setSendSharesGate(address)
+    - setReceiveAssetsGate(address)
+    - setSendAssetsGate(address)
+    - setAdapterRegistry(address)
+    - setManagementFee(uint256)
+    - setPerformanceFeeRecipient(address)
+    - setManagementFeeRecipient(address)
+    - setForceDeallocatePenalty(address,uint256)
+    - abdicate(bytes4)
 
 universe:
   onchain_selection: { max_tokens: 5, min_pool_depth_usd: 250000 }
@@ -391,6 +407,15 @@ live:
   refresh_nice: 10
   board_snapshot_minutes: 10
 
+# Curator view (live/curator.py, GET /v1/live/curator): every live USDG Morpho market against a
+# Stock Token, tonight's bad case against its cushion, and a recommendation. "Do not increase"
+# uses the vault's own margin (policy.pullback_fraction of the cushion); the two below flag exit
+# liquidity and one borrower holding most of a market.
+curator:
+  watch_utilization: 0.95              # at or above this share lent, lenders can barely withdraw
+  min_supplied_usdg: 1                 # markets with less supply are dust and not listed
+  concentration_watch_share: 0.5       # one borrower holding this share of a market's debt
+
 # Telegram alerts (core.telegram.org/bots/api: https://api.telegram.org/bot<token>/METHOD_NAME).
 # Testnet gas, all sent by the deployer, so only the deployer needs faucet ETH. Measured on an
 # rh-testnet fork on 2026-09-27 and priced at live rates (0.01 gwei L2 gas plus L1 data from
@@ -399,6 +424,7 @@ live:
 funding:
   allocator_eth: 0.002                 # about 150 first-cycle-sized bot cycles
   curator_eth: 0.0005                  # topped up before `make deploy`; about 6x its deploy gas
+  guardian_eth: 0.0005                 # gas for an emergency cap cut or revoke (`fund-allocator --role guardian`)
   keep_deployer_eth: 0.001             # refuse if the deployer would be left with less than this
   faucet_profile: rh-testnet           # `make testnet-keys` points to this testnet's faucet
 
@@ -429,6 +455,13 @@ state:
   event_poll_seconds: 30               # how often the API looks for new bot events (SSE)
   cycle_lock_seconds: 900              # a bot cycle holds the lock at most this long
   checked_ttl_days: 7                  # pre-close bookkeeping expires after this
+
+# Scheduled pre-close cycles (bot/automation.py): every cycle is recorded, including holds, so
+# health can tell "ran and held" from "never ran".
+automation:
+  history_cycles: 60                   # cycle records kept in the shared store
+  running_timeout_minutes: 25          # a cycle still "running" after this died (job timeout 20)
+  lookback_days: 7                     # expected pre-close cycles checked over this many days
 
 # Web analytics: GoatCounter (goatcounter.com/help/start; aggregate counts, no IP addresses kept,
 # goatcounter.com/help/gdpr). The script comes only from script_src; each site's count endpoint

@@ -141,6 +141,9 @@ def read(cfg: AfterhoursConfig, lag_blocks: int = 30) -> dict[str, Any]:
         by_lltv[f"{lv:g}"] = {
             "markets": len(rows),
             "supplied": sum(r["supplied"] for r in rows),
+            "borrowed": sum(r["borrowed"] for r in rows),
+            "utilization": sum(r["borrowed"] for r in rows)
+            / max(sum(r["supplied"] for r in rows), 1e-9),
             "supply_apy_supply_weighted": weighted(rows, "supply_apy", "supplied"),
         }
     rates = {

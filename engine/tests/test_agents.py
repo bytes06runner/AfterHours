@@ -33,6 +33,8 @@ BOARD: dict[str, Any] = {
                 "symbol": "NVDA",
                 "alpha": 0.01,
                 "bad_case_drop": 0.071,
+                "held_out_miss_rate": 0.017257,
+                "held_out_years": [2017, 2026],
                 "period": {
                     "starts": "2026-10-02T20:00:00+00:00",
                     "ends": "2026-10-05T13:30:00+00:00",
@@ -60,7 +62,12 @@ def test_weekend_risk_summary() -> None:
     assert doc["bad_case_drop"] == pytest.approx(0.071)
     s = doc["summary"]
     assert s.startswith("Frozen since Friday 20:00 New York")
-    assert "1 night in 100, is 7.1%" in s
+    # The measured held-out rate, not "1 night in 100" (the target, beaten more often on weekends).
+    assert "Its bad case is 7.1%: the forecast aims for a fall beyond it on 1.0%" in s
+    assert "On held-out years 2017 to 2026, falls went beyond it on 1.73% of weekend" in s
+    assert "about 1 in 58" in s
+    assert "1 night in 100" not in s
+    assert doc["held_out_miss_rate"] == pytest.approx(0.017257)
     assert "beyond the cushion of 1 of 2 USDG Morpho markets" in s
     assert "Fri Oct 2, 16:00 New York" in s
     assert s.endswith(agents.DISCLAIMER)
@@ -189,3 +196,17 @@ def test_agent_routes_are_rate_limited(monkeypatch: pytest.MonkeyPatch) -> None:
     other = client.get("/v1/agent/market-status", headers={"x-forwarded-for": "203.0.113.8"})
     assert other.status_code == 200  # per client
     assert client.get("/v1/health").status_code == 200  # only /v1/agent/ is limited
+
+
+def test_held_out_coverage_comes_from_the_report_card() -> None:
+    import json
+
+    from afterhours.risk.live import held_out_coverage
+
+    cov = held_out_coverage(CFG)
+    card = json.loads(
+        (CFG.path(CFG.paths.artifacts_dir) / "model" / "report_card.json").read_text()
+    )
+    assert cov["miss_rate"]["weekend"] == card["shipped_performance"]["weekend"]["miss_rate"]
+    assert cov["miss_rate"]["weekend"] > cov["target"]  # why "1 night in 100" was wrong
+    assert cov["test_years"] == [2017, 2026]

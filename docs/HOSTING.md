@@ -12,7 +12,7 @@ tiers change, so each section names its source page; check it again if something
 | --- | --- | --- |
 | Web app (`web/`) | Vercel Hobby | Free Next.js hosting. |
 | API: risk board, position checker, Telegram webhook | Render free web service (`render.free.yaml`) | Free Python web service. |
-| Pre-close bot cycle (testnet vault) and pre-close Telegram alerts | GitHub Actions (`.github/workflows/pre-close.yml`) | Free for public repositories; runs hourly on weekdays. |
+| Pre-close bot cycle (testnet vault) and pre-close Telegram alerts | GitHub Actions (`.github/workflows/pre-close.yml`) | Free for public repositories; runs every 10 to 20 minutes across the hours that can hold a pre-close window on weekdays. |
 | Bot history and Telegram subscriptions | Upstash Redis | Free, reached over HTTPS, so the API and the Actions job share it. |
 | Keeping the API awake | UptimeRobot | Free; calls `/v1/health` every 5 minutes. |
 | Page counts | GoatCounter | Free, no cookies, keeps aggregate counts only. |
@@ -37,7 +37,7 @@ in the background, in about 20 seconds (measured locally from an empty cache).
 | Render free web service | Right. 512 MB RAM and 0.1 CPU; 750 free instance hours per workspace per month, then free services are suspended until the next month; sleeps after 15 minutes without inbound traffic and wakes on the next HTTP request in about a minute; no disk, files lost on restart (render.com/docs/free; RAM from render.com/blog/free-tier). |
 | The API fits in free RAM | Right, measured. From an empty cache, the API fetched all 35 Stock Tokens' prices, built the board and scanned borrowers with a peak of 366 MB (macOS, `time -l`), plus about 17 MB for the `uv` wrapper. Linux differs a little. |
 | Telegram webhook with a secret | Right. `setWebhook` takes `secret_token` (1 to 256 characters, `A-Z a-z 0-9 _ -`), sent back in the `X-Telegram-Bot-Api-Secret-Token` header; webhooks use ports 443, 80, 88 or 8443; `getUpdates` stops working while a webhook is set (core.telegram.org/bots/api#setwebhook). |
-| GitHub Actions hourly on weekdays | Right, with limits. Free for public repositories (this one is public); private repositories on GitHub Free get 2,000 minutes a month. Scheduled runs can be delayed or dropped under load, "especially the start of every hour", so the job runs at minute 23; they run only on the default branch and are disabled after 60 days without repository activity (docs.github.com, events that trigger workflows; billing for GitHub Actions). |
+| GitHub Actions on weekday afternoons (UTC) | Right, with limits. Free for public repositories (this one is public); private repositories on GitHub Free get 2,000 minutes a month. Scheduled runs can be delayed or dropped under load, "especially the start of every hour"; measured here, an hourly schedule at minute 23 fired 32 times in 9 days and never inside a pre-close window, so the job now fires every 10 minutes from 18:00 to 20:59 UTC and every 20 from 15:00 to 17:59 UTC, off the round minutes; they run only on the default branch and are disabled after 60 days without repository activity (docs.github.com, events that trigger workflows; billing for GitHub Actions). |
 | A free database | Upstash Redis free: 256 MB data, 500,000 commands a month, 10 GB bandwidth, REST API included (upstash.com/docs/redis/overall/pricing). Free databases are archived after at least 30 days of inactivity, with warning emails and a backup you can restore (upstash.com/docs/redis/help/faq). |
 | Vercel Hobby | Right, with one condition: free, but "non-commercial, personal use only" (vercel.com/docs/plans/hobby). A hackathon demo fits; a business would need Pro. |
 | Free analytics | GoatCounter: free "for reasonable public usage", including a personal site or a small-to-medium business; stores aggregate data and no IP addresses (goatcounter.com, goatcounter.com/help/gdpr). |
@@ -193,15 +193,22 @@ message your bot `/watch NVDA`; it should answer "Following NVDA".
 
 ## Step 8. GitHub Actions: the pre-close jobs
 
-The workflow `.github/workflows/pre-close.yml` runs at minute 23 of every hour, Monday to
-Friday (UTC). Each run:
+The workflow `.github/workflows/pre-close.yml` runs every 10 minutes from 18:00 to 20:59 UTC
+and every 20 minutes from 15:00 to 17:59 UTC, Monday to Friday, so every pre-close window
+(regular and early closes, daylight and standard time) gets several chances. Each run:
 
-1. installs the engine and asks it whether now is inside a pre-close window (the two hours
-   before an exchange close, holidays and early closes included). If not, it stops;
-2. refreshes every Stock Token's prices;
-3. runs the bot's pre-close cycle for the testnet vault, once per close, if the vault is
-   deployed;
-4. sends the Telegram pre-close alerts, once per subscription per close.
+1. installs the engine, records a heartbeat and asks whether now is inside a pre-close window
+   (the two hours before an exchange close, holidays and early closes included). If not, it
+   stops;
+2. if this close's cycle has not completed yet: refreshes every Stock Token's prices and runs
+   the bot's pre-close cycle for the testnet vault (recorded as hold or act; a failure fails the
+   job and the next run retries);
+3. sends the Telegram pre-close alerts, once per subscription per close.
+
+`GET /v1/automation` on the API reports the heartbeat, the last cycle and any missed close;
+`/v1/automation?strict=true` answers 503 when a close was missed or a cycle failed, for an
+uptime monitor. Manual dispatch with `force_cycle` runs a cycle outside a window, recorded as
+manual.
 
 Set it up:
 
@@ -363,7 +370,7 @@ Never paste real values into a file in git, an issue or a chat.
 | Telegram subscriptions | Upstash hash `afterhours:alerts:chats` | kept |
 | Which subscriptions were checked for a close | Upstash key `afterhours:alerts:checked` (expires after `state.checked_ttl_days`) | kept |
 | Bot history: plan, forecasts, reasons, event log | Upstash keys under `afterhours:<profile>:` | kept |
-| Which close the bot already ran for | Upstash key `afterhours:<profile>:doc:pre_close_run` | kept |
+| Heartbeat and every recorded cycle (hold or act) | Upstash key `afterhours:<profile>:doc:automation` (the older `doc:pre_close_run` is no longer read) | kept |
 | Prices and earnings | API's local cache; Actions cache in the workflow | yes, at start (about 20 s) |
 | Borrower scan, market registry | API's local state folder | yes, at start |
 

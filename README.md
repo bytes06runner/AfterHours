@@ -16,23 +16,26 @@ live, which pricing regime every Stock Token is in and how far its price can be 
 
 ![The Afterhours landing page at night, with the exchange closed and the price ticker](artifacts/screens/live/landing.png)
 
-Built for the Colosseum Crypto World's Fair, Robinhood Chain track; the same code runs on
-Arbitrum.
+Built for the Colosseum Crypto World's Fair, Robinhood Chain track. The deploy scripts also
+target Arbitrum Sepolia (rehearsed on a fork); nothing is deployed on Arbitrum yet.
 
 ## At a glance
 
 | Part | Where it runs | Status |
 | --- | --- | --- |
-| Lending vault (Morpho Vault V2, three tiers per stock, onchain reason registry) | Robinhood Chain Testnet, simulated tokens | Deployed; bot runs before each US close from GitHub Actions |
+| Lending vault (Morpho Vault V2, three tiers per stock, onchain reason registry) | Robinhood Chain Testnet, simulated tokens | Deployed 2026-09-27. A GitHub Actions schedule runs the pre-close cycle and records every run, hold or act, at [`/v1/automation`](https://afterhours-api.onrender.com/v1/automation). Until 2026-10-07 the old schedule never fired inside a pre-close window; the last cycle was manual (2026-09-27) |
 | Risk board, price regime monitor, position checker | Robinhood Chain mainnet, read-only | Live on the web app and API |
-| Telegram alerts (`/watch NVDA`, `/watch 0x...`) | [@afterhours_time_bot](https://t.me/afterhours_time_bot) | Live, messages before a risky close |
+| Curator view: which LLTV survives tonight, per live Morpho market | Robinhood Chain mainnet, read-only | New on 2026-10-07: [`/curators`](https://after-hours-web-eta.vercel.app/curators) and `GET /v1/live/curator` (needs the next deploy) |
+| Telegram alerts (`/watch NVDA`, `/watch 0x...`) | [@afterhours_time_bot](https://t.me/afterhours_time_bot) | Commands work (`/watch`, `/list`, `/stop`). Pre-close alerts run in the same scheduled job; none has been sent yet |
 | Weekend risk for AI agents (MCP server and REST) | Your machine (MCP, stdio) calling the hosted API | Live; install in one config block |
 | Backtest, replays, report card | Historical stock prices, simulated vault | Published with every run in `artifacts/` |
 
 > **What is real and what is simulated.** The vault runs on Robinhood Chain Testnet with
 > simulated USDG, Stock Tokens and price feeds, and the app labels it Simulation. The risk board
 > and position checker read Robinhood Chain mainnet live, read-only. Backtests are "historical
-> stock prices, simulated vault". Every number in this README comes from a generated file in
+> stock prices, simulated vault". Deposit and withdraw work on the local demo chain, which has a
+> faucet for simulated USDG; the hosted testnet vault has no faucet for visitors. Every number in
+> this README comes from a generated file in
 > `artifacts/`; `artifacts/report/numbers.json` lists each with its source, and
 > `scripts/check-numbers.py` fails if this file quotes one that is not there.
 
@@ -44,6 +47,7 @@ Arbitrum.
 - [The problem](#the-problem)
 - [How it works](#how-it-works)
 - [What you can use today](#what-you-can-use-today)
+- [For curators](#for-curators)
 - [For AI agents](#for-ai-agents)
 - [Results](#results)
 - [Architecture](#architecture)
@@ -74,9 +78,11 @@ weekend price from one venue can gap and be pushed around while the regular mark
 [price regime monitor](docs/REGIME.md) classifies every token as regular session, extended hours,
 weekend price or frozen, from the exchange calendar, its feed's cadence measured from the study,
 and its DEX price and depth against the feed, and gives each a price quality score with a
-documented formula. On Saturday 2026-10-04 (block 79,868,354) all 35 were frozen, the median DEX
-price sat 0.36% from its frozen feed, and IONQ and RGTI had drifted 3.4% and 7.3%, past the
-divergence trigger (`artifacts/regime/`). People see it on the landing page and the risk board;
+documented formula. When a DEX read fails, each token says so (`dex_status: unavailable`) and its
+score uses feed staleness alone. On Sunday 2026-10-04 at 10:34 UTC (block 79,868,354) all 35
+were frozen and the median DEX price sat 0.36% from its frozen feed. IONQ's and RGTI's DEX prices
+sat -3.4% and +7.3% from theirs, past the divergence trigger, in pools with $50 and $73 of depth
+within 2%: thin pools, not price discovery (`artifacts/regime/`). People see it on the landing page and the risk board;
 agents get it through four read-only [MCP tools](#for-ai-agents).
 
 ![The risk board's price regime column: regime, price quality and a plain line per Stock Token](artifacts/screens/regime/board-night-1440.png)
@@ -86,8 +92,13 @@ agents get it through four read-only [MCP tools](#for-ai-agents).
 In the held-out backtest (2022-01-03 to 2026-09-24, settings chosen on earlier years only),
 Afterhours earned 9.12% against 9.09% for the fixed weekday/weekend mix with the nearest yield,
 with 5,849 USDG of bad debt against 11,132: the same yield as the best fixed mix, with about half
-the loss. These are historical stock prices, a simulated vault and modelled rates: real Stock
-Token markets on Morpho paid lenders 0.0016% at block 73,650,323.
+the loss. These are historical stock prices, a simulated vault and modelled rates (7.0% to 9.5%).
+Live Stock Token markets on Morpho are now almost fully lent: at block 82,622,425 (2026-10-07),
+1,665,217 of 1,721,781 USDG supplied was borrowed (96.7% utilization), 99.97% of supply sat in
+62.5% LLTV markets, and lenders earned 15.4% (`artifacts/report/market_snapshot_82622425.json`).
+In markets that full, the vault's pullback (it moves only money borrowers are not using) moves
+little; the decision that matters is which LLTV survives tonight, and that is what the
+[curator view](#for-curators) answers.
 
 ## The problem
 
@@ -139,7 +150,7 @@ All of these are live at [after-hours-web-eta.vercel.app](https://after-hours-we
 | Page | What it shows | Data |
 | --- | --- | --- |
 | Landing | The exchange clock, and "Frozen today, thin tomorrow": live counts per price regime and the least trustworthy prices | Robinhood Chain mainnet, read-only |
-| Vault | The vault's allocation across stocks and tiers, deposit and withdraw | Robinhood Chain Testnet, simulated tokens |
+| Vault | The vault's allocation across stocks and tiers; deposit and withdraw on the local demo chain (no faucet for visitors on the hosted testnet vault) | Robinhood Chain Testnet, simulated tokens |
 | Ledger | Every move the vault made with its reason card; "Verify on chain" recomputes the hash and checks the registry | Testnet registry |
 | Almanac | Each stock's forecast bad case for the closed periods ahead | Historical prices, live model |
 | Replay | Past nights replayed on a simulated vault, such as META's 2022 earnings gap | Historical stock prices, simulated vault |
@@ -158,10 +169,36 @@ signed.
 
 **Telegram alerts.** Message [@afterhours_time_bot](https://t.me/afterhours_time_bot): `/watch NVDA`
 follows a stock, `/watch 0x...` follows a wallet's Stock Token loans, `/list`, `/unwatch` and
-`/stop` manage them. Before each close, inside the pre-close window, it messages only when
-tonight's bad case reaches a market's cushion (a stock) or a loan's liquidation price (a wallet).
-Commands arrive through a webhook on the API; the checks run in GitHub Actions. Running your own
+`/stop` manage them. Inside the pre-close window it is set to message only when tonight's bad
+case reaches a market's cushion (a stock) or a loan's liquidation price (a wallet). Commands
+arrive through a webhook on the API; the checks run in the scheduled GitHub Actions job, which
+had not run inside a pre-close window before 2026-10-07, so no pre-close alert has been sent yet. Running your own
 copy: [docs/HOSTING.md](docs/HOSTING.md), steps 2 and 7.
+
+## For curators
+
+The people who carry the weekend gap today are the curators funding Stock Token markets on
+Morpho: on 2026-10-07 those markets were 96.7% lent, almost all at 62.5% LLTV. The curator view
+([`/curators`](https://after-hours-web-eta.vercel.app/curators), `GET /v1/live/curator`) answers
+one question per live USDG market before each close: which LLTV survives tonight?
+
+For every market it shows tonight's calibrated bad case against the market's cushion (1 minus
+LLTV minus Morpho's liquidation incentive), the highest enabled LLTV whose cushion the bad case
+does not reach, utilization and exit liquidity (what lenders could withdraw now), borrower
+concentration from Morpho `Borrow` events and `position()`, the feed's state and price regime,
+and one recommendation:
+
+| Call | When |
+| --- | --- |
+| Reduce cap | Tonight's bad case reaches the cushion: a loan at the limit could be left with bad debt |
+| Do not increase | Inside the cushion, but past the margin Afterhours' own vault keeps (40% of the cushion) |
+| Watch | The bad case fits, but almost all of the market is lent (`curator.watch_utilization` in config), so lenders can barely withdraw, or one borrower holds half the debt or more |
+| Survives the modelled bad case | Inside the cushion with the vault's margin |
+
+It reuses the risk board's forecast (no second model) and is read-only. "Survives" means
+survives the modelled bad case, which the forecast targets at 1% of closed periods and which
+held-out years beat more often on weekends (1.73%) and holidays (2.74%). The logic is
+`engine/afterhours/live/curator.py`; screenshots in `artifacts/screens/curators/`.
 
 ## For AI agents
 
@@ -190,8 +227,9 @@ no key, no write path). Add it to Claude Desktop:
 }
 ```
 
-The REST routes have an OpenAPI schema at `/openapi.json` and a per-client rate limit. A real
-session, captured through exactly this install, is on the [Agents page](https://after-hours-web-eta.vercel.app/agents)
+The REST routes have an OpenAPI schema at `/openapi.json` and a per-client rate limit. A captured
+session (a scripted MCP client calling all four tools through exactly this install against the
+hosted API; not an LLM conversation) is on the [Agents page](https://after-hours-web-eta.vercel.app/agents)
 (`artifacts/agents/example-session.json`).
 
 ## Results
@@ -201,7 +239,8 @@ chosen on 2017 to 2021 only, evaluated on 2022-01-03 to 2026-09-24 (1,186 closed
 
 **Yields here use modelled rates.** The backtest assumes supply APYs of 9.5%, 8.5% and 7.0% for
 the 91.5%, 86% and 77% tiers. Real Stock Token markets on Morpho paid lenders 0.0016% at block
-73,650,323 (see "The market today" below). The comparisons between strategies hold under the
+73,650,323 (2026-09-27) and 15.4% at block 82,622,425 (2026-10-07), almost all at 62.5% LLTV
+(see "The market today" below). The comparisons between strategies hold under the
 same assumed rates; the yield levels do not describe today's market.
 
 **How the policy was chosen.** Before running, we wrote down a rule for the design we expected to
@@ -262,14 +301,20 @@ pulled META's unborrowed money five nights before, loses 9,953 on the money that
 **Forecasts.** The LightGBM gap model we built did not beat the simplest baseline on held-out
 years, so Afterhours ships the baseline (the report card says so in its first sentence). On
 1,229,403 held-out closed periods across 10 walk-forward folds, the real drop was worse than the
-forecast bad case 1.30% of the time against a 1% target; on earnings nights 1.08%
-(`artifacts/model/report_card.json`).
+forecast bad case 1.30% of the time against a 1% target: 1.08% on earnings nights, 1.14% on
+overnights, 1.73% on weekends (about 1 in 58) and 2.74% on holidays
+(`artifacts/model/report_card.json`). The API and agent tools quote these measured rates with
+every bad case, not the 1% target alone.
 
-**The market today.** At Robinhood Chain block 73,650,323 (2026-09-27), 150 Morpho markets used a
-Stock Token as collateral; the 148 lending USDG held 804,926 USDG supplied and 6,182 borrowed, a
-utilization of 0.77%. Borrowing happened in 31 of them. Lenders there earned a supply APY of
-0.0016% (supply-weighted) and borrowers paid 0.20% (`artifacts/discovery/market_size.json`,
-read with each market's interest rate model at that block). The market is early.
+**The market today.** At Robinhood Chain block 82,622,425 (2026-10-07 16:43 UTC), the 149 Morpho
+markets lending USDG against a Stock Token held 1,721,781 USDG supplied and 1,665,217 borrowed:
+96.7% utilization. 99.97% of supply sat in 62.5% LLTV markets. NVDA, SPCX, GOOGL and AAPL
+carried 99.7% of the borrowing, and 4 markets were fully lent, so their lenders could not
+withdraw. Borrowers paid 15.9% and lenders earned 15.4% (borrow- and supply-weighted; each
+market's interest rate model at that block; `artifacts/report/market_snapshot_82622425.json`,
+`competitive_analysis/current-market-measurement.md`). Ten days earlier, at block 73,650,323
+(2026-09-27), the same markets held 804,926 USDG supplied and 6,182 borrowed (0.77%)
+(`artifacts/discovery/market_size.json`). The market went from idle to fully lent in ten days.
 
 ## Architecture
 
@@ -363,7 +408,7 @@ it pulls META's unborrowed money and anchors the reason in the onchain registry.
 | Where | Status |
 | --- | --- |
 | Web app and API | [after-hours-web-eta.vercel.app](https://after-hours-web-eta.vercel.app) (Vercel) and [afterhours-api.onrender.com](https://afterhours-api.onrender.com/v1/health) (Render), free tiers; set up with [docs/HOSTING.md](docs/HOSTING.md) |
-| Scheduled jobs | GitHub Actions, `Pre-close jobs`: the bot's pre-close cycle on the testnet vault and the Telegram pre-close alerts, hourly on weekdays |
+| Scheduled jobs | GitHub Actions, `Pre-close jobs`: the bot's pre-close cycle on the testnet vault and the Telegram pre-close alerts, every 10 to 20 minutes across the hours that can hold a pre-close window on weekdays. Each run records a heartbeat and each cycle a record (hold or act); [`/v1/automation`](https://afterhours-api.onrender.com/v1/automation) reports them and `?strict=true` answers 503 when a close was missed or a cycle failed |
 | Telegram bot | [@afterhours_time_bot](https://t.me/afterhours_time_bot), webhook on the API, subscriptions in Upstash Redis |
 | Robinhood Chain testnet | Deployed 2026-09-27 (`deployments/rh-testnet.json`), simulated USDG, collateral and oracles: vault [`0xD4791630C02FF7462536bAEae7BcE13c5917E6d3`](https://explorer.testnet.chain.robinhood.com/address/0xD4791630C02FF7462536bAEae7BcE13c5917E6d3), reason registry [`0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0`](https://explorer.testnet.chain.robinhood.com/address/0x2416C56ea86895cf2dE81eBe0Da1f742bDb30ee0) |
 | Arbitrum Sepolia | Rehearsed on a fork of the testnet (`scripts/rehearse-testnet.sh arb-sepolia`); not deployed yet |
@@ -411,7 +456,11 @@ make lighthouse   # production build, every page
 - **The model.** The LightGBM model lost to the EWMA baseline, which ships. The baseline misses
   more often than targeted on holidays (2.74% against 1%); most of those misses fall on a few
   market-wide shock dates (PROGRESS.md, item 4).
-- **Money already lent cannot move.** Afterhours can only pull what borrowers are not using.
+- **Money already lent cannot move.** Afterhours can only pull what borrowers are not using. In
+  today's mainnet Stock Token markets (96.7% utilization) that is a few percent of supply.
+- **Automation is new.** Until 2026-10-07 the scheduled job never ran a pre-close cycle (GitHub
+  ran the hourly schedule at irregular times, none inside a window). The pullback has run on the
+  local demo chain and in backtests, never on a public chain.
 - **Universe.** The stock universe for the gap study is today's S&P 500 plus Stock Tokens, so it
   has survivorship bias.
 - **Free hosting.** The API runs on a free instance (512 MB) that sleeps without traffic, so a
@@ -425,7 +474,12 @@ make lighthouse   # production build, every page
 - **Agents.** The MCP server runs on the agent's machine over stdio and calls the hosted API; it
   is not served from the API host, which has no memory to spare on the free plan. It reads only.
 - **Not audited.** The contracts we wrote are small (the registry and simulated tokens), and the
-  vault and markets are Morpho's, but nothing here has had a security review.
+  vault and markets are Morpho's, but nothing here has had a security review. Testnet source is
+  verified on the explorer (`competitive_analysis/contract-verification.md`).
+- **Keys and timelocks.** Owner, curator, allocator and guardian are single keys (EOAs) on
+  testnet, and the guardian holds no gas. Cap raises, adapters, allocators and the performance fee
+  wait one day; the exit gates, adapter registry, management fee, fee recipients and
+  force-deallocate penalty have no timelock yet (`competitive_analysis/contract-verification.md`).
 
 ## Future work
 

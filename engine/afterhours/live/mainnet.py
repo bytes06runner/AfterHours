@@ -44,6 +44,7 @@ from afterhours.data.pipeline import make_cache
 from afterhours.deployments import load_discovered
 from afterhours.discovery.pools import Pool, measure_depth
 from afterhours.live import regime as rg
+from afterhours.logsafe import redact
 from afterhours.policy.lp import tier_spec
 from afterhours.risk.live import LiveRisk
 
@@ -167,11 +168,16 @@ class Mainnet:
             retries=cfg.live.rpc_retries,
         )
         public = cfg.chains[cfg.profiles[cfg.live.profile].chain].public_rpc_url
-        # Log scans need wide block ranges, which the public RPC allows (live.logs_from_public_rpc).
-        self.w3_logs: Web3 = (
+        # The chain's public RPC as a second client when the primary is another endpoint: log
+        # scans need its wide block ranges (live.logs_from_public_rpc), and DEX reads fall back
+        # to it when the primary fails them.
+        self.w3_public: Web3 | None = (
             connect(public, timeout=cfg.live.rpc_timeout_seconds, retries=cfg.live.rpc_retries)
-            if cfg.live.logs_from_public_rpc and public
-            else self.w3
+            if public and public != cfg.rpc_url(cfg.live.profile)
+            else None
+        )
+        self.w3_logs: Web3 = (
+            self.w3_public if cfg.live.logs_from_public_rpc and self.w3_public else self.w3
         )
         disc = load_discovered(cfg, cfg.live.discovery_profile)
         self.blue = to_checksum_address(disc["core"]["morpho_blue"]["address"])
@@ -224,6 +230,14 @@ class Mainnet:
         self._symbols: dict[str, str | None] = {}
         self.store = cfg.path(cfg.paths.state_dir) / "live-markets.json"
         self.borrowers = cfg.path(cfg.paths.state_dir) / "live-borrowers.json"
+        # Curator view: Morpho's enabled LLTVs (M1 discovery) and borrowers per market.
+        self.enabled_lltvs: list[float] = [
+            float(x) for x in disc.get("lltvs", {}).get("values", [])
+        ]
+        self.borrowers_by_market = cfg.path(cfg.paths.state_dir) / "live-borrowers-by-market.json"
+        self._curator: tuple[float, dict[str, Any]] | None = None
+        self._curator_lock = threading.Lock()
+        self._scan_lock = threading.Lock()
 
     # ------------------------------------------------------------------ chain helpers
     def deadline(self) -> float:
@@ -234,12 +248,16 @@ class Mainnet:
         return int(self.w3.eth.block_number) - self.cfg.live.lag_blocks
 
     def decimals(
-        self, tokens: list[str], block: int, deadline: float | None = None
+        self,
+        tokens: list[str],
+        block: int,
+        deadline: float | None = None,
+        w3: Web3 | None = None,
     ) -> dict[str, int]:
         missing = [t for t in tokens if t not in self._decimals]
         if missing:
             calls = [Call(t, "decimals()(uint8)") for t in missing]
-            vals = call_many(self.w3, calls, block=block, deadline=deadline)
+            vals = call_many(w3 or self.w3, calls, block=block, deadline=deadline)
             for t, v in zip(missing, vals, strict=True):
                 self._decimals[t] = int(v) if v is not None else 18
         return {t: self._decimals[t] for t in tokens}
@@ -341,7 +359,11 @@ class Mainnet:
             return None
         if not math.isfinite(f.bad_case_drop):
             return None
-        return f.to_json()
+        out = f.to_json()
+        cov = self.risk.coverage
+        out["held_out_miss_rate"] = cov["miss_rate"].get(f.period.segment)
+        out["held_out_years"] = cov["test_years"]
+        return out
 
     # ------------------------------------------------------------------ risk board
     def board(self, now: datetime | None = None, *, wait: bool = False) -> dict[str, Any]:
@@ -393,9 +415,18 @@ class Mainnet:
 
     # ------------------------------------------------------------------ price regime monitor
     def dex_prices(
-        self, syms: list[str], block: int, deadline: float | None = None
+        self,
+        syms: list[str],
+        block: int,
+        deadline: float | None = None,
+        w3: Web3 | None = None,
     ) -> dict[str, float | None]:
-        """Mid price in USDG of each token's deepest USDG pool that answers (v3 or v4)."""
+        """Mid price in USDG of each token's deepest USDG pool that answers (v3 or v4).
+
+        Raises if the read fails (any RPC error other than a revert); a token whose pools all
+        revert or hold no price gets None.
+        """
+        client = w3 or self.w3
         calls: list[Call] = []
         owners: list[tuple[str, Pool]] = []
         for s in syms:
@@ -407,8 +438,10 @@ class Mainnet:
                         Call(self.state_view, V4_GET_SLOT0, (bytes.fromhex(p.address_or_id[2:]),))
                     )
                 owners.append((s, p))
-        dec = self.decimals(sorted({p.token for _, p in owners} | {self.usdg}), block, deadline)
-        res = call_many(self.w3, calls, block=block, deadline=deadline) if calls else []
+        dec = self.decimals(
+            sorted({p.token for _, p in owners} | {self.usdg}), block, deadline, client
+        )
+        res = call_many(client, calls, block=block, deadline=deadline) if calls else []
         out: dict[str, float | None] = {s: None for s in syms}
         for (s, p), r in zip(owners, res, strict=True):
             if out[s] is not None or not r or not int(r[0]):
@@ -417,7 +450,11 @@ class Mainnet:
         return out
 
     def dex_depth(
-        self, prices: dict[str, float | None], block: int, deadline: float | None = None
+        self,
+        prices: dict[str, float | None],
+        block: int,
+        deadline: float | None = None,
+        w3: Web3 | None = None,
     ) -> dict[str, float]:
         """USD sellable within `vault.max_slippage` across each token's pools (re-quoted at most
         every `regime.depth_refresh_minutes`)."""
@@ -432,10 +469,10 @@ class Mainnet:
         ]
         if not pools:
             return {}
-        dec = self.decimals(sorted({p.token for p in pools} | {self.usdg}), block, deadline)
+        dec = self.decimals(sorted({p.token for p in pools} | {self.usdg}), block, deadline, w3)
         by_token: dict[str, str] = {str(a): sym for a, sym in self.tokens.items()}
         measure_depth(
-            self.w3,
+            w3 or self.w3,
             pools,
             v3_quoter=self.v3_quoter,
             v4_quoter=self.v4_quoter,
@@ -472,17 +509,30 @@ class Mainnet:
         )
         syms = [r["symbol"] for r in rows]
         # DEX reads add marks to the score; regimes come from the calendar and feeds regardless.
+        # A failed read is never shown as "no price": each row says why its DEX mark is missing.
         prices: dict[str, float | None] = {}
         depth: dict[str, float] = {}
-        try:
-            prices = self.dex_prices(syms, block, deadline)
-        except Exception as exc:
-            log.warning("DEX prices failed: %s", exc)
-        try:
-            feed = {r["symbol"]: r["price"] for r in rows}
-            depth = self.dex_depth({s: feed[s] for s in syms if prices.get(s)}, block, deadline)
-        except Exception as exc:  # e.g. out of the refresh budget: re-quoted next time
-            log.warning("DEX depth failed: %s", exc)
+        dex = self.read_dex(syms, block, deadline)
+        prices, client, dex_block = dex.pop("prices"), dex.pop("client"), dex["block"]
+        if client is not None:
+            try:
+                feed = {r["symbol"]: r["price"] for r in rows}
+                depth = self.dex_depth(
+                    {s: feed[s] for s in syms if prices.get(s)},
+                    dex_block,
+                    deadline if client is self.w3 else self.deadline(),
+                    client,
+                )
+            except Exception as exc:  # e.g. out of the refresh budget: re-quoted next time
+                log.warning("DEX depth failed: %s", type(exc).__name__)
+                dex["depth_error"] = redact(f"{type(exc).__name__}: {exc}")[:200]
+                # Depth moves slowly: the last good quote, with its age, beats none.
+                depth = self._depth[1] if self._depth else {}
+        dex["depth_as_of"] = (
+            datetime.fromtimestamp(self._depth[0], UTC).isoformat()
+            if self._depth and depth
+            else None
+        )
         counts = dict.fromkeys(rg.REGIMES, 0)
         for r in rows:
             updated = datetime.fromisoformat(r["updated_at"]) if r["updated_at"] else None
@@ -497,6 +547,15 @@ class Mainnet:
                 dex_price=prices.get(r["symbol"]),
                 depth_usd=depth.get(r["symbol"]),
                 cadence_doc=self.cadence,
+                dex_status=(
+                    "no_pool"
+                    if not self.pools.get(r["symbol"])
+                    else "unavailable"
+                    if client is None
+                    else "ok"
+                    if prices.get(r["symbol"])
+                    else "no_price"
+                ),
             )
             counts[r["regime"]["regime"]] += 1
         return {
@@ -504,7 +563,45 @@ class Mainnet:
             "segment": cal["segment"],
             "closed_since": since.isoformat() if since else None,
             "counts": counts,
+            "dex": dex,
             "method": "docs/REGIME.md",
+        }
+
+    def read_dex(self, syms: list[str], block: int, deadline: float | None) -> dict[str, Any]:
+        """DEX prices from the primary RPC, else the chain's public RPC at its own block.
+
+        Returns {"prices", "client", "source", "block", "errors"}; `client` is None and every
+        price None when both failed, with the reason for each in `errors`.
+        """
+        clients: list[tuple[str, Web3]] = [("primary", self.w3)]
+        if self.w3_public is not None:
+            clients.append(("public", self.w3_public))
+        errors: dict[str, str] = {}
+        for label, client in clients:
+            try:
+                b = (
+                    block
+                    if client is self.w3
+                    else int(client.eth.block_number) - self.cfg.live.lag_blocks
+                )
+                d = deadline if client is self.w3 else self.deadline()
+                prices = self.dex_prices(syms, b, d, client)
+                return {
+                    "prices": prices,
+                    "client": client,
+                    "source": label,
+                    "block": b,
+                    "errors": errors,
+                }
+            except Exception as exc:
+                log.warning("DEX prices failed on the %s RPC: %s", label, type(exc).__name__)
+                errors[label] = redact(f"{type(exc).__name__}: {exc}")[:200]
+        return {
+            "prices": dict.fromkeys(syms),
+            "client": None,
+            "source": None,
+            "block": block,
+            "errors": errors,
         }
 
     def _board_now(self, now: datetime) -> dict[str, Any]:
@@ -562,6 +659,174 @@ class Mainnet:
         }
         self._board = (time.time(), doc)
         return doc
+
+    # ------------------------------------------------------------------ curator view
+    def curator(self, now: datetime | None = None, *, wait: bool = False) -> dict[str, Any]:
+        """Per live USDG Morpho market: tonight's bad case against its cushion (live/curator.py).
+
+        Reuses the risk board (forecast, feed state, regime) and adds each market's Morpho state
+        and borrower concentration. Cached like the board; raises `WarmingError` while the first
+        board is being read.
+        """
+        cached = self._curator
+        if cached and time.time() - cached[0] < self.cfg.live.board_cache_seconds:
+            return cached[1]
+        board = self.board(now, wait=wait)
+        with self._curator_lock:
+            cached = self._curator
+            if cached and time.time() - cached[0] < self.cfg.live.board_cache_seconds:
+                return cached[1]
+            doc = self._curator_now(board, wait=wait)
+            self._curator = (time.time(), doc)
+            return doc
+
+    def _curator_now(self, board: dict[str, Any], *, wait: bool = False) -> dict[str, Any]:
+        from afterhours.live import curator as cur
+
+        # Market state at the current head, not the board's block: the board can be a saved
+        # snapshot from before a restart, older than a pruned node keeps state for. Forecasts and
+        # feed state keep the board's own time (`forecast_as_of`).
+        block = self.block()
+        deadline = self.deadline()
+        markets = [m for m in self.markets() if m.loan_token == self.usdg]
+        states = call_many(
+            self.w3,
+            [Call(self.blue, MARKET, (bytes.fromhex(m.id[2:]),)) for m in markets],
+            block=block,
+            deadline=deadline,
+        )
+        unit = 10 ** self.decimals([self.usdg], block, deadline)[self.usdg]
+        live: list[tuple[dict[str, Any], tuple[int, ...]]] = []
+        for m, st in zip(markets, states, strict=True):
+            if st is None:
+                continue
+            supplied, borrowed = int(st[0]) / unit, int(st[2]) / unit
+            if supplied < self.cfg.curator.min_supplied_usdg:
+                continue
+            row = {
+                "id": m.id,
+                "symbol": m.symbol,
+                "lltv": m.lltv,
+                "supplied": supplied,
+                "borrowed": borrowed,
+            }
+            live.append((row, tuple(int(x) for x in st)))
+        conc_error = None
+        try:  # concentration adds to the view; a rate-limited read must not take it down
+            conc, scanned = self.concentration(live, block, deadline, wait=wait)
+        except Exception as exc:
+            log.warning("borrower concentration failed: %s", type(exc).__name__)
+            conc, scanned = {}, None
+            conc_error = redact(f"{type(exc).__name__}: {exc}")[:200]
+        by_symbol = {r["symbol"]: r for r in board["stocks"]}
+        rows = [
+            cur.market_row(
+                self.cfg, m, by_symbol.get(m["symbol"]), self.enabled_lltvs, conc.get(m["id"])
+            )
+            for m, _ in live
+        ]
+        order = list(cur.LABELS)
+        rows.sort(key=lambda r: (order.index(r["recommendation"]), -r["borrowed_usdg"]))
+        supplied = sum(r["supplied_usdg"] for r in rows)
+        borrowed = sum(r["borrowed_usdg"] for r in rows)
+        return {
+            "network": board["network"],
+            "block": block,
+            "as_of": datetime.now(UTC).isoformat(),
+            "forecast_as_of": board["as_of"],
+            "board_block": board["block"],
+            "markets": rows,
+            "totals": {
+                "markets": len(rows),
+                "supplied_usdg": supplied,
+                "borrowed_usdg": borrowed,
+                "utilization": borrowed / supplied if supplied else 0.0,
+            },
+            "summary": cur.summarize(rows),
+            "enabled_lltvs": self.enabled_lltvs,
+            "coverage": self.risk.coverage,
+            "borrowers_scanned_to_block": scanned,
+            "concentration_error": conc_error,
+            "policy": {
+                "margin_fraction": self.cfg.policy.pullback_fraction,
+                "watch_utilization": self.cfg.curator.watch_utilization,
+                "concentration_watch_share": self.cfg.curator.concentration_watch_share,
+            },
+            "method": "engine/afterhours/live/curator.py",
+        }
+
+    def concentration(
+        self,
+        live: list[tuple[dict[str, Any], tuple[int, ...]]],
+        block: int,
+        deadline: float | None,
+        *,
+        wait: bool = False,
+    ) -> tuple[dict[str, dict[str, Any]], int | None]:
+        """Borrowers per market with open debt, and the largest one's share of the debt.
+
+        Borrowers come from Morpho `Borrow` events (`live-borrowers-by-market.json`, scanned
+        incrementally in the background; empty until the first scan ends), and each one's debt
+        from `position()` borrow shares against the market's total at `block`.
+        """
+        doc = self._load(self.borrowers_by_market, "live_borrowers_by_market")
+        stale = doc is None or time.time() - doc.get("scanned_at", 0) >= (
+            self.cfg.live.market_refresh_minutes * 60
+        )
+        if stale and wait:
+            with self._scan_lock:
+                doc = self._scan_borrowers(doc)
+        elif stale and self._scan_lock.acquire(blocking=False):
+
+            def run(prev: dict[str, Any] | None) -> None:
+                try:
+                    self._scan_borrowers(prev)
+                except Exception as exc:  # the next request tries again
+                    log.warning("borrower scan failed: %s", type(exc).__name__)
+                finally:
+                    self._scan_lock.release()
+
+            threading.Thread(target=run, args=(doc,), daemon=True).start()
+        if doc is None:
+            return {}, None
+        by_market: dict[str, list[str]] = doc["by_market"]
+        pairs = [
+            (m, st, who)
+            for m, st in live
+            if m["borrowed"] > 0
+            for who in by_market.get(m["id"], [])
+        ]
+        pos = call_many(
+            self.w3,
+            [Call(self.blue, POSITION, (bytes.fromhex(m["id"][2:]), who)) for m, _, who in pairs],
+            block=block,
+            deadline=deadline,
+        )
+        shares: dict[str, list[float]] = {}
+        for (m, st, _), p in zip(pairs, pos, strict=True):
+            if p and int(p[1]) > 0 and st[3] > 0:
+                shares.setdefault(m["id"], []).append(int(p[1]) / st[3])
+        out = {mid: {"count": len(v), "top_share": max(v)} for mid, v in shares.items()}
+        return out, int(doc["last_block"])
+
+    def _scan_borrowers(self, doc: dict[str, Any] | None) -> dict[str, Any]:
+        """Add `Borrow` events since the last scan: borrower addresses by market id."""
+        head = self.block()
+        start = doc["last_block"] + 1 if doc else 0
+        by_market: dict[str, list[str]] = {
+            k: list(v) for k, v in (doc or {}).get("by_market", {}).items()
+        }
+        if start <= head:
+            span = self.cfg.discovery.oracle_study.max_log_block_range * 20
+            for ev in get_logs(self.w3_logs, BORROW, [self.blue], start, head, max_range=span):
+                mid = "0x" + bytes(ev["id"]).hex()
+                who = str(to_checksum_address(ev["onBehalf"]))
+                seen = by_market.setdefault(mid, [])
+                if who not in seen:
+                    seen.append(who)
+        out = {"last_block": head, "scanned_at": time.time(), "by_market": by_market}
+        self._save(self.borrowers_by_market, "live_borrowers_by_market", out)
+        return out
 
     # ------------------------------------------------------------------ positions
     def positions(self, address: str, now: datetime | None = None) -> dict[str, Any]:

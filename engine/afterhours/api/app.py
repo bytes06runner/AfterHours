@@ -279,7 +279,44 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                 "last_cycle": plan.get("now") if plan else None,
                 "last_trigger": plan.get("trigger") if plan else None,
             },
+            # Process health stays "ok" when the bot is stale, so the host never restarts over
+            # it; the automation's own state is here and in full at /v1/automation.
+            "automation": automation_brief(),
         }
+
+    def automation_doc() -> dict[str, Any]:
+        from afterhours.bot.automation import status as automation_status
+
+        return automation_status(ctx.store, cfg, ctx.now(), deployed=bool(ctx.deployment))
+
+    def automation_brief() -> dict[str, Any]:
+        try:
+            doc = automation_doc()
+        except Exception as e:  # a store outage must not take process health down
+            log.warning("automation status unavailable: %s", type(e).__name__)
+            return {"status": "unknown", "healthy": None}
+        last = doc["last_cycle"] or {}
+        return {
+            "status": doc["status"],
+            "healthy": doc["healthy"],
+            "last_cycle_at": last.get("finished_at"),
+            "last_decision": last.get("decision"),
+            "missed_closes": len(doc["missed_closes"]),
+        }
+
+    @app.get("/v1/automation")
+    def automation(strict: bool = False) -> Any:
+        """Scheduled pre-close cycles: heartbeat, last cycle (hold or act), missed closes.
+
+        With `?strict=true` an unhealthy state answers 503, for an uptime monitor that should
+        alert on a bot that stopped running without restarting the API.
+        """
+        doc = automation_doc()
+        if strict and not doc["healthy"]:
+            from fastapi.responses import JSONResponse
+
+            return JSONResponse(doc, status_code=503)
+        return doc
 
     @app.get("/v1/config/public")
     def config_public() -> dict[str, Any]:
@@ -501,7 +538,16 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
         gaps = ctx.artifact("gaps", "summary.json")
         study = ctx.artifact("discovery", "oracle_study.json")
         activity = ctx.artifact("backtest", "option_b_activity.json")["universes"]
-        market = ctx.artifact("discovery", "market_size.json")
+        # The newest dated snapshot (market-size --snapshot), else the 2026-09-27 reading.
+        snaps = sorted(
+            (cfg.path(cfg.paths.artifacts_dir) / "report").glob("market_snapshot_*.json"),
+            key=lambda p: int(p.stem.rsplit("_", 1)[1]),
+        )
+        market = (
+            ctx.artifact("report", snaps[-1].name)
+            if snaps
+            else ctx.artifact("discovery", "market_size.json")
+        )
         a_doc = ctx.artifact("backtest", "option_a.json")
         b_doc = ctx.artifact("backtest", "option_b.json")
         numbers = ctx.artifact("report", "numbers.json")["numbers"]
@@ -561,6 +607,8 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                     "supply_apy": market["rates"]["usdg_supply_apy_supply_weighted"],
                     "borrow_apy": market["rates"]["usdg_borrow_apy_borrow_weighted"],
                     "utilization": market["rates"]["usdg_utilization"],
+                    "usdg_markets": market["usdg_loan"]["markets"],
+                    "by_lltv": market["rates"]["by_lltv"],
                 },
                 "assumed_apy": {
                     name: cfg.backtest.apy(lltv) for name, lltv in cfg.morpho.lltv_tiers.ordered()
@@ -636,6 +684,13 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     @app.get("/v1/live/board")
     def live_board() -> dict[str, Any]:
         return cast(dict[str, Any], _live(lambda: ctx.mainnet().board()))
+
+    @app.get("/v1/live/curator")
+    def live_curator() -> dict[str, Any]:
+        """Per live USDG Morpho market against a Stock Token: tonight's bad case against the
+        market's cushion, the highest LLTV that survives it, exit liquidity, borrower
+        concentration and one recommendation. Read-only."""
+        return cast(dict[str, Any], _live(lambda: ctx.mainnet().curator()))
 
     def regimes_doc() -> dict[str, Any]:
         from afterhours.live.mainnet import WarmingError
