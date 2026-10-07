@@ -351,7 +351,11 @@ class Mainnet:
             return None
         if not math.isfinite(f.bad_case_drop):
             return None
-        return f.to_json()
+        out = f.to_json()
+        cov = self.risk.coverage
+        out["held_out_miss_rate"] = cov["miss_rate"].get(f.period.segment)
+        out["held_out_years"] = cov["test_years"]
+        return out
 
     # ------------------------------------------------------------------ risk board
     def board(self, now: datetime | None = None, *, wait: bool = False) -> dict[str, Any]:

@@ -548,6 +548,9 @@ const LiveForecast = z.object({
   }),
   bad_case_drop: z.number(),
   alpha: z.number(),
+  /** Share of held-out closed periods of this segment whose fall went beyond the bad case. */
+  held_out_miss_rate: z.number().nullable().optional(),
+  held_out_years: z.array(z.number()).nullable().optional(),
 });
 /** Price regime of one Stock Token (docs/REGIME.md). */
 export const LiveRegime = z.object({
@@ -557,6 +560,8 @@ export const LiveRegime = z.object({
   feed_age_seconds: z.number().nullable(),
   typical_interval_minutes: z.number().nullable(),
   dex_price: z.number().nullable(),
+  /** Why a DEX price is or is not there: ok, no_pool, no_price, unavailable (read failed). */
+  dex_status: z.string().optional(),
   divergence: z.number().nullable(),
   depth_usd: z.number().nullable(),
   quality: z.object({

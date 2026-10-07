@@ -18,10 +18,10 @@ export function FactsBand() {
     `${less(u.b.bad_debt, u.nearest_blend.bad_debt)} less bad debt than the fixed mix with the same yield`,
     `${less(u.b.worst, u.nearest_blend.worst)} smaller worst night`,
     `${u.pulls.total.nights} nights pulled back, ${d.evaluation_years}`,
-    `${oracle.feeds_without_update} of ${oracle.feeds} feeds silent over the weekend`,
-    `${d.market_now.markets} Stock Token markets on Morpho`,
-    `${formatUsd(d.market_now.usdg_supplied)} USDG supplied today`,
-    `${formatPct(d.market_now.supply_apy, 4)} supply APY today`,
+    `${oracle.feeds_without_update} of ${oracle.feeds} feeds silent across ${oracle.weekends} weekends`,
+    `${formatUsd(d.market_now.usdg_borrowed)} of ${formatUsd(d.market_now.usdg_supplied)} USDG lent against Stock Tokens on ${d.market_now.block_time.slice(0, 10)}`,
+    `${formatPct(d.market_now.utilization, 1)} utilization`,
+    `${formatPct(d.market_now.supply_apy, 1)} supply APY`,
   ];
   const row = (copy: number) => (
     <span className="flex shrink-0 gap-[3em] pr-[3em]" aria-hidden={copy === 1}>

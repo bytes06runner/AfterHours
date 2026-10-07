@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 
 import { ApiError, liveErrorText, type LivePositions } from "@/lib/api";
 import { useConfig, useLiveExamples, useLivePositions } from "@/lib/queries";
-import { formatPct } from "@/lib/time";
+import { coverageText, formatPct } from "@/lib/time";
 
 import { LiveLabel } from "./LiveLabel";
 import { useWalletGate } from "./wallet/WalletGate";
@@ -111,8 +111,7 @@ function PositionCard({ p }: { p: Pos }) {
                     : `Tonight's bad case is a ${formatPct(p.tonight.bad_case_drop)} fall, short of your liquidation price.`}{" "}
                   <span className="font-normal text-ink">
                     ({seg[p.tonight.period.segment] ?? p.tonight.period.segment} until{" "}
-                    <ZonedTime iso={p.tonight.period.ends} />; a fall that size is expected about 1
-                    night in {Math.round(1 / p.tonight.alpha)}.)
+                    <ZonedTime iso={p.tonight.period.ends} />; {coverageText(p.tonight)}.)
                   </span>
                 </li>
               ) : (

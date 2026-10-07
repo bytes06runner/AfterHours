@@ -141,6 +141,26 @@ def ewma_sigma(prices: pd.DataFrame, as_of: date, lam: float) -> float:
     return float(np.sqrt(var.iloc[-1])) if len(var) else float("nan")
 
 
+def held_out_coverage(cfg: AfterhoursConfig) -> dict[str, Any]:
+    """How often the shipped forecaster's bad case was beaten on held-out years, per segment.
+
+    From `artifacts/model/report_card.json` (`shipped_performance`, walk-forward test folds).
+    The forecast targets `model.target_alpha`; these are the measured rates, which is what any
+    "beaten about 1 night in N" sentence must quote.
+    """
+    path = cfg.path(cfg.paths.artifacts_dir) / "model" / "report_card.json"
+    card = json.loads(path.read_text())
+    tests = [int(f["fold"]["test"][0]) for f in card.get("folds", [])]
+    return {
+        "target": cfg.model.target_alpha,
+        "test_years": [min(tests), max(tests)] if tests else None,
+        "miss_rate": {
+            seg: float(v["miss_rate"]) for seg, v in card.get("shipped_performance", {}).items()
+        },
+        "source": "artifacts/model/report_card.json",
+    }
+
+
 class LiveRisk:
     """Forecasts for the selected Stock Tokens from the shipped method."""
 
@@ -154,6 +174,7 @@ class LiveRisk:
             raise NotImplementedError(
                 f"live serving implements the shipped baseline; production ships {self.method}"
             )
+        self.coverage = held_out_coverage(cfg)
 
     def forecast(self, symbol: str, now: datetime, horizon: int) -> list[Forecast]:
         """Forecasts for `symbol` over the next `horizon` closed periods."""

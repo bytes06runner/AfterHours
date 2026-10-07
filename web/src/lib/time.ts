@@ -36,3 +36,21 @@ export function formatUsd(n: number, digits = 0): string {
 export function formatPct(x: number, digits = 1): string {
   return `${(x * 100).toFixed(digits)}%`;
 }
+
+/**
+ * How often the bad case is beaten: the forecast's target and, when the API gives it, the
+ * measured share on held-out years for this kind of closed period (never "1 in 100" alone,
+ * which is only the target).
+ */
+export function coverageText(t: {
+  alpha: number;
+  period: { segment: string };
+  held_out_miss_rate?: number | null;
+  held_out_years?: number[] | null;
+}): string {
+  const target = `the forecast aims for a fall beyond it on ${formatPct(t.alpha, 0)} of closed periods`;
+  const miss = t.held_out_miss_rate;
+  if (!miss) return target;
+  const years = t.held_out_years ? ` ${t.held_out_years[0]} to ${t.held_out_years[1]}` : "";
+  return `${target}; on held-out years${years} it was beaten on ${formatPct(miss, 2)} of ${t.period.segment} periods, about 1 in ${Math.round(1 / miss)}`;
+}

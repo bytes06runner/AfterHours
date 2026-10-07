@@ -112,8 +112,10 @@ def market_status() -> dict[str, Any]:
 def get_weekend_risk(ticker: str) -> dict[str, Any]:
     """Weekend and overnight risk for one Robinhood Stock Token (for example NVDA, TSLA, SPY):
     its price regime and price quality score, the next closed period, the calibrated bad-case
-    drop for it (beaten about 1 night in 100), which USDG Morpho markets' cushions that drop
-    passes, and a one-paragraph plain-English summary."""
+    drop for it (the forecast targets 1% of closed periods; the answer also gives how often such
+    falls were beaten on held-out years for that kind of period, more often on weekends and
+    holidays than the target), which
+    USDG Morpho markets' cushions that drop passes, and a one-paragraph plain-English summary."""
     if not TICKER.match(ticker.strip()):
         raise AfterhoursError(f"{ticker!r} does not look like a ticker, such as NVDA.")
     return _get("/v1/agent/weekend-risk/" + urllib.parse.quote(ticker.strip().upper()))

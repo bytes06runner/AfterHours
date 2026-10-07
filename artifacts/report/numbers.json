@@ -183,9 +183,29 @@
       "text": "3.4%",
       "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
     },
+    "regime.divergence_signed.IONQ": {
+      "value": -0.03409,
+      "text": "-3.4%",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.depth.IONQ": {
+      "value": 50,
+      "text": "$50",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
     "regime.divergence.RGTI": {
       "value": 0.07297,
       "text": "7.3%",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.divergence_signed.RGTI": {
+      "value": 0.07297,
+      "text": "+7.3%",
+      "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
+    },
+    "regime.depth.RGTI": {
+      "value": 73,
+      "text": "$73",
       "source": "artifacts/regime/snapshot-2026-10-04T1034Z.json"
     },
     "model.shipped": {
@@ -1160,12 +1180,17 @@
       "text": "34",
       "source": "artifacts/report/market_snapshot_82622425.json"
     },
-    "market_now.lltv625_supply_share": {
+    "market_now.dominant_lltv": {
+      "value": 0.625,
+      "text": "62.5%",
+      "source": "artifacts/report/market_snapshot_82622425.json"
+    },
+    "market_now.dominant_lltv_supply_share": {
       "value": 0.9997151320578833,
       "text": "99.97%",
       "source": "artifacts/report/market_snapshot_82622425.json"
     },
-    "market_now.lltv625_borrowed": {
+    "market_now.dominant_lltv_borrowed": {
       "value": 1665196.599044,
       "text": "1,665,197",
       "source": "artifacts/report/market_snapshot_82622425.json"

@@ -43,6 +43,14 @@ export function RegimeBadge({ r, size = "md" }: { r: LiveRegimeT; size?: "sm" | 
           Price quality {q.score}, {q.grade}
         </span>
       )}
+      {r.dex_status === "unavailable" && (
+        <span
+          className="text-[14px]"
+          title="The DEX read failed on every RPC; the score uses feed staleness alone"
+        >
+          DEX unavailable
+        </span>
+      )}
     </span>
   );
 }

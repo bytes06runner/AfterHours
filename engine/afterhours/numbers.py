@@ -165,6 +165,10 @@ def build(cfg: AfterhoursConfig) -> dict[str, Any]:
         for sym in sm["beyond_divergence_trigger"]:
             d = by[sym]["divergence"]
             n[f"regime.divergence.{sym}"] = _entry(d, f"{abs(d):.1%}", src)
+            n[f"regime.divergence_signed.{sym}"] = _entry(d, f"{d:+.1%}", src)
+            depth = by[sym].get("depth_usd")
+            if depth is not None:  # thin pools: a move there is not price discovery
+                n[f"regime.depth.{sym}"] = _entry(depth, f"${depth:,.0f}", src)
 
     src = "artifacts/model/report_card.json"
     acc = card["acceptance"]
@@ -425,7 +429,8 @@ def market_now(art: Path) -> dict[str, dict[str, Any]]:
     by_borrow = sorted(usdg, key=lambda m: -m["borrowed"])
     top4 = sum(m["borrowed"] for m in by_borrow[:4])
     full = [m for m in usdg if m["supplied"] > 0 and m["borrowed"] >= m["supplied"] * 0.9999]
-    lv = r["by_lltv"].get("0.625", {"supplied": 0.0, "borrowed": 0.0, "markets": 0})
+    dominant = max(r["by_lltv"], key=lambda k: r["by_lltv"][k]["supplied"])
+    lv = r["by_lltv"][dominant]
     n = {
         "market_now.block": _entry(ms["block"], count(ms["block"]), src),
         "market_now.date": _entry(ms["block_time"], ms["block_time"][:10], src),
@@ -442,10 +447,11 @@ def market_now(art: Path) -> dict[str, dict[str, Any]]:
         "market_now.markets_with_borrowing": _entry(
             r["markets_with_borrowing"], str(r["markets_with_borrowing"]), src
         ),
-        "market_now.lltv625_supply_share": _entry(
+        "market_now.dominant_lltv": _entry(float(dominant), pct(float(dominant)), src),
+        "market_now.dominant_lltv_supply_share": _entry(
             lv["supplied"] / u["supplied"], pct(lv["supplied"] / u["supplied"], 2), src
         ),
-        "market_now.lltv625_borrowed": _entry(lv["borrowed"], usd(lv["borrowed"]), src),
+        "market_now.dominant_lltv_borrowed": _entry(lv["borrowed"], usd(lv["borrowed"]), src),
         "market_now.top4_borrow_share": _entry(
             top4 / u["borrowed"], pct(top4 / u["borrowed"]), src
         ),

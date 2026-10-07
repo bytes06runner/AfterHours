@@ -304,7 +304,7 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
             "missed_closes": len(doc["missed_closes"]),
         }
 
-    @app.api_route("/v1/automation", methods=["GET", "HEAD"])
+    @app.get("/v1/automation")
     def automation(strict: bool = False) -> Any:
         """Scheduled pre-close cycles: heartbeat, last cycle (hold or act), missed closes.
 
@@ -538,7 +538,16 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
         gaps = ctx.artifact("gaps", "summary.json")
         study = ctx.artifact("discovery", "oracle_study.json")
         activity = ctx.artifact("backtest", "option_b_activity.json")["universes"]
-        market = ctx.artifact("discovery", "market_size.json")
+        # The newest dated snapshot (market-size --snapshot), else the 2026-09-27 reading.
+        snaps = sorted(
+            (cfg.path(cfg.paths.artifacts_dir) / "report").glob("market_snapshot_*.json"),
+            key=lambda p: int(p.stem.rsplit("_", 1)[1]),
+        )
+        market = (
+            ctx.artifact("report", snaps[-1].name)
+            if snaps
+            else ctx.artifact("discovery", "market_size.json")
+        )
         a_doc = ctx.artifact("backtest", "option_a.json")
         b_doc = ctx.artifact("backtest", "option_b.json")
         numbers = ctx.artifact("report", "numbers.json")["numbers"]
@@ -598,6 +607,8 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                     "supply_apy": market["rates"]["usdg_supply_apy_supply_weighted"],
                     "borrow_apy": market["rates"]["usdg_borrow_apy_borrow_weighted"],
                     "utilization": market["rates"]["usdg_utilization"],
+                    "usdg_markets": market["usdg_loan"]["markets"],
+                    "by_lltv": market["rates"]["by_lltv"],
                 },
                 "assumed_apy": {
                     name: cfg.backtest.apy(lltv) for name, lltv in cfg.morpho.lltv_tiers.ordered()

@@ -313,7 +313,7 @@ function Decision({ d }: { d: DecisionData }) {
         {d.market_now.block_time.slice(0, 10)}), the {d.market_now.markets} Morpho markets that take
         a Stock Token as collateral held {formatUsd(d.market_now.usdg_supplied)} USDG supplied and{" "}
         {formatUsd(d.market_now.usdg_borrowed)} borrowed ({formatPct(d.market_now.utilization, 2)}{" "}
-        utilization). Lenders earned a supply APY of {formatPct(d.market_now.supply_apy, 4)}{" "}
+        utilization). Lenders earned a supply APY of {formatPct(d.market_now.supply_apy, 2)}{" "}
         (supply-weighted) and borrowers paid {formatPct(d.market_now.borrow_apy, 2)}, read from each
         market&apos;s interest rate model at that block. The yields above use modelled rates.
       </p>

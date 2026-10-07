@@ -57,10 +57,11 @@ Measured on 2026-10-04: importing the SDK adds 25 MB to the API process; product
 482 MB under load against Render free's 512 MB. Mounting it would leave about 5 MB, so the
 server ships as a local stdio package that calls the hosted REST API instead.
 
-## A real session
+## A captured session
 
 `agents/scripts/capture_example.py` starts the server exactly as the install steps do (`uvx`
 from GitHub), calls all four tools against the hosted API and writes
 `artifacts/agents/example-session.json`, served at `/v1/agents/example-session` and shown on
 the Agents page. Captured 2026-10-04 15:02 UTC: all five calls answered without error. The
-questions are examples; the tool calls and answers are real.
+questions are examples written for the script (a scripted MCP client, not an LLM
+conversation); the tool calls and answers are real.

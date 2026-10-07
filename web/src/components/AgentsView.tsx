@@ -20,7 +20,7 @@ const TOOLS = [
   },
   {
     name: "get_weekend_risk(ticker)",
-    does: "One Stock Token: price regime and price quality, the next closed period, its 1-in-100 bad-case drop, which USDG Morpho markets' cushions that passes, and a plain paragraph.",
+    does: "One Stock Token: price regime and price quality, the next closed period, its bad-case drop with the measured held-out miss rate for that kind of night, which USDG Morpho markets' cushions that passes, and a plain paragraph.",
     path: "/v1/agent/weekend-risk/NVDA",
   },
   {
@@ -209,11 +209,12 @@ export function AgentsView() {
 
       <section className="mt-12" aria-labelledby="session">
         <h2 id="session" className="text-[36px]">
-          A real session
+          A captured session
         </h2>
         <p className="mt-2 max-w-[72ch] text-[18px]">
-          The questions are examples. Every tool call and every answer below is what the tools
-          returned.
+          A scripted MCP client, started exactly as the install steps above, called each tool
+          against the hosted API. The questions are examples written for the script, not an AI
+          conversation. Every tool call and every answer below is what the tools returned.
         </p>
         {session.data && <Session s={session.data} />}
         {!session.data && !session.isError && (
