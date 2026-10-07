@@ -289,8 +289,14 @@ def regime_row(
     dex_price: float | None,
     depth_usd: float | None,
     cadence_doc: dict[str, Any] | None,
+    dex_status: str | None = None,
 ) -> dict[str, Any]:
-    """Regime, score and line for one token (all inputs already read)."""
+    """Regime, score and line for one token (all inputs already read).
+
+    `dex_status` says why a DEX price is or is not there: "ok", "no_pool" (no USDG pool found at
+    discovery), "no_price" (the pool answered with no usable price) or "unavailable" (the read
+    failed). Without it, "ok" or "no_price" is inferred from `dex_price`.
+    """
     r = cfg.regime
     regime = classify(cal["state"], updated_at, since, r.window_grace_seconds)
     age = (now - updated_at).total_seconds() if updated_at else None
@@ -313,6 +319,7 @@ def regime_row(
         "feed_age_seconds": None if age is None else round(age),
         "typical_interval_minutes": typical,
         "dex_price": dex_price,
+        "dex_status": dex_status or ("ok" if dex_price else "no_price"),
         "divergence": None if divergence is None else round(divergence, 5),
         "depth_usd": None if depth_usd is None else round(depth_usd),
         "quality": quality(cfg, marks),

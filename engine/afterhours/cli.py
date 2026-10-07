@@ -648,14 +648,27 @@ def regime_snapshot_cmd() -> None:
 
 
 @app.command("market-size")
-def market_size_cmd() -> None:
+def market_size_cmd(
+    snapshot: Annotated[
+        bool,
+        typer.Option(
+            help="Write a dated artifacts/report/market_snapshot_<block>.json instead of "
+            "replacing artifacts/discovery/market_size.json."
+        ),
+    ] = False,
+) -> None:
     """Supplied and borrowed across Stock Token Morpho markets on mainnet, at a recent block."""
     from afterhours.discovery.market_size import read
 
     _logging()
     cfg = load_config()
     doc = read(cfg)
-    out = cfg.path(cfg.paths.artifacts_dir) / "discovery" / "market_size.json"
+    artifacts = cfg.path(cfg.paths.artifacts_dir)
+    out = (
+        artifacts / "report" / f"market_snapshot_{doc['block']}.json"
+        if snapshot
+        else artifacts / "discovery" / "market_size.json"
+    )
     out.write_text(json.dumps(doc, indent=2) + "\n")
     u = doc["usdg_loan"]
     typer.echo(

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, time
+from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -405,7 +406,57 @@ def build(cfg: AfterhoursConfig) -> dict[str, Any]:
                 r["markets_with_borrowing"], str(r["markets_with_borrowing"]), src
             )
             n["market.usdg_markets"] = _entry(u["markets"], str(u["markets"]), src)
+    n |= market_now(art)
     return {"generated_from": "afterhours numbers", "numbers": n, "oracle": o}
+
+
+def market_now(art: Path) -> dict[str, dict[str, Any]]:
+    """`market_now.*`: the latest dated snapshot (`afterhours market-size --snapshot`)."""
+    snaps = sorted(
+        (art / "report").glob("market_snapshot_*.json"),
+        key=lambda p: int(p.stem.rsplit("_", 1)[1]),
+    )
+    if not snaps:
+        return {}
+    ms = json.loads(snaps[-1].read_text())
+    src = f"artifacts/report/{snaps[-1].name}"
+    u, r = ms["usdg_loan"], ms["rates"]
+    usdg = [m for m in ms["markets"] if m["loan_token"] == ms["usdg"]]
+    by_borrow = sorted(usdg, key=lambda m: -m["borrowed"])
+    top4 = sum(m["borrowed"] for m in by_borrow[:4])
+    full = [m for m in usdg if m["supplied"] > 0 and m["borrowed"] >= m["supplied"] * 0.9999]
+    lv = r["by_lltv"].get("0.625", {"supplied": 0.0, "borrowed": 0.0, "markets": 0})
+    n = {
+        "market_now.block": _entry(ms["block"], count(ms["block"]), src),
+        "market_now.date": _entry(ms["block_time"], ms["block_time"][:10], src),
+        "market_now.usdg_markets": _entry(u["markets"], str(u["markets"]), src),
+        "market_now.usdg_supplied": _entry(u["supplied"], usd(u["supplied"]), src),
+        "market_now.usdg_borrowed": _entry(u["borrowed"], usd(u["borrowed"]), src),
+        "market_now.utilization": _entry(r["usdg_utilization"], pct(r["usdg_utilization"]), src),
+        "market_now.borrow_apy": _entry(
+            r["usdg_borrow_apy_borrow_weighted"], pct(r["usdg_borrow_apy_borrow_weighted"]), src
+        ),
+        "market_now.supply_apy": _entry(
+            r["usdg_supply_apy_supply_weighted"], pct(r["usdg_supply_apy_supply_weighted"]), src
+        ),
+        "market_now.markets_with_borrowing": _entry(
+            r["markets_with_borrowing"], str(r["markets_with_borrowing"]), src
+        ),
+        "market_now.lltv625_supply_share": _entry(
+            lv["supplied"] / u["supplied"], pct(lv["supplied"] / u["supplied"], 2), src
+        ),
+        "market_now.lltv625_borrowed": _entry(lv["borrowed"], usd(lv["borrowed"]), src),
+        "market_now.top4_borrow_share": _entry(
+            top4 / u["borrowed"], pct(top4 / u["borrowed"]), src
+        ),
+        "market_now.top4_symbols": _entry(
+            [m["symbol"] for m in by_borrow[:4]],
+            ", ".join(m["symbol"] for m in by_borrow[:4]),
+            src,
+        ),
+        "market_now.fully_lent_markets": _entry(len(full), str(len(full)), src),
+    }
+    return n
 
 
 def write(cfg: AfterhoursConfig) -> str:
