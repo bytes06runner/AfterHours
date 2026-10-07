@@ -310,3 +310,47 @@ def test_api_automation_route(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     if r.json()["status"] != "not_applicable":
         assert r.status_code == 200
         assert r.json()["status"] == "ok"
+
+
+def test_dry_run_is_recorded_as_dry_run_not_hold(store: Store) -> None:
+    from afterhours.bot.automation import run_recorded
+
+    result = CycleResult("manual", IN_WINDOW.isoformat(), plan(execute=True, pulled=True), False)
+    out = run_recorded(
+        store,
+        CFG,
+        cycle_id="manual:cli:test",
+        kind="manual",
+        close=None,
+        source="cli:smoke",
+        run_ref=None,
+        make_runner=lambda: FakeRunner(result),
+        clock=lambda: IN_WINDOW,
+        execute=False,
+    )
+    rec = out["cycle"]
+    assert rec["decision"] == "dry_run"
+    assert rec["executed"] is False
+    assert "Dry run, nothing sent: the plan would move money" in rec["reason"]
+    assert "META" in rec["reason"]
+
+
+def test_close_done_lets_later_runs_skip_the_work(store: Store) -> None:
+    from afterhours.bot.automation import close_done
+
+    assert close_done(store, CLOSE) is False
+    with pytest.raises(ConnectionError):  # a failed cycle is not done: the next run retries
+        due(store, FakeRunner(error=ConnectionError("down")), IN_WINDOW)
+    assert close_done(store, CLOSE) is False
+    due(store, FakeRunner(), IN_WINDOW + timedelta(minutes=10))
+    assert close_done(store, CLOSE) is True
+
+
+def test_workflow_skips_prices_and_bot_once_the_close_is_done() -> None:
+    wf = yaml.safe_load((REPO_ROOT / ".github" / "workflows" / "pre-close.yml").read_text())
+    steps = {s.get("name", ""): s for s in wf["jobs"]["pre-close"]["steps"]}
+    window = steps["Heartbeat; inside a pre-close window?"]["run"]
+    assert '"$window" = done' in window
+    for name in ("Refresh every Stock Token's prices", "Bot pre-close cycle"):
+        assert steps[name]["if"] == "steps.window.outputs.cycle == 'true'"
+    assert "steps.window.outputs.due == 'true'" in steps["Telegram pre-close alerts"]["if"]

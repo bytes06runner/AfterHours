@@ -324,16 +324,24 @@ def pre_close_cmd(
     source: Annotated[str, typer.Option(help="What started this run.")] = "cli",
     run_ref: Annotated[str | None, typer.Option(help="CI run id.")] = None,
 ) -> None:
-    """Print `true` inside a pre-close window, else `false` (scheduled jobs gate on it)."""
+    """Print `true` inside a pre-close window, else `false` (scheduled jobs gate on it).
+
+    With --heartbeat, also records the run, and prints `done` inside a window whose pre-close
+    cycle has already completed (later runs in the window skip the price fetch and the bot).
+    """
     from afterhours.bot.scheduler import pre_close_window
 
     cfg = load_config()
     now = datetime.now(UTC)
     if record_heartbeat:
-        from afterhours.bot.automation import heartbeat
+        from afterhours.bot.automation import close_done, heartbeat
         from afterhours.state import Store
 
-        close = heartbeat(Store.for_profile(cfg), cfg, now, source, run_ref)
+        store = Store.for_profile(cfg)
+        close = heartbeat(store, cfg, now, source, run_ref)
+        if close and close_done(store, close):
+            typer.echo("done")
+            return
     else:
         close = pre_close_window(cfg, now)
     typer.echo("true" if close else "false")
@@ -444,7 +452,7 @@ def harden_timelocks_cmd(
     Prints each function's current timelock first and sends nothing unless confirmed. Raises
     only, to `vault.timelock_seconds`; never lowers or abdicates anything.
     """
-    from afterhours.chain.rpc import call_many, connect
+    from afterhours.chain.rpc import Call, call_many, connect
     from afterhours.chain.tx import Signer
     from afterhours.deploy import harden_timelocks, role_keys, timelock_plan
     from afterhours.deployments import load_deployment
@@ -476,7 +484,12 @@ def harden_timelocks_cmd(
     ):
         raise typer.Exit(1)
     curator = Signer(w3, role_keys(cfg, profile, ("CURATOR_PK",))["CURATOR_PK"])
-    for tx in harden_timelocks(curator.send, vault, plan):
+
+    def pending(data: bytes) -> bool:  # submitted by an earlier run that stopped halfway
+        (at,) = call_many(w3, [Call(vault, "executableAt(bytes)(uint256)", (data,))])
+        return bool(at)
+
+    for tx in harden_timelocks(curator.send, vault, plan, pending):
         typer.echo(f"sent: {chain.explorer_url}/tx/{tx}" if chain.explorer_url else f"sent: {tx}")
     after = timelock_plan(
         lambda calls: call_many(w3, calls), vault, cfg.vault.harden_timelock_functions, seconds

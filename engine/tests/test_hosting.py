@@ -140,6 +140,10 @@ def test_timelock_plan_and_hardening_only_raise() -> None:
     sel0 = keccak(text=fns[0])[:4]
     assert sent[0] == ("0xVault", "submit(bytes)", (encode_call(INCREASE_TIMELOCK, sel0, 86_400),))
     assert sent[1] == ("0xVault", INCREASE_TIMELOCK, (sel0, 86_400))
+    # A rerun after a run that submitted but stopped: execute only, no second submit.
+    sent.clear()
+    harden_timelocks(send, "0xVault", plan, pending=lambda data: True)
+    assert [sig for _, sig, _ in sent] == [INCREASE_TIMELOCK] * len(raises)
 
 
 def test_hardening_refuses_mainnet_and_local_profiles() -> None:

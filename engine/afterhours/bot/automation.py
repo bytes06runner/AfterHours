@@ -89,6 +89,12 @@ def heartbeat(
     return close
 
 
+def close_done(store: BaseStore, close: datetime) -> bool:
+    """True once this close's pre-close cycle has completed (later runs have nothing to do)."""
+    rec = _find(load(store), f"pre_close:{_iso(close)}")
+    return bool(rec and rec["status"] == "completed")
+
+
 def policy_snapshot(cfg: AfterhoursConfig) -> dict[str, Any]:
     """The policy settings a cycle ran under (option B, frozen since 2026-09-27)."""
     p = cfg.policy
@@ -124,11 +130,17 @@ def input_snapshot(plan: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def decide(result: CycleLike, min_rebalance_usd: float) -> tuple[str, str]:
-    """("act" | "hold", plain-English reason) for a finished cycle."""
+def decide(
+    result: CycleLike, min_rebalance_usd: float, *, executed: bool = True
+) -> tuple[str, str]:
+    """("act" | "hold" | "dry_run", plain-English reason) for a finished cycle."""
     plan = result.plan
     decisions = plan.get("decisions", {})
     pulled = sorted(s for s, d in decisions.items() if d.get("pulled"))
+    if not executed:  # planned only: never reported as a hold or a move
+        would = "would move money" if plan.get("execute") else "would hold"
+        why = f" Over the pullback limit: {', '.join(pulled)}." if pulled else ""
+        return "dry_run", f"Dry run, nothing sent: the plan {would}.{why}"
     if result.txs:
         moved = f"{len(result.txs)} transaction(s), {len(result.reasons)} reason card(s) anchored"
         why = f" Pulled: {', '.join(pulled)}." if pulled else ""
@@ -234,7 +246,7 @@ def run_recorded(
     except Exception as e:
         finish(status="failed", error=redact(f"{type(e).__name__}: {e}")[:500])
         raise
-    decision, reason = decide(result, cfg.policy.min_rebalance_usd)
+    decision, reason = decide(result, cfg.policy.min_rebalance_usd, executed=execute)
     done = finish(
         status="completed",
         decision=decision,

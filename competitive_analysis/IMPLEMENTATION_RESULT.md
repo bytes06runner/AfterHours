@@ -10,7 +10,29 @@ earlier session's changes were present). All work is in local commits, **not pus
 | `847573f` | Docs: testnet source verification, onchain roles and timelocks |
 | `08a1c22` | Truth pass; bad case quoted with its measured held-out miss rate |
 | `79d241a` | Curator view (`/v1/live/curator`, `/curators`); `harden-timelocks`; guardian funding |
-| (final) | PROGRESS, builder update, this report |
+| `749eb84` | PROGRESS, builder update, this report |
+| (audit) | Release audit fixes, below |
+
+## Release audit (before push)
+
+Every changed file was reviewed against `origin/main`. No secrets, `.env` changes, private keys,
+temporary scripts or debug code; the 151 64-hex strings in the market snapshot are its market
+ids. Fixed in the audit:
+
+1. Curator view read Morpho market state at the risk board's block. The board can be a saved
+   snapshot from before a restart, older than a pruned node keeps state for, which would have
+   turned the whole view into a 503. It now reads market state at the current head and reports
+   `forecast_as_of` and `board_block` for the forecasts.
+2. Borrower concentration is optional, but a rate-limited `position()` read took the whole view
+   down. Now best effort, with `concentration_error` (redacted).
+3. `bot once --dry-run` was recorded as `hold`, and could say "every planned move was dust".
+   Now recorded as `dry_run` with what the plan would have done.
+4. After a close's cycle completed, every later run in the window still fetched all 35 Stock
+   Tokens' prices from Yahoo (known to rate-limit). The window step now prints `done`, and the
+   price fetch and bot step skip; alerts keep their own once-per-close gate.
+5. `harden-timelocks` could not resume after stopping between submit and execute
+   (`DataAlreadyPending`). It now reads `executableAt` and executes without resubmitting.
+6. `docs/HOSTING.md` still described the hourly schedule and the `pre_close_run` key.
 
 ## Completed
 

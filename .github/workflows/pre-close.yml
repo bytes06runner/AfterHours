@@ -78,11 +78,16 @@ jobs:
       - name: Heartbeat; inside a pre-close window?
         id: window
         if: steps.config.outputs.ready == 'true'
+        # Prints true (in a window, cycle still to run), done (in a window, this close's cycle
+        # already completed) or false (outside every window).
         run: |
-          due=$(uv run --frozen --no-dev afterhours pre-close --heartbeat \
+          window=$(uv run --frozen --no-dev afterhours pre-close --heartbeat \
             --source "$GITHUB_EVENT_NAME" --run-ref "github-actions:$GITHUB_RUN_ID")
-          echo "due=$due" >> "$GITHUB_OUTPUT"
-          if [ "$due" = true ] || [ "$FORCE_CYCLE" = true ]; then
+          echo "window=$window"
+          if [ "$window" = true ] || [ "$window" = done ]; then
+            echo "due=true" >> "$GITHUB_OUTPUT"
+          fi
+          if [ "$window" = true ] || [ "$FORCE_CYCLE" = true ]; then
             echo "cycle=true" >> "$GITHUB_OUTPUT"
           fi
         env:

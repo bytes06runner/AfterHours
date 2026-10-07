@@ -342,12 +342,19 @@ def timelock_plan(
     return plan
 
 
-def harden_timelocks(send: Any, vault: str, plan: list[dict[str, Any]]) -> list[str]:
+def harden_timelocks(
+    send: Any,
+    vault: str,
+    plan: list[dict[str, Any]],
+    pending: Any = lambda data: False,
+) -> list[str]:
     """Raise each planned timelock: the curator submits `increaseTimelock`, then executes it.
 
     `increaseTimelock` itself has no timelock on these vaults (read onchain first: the plan
     only raises, never lowers), so the execution follows the submission at once.
-    `send(to, signature, *args)` signs as the curator (Signer.send). Returns the tx hashes.
+    `send(to, signature, *args)` signs as the curator (Signer.send). `pending(data)` says the
+    same data was already submitted (VaultV2 `executableAt`), e.g. by a run that stopped
+    halfway; then only the execution is sent. Returns the tx hashes.
     """
     from afterhours.chain.abi import encode_call
 
@@ -357,6 +364,7 @@ def harden_timelocks(send: Any, vault: str, plan: list[dict[str, Any]]) -> list[
             continue
         sel = bytes.fromhex(p["selector"][2:])
         data = encode_call(INCREASE_TIMELOCK, sel, p["target"])
-        txs.append(send(vault, "submit(bytes)", data).tx_hash)
+        if not pending(data):
+            txs.append(send(vault, "submit(bytes)", data).tx_hash)
         txs.append(send(vault, INCREASE_TIMELOCK, sel, p["target"]).tx_hash)
     return txs

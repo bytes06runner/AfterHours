@@ -683,7 +683,10 @@ class Mainnet:
     def _curator_now(self, board: dict[str, Any], *, wait: bool = False) -> dict[str, Any]:
         from afterhours.live import curator as cur
 
-        block = int(board["block"])
+        # Market state at the current head, not the board's block: the board can be a saved
+        # snapshot from before a restart, older than a pruned node keeps state for. Forecasts and
+        # feed state keep the board's own time (`forecast_as_of`).
+        block = self.block()
         deadline = self.deadline()
         markets = [m for m in self.markets() if m.loan_token == self.usdg]
         states = call_many(
@@ -708,7 +711,13 @@ class Mainnet:
                 "borrowed": borrowed,
             }
             live.append((row, tuple(int(x) for x in st)))
-        conc, scanned = self.concentration(live, block, deadline, wait=wait)
+        conc_error = None
+        try:  # concentration adds to the view; a rate-limited read must not take it down
+            conc, scanned = self.concentration(live, block, deadline, wait=wait)
+        except Exception as exc:
+            log.warning("borrower concentration failed: %s", type(exc).__name__)
+            conc, scanned = {}, None
+            conc_error = redact(f"{type(exc).__name__}: {exc}")[:200]
         by_symbol = {r["symbol"]: r for r in board["stocks"]}
         rows = [
             cur.market_row(
@@ -723,7 +732,9 @@ class Mainnet:
         return {
             "network": board["network"],
             "block": block,
-            "as_of": board["as_of"],
+            "as_of": datetime.now(UTC).isoformat(),
+            "forecast_as_of": board["as_of"],
+            "board_block": board["block"],
             "markets": rows,
             "totals": {
                 "markets": len(rows),
@@ -735,6 +746,7 @@ class Mainnet:
             "enabled_lltvs": self.enabled_lltvs,
             "coverage": self.risk.coverage,
             "borrowers_scanned_to_block": scanned,
+            "concentration_error": conc_error,
             "policy": {
                 "margin_fraction": self.cfg.policy.pullback_fraction,
                 "watch_utilization": self.cfg.curator.watch_utilization,

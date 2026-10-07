@@ -142,6 +142,7 @@ def test_mainnet_curator_end_to_end(monkeypatch: pytest.MonkeyPatch, tmp_path: A
     live.borrowers_by_market = tmp_path / "scan.json"
     board = {"network": "Robinhood Chain", "block": 100, "as_of": "t", "stocks": [stock(0.071)]}
     monkeypatch.setattr(live, "board", lambda *a, **k: board)
+    monkeypatch.setattr(live, "block", lambda: 120)  # market state at the head, not the board
     m1, m2 = "0x" + "11" * 32, "0x" + "22" * 32
     monkeypatch.setattr(
         live,
@@ -172,3 +173,36 @@ def test_mainnet_curator_end_to_end(monkeypatch: pytest.MonkeyPatch, tmp_path: A
     assert doc["markets"][0]["market_id"] == m1  # strongest recommendation first
     assert doc["totals"]["utilization"] == pytest.approx(2880 / 3000)
     assert doc["borrowers_scanned_to_block"] == 90
+    assert doc["block"] == 120  # market state read at the head
+    assert doc["board_block"] == 100
+    assert doc["forecast_as_of"] == "t"
+    assert doc["concentration_error"] is None
+
+
+def test_concentration_failure_does_not_take_the_view_down(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Any
+) -> None:
+    from afterhours.live import mainnet as mn
+
+    live = Mainnet(CFG)
+    board = {"network": "Robinhood Chain", "block": 100, "as_of": "t", "stocks": [stock(0.02)]}
+    monkeypatch.setattr(live, "board", lambda *a, **k: board)
+    monkeypatch.setattr(live, "block", lambda: 120)
+    m1 = "0x" + "11" * 32
+    monkeypatch.setattr(live, "markets", lambda: [FakeMarket(m1, 0.625, live.usdg)])
+    monkeypatch.setattr(live, "decimals", lambda tokens, *a, **k: dict.fromkeys(tokens, 6))
+    monkeypatch.setattr(
+        mn, "call_many", lambda w3, calls, **k: [(1_000_000_000, 0, 500_000_000, 1000, 0, 0)]
+    )
+
+    def rate_limited(*a: Any, **k: Any) -> Any:
+        raise TimeoutError(
+            "the node is rate limiting at https://rpc.example/v2/sekret"
+        )  # hardcode-ok: test fixture
+
+    monkeypatch.setattr(live, "concentration", rate_limited)
+    doc = live.curator(wait=True)
+    assert doc["markets"][0]["recommendation"] == "survives"
+    assert doc["markets"][0]["borrowers"] is None
+    assert "TimeoutError" in doc["concentration_error"]
+    assert "sekret" not in doc["concentration_error"]

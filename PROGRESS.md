@@ -1240,4 +1240,10 @@ Evidence: `make test-py` (161 passed), `make lint-py`, `make lint-web`, `make te
 4 passed (desktop and mobile); screenshots `artifacts/screens/curators/`. Not run here:
 Foundry (installer host blocked), `make test-integration` and the full `make e2e` (no Anvil).
 
+Release audit before push (same day): curator market state read at the head (a restored board
+snapshot could be older than a pruned node keeps), concentration made best effort, dry runs
+recorded as `dry_run`, later runs in a window skip the price fetch once the close is done,
+`harden-timelocks` resumes a half-finished run, HOSTING.md schedule text updated. Details in
+`competitive_analysis/IMPLEMENTATION_RESULT.md`, "Release audit".
+
 Next: founder steps in BLOCKED 6, then watch the first in-window run.
