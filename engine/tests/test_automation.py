@@ -295,16 +295,23 @@ def test_api_automation_route(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     files = Store(tmp_path)
     monkeypatch.setattr(Store, "for_profile", classmethod(lambda cls, cfg, profile=None: files))
     monkeypatch.setattr(Context, "now", lambda self: CLOSE + timedelta(hours=1))
-    client = TestClient(create_app(CFG))
+    import time
+
+    # /v1/automation is cached for api.health_chain_cache_seconds: the shortest, 1 s, here.
+    fast = CFG.model_copy(
+        update={"api": CFG.api.model_copy(update={"health_chain_cache_seconds": 1})}
+    )
+    client = TestClient(create_app(fast))
     health = client.get("/v1/health")
     assert health.status_code == 200
     assert health.json()["service"] == "ok"
-    assert health.json()["automation"]["status"] in ("never_ran", "not_applicable")
+    assert health.json()["automation"]["heartbeat_at"] is None  # never ran, said cheaply
     r = client.get("/v1/automation")
     assert r.status_code == 200
     if r.json()["status"] == "never_ran":
         assert client.get("/v1/automation?strict=true").status_code == 503
     due(files, FakeRunner(), IN_WINDOW)
+    time.sleep(1.1)
     r = client.get("/v1/automation?strict=true")
     assert r.json()["last_cycle"]["decision"] == "hold"
     if r.json()["status"] != "not_applicable":
@@ -354,3 +361,44 @@ def test_workflow_skips_prices_and_bot_once_the_close_is_done() -> None:
     for name in ("Refresh every Stock Token's prices", "Bot pre-close cycle"):
         assert steps[name]["if"] == "steps.window.outputs.cycle == 'true'"
     assert "steps.window.outputs.due == 'true'" in steps["Telegram pre-close alerts"]["if"]
+
+
+def test_status_agrees_with_the_window_and_expected_closes(store: Store) -> None:
+    """status() builds one schedule; it must match pre_close_window and expected_closes."""
+    from afterhours.bot.automation import expected_closes
+    from afterhours.bot.scheduler import pre_close_window
+
+    automation.heartbeat(store, CFG, CLOSE - timedelta(days=3), "schedule", None)
+    since = automation.load(store)["tracking_since"]
+    for now in (IN_WINDOW, CLOSE + timedelta(hours=1), datetime(2026, 10, 10, 12, tzinfo=UTC)):
+        st = automation.status(store, CFG, now, deployed=True)
+        w = pre_close_window(CFG, now)
+        assert st["current_window_close"] == (w.isoformat() if w else None)
+        exp = expected_closes(CFG, datetime.fromisoformat(since), now)
+        assert st["expected_closes"] == [c.isoformat() for c in exp]
+        assert st["next_close"] > now.isoformat()
+
+
+def test_health_reads_the_record_without_calendar_work(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from fastapi.testclient import TestClient
+
+    from afterhours.api.app import Context, create_app
+
+    files = Store(tmp_path)
+    monkeypatch.setattr(Store, "for_profile", classmethod(lambda cls, cfg, profile=None: files))
+    monkeypatch.setattr(Context, "now", lambda self: CLOSE + timedelta(hours=1))
+    due(files, FakeRunner(), IN_WINDOW)
+
+    def no_calendar(*a: Any, **k: Any) -> Any:
+        raise AssertionError("health must not build an exchange schedule")
+
+    client = TestClient(create_app(CFG))
+    monkeypatch.setattr(automation, "sessions", no_calendar)
+    monkeypatch.setattr(automation, "pre_close_window", no_calendar)
+    h = client.get("/v1/health").json()["automation"]
+    assert h["last_decision"] == "hold"
+    assert h["last_status"] == "completed"
+    assert h["heartbeat_at"] == IN_WINDOW.isoformat()
+    assert h["detail"] == "/v1/automation"

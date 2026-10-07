@@ -326,11 +326,21 @@ def status(
     completed = [c for c in cycles if c["status"] == "completed"]
     running = [c for c in cycles if c["status"] == "running" and not _timed_out(c, now, cfg)]
     pre = {c["close"]: c for c in cycles if c["kind"] == "pre_close"}
-    expected = expected_closes(cfg, since, now) if since else []
+    # One exchange schedule for the window, the expected closes and the next close (each
+    # schedule costs a noticeable share of a small host's CPU).
+    lookback = now - timedelta(days=cfg.automation.lookback_days)
+    first = max(since, lookback) if since else now - timedelta(days=1)
+    sess = sessions(
+        cfg.data.exchange_calendar,
+        min(first, now - timedelta(days=1)).date(),
+        (now + timedelta(days=7)).date(),
+    )
+    closes: list[datetime] = [c.to_pydatetime() for c in sess["close"]]
+    lead = timedelta(minutes=cfg.schedule.pre_close_minutes)
+    expected = [c for c in closes if since < c <= now and c.date() >= first.date()] if since else []
     missed = [_iso(c) for c in expected if pre.get(_iso(c), {}).get("status") != "completed"]
-    window = pre_close_window(cfg, now)
-    later = sessions(cfg.data.exchange_calendar, now.date(), (now + timedelta(days=7)).date())
-    upcoming = [c.to_pydatetime() for c in later["close"] if c.to_pydatetime() > now]
+    window = next((c for c in closes if c - lead <= now < c), None)
+    upcoming = [c for c in closes if c > now]
 
     if not deployed:
         state, detail = "not_applicable", f"No deployment for {cfg.active_profile}."

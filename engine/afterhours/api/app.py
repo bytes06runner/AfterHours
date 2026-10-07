@@ -284,24 +284,38 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
             "automation": automation_brief(),
         }
 
+    automation_cache: dict[str, tuple[float, dict[str, Any]]] = {}
+
     def automation_doc() -> dict[str, Any]:
+        """Full automation status (exchange calendar work), cached like the chain health."""
         from afterhours.bot.automation import status as automation_status
 
-        return automation_status(ctx.store, cfg, ctx.now(), deployed=bool(ctx.deployment))
+        hit = automation_cache.get("doc")
+        if hit and time.monotonic() - hit[0] < cfg.api.health_chain_cache_seconds:
+            return hit[1]
+        doc = automation_status(ctx.store, cfg, ctx.now(), deployed=bool(ctx.deployment))
+        automation_cache["doc"] = (time.monotonic(), doc)
+        return doc
 
     def automation_brief() -> dict[str, Any]:
+        """What the store already holds, with no calendar work: health probes stay cheap on a
+        fraction of a CPU, so the host never restarts the API over them. Full status (missed
+        closes, never ran, failed) is at /v1/automation."""
+        from afterhours.bot.automation import DOC
+
         try:
-            doc = automation_doc()
+            doc = ctx.store.read(DOC) or {}
         except Exception as e:  # a store outage must not take process health down
-            log.warning("automation status unavailable: %s", type(e).__name__)
-            return {"status": "unknown", "healthy": None}
-        last = doc["last_cycle"] or {}
+            log.warning("automation record unavailable: %s", type(e).__name__)
+            return {"record": "unavailable", "detail": "/v1/automation"}
+        cycles = [c for c in doc.get("cycles", []) if c.get("status") != "running"]
+        last = cycles[-1] if cycles else {}
         return {
-            "status": doc["status"],
-            "healthy": doc["healthy"],
+            "heartbeat_at": (doc.get("heartbeat") or {}).get("at"),
             "last_cycle_at": last.get("finished_at"),
+            "last_status": last.get("status"),
             "last_decision": last.get("decision"),
-            "missed_closes": len(doc["missed_closes"]),
+            "detail": "/v1/automation",
         }
 
     @app.get("/v1/automation")
