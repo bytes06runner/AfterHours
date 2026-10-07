@@ -244,6 +244,33 @@
       "title": "ApiConfig",
       "type": "object"
     },
+    "AutomationConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "history_cycles": {
+          "exclusiveMinimum": 0,
+          "title": "History Cycles",
+          "type": "integer"
+        },
+        "lookback_days": {
+          "exclusiveMinimum": 0,
+          "title": "Lookback Days",
+          "type": "integer"
+        },
+        "running_timeout_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Running Timeout Minutes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "history_cycles",
+        "running_timeout_minutes",
+        "lookback_days"
+      ],
+      "title": "AutomationConfig",
+      "type": "object"
+    },
     "BacktestConfig": {
       "additionalProperties": false,
       "properties": {
@@ -2329,6 +2356,9 @@
     "api": {
       "$ref": "#/$defs/ApiConfig"
     },
+    "automation": {
+      "$ref": "#/$defs/AutomationConfig"
+    },
     "backtest": {
       "$ref": "#/$defs/BacktestConfig"
     },
@@ -2426,7 +2456,8 @@
     "regime",
     "agents",
     "funding",
-    "state"
+    "state",
+    "automation"
   ],
   "title": "Afterhours configuration",
   "type": "object"

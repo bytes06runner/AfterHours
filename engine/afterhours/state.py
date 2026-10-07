@@ -71,6 +71,10 @@ class BaseStore:
     def read(self, name: str) -> dict[str, Any] | None:
         raise NotImplementedError
 
+    def read_fresh(self, name: str) -> dict[str, Any] | None:
+        """`read` without any cache (for read-modify-write under a lock)."""
+        return self.read(name)
+
     @contextmanager
     def lock(self, name: str) -> Iterator[None]:
         raise NotImplementedError
@@ -242,6 +246,10 @@ class KVStore(BaseStore):
             f"doc:{name}", self.cfg.state.read_cache_seconds, load
         )
         return doc
+
+    def read_fresh(self, name: str) -> dict[str, Any] | None:
+        self._cache.pop(f"doc:{name}", None)
+        return self.read(name)
 
     @contextmanager
     def lock(self, name: str) -> Iterator[None]:

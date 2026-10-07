@@ -1,11 +1,21 @@
 # Pre-close jobs for the free hosting setup (docs/HOSTING.md): the allocator bot's pre-close
-# cycle and the Telegram pre-close alerts. Runs hourly on weekdays; the engine decides whether
-# now is inside a pre-close window (schedule.pre_close_minutes before an exchange close, holidays
-# and early closes included) and does nothing otherwise.
+# cycle and the Telegram pre-close alerts. The engine decides whether now is inside a pre-close
+# window (schedule.pre_close_minutes before an exchange close, holidays and early closes
+# included) and does nothing else otherwise.
 #
-# GitHub delays scheduled runs at busy times, especially the start of every hour, so this runs at
-# minute 23; a two-hour window gives it two chances per close. Scheduled workflows run only on
-# the default branch, and GitHub disables them after 60 days without repository activity.
+# Why so many schedule entries: GitHub drops and delays scheduled runs on quiet repositories.
+# An hourly schedule at minute 23 produced 32 runs between 2026-09-28 and 2026-10-07, at
+# irregular times, and none of them inside a pre-close window. So the schedule now fires every
+# 10 minutes across the hours that can hold a window: 18:00 to 20:59 UTC covers a regular close
+# (20:00 UTC in daylight time, 21:00 UTC in standard time), and every 20 minutes from 15:00 to
+# 17:59 UTC covers early closes (17:00 or 18:00 UTC). Off the round minutes, where GitHub is
+# busiest. Runs outside a window only record a heartbeat. Scheduled workflows run only on the
+# default branch, and GitHub disables them after 60 days without repository activity.
+#
+# Every run records a heartbeat, and every cycle a record (hold or act) in the shared store
+# (engine/afterhours/bot/automation.py); `GET /v1/automation` reports them. A pre-close cycle
+# runs once per close: later runs in the same window see the completed record and stop. A
+# failed cycle fails the job and the next run in the window retries it.
 #
 # Missing configuration never fails the run: each job that lacks what it needs is skipped with a
 # notice naming the secret or variable to add (Settings > Secrets and variables > Actions).
@@ -14,8 +24,14 @@ name: Pre-close jobs
 
 on:
   schedule:
-    - cron: "23 * * * 1-5"
+    - cron: "7-59/10 18-20 * * 1-5"
+    - cron: "7-59/20 15-17 * * 1-5"
   workflow_dispatch:
+    inputs:
+      force_cycle:
+        description: "Run a manual cycle even outside a pre-close window (recorded as manual)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -59,31 +75,43 @@ jobs:
       - name: Install the engine
         if: steps.config.outputs.ready == 'true'
         run: uv sync --frozen --no-dev
-      - name: Inside a pre-close window?
+      - name: Heartbeat; inside a pre-close window?
         id: window
         if: steps.config.outputs.ready == 'true'
-        run: echo "due=$(uv run --frozen --no-dev afterhours pre-close)" >> "$GITHUB_OUTPUT"
+        run: |
+          due=$(uv run --frozen --no-dev afterhours pre-close --heartbeat \
+            --source "$GITHUB_EVENT_NAME" --run-ref "github-actions:$GITHUB_RUN_ID")
+          echo "due=$due" >> "$GITHUB_OUTPUT"
+          if [ "$due" = true ] || [ "$FORCE_CYCLE" = true ]; then
+            echo "cycle=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          FORCE_CYCLE: ${{ github.event_name == 'workflow_dispatch' && inputs.force_cycle }}
       - name: Restore the price cache
-        if: steps.window.outputs.due == 'true'
+        if: steps.window.outputs.cycle == 'true'
         uses: actions/cache@v6
         with:
           path: data/cache
           key: prices-${{ github.run_id }}
           restore-keys: prices-
       - name: Refresh every Stock Token's prices
-        if: steps.window.outputs.due == 'true'
+        if: steps.window.outputs.cycle == 'true'
         continue-on-error: true
         run: uv run --frozen --no-dev afterhours data fetch --stock-tokens > /dev/null
       - name: Bot pre-close cycle
-        if: steps.window.outputs.due == 'true'
+        if: steps.window.outputs.cycle == 'true'
         env:
           ALLOCATOR_PK: ${{ secrets.ALLOCATOR_PK }}
+          FORCE_CYCLE: ${{ github.event_name == 'workflow_dispatch' && inputs.force_cycle }}
         run: |
           if [ -z "$ALLOCATOR_PK" ]; then
             echo "::notice title=Bot cycle skipped::Add the secret ALLOCATOR_PK to run the allocator bot."
             exit 0
           fi
-          uv run --frozen --no-dev afterhours bot due
+          force=()
+          [ "$FORCE_CYCLE" = true ] && force=(--force)
+          uv run --frozen --no-dev afterhours bot due "${force[@]}" \
+            --source "$GITHUB_EVENT_NAME" --run-ref "github-actions:$GITHUB_RUN_ID"
       - name: Telegram pre-close alerts
         if: always() && steps.window.outputs.due == 'true'
         env:

@@ -478,6 +478,12 @@ class AlertsConfig(_Strict):
     webhook_path: str
 
 
+class AutomationConfig(_Strict):
+    history_cycles: PositiveInt
+    running_timeout_minutes: PositiveInt
+    lookback_days: PositiveInt
+
+
 class StateConfig(_Strict):
     kv_url_env: EnvName
     kv_token_env: EnvName
@@ -537,6 +543,7 @@ class AfterhoursConfig(BaseSettings):
     agents: AgentsConfig
     funding: FundingConfig
     state: StateConfig
+    automation: AutomationConfig
 
     @classmethod
     def settings_customise_sources(

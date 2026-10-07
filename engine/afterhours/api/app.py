@@ -279,7 +279,44 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
                 "last_cycle": plan.get("now") if plan else None,
                 "last_trigger": plan.get("trigger") if plan else None,
             },
+            # Process health stays "ok" when the bot is stale, so the host never restarts over
+            # it; the automation's own state is here and in full at /v1/automation.
+            "automation": automation_brief(),
         }
+
+    def automation_doc() -> dict[str, Any]:
+        from afterhours.bot.automation import status as automation_status
+
+        return automation_status(ctx.store, cfg, ctx.now(), deployed=bool(ctx.deployment))
+
+    def automation_brief() -> dict[str, Any]:
+        try:
+            doc = automation_doc()
+        except Exception as e:  # a store outage must not take process health down
+            log.warning("automation status unavailable: %s", type(e).__name__)
+            return {"status": "unknown", "healthy": None}
+        last = doc["last_cycle"] or {}
+        return {
+            "status": doc["status"],
+            "healthy": doc["healthy"],
+            "last_cycle_at": last.get("finished_at"),
+            "last_decision": last.get("decision"),
+            "missed_closes": len(doc["missed_closes"]),
+        }
+
+    @app.api_route("/v1/automation", methods=["GET", "HEAD"])
+    def automation(strict: bool = False) -> Any:
+        """Scheduled pre-close cycles: heartbeat, last cycle (hold or act), missed closes.
+
+        With `?strict=true` an unhealthy state answers 503, for an uptime monitor that should
+        alert on a bot that stopped running without restarting the API.
+        """
+        doc = automation_doc()
+        if strict and not doc["healthy"]:
+            from fastapi.responses import JSONResponse
+
+            return JSONResponse(doc, status_code=503)
+        return doc
 
     @app.get("/v1/config/public")
     def config_public() -> dict[str, Any]:

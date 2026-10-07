@@ -241,45 +241,102 @@ def bot_once(
     trigger: Annotated[str, typer.Option(help="Label recorded with the cycle.")] = "manual",
     dry_run: Annotated[bool, typer.Option(help="Plan without sending transactions.")] = False,
 ) -> None:
-    """Run one planning cycle now."""
-    from afterhours.bot.allocator import Allocator, dump
+    """Run one planning cycle now (recorded in the automation history as a manual cycle)."""
+    from afterhours.bot.allocator import Allocator
+    from afterhours.bot.automation import run_recorded
+    from afterhours.state import Store
 
     _logging()
-    typer.echo(dump(Allocator(load_config()).run_cycle(trigger, execute=not dry_run)))
+    cfg = load_config()
+    now = datetime.now(UTC)
+    out = run_recorded(
+        Store.for_profile(cfg),
+        cfg,
+        cycle_id=f"manual:cli:{now.isoformat()}",
+        kind="manual",
+        close=None,
+        source=f"cli:{trigger}",
+        run_ref=None,
+        make_runner=lambda: Allocator(cfg),
+        execute=not dry_run,
+    )
+    typer.echo(json.dumps(out, indent=2, default=str))
 
 
 @bot_app.command("due")
-def bot_due() -> None:
-    """One pre-close cycle per close, only inside the pre-close window (for scheduled jobs)."""
-    from afterhours.bot.allocator import Allocator, dump
-    from afterhours.bot.scheduler import pre_close_window
+def bot_due(
+    source: Annotated[str, typer.Option(help="What started this run (schedule, ...).")] = "cli",
+    run_ref: Annotated[str | None, typer.Option(help="CI run id, recorded with the cycle.")] = None,
+    force: Annotated[
+        bool, typer.Option(help="Run a manual cycle even outside a pre-close window.")
+    ] = False,
+) -> None:
+    """Scheduled jobs: heartbeat, then one recorded pre-close cycle per close (hold or act).
+
+    Inside a pre-close window the cycle's id is its close, so repeated invocations run it once.
+    A failed cycle is recorded as failed and exits non-zero; the next invocation retries it.
+    """
+    from afterhours.bot.allocator import Allocator
+    from afterhours.bot.automation import heartbeat, run_due
     from afterhours.deployments import deployment_path
     from afterhours.state import Store
 
     _logging()
     cfg = load_config()
-    close = pre_close_window(cfg, datetime.now(UTC))
-    if close is None:
-        typer.echo("not in a pre-close window; nothing to do")
-        return
+    store = Store.for_profile(cfg)
     if not deployment_path(cfg).exists():
+        heartbeat(store, cfg, datetime.now(UTC), source, run_ref)
         typer.echo(f"no deployment for {cfg.active_profile} yet; nothing to do")
         return
-    store = Store.for_profile(cfg)
-    done = store.read("pre_close_run")
-    if done and done.get("close") == close.isoformat():
-        typer.echo(f"already ran for the {close.isoformat()} close")
+    out = run_due(
+        store,
+        cfg,
+        source=source,
+        run_ref=run_ref,
+        make_runner=lambda: Allocator(cfg),
+        force=force,
+    )
+    if out["outcome"] == "not_due":
+        typer.echo("not in a pre-close window; heartbeat recorded, nothing to do")
         return
-    typer.echo(dump(Allocator(cfg).run_cycle("pre_close")))
-    store.write("pre_close_run", {"close": close.isoformat(), "at": datetime.now(UTC).isoformat()})
+    typer.echo(json.dumps(out, indent=2, default=str))
+
+
+@app.command("automation")
+def automation_cmd() -> None:
+    """Print the automation health: last cycle, last success, heartbeat, missed closes."""
+    from afterhours.bot.automation import status
+    from afterhours.deployments import deployment_path
+    from afterhours.state import Store
+
+    cfg = load_config()
+    doc = status(
+        Store.for_profile(cfg), cfg, datetime.now(UTC), deployed=deployment_path(cfg).exists()
+    )
+    typer.echo(json.dumps(doc, indent=2, default=str))
 
 
 @app.command("pre-close")
-def pre_close_cmd() -> None:
+def pre_close_cmd(
+    record_heartbeat: Annotated[
+        bool, typer.Option("--heartbeat", help="Record that a scheduled job ran.")
+    ] = False,
+    source: Annotated[str, typer.Option(help="What started this run.")] = "cli",
+    run_ref: Annotated[str | None, typer.Option(help="CI run id.")] = None,
+) -> None:
     """Print `true` inside a pre-close window, else `false` (scheduled jobs gate on it)."""
     from afterhours.bot.scheduler import pre_close_window
 
-    typer.echo("true" if pre_close_window(load_config(), datetime.now(UTC)) else "false")
+    cfg = load_config()
+    now = datetime.now(UTC)
+    if record_heartbeat:
+        from afterhours.bot.automation import heartbeat
+        from afterhours.state import Store
+
+        close = heartbeat(Store.for_profile(cfg), cfg, now, source, run_ref)
+    else:
+        close = pre_close_window(cfg, now)
+    typer.echo("true" if close else "false")
 
 
 @bot_app.command("run")

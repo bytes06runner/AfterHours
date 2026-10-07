@@ -430,6 +430,13 @@ state:
   cycle_lock_seconds: 900              # a bot cycle holds the lock at most this long
   checked_ttl_days: 7                  # pre-close bookkeeping expires after this
 
+# Scheduled pre-close cycles (bot/automation.py): every cycle is recorded, including holds, so
+# health can tell "ran and held" from "never ran".
+automation:
+  history_cycles: 60                   # cycle records kept in the shared store
+  running_timeout_minutes: 25          # a cycle still "running" after this died (job timeout 20)
+  lookback_days: 7                     # expected pre-close cycles checked over this many days
+
 # Web analytics: GoatCounter (goatcounter.com/help/start; aggregate counts, no IP addresses kept,
 # goatcounter.com/help/gdpr). The script comes only from script_src; each site's count endpoint
 # comes from the env var and must be on endpoint_domain. Counted per route change (help/spa).
