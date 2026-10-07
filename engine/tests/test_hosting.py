@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 import yaml
@@ -98,3 +99,56 @@ def test_cors_allows_the_configured_origin(monkeypatch: pytest.MonkeyPatch) -> N
     client = TestClient(create_app(cfg))
     res = client.get("/v1/config/public", headers={"Origin": site})
     assert res.headers.get("access-control-allow-origin") == site
+
+
+def test_timelock_plan_and_hardening_only_raise() -> None:
+    from eth_utils import keccak
+
+    from afterhours.chain.abi import encode_call
+    from afterhours.deploy import INCREASE_TIMELOCK, harden_timelocks, timelock_plan
+
+    cfg = load_config(load_env_file=False)
+    fns = cfg.vault.harden_timelock_functions
+    assert "setReceiveSharesGate(address)" in fns  # an exit gate
+    assert not any(f.startswith(("removeAdapter", "decrease")) for f in fns)  # de-risking stays
+    now = {fns[0]: 0, fns[1]: 86_400, fns[2]: 172_800}
+
+    def read(calls: list[Any]) -> list[Any]:
+        by_sel = {keccak(text=f)[:4]: f for f in fns}
+        if calls[0].signature.startswith("timelock"):
+            return [now.get(by_sel[c.args[0]], 0) for c in calls]
+        return [by_sel[c.args[0]] == fns[3] for c in calls]  # fns[3] abdicated
+
+    plan = timelock_plan(read, "0xVault", fns, 86_400)
+    by = {p["function"]: p["action"] for p in plan}
+    assert by[fns[0]] == "raise"
+    assert by[fns[1]] == "keep"
+    assert by[fns[2]] == "keep"  # never lowered
+    assert by[fns[3]] == "abdicated"
+    sent: list[tuple[str, str, tuple[Any, ...]]] = []
+
+    class Tx:
+        tx_hash = "0xabc"
+
+    def send(to: str, sig: str, *args: Any) -> Tx:
+        sent.append((to, sig, args))
+        return Tx()
+
+    txs = harden_timelocks(send, "0xVault", plan)
+    raises = [p for p in plan if p["action"] == "raise"]
+    assert len(txs) == 2 * len(raises)
+    sel0 = keccak(text=fns[0])[:4]
+    assert sent[0] == ("0xVault", "submit(bytes)", (encode_call(INCREASE_TIMELOCK, sel0, 86_400),))
+    assert sent[1] == ("0xVault", INCREASE_TIMELOCK, (sel0, 86_400))
+
+
+def test_hardening_refuses_mainnet_and_local_profiles() -> None:
+    from typer.testing import CliRunner
+
+    from afterhours.cli import app
+
+    runner = CliRunner()
+    for profile in ("rh-mainnet", "local", "fork"):
+        res = runner.invoke(app, ["harden-timelocks", "--profile", profile])
+        assert res.exit_code != 0
+        assert "not a testnet profile" in res.output

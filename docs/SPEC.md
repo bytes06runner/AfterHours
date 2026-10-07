@@ -292,6 +292,8 @@ APScheduler jobs built from the exchange calendar and `schedule` config: hourly,
 | `GET /v1/report-card` | Model and backtest artifacts |
 | `GET /v1/replay/scenarios` and `GET /v1/replay/{id}` | Replay scenarios and their time series for both strategies |
 | `POST /v1/sim/close-out`, `POST /v1/sim/shock` | Fork and simulated profiles only, requires the admin token |
+| `GET /v1/automation` | Scheduled pre-close cycles: heartbeat, last cycle and its decision (hold or act), missed closes; `?strict=true` answers 503 when unhealthy (added 2026-10-07: health could not tell "held" from "never ran") |
+| `GET /v1/live/curator` | Per live USDG Morpho market on mainnet: tonight's bad case against its cushion, the LLTV that survives, exit liquidity, borrower concentration, a recommendation (added 2026-10-07: the real market is curated, 96.7% lent at 62.5% LLTV) |
 | `GET /v1/stream` | Server-sent events: `status`, `plan_changed`, `tx_sent`, `tx_confirmed`, `reason_logged`, `vault_updated` |
 
 ## 9. Backtest and replay

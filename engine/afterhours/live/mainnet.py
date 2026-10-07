@@ -230,6 +230,14 @@ class Mainnet:
         self._symbols: dict[str, str | None] = {}
         self.store = cfg.path(cfg.paths.state_dir) / "live-markets.json"
         self.borrowers = cfg.path(cfg.paths.state_dir) / "live-borrowers.json"
+        # Curator view: Morpho's enabled LLTVs (M1 discovery) and borrowers per market.
+        self.enabled_lltvs: list[float] = [
+            float(x) for x in disc.get("lltvs", {}).get("values", [])
+        ]
+        self.borrowers_by_market = cfg.path(cfg.paths.state_dir) / "live-borrowers-by-market.json"
+        self._curator: tuple[float, dict[str, Any]] | None = None
+        self._curator_lock = threading.Lock()
+        self._scan_lock = threading.Lock()
 
     # ------------------------------------------------------------------ chain helpers
     def deadline(self) -> float:
@@ -651,6 +659,162 @@ class Mainnet:
         }
         self._board = (time.time(), doc)
         return doc
+
+    # ------------------------------------------------------------------ curator view
+    def curator(self, now: datetime | None = None, *, wait: bool = False) -> dict[str, Any]:
+        """Per live USDG Morpho market: tonight's bad case against its cushion (live/curator.py).
+
+        Reuses the risk board (forecast, feed state, regime) and adds each market's Morpho state
+        and borrower concentration. Cached like the board; raises `WarmingError` while the first
+        board is being read.
+        """
+        cached = self._curator
+        if cached and time.time() - cached[0] < self.cfg.live.board_cache_seconds:
+            return cached[1]
+        board = self.board(now, wait=wait)
+        with self._curator_lock:
+            cached = self._curator
+            if cached and time.time() - cached[0] < self.cfg.live.board_cache_seconds:
+                return cached[1]
+            doc = self._curator_now(board, wait=wait)
+            self._curator = (time.time(), doc)
+            return doc
+
+    def _curator_now(self, board: dict[str, Any], *, wait: bool = False) -> dict[str, Any]:
+        from afterhours.live import curator as cur
+
+        block = int(board["block"])
+        deadline = self.deadline()
+        markets = [m for m in self.markets() if m.loan_token == self.usdg]
+        states = call_many(
+            self.w3,
+            [Call(self.blue, MARKET, (bytes.fromhex(m.id[2:]),)) for m in markets],
+            block=block,
+            deadline=deadline,
+        )
+        unit = 10 ** self.decimals([self.usdg], block, deadline)[self.usdg]
+        live: list[tuple[dict[str, Any], tuple[int, ...]]] = []
+        for m, st in zip(markets, states, strict=True):
+            if st is None:
+                continue
+            supplied, borrowed = int(st[0]) / unit, int(st[2]) / unit
+            if supplied < self.cfg.curator.min_supplied_usdg:
+                continue
+            row = {
+                "id": m.id,
+                "symbol": m.symbol,
+                "lltv": m.lltv,
+                "supplied": supplied,
+                "borrowed": borrowed,
+            }
+            live.append((row, tuple(int(x) for x in st)))
+        conc, scanned = self.concentration(live, block, deadline, wait=wait)
+        by_symbol = {r["symbol"]: r for r in board["stocks"]}
+        rows = [
+            cur.market_row(
+                self.cfg, m, by_symbol.get(m["symbol"]), self.enabled_lltvs, conc.get(m["id"])
+            )
+            for m, _ in live
+        ]
+        order = list(cur.LABELS)
+        rows.sort(key=lambda r: (order.index(r["recommendation"]), -r["borrowed_usdg"]))
+        supplied = sum(r["supplied_usdg"] for r in rows)
+        borrowed = sum(r["borrowed_usdg"] for r in rows)
+        return {
+            "network": board["network"],
+            "block": block,
+            "as_of": board["as_of"],
+            "markets": rows,
+            "totals": {
+                "markets": len(rows),
+                "supplied_usdg": supplied,
+                "borrowed_usdg": borrowed,
+                "utilization": borrowed / supplied if supplied else 0.0,
+            },
+            "summary": cur.summarize(rows),
+            "enabled_lltvs": self.enabled_lltvs,
+            "coverage": self.risk.coverage,
+            "borrowers_scanned_to_block": scanned,
+            "policy": {
+                "margin_fraction": self.cfg.policy.pullback_fraction,
+                "watch_utilization": self.cfg.curator.watch_utilization,
+                "concentration_watch_share": self.cfg.curator.concentration_watch_share,
+            },
+            "method": "engine/afterhours/live/curator.py",
+        }
+
+    def concentration(
+        self,
+        live: list[tuple[dict[str, Any], tuple[int, ...]]],
+        block: int,
+        deadline: float | None,
+        *,
+        wait: bool = False,
+    ) -> tuple[dict[str, dict[str, Any]], int | None]:
+        """Borrowers per market with open debt, and the largest one's share of the debt.
+
+        Borrowers come from Morpho `Borrow` events (`live-borrowers-by-market.json`, scanned
+        incrementally in the background; empty until the first scan ends), and each one's debt
+        from `position()` borrow shares against the market's total at `block`.
+        """
+        doc = self._load(self.borrowers_by_market, "live_borrowers_by_market")
+        stale = doc is None or time.time() - doc.get("scanned_at", 0) >= (
+            self.cfg.live.market_refresh_minutes * 60
+        )
+        if stale and wait:
+            with self._scan_lock:
+                doc = self._scan_borrowers(doc)
+        elif stale and self._scan_lock.acquire(blocking=False):
+
+            def run(prev: dict[str, Any] | None) -> None:
+                try:
+                    self._scan_borrowers(prev)
+                except Exception as exc:  # the next request tries again
+                    log.warning("borrower scan failed: %s", type(exc).__name__)
+                finally:
+                    self._scan_lock.release()
+
+            threading.Thread(target=run, args=(doc,), daemon=True).start()
+        if doc is None:
+            return {}, None
+        by_market: dict[str, list[str]] = doc["by_market"]
+        pairs = [
+            (m, st, who)
+            for m, st in live
+            if m["borrowed"] > 0
+            for who in by_market.get(m["id"], [])
+        ]
+        pos = call_many(
+            self.w3,
+            [Call(self.blue, POSITION, (bytes.fromhex(m["id"][2:]), who)) for m, _, who in pairs],
+            block=block,
+            deadline=deadline,
+        )
+        shares: dict[str, list[float]] = {}
+        for (m, st, _), p in zip(pairs, pos, strict=True):
+            if p and int(p[1]) > 0 and st[3] > 0:
+                shares.setdefault(m["id"], []).append(int(p[1]) / st[3])
+        out = {mid: {"count": len(v), "top_share": max(v)} for mid, v in shares.items()}
+        return out, int(doc["last_block"])
+
+    def _scan_borrowers(self, doc: dict[str, Any] | None) -> dict[str, Any]:
+        """Add `Borrow` events since the last scan: borrower addresses by market id."""
+        head = self.block()
+        start = doc["last_block"] + 1 if doc else 0
+        by_market: dict[str, list[str]] = {
+            k: list(v) for k, v in (doc or {}).get("by_market", {}).items()
+        }
+        if start <= head:
+            span = self.cfg.discovery.oracle_study.max_log_block_range * 20
+            for ev in get_logs(self.w3_logs, BORROW, [self.blue], start, head, max_range=span):
+                mid = "0x" + bytes(ev["id"]).hex()
+                who = str(to_checksum_address(ev["onBehalf"]))
+                seen = by_market.setdefault(mid, [])
+                if who not in seen:
+                    seen.append(who)
+        out = {"last_block": head, "scanned_at": time.time(), "by_market": by_market}
+        self._save(self.borrowers_by_market, "live_borrowers_by_market", out)
+        return out
 
     # ------------------------------------------------------------------ positions
     def positions(self, address: str, now: datetime | None = None) -> dict[str, Any]:

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 
@@ -372,19 +372,8 @@ def testnet_keys_cmd() -> None:
     typer.echo(f"Deployer address: {who['DEPLOYER_PK']}")
 
 
-@app.command("fund-allocator")
-def fund_allocator_cmd(
-    profile: Annotated[str, typer.Option(help="A testnet profile: rh-testnet or arb-sepolia.")],
-    yes: Annotated[bool, typer.Option("--yes", help="Send without asking.")] = False,
-) -> None:
-    """Send testnet ETH from the deployer to the allocator (keys from .env, never printed)."""
-    from eth_utils.address import to_checksum_address
-
-    from afterhours.chain.rpc import connect
-    from afterhours.chain.tx import Signer
-    from afterhours.deploy import addresses, role_keys
-
-    cfg = load_config()
+def _testnet_chain(cfg: Any, profile: str) -> Any:
+    """The chain of a testnet profile; refuses mainnet, local and unknown profiles."""
     prof = cfg.profiles.get(profile)
     chain = cfg.chains[prof.chain] if prof else None
     # Testnets only: a chain with a faucet, no local node, no mainnet go required.
@@ -393,7 +382,30 @@ def fund_allocator_cmd(
     )
     if not prof or not chain or not testnet:
         raise typer.BadParameter(f"{profile} is not a testnet profile with a faucet")
-    keys = role_keys(cfg, profile, ("DEPLOYER_PK", "ALLOCATOR_PK"))
+    return chain
+
+
+@app.command("fund-allocator")
+def fund_allocator_cmd(
+    profile: Annotated[str, typer.Option(help="A testnet profile: rh-testnet or arb-sepolia.")],
+    yes: Annotated[bool, typer.Option("--yes", help="Send without asking.")] = False,
+    role: Annotated[
+        str, typer.Option(help="Who gets the gas: allocator (funding.allocator_eth) or guardian.")
+    ] = "allocator",
+) -> None:
+    """Send testnet ETH from the deployer to the allocator or guardian (keys never printed)."""
+    from eth_utils.address import to_checksum_address
+
+    from afterhours.chain.rpc import connect
+    from afterhours.chain.tx import Signer
+    from afterhours.deploy import addresses, role_keys
+
+    cfg = load_config()
+    if role not in ("allocator", "guardian"):
+        raise typer.BadParameter("role must be allocator or guardian")
+    chain = _testnet_chain(cfg, profile)
+    target = f"{role.upper()}_PK"
+    keys = role_keys(cfg, profile, ("DEPLOYER_PK", target))
     who = addresses(keys)
     w3 = connect(cfg.rpc_url(profile))
 
@@ -403,22 +415,74 @@ def fund_allocator_cmd(
     if chain.chain_id and int(w3.eth.chain_id) != chain.chain_id:
         raise typer.BadParameter(f"RPC answers chain {w3.eth.chain_id}, expected {chain.chain_id}")
     unit = chain.native_currency.symbol
-    amount = int(cfg.funding.allocator_eth * 10**18)
+    eth = cfg.funding.allocator_eth if role == "allocator" else cfg.funding.guardian_eth
+    amount = int(eth * 10**18)
     keep = int(cfg.funding.keep_deployer_eth * 10**18)
     have = balance("DEPLOYER_PK")
     typer.echo(f"{chain.name}: deployer {who['DEPLOYER_PK']} has {have / 1e18:.6f} {unit}")
-    typer.echo(f"allocator {who['ALLOCATOR_PK']} has {balance('ALLOCATOR_PK') / 1e18:.6f} {unit}")
+    typer.echo(f"{role} {who[target]} has {balance(target) / 1e18:.6f} {unit}")
     if have < amount + keep:
         raise typer.BadParameter(
             f"the deployer needs at least {(amount + keep) / 1e18} {unit}: "
             f"fund it at {chain.faucet_url}"
         )
-    if not yes and not typer.confirm(f"Send {amount / 1e18} {unit} to the allocator?"):
+    if not yes and not typer.confirm(f"Send {amount / 1e18} {unit} to the {role}?"):
         raise typer.Exit(1)
-    sent = Signer(w3, keys["DEPLOYER_PK"]).transfer(who["ALLOCATOR_PK"], amount)
+    sent = Signer(w3, keys["DEPLOYER_PK"]).transfer(who[target], amount)
     link = f"{chain.explorer_url}/tx/{sent.tx_hash}" if chain.explorer_url else sent.tx_hash
     typer.echo(f"sent: {link}")
-    typer.echo(f"allocator now has {balance('ALLOCATOR_PK') / 1e18:.6f} {unit}")
+    typer.echo(f"{role} now has {balance(target) / 1e18:.6f} {unit}")
+
+
+@app.command("harden-timelocks")
+def harden_timelocks_cmd(
+    profile: Annotated[str, typer.Option(help="A testnet profile: rh-testnet or arb-sepolia.")],
+    yes: Annotated[bool, typer.Option("--yes", help="Send without asking.")] = False,
+) -> None:
+    """Timelock the vault's exit gates, adapter registry and fee setters (curator key; testnet).
+
+    Prints each function's current timelock first and sends nothing unless confirmed. Raises
+    only, to `vault.timelock_seconds`; never lowers or abdicates anything.
+    """
+    from afterhours.chain.rpc import call_many, connect
+    from afterhours.chain.tx import Signer
+    from afterhours.deploy import harden_timelocks, role_keys, timelock_plan
+    from afterhours.deployments import load_deployment
+
+    cfg = load_config()
+    chain = _testnet_chain(cfg, profile)
+    deployment = load_deployment(cfg, profile)
+    if not deployment:
+        raise typer.BadParameter(f"no deployments/{profile}.json")
+    vault = deployment["vault"]["address"]
+    w3 = connect(cfg.rpc_url(profile))
+    if chain.chain_id and int(w3.eth.chain_id) != chain.chain_id:
+        raise typer.BadParameter(f"RPC answers chain {w3.eth.chain_id}, expected {chain.chain_id}")
+    seconds = int(cfg.vault.timelock_seconds or 0)
+    if seconds <= 0:
+        raise typer.BadParameter("vault.timelock_seconds is not set")
+    plan = timelock_plan(
+        lambda calls: call_many(w3, calls), vault, cfg.vault.harden_timelock_functions, seconds
+    )
+    typer.echo(f"{chain.name}: vault {vault}")
+    for p in plan:
+        typer.echo(f"  {p['function']:<42} {p['current']:>7} s -> {p['action']}")
+    todo = [p for p in plan if p["action"] == "raise"]
+    if not todo:
+        typer.echo("nothing to raise")
+        return
+    if not yes and not typer.confirm(
+        f"Raise {len(todo)} timelocks to {seconds} s with the curator key ({2 * len(todo)} txs)?"
+    ):
+        raise typer.Exit(1)
+    curator = Signer(w3, role_keys(cfg, profile, ("CURATOR_PK",))["CURATOR_PK"])
+    for tx in harden_timelocks(curator.send, vault, plan):
+        typer.echo(f"sent: {chain.explorer_url}/tx/{tx}" if chain.explorer_url else f"sent: {tx}")
+    after = timelock_plan(
+        lambda calls: call_many(w3, calls), vault, cfg.vault.harden_timelock_functions, seconds
+    )
+    left = [p["function"] for p in after if p["action"] == "raise"]
+    typer.echo("all raised" if not left else f"still short: {', '.join(left)}")
 
 
 state_app = typer.Typer(no_args_is_help=True, help="Bot history storage.")

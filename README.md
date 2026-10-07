@@ -25,6 +25,7 @@ target Arbitrum Sepolia (rehearsed on a fork); nothing is deployed on Arbitrum y
 | --- | --- | --- |
 | Lending vault (Morpho Vault V2, three tiers per stock, onchain reason registry) | Robinhood Chain Testnet, simulated tokens | Deployed 2026-09-27. A GitHub Actions schedule runs the pre-close cycle and records every run, hold or act, at [`/v1/automation`](https://afterhours-api.onrender.com/v1/automation). Until 2026-10-07 the old schedule never fired inside a pre-close window; the last cycle was manual (2026-09-27) |
 | Risk board, price regime monitor, position checker | Robinhood Chain mainnet, read-only | Live on the web app and API |
+| Curator view: which LLTV survives tonight, per live Morpho market | Robinhood Chain mainnet, read-only | New on 2026-10-07: [`/curators`](https://after-hours-web-eta.vercel.app/curators) and `GET /v1/live/curator` (needs the next deploy) |
 | Telegram alerts (`/watch NVDA`, `/watch 0x...`) | [@afterhours_time_bot](https://t.me/afterhours_time_bot) | Commands work (`/watch`, `/list`, `/stop`). Pre-close alerts run in the same scheduled job; none has been sent yet |
 | Weekend risk for AI agents (MCP server and REST) | Your machine (MCP, stdio) calling the hosted API | Live; install in one config block |
 | Backtest, replays, report card | Historical stock prices, simulated vault | Published with every run in `artifacts/` |
@@ -46,6 +47,7 @@ target Arbitrum Sepolia (rehearsed on a fork); nothing is deployed on Arbitrum y
 - [The problem](#the-problem)
 - [How it works](#how-it-works)
 - [What you can use today](#what-you-can-use-today)
+- [For curators](#for-curators)
 - [For AI agents](#for-ai-agents)
 - [Results](#results)
 - [Architecture](#architecture)
@@ -172,6 +174,31 @@ case reaches a market's cushion (a stock) or a loan's liquidation price (a walle
 arrive through a webhook on the API; the checks run in the scheduled GitHub Actions job, which
 had not run inside a pre-close window before 2026-10-07, so no pre-close alert has been sent yet. Running your own
 copy: [docs/HOSTING.md](docs/HOSTING.md), steps 2 and 7.
+
+## For curators
+
+The people who carry the weekend gap today are the curators funding Stock Token markets on
+Morpho: on 2026-10-07 those markets were 96.7% lent, almost all at 62.5% LLTV. The curator view
+([`/curators`](https://after-hours-web-eta.vercel.app/curators), `GET /v1/live/curator`) answers
+one question per live USDG market before each close: which LLTV survives tonight?
+
+For every market it shows tonight's calibrated bad case against the market's cushion (1 minus
+LLTV minus Morpho's liquidation incentive), the highest enabled LLTV whose cushion the bad case
+does not reach, utilization and exit liquidity (what lenders could withdraw now), borrower
+concentration from Morpho `Borrow` events and `position()`, the feed's state and price regime,
+and one recommendation:
+
+| Call | When |
+| --- | --- |
+| Reduce cap | Tonight's bad case reaches the cushion: a loan at the limit could be left with bad debt |
+| Do not increase | Inside the cushion, but past the margin Afterhours' own vault keeps (40% of the cushion) |
+| Watch | The bad case fits, but almost all of the market is lent (`curator.watch_utilization` in config), so lenders can barely withdraw, or one borrower holds half the debt or more |
+| Survives the modelled bad case | Inside the cushion with the vault's margin |
+
+It reuses the risk board's forecast (no second model) and is read-only. "Survives" means
+survives the modelled bad case, which the forecast targets at 1% of closed periods and which
+held-out years beat more often on weekends (1.73%) and holidays (2.74%). The logic is
+`engine/afterhours/live/curator.py`; screenshots in `artifacts/screens/curators/`.
 
 ## For AI agents
 

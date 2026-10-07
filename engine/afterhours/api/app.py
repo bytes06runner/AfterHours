@@ -685,6 +685,13 @@ def create_app(cfg: AfterhoursConfig | None = None) -> FastAPI:
     def live_board() -> dict[str, Any]:
         return cast(dict[str, Any], _live(lambda: ctx.mainnet().board()))
 
+    @app.get("/v1/live/curator")
+    def live_curator() -> dict[str, Any]:
+        """Per live USDG Morpho market against a Stock Token: tonight's bad case against the
+        market's cushion, the highest LLTV that survives it, exit liquidity, borrower
+        concentration and one recommendation. Read-only."""
+        return cast(dict[str, Any], _live(lambda: ctx.mainnet().curator()))
+
     def regimes_doc() -> dict[str, Any]:
         from afterhours.live.mainnet import WarmingError
 

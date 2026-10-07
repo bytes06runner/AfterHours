@@ -580,6 +580,35 @@
       "title": "ConformalConfig",
       "type": "object"
     },
+    "CuratorConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "concentration_watch_share": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Concentration Watch Share",
+          "type": "number"
+        },
+        "min_supplied_usdg": {
+          "minimum": 0,
+          "title": "Min Supplied Usdg",
+          "type": "number"
+        },
+        "watch_utilization": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Watch Utilization",
+          "type": "number"
+        }
+      },
+      "required": [
+        "watch_utilization",
+        "min_supplied_usdg",
+        "concentration_watch_share"
+      ],
+      "title": "CuratorConfig",
+      "type": "object"
+    },
     "DataConfig": {
       "additionalProperties": false,
       "properties": {
@@ -1001,6 +1030,11 @@
           "title": "Faucet Profile",
           "type": "string"
         },
+        "guardian_eth": {
+          "exclusiveMinimum": 0,
+          "title": "Guardian Eth",
+          "type": "number"
+        },
         "keep_deployer_eth": {
           "exclusiveMinimum": 0,
           "title": "Keep Deployer Eth",
@@ -1010,6 +1044,7 @@
       "required": [
         "allocator_eth",
         "curator_eth",
+        "guardian_eth",
         "keep_deployer_eth",
         "faucet_profile"
       ],
@@ -2229,6 +2264,13 @@
           "title": "Depth Multiplier",
           "type": "number"
         },
+        "harden_timelock_functions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Harden Timelock Functions",
+          "type": "array"
+        },
         "market_cap_usdg": {
           "exclusiveMinimum": 0,
           "title": "Market Cap Usdg",
@@ -2369,6 +2411,9 @@
       "title": "Chains",
       "type": "object"
     },
+    "curator": {
+      "$ref": "#/$defs/CuratorConfig"
+    },
     "data": {
       "$ref": "#/$defs/DataConfig"
     },
@@ -2457,7 +2502,8 @@
     "agents",
     "funding",
     "state",
-    "automation"
+    "automation",
+    "curator"
   ],
   "title": "Afterhours configuration",
   "type": "object"

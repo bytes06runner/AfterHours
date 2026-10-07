@@ -11,7 +11,8 @@ const NAV = [
   { href: "/replay", label: "Replay" },
   { href: "/report-card", label: "Report card" },
   { href: "/live", label: "Risk board" },
-  { href: "/positions", label: "Check a position" },
+  { href: "/curators", label: "Curators" },
+  { href: "/positions", label: "Positions" },
   { href: "/agents", label: "Agents" },
 ];
 
@@ -21,9 +22,16 @@ export function SiteHeader() {
       <Link href="/" className="font-display text-[24px] no-underline sm:text-[28px]">
         Afterhours
       </Link>
-      <nav aria-label="Main" className="ml-4 hidden gap-6 text-[16px] font-semibold xl:flex">
+      <nav
+        aria-label="Main"
+        className="ml-4 hidden gap-5 text-[16px] font-semibold xl:flex 2xl:gap-6"
+      >
         {NAV.map((n) => (
-          <Link key={n.href} href={n.href} className="no-underline hover:underline">
+          <Link
+            key={n.href}
+            href={n.href}
+            className="whitespace-nowrap no-underline hover:underline"
+          >
             {n.label}
           </Link>
         ))}

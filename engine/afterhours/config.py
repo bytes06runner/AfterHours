@@ -120,6 +120,7 @@ class VaultConfig(_Strict):
     depth_multiplier: Annotated[float, Field(gt=0)]
     max_slippage: Fraction
     market_cap_usdg: Annotated[float, Field(gt=0)]
+    harden_timelock_functions: list[str] = Field(default_factory=list)
 
 
 class OnchainSelection(_Strict):
@@ -423,6 +424,12 @@ class LiveConfig(_Strict):
     board_snapshot_minutes: PositiveInt
 
 
+class CuratorConfig(_Strict):
+    watch_utilization: Annotated[float, Field(gt=0, le=1)]
+    min_supplied_usdg: NonNegativeFloat
+    concentration_watch_share: Annotated[float, Field(gt=0, le=1)]
+
+
 class RegimeWeights(_Strict):
     staleness: NonNegativeFloat
     divergence: NonNegativeFloat
@@ -461,6 +468,7 @@ class AgentsConfig(_Strict):
 class FundingConfig(_Strict):
     allocator_eth: PositiveFloat
     curator_eth: PositiveFloat
+    guardian_eth: PositiveFloat
     keep_deployer_eth: PositiveFloat
     faucet_profile: str
 
@@ -544,6 +552,7 @@ class AfterhoursConfig(BaseSettings):
     funding: FundingConfig
     state: StateConfig
     automation: AutomationConfig
+    curator: CuratorConfig
 
     @classmethod
     def settings_customise_sources(
